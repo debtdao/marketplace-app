@@ -145,7 +145,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'completed'}
+          transactionCompletedLabel={t('components.transaction.success-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>
@@ -157,7 +157,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'could not cancel proposed deal'}
+          transactionCompletedLabel={t('components.transaction.revoke-consent.error-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>

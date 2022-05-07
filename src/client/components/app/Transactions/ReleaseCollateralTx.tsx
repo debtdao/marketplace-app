@@ -237,7 +237,7 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'completed'}
+          transactionCompletedLabel={t('components.transaction.success-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>
@@ -249,7 +249,7 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'could not release collateral'}
+          transactionCompletedLabel={t('components.transaction.release-collateral.error-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>

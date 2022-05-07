@@ -175,7 +175,8 @@
         "bad-line": {
           "title": "This line can not be deposited into",
           "body": "Your chosen line is not in a healthy state. You can find more lines to deposit into back in the marketplace."
-        }
+        },
+        "error-message": "could not add credit"
       },
       "add-collateral": {
         "header": "Setup deal terms",
@@ -190,7 +191,8 @@
           "find-cta": "Go to Discord",
           "login-cta": "Login as Arbiter",
           "enable-cta": "Enable token"
-        }
+        },
+        "error-message": "could not add collateral"
       },
       "deposit-collateral": {
         "header": "Deposit Collateral",
@@ -199,13 +201,14 @@
 
       "release-collateral": {
         "header": "Release Collateral",
-        "select-token": "The Token Used As Collateral"
-
+        "select-token": "The Token Used As Collateral",
+        "error-message": "could not release collateral"
       },
       "arbiter-liquidate": {
         "header": "Liquidate Borrowers",
         "select-credit": "1. Select a borrower to liquidate",
-        "select-token": "2. Select token and amount"
+        "select-token": "2. Select token and amount",
+        "error-message": "could not liquidate collateral"
       },
       "deploy-line": {
         "header": "Deploy Credit Line",
@@ -216,13 +219,16 @@
         "cratio": "3. Select a Collateralization Ratio",
         "cratio-input": "Collaterization Ratio",
         "revenue-split": "4. Select a Revenue Split",
-        "revenue-split-input": "Revenue Split"
+        "revenue-split-input": "Revenue Split",
+        "error-message": "could not deploy line",
+        "success-message": "deployed line successfully"
       },
       "borrow-credit": {
         "header": "Borrow",
         "select-line": "1. Select a Position:",
         "select-amount": "2. Amount to Borrow:",
-        "your-rates": "3. Your Rates:"
+        "your-rates": "3. Your Rates:",
+        "error-message": "could not borrow credit"
       },
       "repay": {
         "header": "Repay",
@@ -240,7 +246,8 @@
         "deposit-and-repay": {
           "title": "Deposit & repay",
           "desc": "from your wallet",
-          "cta": "Deposit & Repay"
+          "cta": "Deposit & Repay",
+          "error-message": "could not deposit and repay"
         },
         "deposit-and-close": {
           "title": "Repay & close",
@@ -273,7 +280,8 @@
       "withdraw-credit": {
         "header": "Withdraw",
         "select-line": "1. Selected line to withdraw",
-        "select-amount": "2. Select amount to withdraw"
+        "select-amount": "2. Select amount to withdraw",
+        "error-message": "could not withdraw credit"
       },
       "revoke-consent": {
         "header": "Cancel Proposed Deal",
@@ -286,7 +294,8 @@
           "facility-rate": "Facility Rate",
           "drawn-rate": "Drawn Rate"
         },
-        "lender-address": "Ethereum Address"
+        "lender-address": "Ethereum Address",
+        "error-message": "could not cancel proposed deal"
       },
       "enable-spigot": {
         "header":"Enable Spigot",
@@ -309,9 +318,12 @@
         "claim-data-input": "Hexcode (0xdebfda05....)",
         "cta": "Claim",
         "claim-operator-tokens":{
-          "cta":"Claim Operator Tokens"
-        }
-      }
+          "cta":"Claim Operator Tokens",
+          "error-message": "could not claim operator tokens"
+        },
+        "error-message": "could not claim revenue"
+      },
+      "success-message": "completed"
     }
   },
   "dashboard": {

@@ -172,7 +172,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'completed'}
+          transactionCompletedLabel={t('components.transaction.success-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>
@@ -184,7 +184,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'could not borrow credit'}
+          transactionCompletedLabel={t('components.transaction.withdraw-credit.error-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>

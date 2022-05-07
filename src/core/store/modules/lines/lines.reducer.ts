@@ -118,9 +118,8 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
 
     .addCase(setProposal, (state, { payload: { lineAddress, positionId, proposalId } }) => {
-      const { revokedAt: oldRevokedAt, ...rest } = state.positionsMap[positionId]?.proposalsMap[proposalId];
-      const revokedAt = 1234; // TODO: replace with actual time the proposal was revoked
-      const updatedProposal = { revokedAt, ...rest };
+      const { revokedAt, ...rest } = state.positionsMap[positionId]?.proposalsMap[proposalId];
+      const updatedProposal = { ...rest, revokedAt: 1234 }; // TODO: replace with actual time the proposal was revoked
       state.positionsMap[positionId].proposalsMap[proposalId] = updatedProposal;
     })
     /* -------------------------------------------------------------------------- */

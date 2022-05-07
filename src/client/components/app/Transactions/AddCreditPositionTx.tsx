@@ -245,7 +245,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         dispatch(
           LinesActions.setPosition({
             id: selectedPosition.id,
-            position: selectedPosition, // TODO: this looks incorrect. set to updatedPosition?
+            position: updatedPosition,
           })
         );
         setTransactionCompleted(1);
@@ -298,7 +298,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'completed'}
+          transactionCompletedLabel={t('components.transaction.success-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>
@@ -310,7 +310,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'could not add credit'}
+          transactionCompletedLabel={t('components.transaction.add-credit.error-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>

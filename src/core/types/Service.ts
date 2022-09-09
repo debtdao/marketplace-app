@@ -19,6 +19,8 @@ import {
   Network,
   TokenAllowance,
 } from '@types';
+import { BigNumberish } from "ethers";
+import { BytesLike } from "@ethersproject/bytes/src.ts";
 
 // *************** USER ***************
 
@@ -123,6 +125,19 @@ export interface MigrateProps {
 // *************** LOAN ***************
 export interface CreditLineService {
   getCreditLines: (props: GetCreditLinesProps) => Promise<CreditLine[]>;
+
+  addCredit: (drate: BigNumberish,
+              frate: BigNumberish,
+              amount: BigNumberish,
+              token: Address,
+              lender: Address) => Promise<TransactionResponse>;
+  close: (id: BytesLike) => Promise<TransactionResponse>;
+  setRates: (
+    id: BytesLike,
+    drate: BigNumberish,
+    frate: BigNumberish
+  ) => Promise<TransactionResponse>;
+  increaseCredit: (id: BytesLike, amount: BigNumberish) => Promise<TransactionResponse>;
 }
 
 export interface GetCreditLinesProps {
@@ -215,6 +230,7 @@ export interface ExecuteTransactionProps {
   abi: any;
   contractAddress: Address;
 }
+
 export interface HandleTransactionProps {
   tx: TransactionResponse;
   network: Network;

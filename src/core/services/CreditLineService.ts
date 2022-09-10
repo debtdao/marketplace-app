@@ -186,7 +186,7 @@ export class CreditLineServiceImpl implements CreditLineService {
   public async getCredit(contractAddress: Address, id: BytesLike): Promise<Address> {
     try {
       const contract = getContract(contractAddress, this.abi, this.web3Provider.getInstanceOf('ethereum'));
-      return await contract.credits(id);
+      return (await contract.credits(id)).lender;
     } catch (e) {
       console.log(`An error occured while getting credit [${contractAddress}] with id [${id}], error = [${JSON.stringify(e)}]`);
       return Promise.reject(false);

@@ -5,12 +5,14 @@ import {
   TransactionService,
   Web3Provider,
   Config,
-  GetCreditLinesProps, Address, TransactionResponse,
+  GetCreditLinesProps, Address, TransactionResponse, STATUS,
 } from '@types';
 import { getConfig } from '@config';
-import { BigNumberish } from "ethers";
+import { BigNumberish, ethers, PopulatedTransaction } from "ethers";
 import { lineOfCreditABI } from "@services/contracts";
 import { BytesLike } from "@ethersproject/bytes/src.ts";
+import { getContract } from "@frameworks/ethers";
+import { keccak256 } from "ethers/lib/utils";
 
 export class CreditLineServiceImpl implements CreditLineService {
   private graphUrl: string;
@@ -39,17 +41,43 @@ export class CreditLineServiceImpl implements CreditLineService {
   }
 
   public async getCreditLines(params: GetCreditLinesProps): Promise<CreditLine[]> {
-    // graphURL
-    return [];
+    const result = await fetch(`${this.graphUrl}/subgraphs/name/LineOfCredit/loan`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: `
+      query {
+        Borrower {
+          id          
+        }
+        Lender {
+          id          
+        }
+    }`
+      }),
+    })
+    return await result.json();
   }
 
   public async addCredit(drate: BigNumberish,
                          frate: BigNumberish,
                          amount: BigNumberish,
                          token: Address,
-                         lender: Address): Promise<TransactionResponse> {
-    let tx;
+                         lender: Address,
+                         dryRun: boolean): Promise<TransactionResponse | PopulatedTransaction> {
+
     try {
+      if (dryRun) {
+        return await this.transactionService.populateTransaction({
+          network: "mainnet",
+          args: [drate, frate, amount, token, lender],
+          methodName: "addCredit",
+          abi: this.abi,
+          contractAddress: "" // Either read from config or from params 
+        })
+      }
+
+      let tx;
       tx = await this.transactionService.execute(
         {
           network: "mainnet",
@@ -62,7 +90,7 @@ export class CreditLineServiceImpl implements CreditLineService {
       await tx.wait();
       return tx
     } catch (e) {
-      console.log(`An error occured while adding credit by [${tx?.from}], error = [${JSON.stringify(e)}]`);
+      console.log(`An error occured while adding credit, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
     }
   }
@@ -90,10 +118,22 @@ export class CreditLineServiceImpl implements CreditLineService {
   public async setRates(
     id: BytesLike,
     drate: BigNumberish,
-    frate: BigNumberish
-  ): Promise<TransactionResponse> {
-    let tx;
+    frate: BigNumberish,
+    dryRun: boolean
+  ): Promise<TransactionResponse | PopulatedTransaction> {
     try {
+      if (dryRun) {
+        return await this.transactionService.populateTransaction({
+            network: "mainnet",
+            args: [id, drate, frate],
+            methodName: "setRates",
+            abi: this.abi,
+            contractAddress: "" // Either read from config or from params 
+          }
+        )
+      }
+
+      let tx;
       tx = await this.transactionService.execute(
         {
           network: "mainnet",
@@ -106,14 +146,26 @@ export class CreditLineServiceImpl implements CreditLineService {
       await tx.wait();
       return tx
     } catch (e) {
-      console.log(`An error occured while setRate of CreditLine [${id}] by [${tx?.from}], error = [${JSON.stringify(e)}]`);
+      console.log(`An error occured while setRate of CreditLine [${id}], error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
     }
   }
 
-  public async increaseCredit(id: BytesLike, amount: BigNumberish): Promise<TransactionResponse> {
-    let tx;
+  public async increaseCredit(id: BytesLike, amount: BigNumberish, dryRun: boolean): Promise<TransactionResponse | PopulatedTransaction> {
+
     try {
+      if (dryRun) {
+        return await this.transactionService.populateTransaction({
+            network: "mainnet",
+            args: [id, amount],
+            methodName: "increaseCredit",
+            abi: this.abi,
+            contractAddress: "" // Either read from config or from params 
+          }
+        )
+      }
+
+      let tx;
       tx = await this.transactionService.execute(
         {
           network: "mainnet",
@@ -126,8 +178,40 @@ export class CreditLineServiceImpl implements CreditLineService {
       await tx.wait();
       return tx
     } catch (e) {
-      console.log(`An error occured while increaseCredit of CreditLine [${id}] by [${tx?.from}], error = [${JSON.stringify(e)}]`);
+      console.log(`An error occured while increaseCredit of CreditLine [${id}], error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
+    }
+  }
+
+  public async getCredit(contractAddress: Address, id: BytesLike): Promise<Address> {
+    try {
+      const contract = getContract(contractAddress, this.abi, this.web3Provider.getInstanceOf('ethereum'));
+      return await contract.credits(id);
+    } catch (e) {
+      console.log(`An error occured while getting credit [${contractAddress}] with id [${id}], error = [${JSON.stringify(e)}]`);
+      return Promise.reject(false);
+    }
+  }
+
+
+  public async isActive(contractAddress: Address): Promise<boolean> {
+    try {
+      const contract = getContract(contractAddress, this.abi, this.web3Provider.getInstanceOf('ethereum'));
+      return (await contract.status()) === STATUS.ACTIVE;
+    } catch (e) {
+      console.log(`An error occured while getting creditLine [${contractAddress}] status, error = [${JSON.stringify(e)}]`);
+      return Promise.reject(false);
+    }
+  }
+
+  public async isMutualConsent(contractAddress: Address, trxData: string | undefined, lender: Address): Promise<boolean> {
+    try {
+      const contract = getContract(contractAddress, this.abi, this.web3Provider.getInstanceOf('ethereum'));
+      const expectedHash = keccak256(ethers.utils.solidityPack(['string', 'address'], [trxData, lender]));
+      return contract.mutualConsents(expectedHash);
+    } catch (e) {
+      console.log(`An error occured while getting creditLine [${contractAddress}] status, error = [${JSON.stringify(e)}]`);
+      return Promise.reject(false);
     }
   }
 }

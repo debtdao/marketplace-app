@@ -21,6 +21,7 @@ import {
 } from '@types';
 import { BigNumberish } from "ethers";
 import { BytesLike } from "@ethersproject/bytes/src.ts";
+import { PopulatedTransaction } from "@ethersproject/contracts/src.ts";
 
 // *************** USER ***************
 
@@ -123,6 +124,14 @@ export interface MigrateProps {
 }
 
 // *************** LOAN ***************
+export enum STATUS {
+  UNINITIALIZED,
+  ACTIVE,
+  LIQUIDATABLE,
+  REPAID,
+  INSOLVENT
+}
+
 export interface CreditLineService {
   getCreditLines: (props: GetCreditLinesProps) => Promise<CreditLine[]>;
 
@@ -130,14 +139,20 @@ export interface CreditLineService {
               frate: BigNumberish,
               amount: BigNumberish,
               token: Address,
-              lender: Address) => Promise<TransactionResponse>;
+              lender: Address,
+              dryRun: boolean) => Promise<TransactionResponse | PopulatedTransaction>;
   close: (id: BytesLike) => Promise<TransactionResponse>;
   setRates: (
     id: BytesLike,
     drate: BigNumberish,
-    frate: BigNumberish
-  ) => Promise<TransactionResponse>;
-  increaseCredit: (id: BytesLike, amount: BigNumberish) => Promise<TransactionResponse>;
+    frate: BigNumberish,
+    dryRun: boolean
+  ) => Promise<TransactionResponse | PopulatedTransaction>;
+  increaseCredit: (id: BytesLike, amount: BigNumberish, dryRun: boolean) => Promise<TransactionResponse | PopulatedTransaction>;
+  getCredit(contractAddress: Address, id: BytesLike): Promise<Address>;
+
+  isActive: (contractAddress: Address) => Promise<boolean>;
+  isMutualConsent: (contractAddress: Address, trxData: string | undefined, lender: Address) => Promise<boolean>;
 }
 
 export interface GetCreditLinesProps {
@@ -219,6 +234,7 @@ export interface ApproveProps {
 
 export interface TransactionService {
   execute: (props: ExecuteTransactionProps) => Promise<TransactionResponse>;
+  populateTransaction(props: ExecuteTransactionProps): Promise<PopulatedTransaction>;
   handleTransaction: (props: HandleTransactionProps) => Promise<TransactionReceipt>;
 }
 

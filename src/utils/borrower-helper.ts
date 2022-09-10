@@ -3,7 +3,7 @@ import { BigNumberish } from "ethers";
 import { BytesLike } from "@ethersproject/bytes/src.ts";
 
 interface ContractAddressesProps {
-  lineOfCreditAddress: string;
+  creditLineAddress: string;
   spigotedLineAddress: string;
   escrowAddress: string;
 }
@@ -14,39 +14,75 @@ export function borrower(creditLineService: CreditLineService, props: ContractAd
                            frate: BigNumberish,
                            amount: BigNumberish,
                            token: Address,
-                           lender: Address): Promise<TransactionResponse> => {
-    // set creditLineService.contract address by props.lineOfCreditAddress
-    // check if(status != LineLib.STATUS.ACTIVE) { revert NotActive(); }
-    // check mutualConsent 
-    return await creditLineService.addCredit(drate,
+                           lender: Address): Promise<string> => {
+    // check if status is ACTIVE     
+    if (await creditLineService.isActive(props.creditLineAddress)) {
+      console.log(`Adding credit is not possible. reason: "The given creditLine [${props.creditLineAddress}] is not active"`);
+      return "";
+    }
+    const populatedTrx = await creditLineService.addCredit(drate,
       frate,
       amount,
       token,
-      lender
+      lender,
+      true
     )
+    // check mutualConsent
+    if (!(await creditLineService.isMutualConsent(props.creditLineAddress, populatedTrx.data, lender))) {
+      console.log(`Adding credit is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.creditLineAddress}]`);
+      return "";
+    }
+    return (<TransactionResponse>(await creditLineService.addCredit(drate,
+      frate,
+      amount,
+      token,
+      lender,
+      false
+    ))).hash
   }
 
-  const close = async (id: BytesLike): Promise<TransactionResponse> => {
-    // set creditLineService.contract address by props.lineOfCreditAddress
-    return await creditLineService.close(id);
+  const close = async (id: BytesLike): Promise<string> => {
+    return (await creditLineService.close(id)).hash;
   }
 
   const setRates = async (id: BytesLike,
                           drate: BigNumberish,
-                          frate: BigNumberish): Promise<TransactionResponse> => {
-    // set creditLineService.contract address by props.lineOfCreditAddress
+                          frate: BigNumberish): Promise<string> => {
     // check mutualConsentById 
-    return await creditLineService.setRates(id,
+    const populatedTrx = await creditLineService.setRates(id,
       drate,
       frate,
+      true
     )
+    const nonCaller = await creditLineService.getCredit(props.creditLineAddress, id);
+    if (!(await creditLineService.isMutualConsent(props.creditLineAddress, populatedTrx.data, nonCaller))) {
+      console.log(`Setting rate is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.creditLineAddress}]`);
+      return "";
+    }
+    
+    return (<TransactionResponse>await creditLineService.setRates(id,
+      drate,
+      frate,
+      false
+    )).hash
   }
 
-  const increaseCredit = async (id: BytesLike, amount: BigNumberish): Promise<TransactionResponse> => {
-    // set creditLineService.contract address by props.lineOfCreditAddress
+  const increaseCredit = async (id: BytesLike, amount: BigNumberish): Promise<string> => {
     // if(status != LineLib.STATUS.ACTIVE) { revert NotActive(); }
-    // mutualConsentById 
-    return await creditLineService.increaseCredit(id, amount)
+    if (await creditLineService.isActive(props.creditLineAddress)) {
+      console.log(`Increasing credit is not possible. reason: "The given creditLine [${props.creditLineAddress}] is not active"`);
+      return "";
+    }
+    
+    // check mutualConsentById 
+    const populatedTrx = await creditLineService.increaseCredit(id, amount, true);
+    const nonCaller = await creditLineService.getCredit(props.creditLineAddress, id);
+    if (!(await creditLineService.isMutualConsent(props.creditLineAddress, populatedTrx.data, nonCaller))) {
+      console.log(`Increasing credit is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.creditLineAddress}]`);
+      return "";
+    }
+
+    return (<TransactionResponse>await creditLineService.increaseCredit(id, amount, false)).hash;
   }
 
   const depositAndRepay = async (): Promise<TransactionResponse> => {

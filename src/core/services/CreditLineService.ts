@@ -5,7 +5,7 @@ import {
   TransactionService,
   Web3Provider,
   Config,
-  GetCreditLinesProps, Address, TransactionResponse, STATUS,
+  GetCreditLinesProps, Address, TransactionResponse, STATUS, ExecuteTransactionProps,
 } from '@types';
 import { getConfig } from '@config';
 import { BigNumberish, ethers, PopulatedTransaction } from "ethers";
@@ -96,23 +96,7 @@ export class CreditLineServiceImpl implements CreditLineService {
   }
 
   public async close(id: BytesLike): Promise<TransactionResponse> {
-    let tx;
-    try {
-      tx = await this.transactionService.execute(
-        {
-          network: "mainnet",
-          args: [id],
-          methodName: "close",
-          abi: this.abi,
-          contractAddress: "" // Either read from config or from params 
-        }
-      )
-      await tx.wait();
-      return tx
-    } catch (e) {
-      console.log(`An error occured while close CreditLine [${id}] by [${tx?.from}], error = [${JSON.stringify(e)}]`);
-      return Promise.reject(e);
-    }
+    return <TransactionResponse>await this.executeContractMethod("close", [id], false);
   }
 
   public async setRates(
@@ -121,66 +105,19 @@ export class CreditLineServiceImpl implements CreditLineService {
     frate: BigNumberish,
     dryRun: boolean
   ): Promise<TransactionResponse | PopulatedTransaction> {
-    try {
-      if (dryRun) {
-        return await this.transactionService.populateTransaction({
-            network: "mainnet",
-            args: [id, drate, frate],
-            methodName: "setRates",
-            abi: this.abi,
-            contractAddress: "" // Either read from config or from params 
-          }
-        )
-      }
-
-      let tx;
-      tx = await this.transactionService.execute(
-        {
-          network: "mainnet",
-          args: [id, drate, frate],
-          methodName: "setRates",
-          abi: this.abi,
-          contractAddress: "" // Either read from config or from params 
-        }
-      )
-      await tx.wait();
-      return tx
-    } catch (e) {
-      console.log(`An error occured while setRate of CreditLine [${id}], error = [${JSON.stringify(e)}]`);
-      return Promise.reject(e);
-    }
+    return await this.executeContractMethod("setRates", [id, drate, frate], dryRun);
   }
 
   public async increaseCredit(id: BytesLike, amount: BigNumberish, dryRun: boolean): Promise<TransactionResponse | PopulatedTransaction> {
+    return await this.executeContractMethod("increaseCredit", [id, amount], dryRun);
+  }
 
-    try {
-      if (dryRun) {
-        return await this.transactionService.populateTransaction({
-            network: "mainnet",
-            args: [id, amount],
-            methodName: "increaseCredit",
-            abi: this.abi,
-            contractAddress: "" // Either read from config or from params 
-          }
-        )
-      }
+  public async depositAndRepay(amount: BigNumberish, dryRun: boolean): Promise<TransactionResponse | PopulatedTransaction> {
+    return await this.executeContractMethod("depositAndRepay", [amount], dryRun);
+  }
 
-      let tx;
-      tx = await this.transactionService.execute(
-        {
-          network: "mainnet",
-          args: [id, amount],
-          methodName: "increaseCredit",
-          abi: this.abi,
-          contractAddress: "" // Either read from config or from params 
-        }
-      )
-      await tx.wait();
-      return tx
-    } catch (e) {
-      console.log(`An error occured while increaseCredit of CreditLine [${id}], error = [${JSON.stringify(e)}]`);
-      return Promise.reject(e);
-    }
+  public async depositAndClose(dryRun: boolean): Promise<TransactionResponse | PopulatedTransaction> {
+    return await this.executeContractMethod("depositAndClose", [], dryRun);
   }
 
   public async getCredit(contractAddress: Address, id: BytesLike): Promise<Address> {
@@ -192,7 +129,6 @@ export class CreditLineServiceImpl implements CreditLineService {
       return Promise.reject(false);
     }
   }
-
 
   public async isActive(contractAddress: Address): Promise<boolean> {
     try {
@@ -212,6 +148,30 @@ export class CreditLineServiceImpl implements CreditLineService {
     } catch (e) {
       console.log(`An error occured while getting creditLine [${contractAddress}] status, error = [${JSON.stringify(e)}]`);
       return Promise.reject(false);
+    }
+  }
+
+  private async executeContractMethod(methodName: string, params: any[], dryRun: boolean) {
+    let props: ExecuteTransactionProps | undefined = undefined;
+    try {
+      props = {
+        network: "mainnet",
+        args: params,
+        methodName: methodName,
+        abi: this.abi,
+        contractAddress: "" // Either read from config or from params 
+      };
+      if (dryRun) {
+        return await this.transactionService.populateTransaction(props)
+      }
+
+      let tx;
+      tx = await this.transactionService.execute(props)
+      await tx.wait();
+      return tx
+    } catch (e) {
+      console.log(`An error occured while ${methodName} with params [${params}] on CreditLine [${props?.contractAddress}], error = [${JSON.stringify(e)}]`);
+      return Promise.reject(e);
     }
   }
 }

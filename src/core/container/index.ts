@@ -10,6 +10,7 @@ import {
   VaultServiceImpl,
   GasServiceImpl,
   TransactionServiceImpl,
+  SpigotedLineServiceImpl, EscrowServiceImpl,
 } from '@services';
 import { getConfig } from '@config';
 import { DIContainer, ContextContainer, ServiceContainer, ConfigContainer } from '@types';
@@ -38,6 +39,8 @@ export class Container implements DIContainer {
   private registerServices() {
     this.container.register({
       creditLineService: awilix.asClass(CreditLineServiceImpl),
+      spigotedLineService: awilix.asClass(SpigotedLineServiceImpl),
+      escrowService: awilix.asClass(EscrowServiceImpl),
       tokenService: awilix.asClass(TokenServiceImpl),
       userService: awilix.asClass(UserServiceImpl),
       vaultService: awilix.asClass(VaultServiceImpl),

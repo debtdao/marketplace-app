@@ -149,6 +149,9 @@ export interface CreditLineService {
     dryRun: boolean
   ) => Promise<TransactionResponse | PopulatedTransaction>;
   increaseCredit: (id: BytesLike, amount: BigNumberish, dryRun: boolean) => Promise<TransactionResponse | PopulatedTransaction>;
+  depositAndRepay: (amount: BigNumberish, dryRun: boolean) => Promise<TransactionResponse | PopulatedTransaction>;
+  depositAndClose: (dryRun: boolean) => Promise<TransactionResponse | PopulatedTransaction>;
+
   getCredit(contractAddress: Address, id: BytesLike): Promise<Address>;
 
   isActive: (contractAddress: Address) => Promise<boolean>;
@@ -161,6 +164,44 @@ export interface GetCreditLinesProps {
   network: Network;
 }
 
+export interface SpigotedLineService {
+  claimAndTrade(
+    claimToken: Address,
+    calldata: BytesLike,
+    dryRun: boolean
+  ): Promise<TransactionResponse | PopulatedTransaction>
+  claimAndRepay(
+    claimToken: Address,
+    calldata: BytesLike,
+    dryRun: boolean
+  ): Promise<TransactionResponse | PopulatedTransaction>
+  addSpigot(
+    revenueContract: Address,
+    setting: ISpigotSetting,
+    dryRun: boolean
+  ): Promise<TransactionResponse | PopulatedTransaction>
+}
+
+export interface ISpigotSetting {
+  token: Address;                // token to claim as revenue from contract
+  ownerSplit: BigNumberish;             // x/100 % to Owner, rest to Treasury
+  claimFunction: BytesLike;         // function signature on contract to call and claim revenue
+  transferOwnerFunction: BytesLike; // function signature on conract to call and transfer ownership 
+}
+
+export interface EscrowService {
+  addCollateral(
+    amount: BigNumberish,
+    token: Address,
+    dryRun: boolean
+  ): Promise<TransactionResponse | PopulatedTransaction>;
+  releaseCollateral(
+    amount: BigNumberish,
+    token: Address,
+    to: Address,
+    dryRun: boolean
+  ): Promise<TransactionResponse | PopulatedTransaction>
+}
 // *************** TOKEN ***************
 export interface TokenService {
   getSupportedTokens: (props: GetSupportedTokensProps) => Promise<Token[]>;
@@ -234,7 +275,9 @@ export interface ApproveProps {
 
 export interface TransactionService {
   execute: (props: ExecuteTransactionProps) => Promise<TransactionResponse>;
+
   populateTransaction(props: ExecuteTransactionProps): Promise<PopulatedTransaction>;
+
   handleTransaction: (props: HandleTransactionProps) => Promise<TransactionReceipt>;
 }
 

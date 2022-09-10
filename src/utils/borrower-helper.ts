@@ -1,6 +1,14 @@
-﻿import { Address, CreditLineService, TransactionResponse } from "@types";
+﻿import {
+  Address,
+  CreditLineService,
+  EscrowService,
+  ISpigotSetting,
+  SpigotedLineService,
+  TransactionResponse
+} from "@types";
 import { BigNumberish } from "ethers";
 import { BytesLike } from "@ethersproject/bytes/src.ts";
+import { EscrowServiceImpl, SpigotedLineServiceImpl } from "@services";
 
 interface ContractAddressesProps {
   creditLineAddress: string;
@@ -8,7 +16,7 @@ interface ContractAddressesProps {
   escrowAddress: string;
 }
 
-export function borrower(creditLineService: CreditLineService, props: ContractAddressesProps) {
+export function borrower(creditLineService: CreditLineService, spigotedLineService: SpigotedLineService, escrowService: EscrowService, props: ContractAddressesProps) {
 
   const addCredit = async (drate: BigNumberish,
                            frate: BigNumberish,
@@ -59,7 +67,7 @@ export function borrower(creditLineService: CreditLineService, props: ContractAd
       console.log(`Setting rate is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.creditLineAddress}]`);
       return "";
     }
-    
+
     return (<TransactionResponse>await creditLineService.setRates(id,
       drate,
       frate,
@@ -73,7 +81,7 @@ export function borrower(creditLineService: CreditLineService, props: ContractAd
       console.log(`Increasing credit is not possible. reason: "The given creditLine [${props.creditLineAddress}] is not active"`);
       return "";
     }
-    
+
     // check mutualConsentById 
     const populatedTrx = await creditLineService.increaseCredit(id, amount, true);
     const nonCaller = await creditLineService.getCredit(props.creditLineAddress, id);
@@ -85,32 +93,32 @@ export function borrower(creditLineService: CreditLineService, props: ContractAd
     return (<TransactionResponse>await creditLineService.increaseCredit(id, amount, false)).hash;
   }
 
-  const depositAndRepay = async (): Promise<TransactionResponse> => {
-    return Promise.resolve(<never>{});
+  const depositAndRepay = async (amount: BigNumberish): Promise<string> => {
+    return (<TransactionResponse>await creditLineService.depositAndRepay(amount, false)).hash;
   }
 
-  const depositAndClose = async (): Promise<TransactionResponse> => {
-    return Promise.resolve(<never>{});
+  const depositAndClose = async (): Promise<string> => {
+    return (<TransactionResponse>await creditLineService.depositAndClose(false)).hash;
   }
 
-  const claimAndTrade = async (): Promise<TransactionResponse> => {
-    return Promise.resolve(<never>{});
+  const claimAndTrade = async (claimToken: Address, calldata: BytesLike): Promise<string> => {
+    return (<TransactionResponse>await spigotedLineService.claimAndTrade(claimToken, calldata, false)).hash;
   }
 
-  const claimAndRepay = async (): Promise<TransactionResponse> => {
-    return Promise.resolve(<never>{});
+  const claimAndRepay = async (claimToken: Address, calldata: BytesLike): Promise<string> => {
+    return (<TransactionResponse>await spigotedLineService.claimAndRepay(claimToken, calldata, false)).hash;
   }
 
-  const addCollateral = async (): Promise<TransactionResponse> => {
-    return Promise.resolve(<never>{});
+  const addSpigot = async (revenueContract: Address, setting: ISpigotSetting): Promise<string> => {
+    return (<TransactionResponse>await spigotedLineService.addSpigot(revenueContract, setting, false)).hash;
   }
 
-  const removeCollateral = async (): Promise<TransactionResponse> => {
-    return Promise.resolve(<never>{});
+  const addCollateral = async (amount: BigNumberish, token: Address): Promise<string> => {
+    return (<TransactionResponse>await escrowService.addCollateral(amount, token, false)).hash;
   }
 
-  const addSpigot = async (): Promise<TransactionResponse> => {
-    return Promise.resolve(<never>{});
+  const releaseCollateral = async (amount: BigNumberish, token: Address, to: Address): Promise<string> => {
+    return (<TransactionResponse>await escrowService.releaseCollateral(amount, token, to, false)).hash;
   }
 
   return {
@@ -122,8 +130,8 @@ export function borrower(creditLineService: CreditLineService, props: ContractAd
     depositAndClose,
     claimAndTrade,
     claimAndRepay,
+    addSpigot,
     addCollateral,
-    removeCollateral,
-    addSpigot
+    releaseCollateral,
   };
 }

@@ -60,6 +60,22 @@ declare module 'styled-components' {
       };
     };
 
+    spacing: {
+      xs: string;
+      sm: string;
+      md: string;
+      lg: string;
+      xl: string;
+    };
+
+    fonts: {
+      xs: string;
+      sm: string;
+      md: string;
+      lg: string;
+      xl: string;
+    };
+
     txModal: {
       width: string;
       gap: string;

@@ -17,6 +17,20 @@ const sharedTheme: SharedTheme = {
     onboardModal: 1100,
     alerts: 1200,
   },
+  spacing: {
+    xs: '0.5rem',
+    sm: '1rem',
+    md: '1.5rem',
+    lg: '2rem',
+    xl: '2.5rem',
+  },
+  fonts: {
+    xs: '0.5rem',
+    sm: '1rem',
+    md: '1.5rem',
+    lg: '2rem',
+    xl: '2.5rem',
+  },
   devices: {
     mobile: 600,
     tablet: 960,

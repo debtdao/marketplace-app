@@ -29,7 +29,7 @@ const ItemCard = styled(LineCard)<{ onClick: any }>`
     min-height: 250px;
   }
   ${({ theme }) => `
-    box-shadow: 0px 4px 10px 2px ${theme.colors.primary};
+    box-shadow: 0px 4px 10px 2px rgba(0, 0, 0, 0.5);
     background: ${theme.colors.background};
     color: ${theme.colors.primary};
   `}
@@ -58,7 +58,7 @@ const BorrowerDescription = styled(Text)`
 
 const LineBorrowerName = styled(Text)`
   ${({ theme }) => theme.fonts.styles.cardHeader};
-  color: ${({ theme }) => theme.colors.icons.variant};
+  color: ${({ theme }) => theme.colors.titles};
   width: 100%;
   white-space: nowrap;
   overflow: hidden;
@@ -87,7 +87,7 @@ const BorrowerData = styled.div`
 const CollateralTitle = styled.h3`
   ${({ theme }) => theme.fonts.styles.cardHeader};
   margin: ${({ theme }) => theme.spacing.md} 0;
-  color: ${({ theme }) => theme.colors.icons.variant};
+  color: ${({ theme }) => theme.colors.titles};
 `;
 
 const CollateralData = styled.div`
@@ -139,7 +139,10 @@ export const LineCards = ({ header, subHeader, items, ...props }: Recommendation
               </BorrowerIcon>
               <BorrowerData>
                 <LineBorrowerName>{item.name}</LineBorrowerName>
-                <BorrowerDescription>{item.info}</BorrowerDescription>
+                <BorrowerDescription>{item.name}</BorrowerDescription>
+                {item.tags?.map((t) => (
+                  <BorrowerDescription>{t}</BorrowerDescription>
+                ))}
               </BorrowerData>
             </BorrowerInfo>
 

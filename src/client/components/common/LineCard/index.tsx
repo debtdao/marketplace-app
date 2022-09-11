@@ -84,7 +84,6 @@ export interface LineCardProps extends StyledSystemProps {
 }
 
 const StyledDiv = styled.article<LineCardProps>`
-  border-radius: ${({ theme }) => theme.globalRadius};
   padding: 1.7rem ${({ theme }) => theme.card.padding};
 
   ${variantStyle};

@@ -78,13 +78,19 @@ const BorrowerIcon = styled.div`
   margin-right: ${({ theme }) => theme.spacing.md};
 `;
 
+const BorrowerData = styled.div`
+  display: flex;
+  flex-direction: column;
+  grid-template-column: 1fr;
+`;
+
 const CollateralTitle = styled.h3`
   ${({ theme }) => theme.fonts.styles.cardHeader};
   margin: ${({ theme }) => theme.spacing.md} 0;
   color: ${({ theme }) => theme.colors.icons.variant};
 `;
 
-const CollateralInfo = styled.div`
+const CollateralData = styled.div`
   display: grid;
   flex-direction: row;
   justify-content: space-around;
@@ -131,18 +137,20 @@ export const LineCards = ({ header, subHeader, items, ...props }: Recommendation
                 {' '}
                 <TokenIcon symbol={item.name} icon={item.icon} size="xBig" />
               </BorrowerIcon>
-              <LineBorrowerName>{item.name}</LineBorrowerName>
-              <BorrowerDescription>{item.info}</BorrowerDescription>
+              <BorrowerData>
+                <LineBorrowerName>{item.name}</LineBorrowerName>
+                <BorrowerDescription>{item.info}</BorrowerDescription>
+              </BorrowerData>
             </BorrowerInfo>
 
             <CollateralTitle>Secured By:</CollateralTitle>
-            <CollateralInfo>
+            <CollateralData>
               {/* TODO: useLineCollateralStats(spigot, escrow) */}
               <BorrowerDescription>{item.name}</BorrowerDescription>
               <BorrowerDescription>{item.name}</BorrowerDescription>
               <BorrowerDescription>{item.name}</BorrowerDescription>
               <BorrowerDescription>{item.name}</BorrowerDescription>
-            </CollateralInfo>
+            </CollateralData>
 
             {item.onAction && <TokenListIcon Component={ChevronRightIcon} />}
           </ItemCard>

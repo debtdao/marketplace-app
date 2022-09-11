@@ -10,7 +10,6 @@ const ContainerCard = styled(LineCard)`
   padding: ${({ theme }) => theme.card.padding} 0;
   width: 100%;
   min-width: 20vw;
-  min-height: 250px;
   height: 100%;
 `;
 
@@ -25,8 +24,9 @@ const StyledCardContent = styled(LineCardContent)`
 
 const ItemCard = styled(LineCard)<{ onClick: any }>`
   max-width: 33vw;
-  @media (${device.mobile}) {
+  @media (${device.tablet}) {
     max-width: 100%;
+    min-height: 250px;
   }
   ${({ theme }) => `
     box-shadow: 0px 4px 10px 2px ${theme.colors.primary};
@@ -37,27 +37,28 @@ const ItemCard = styled(LineCard)<{ onClick: any }>`
 
 const ItemHeader = styled(Text)`
   position: absolute;
-  font-size: ${({ theme }) => theme.fonts.md};
+  font-size: ${({ theme }) => theme.fonts.sizes.md};
+  font-weight: 800; // 400 when on LS-VG5000 font
 `;
 
-const ItemInfo = styled(Text)`
+const BorrowerInfo = styled(Text)`
+  ${({ theme }) => theme.fonts.styles.body};
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   overflow: hidden;
 `;
 
-const ItemInfoLabel = styled(Text)`
+const BorrowerDescription = styled(Text)`
+  ${({ theme }) => theme.fonts.styles.body};
   color: ${({ theme }) => theme.colors.titles};
   margin-top: 0.8rem;
-  font-weight: 700;
-  font-size: 2.4rem;
   overflow: hidden;
   text-overflow: ellipsis;
 `;
 
-const ItemName = styled(Text)`
+const LineBorrowerName = styled(Text)`
+  ${({ theme }) => theme.fonts.styles.cardHeader};
   color: ${({ theme }) => theme.colors.icons.variant};
-  font-size: 1.6rem;
   width: 100%;
   white-space: nowrap;
   overflow: hidden;
@@ -73,10 +74,22 @@ const TokenListIcon = styled(Icon)`
   transition: color 200ms ease-in-out;
 `;
 
-const CenterIcon = styled.div`
-  display: flex;
-  margin-right: ${({ theme }) => theme.layoutPadding};
-  user-select: none;
+const BorrowerIcon = styled.div`
+  margin-right: ${({ theme }) => theme.spacing.md};
+`;
+
+const CollateralTitle = styled.h3`
+  ${({ theme }) => theme.fonts.styles.cardHeader};
+  margin: ${({ theme }) => theme.spacing.md} 0;
+  color: ${({ theme }) => theme.colors.icons.variant};
+`;
+
+const CollateralInfo = styled.div`
+  display: grid;
+  flex-direction: row;
+  justify-content: space-around;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: ${({ theme }) => theme.spacing.md};
 `;
 
 interface Item {
@@ -84,6 +97,9 @@ interface Item {
   icon: string;
   name: string;
   info: string;
+  spigot?: string;
+  escrow?: string;
+  tags?: string[];
   infoDetail?: string;
   action?: string;
   onAction?: () => void;
@@ -93,6 +109,7 @@ interface RecommendationsProps {
   header?: string;
   subHeader?: string;
   items: Item[];
+  // line: BasicLineData
 }
 
 export const LineCards = ({ header, subHeader, items, ...props }: RecommendationsProps) => {
@@ -109,14 +126,23 @@ export const LineCards = ({ header, subHeader, items, ...props }: Recommendation
           <ItemCard key={`${i}-${item.name}`} variant="primary" onClick={item.onAction ? item.onAction : undefined}>
             {item.header && <ItemHeader>{item.header}</ItemHeader>}
 
-            <CenterIcon>
-              <TokenIcon symbol={item.name} icon={item.icon} size="xBig" />
-            </CenterIcon>
+            <BorrowerInfo>
+              <BorrowerIcon>
+                {' '}
+                <TokenIcon symbol={item.name} icon={item.icon} size="xBig" />
+              </BorrowerIcon>
+              <LineBorrowerName>{item.name}</LineBorrowerName>
+              <BorrowerDescription>{item.info}</BorrowerDescription>
+            </BorrowerInfo>
 
-            <ItemInfo>
-              <ItemName>{item.name}</ItemName>
-              <ItemInfoLabel>{item.info}</ItemInfoLabel>
-            </ItemInfo>
+            <CollateralTitle>Secured By:</CollateralTitle>
+            <CollateralInfo>
+              {/* TODO: useLineCollateralStats(spigot, escrow) */}
+              <BorrowerDescription>{item.name}</BorrowerDescription>
+              <BorrowerDescription>{item.name}</BorrowerDescription>
+              <BorrowerDescription>{item.name}</BorrowerDescription>
+              <BorrowerDescription>{item.name}</BorrowerDescription>
+            </CollateralInfo>
 
             {item.onAction && <TokenListIcon Component={ChevronRightIcon} />}
           </ItemCard>

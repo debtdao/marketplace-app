@@ -16,9 +16,8 @@ const StyledLayout = styled.div`
   flex: 1;
   padding: ${({ theme }) => theme.card.padding};
 
-  @media ${device.mobile} {
+  @media ${device.tablet} {
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(30%, 200px);
     row-gap: ${({ theme }) => theme.spacing.xl};
     justify-content: center;
   }

@@ -35,33 +35,33 @@ const sharedTheme: SharedTheme = {
     styles: {
       get body() {
         return `
-        font-size: ${sharedTheme.fonts.sizes.md};
-        font-weight: 400;
-      `;
+          font-size: ${sharedTheme.fonts.sizes.md};
+          font-weight: 400;
+        `;
       },
       get label() {
         return `
-        font-size: ${sharedTheme.fonts.sizes.sm};
-        font-weight: 400;
-      `;
+          font-size: ${sharedTheme.fonts.sizes.sm};
+          font-weight: 400;
+        `;
       },
       get header() {
         return `
-        font-size: ${sharedTheme.fonts.sizes.xl};
-        font-weight: 800;
-      `;
+          font-size: ${sharedTheme.fonts.sizes.xl};
+          font-weight: 800;
+        `;
       },
       get subheader() {
         return `
-        font-size: ${sharedTheme.fonts.sizes.lg};
-        font-weight: 800;
-      `;
+          font-size: ${sharedTheme.fonts.sizes.lg};
+          font-weight: 800;
+        `;
       },
       get cardHeader() {
         return `
-        font-size: ${sharedTheme.fonts.sizes.lg};
-        font-weight: 800;
-      `;
+          font-size: ${sharedTheme.fonts.sizes.lg};
+          font-weight: 800;
+        `;
       },
     },
   },

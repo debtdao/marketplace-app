@@ -3,11 +3,11 @@ import styled, { css } from 'styled-components';
 
 import { styledSystem, StyledSystemProps } from '../styledSystem';
 
-import { LineCardHeader } from './LineCardHeader';
-import { LineCardContent } from './LineCardContent';
-import { LineCardElement } from './LineCardElement';
-import { LineCardEmptyList } from './LineCardEmptyList';
-import { LineCardRedirection } from './LineCardRedirection';
+import { FlatCardHeader } from './FlatCardHeader';
+import { FlatCardContent } from './FlatCardContent';
+import { FlatCardElement } from './FlatCardElement';
+import { FlatCardEmptyList } from './FlatCardEmptyList';
+import { FlatCardRedirection } from './FlatCardRedirection';
 
 const bigSize = css`
   min-height: 17.6rem;
@@ -46,7 +46,7 @@ const surfaceVariant = css`
   color: ${({ theme }) => theme.colors.titles};
 `;
 
-const sizeStyle = ({ cardSize }: LineCardProps) => {
+const sizeStyle = ({ cardSize }: FlatCardProps) => {
   switch (cardSize) {
     case 'micro':
       return microSize;
@@ -59,7 +59,7 @@ const sizeStyle = ({ cardSize }: LineCardProps) => {
   }
 };
 
-const variantStyle = ({ variant }: LineCardProps) => {
+const variantStyle = ({ variant }: FlatCardProps) => {
   switch (variant) {
     case 'primary':
       return primaryVariant;
@@ -74,16 +74,16 @@ const variantStyle = ({ variant }: LineCardProps) => {
   }
 };
 
-type LineCardVariant = 'primary' | 'secondary' | 'background' | 'surface';
-export type LineCardSizeType = 'micro' | 'small' | 'big';
+type FlatCardVariant = 'primary' | 'secondary' | 'background' | 'surface';
+export type FlatCardSizeType = 'micro' | 'small' | 'big';
 
-export interface LineCardProps extends StyledSystemProps {
+export interface FlatCardProps extends StyledSystemProps {
   onClick?: () => void;
-  variant?: LineCardVariant;
-  cardSize?: LineCardSizeType;
+  variant?: FlatCardVariant;
+  cardSize?: FlatCardSizeType;
 }
 
-const StyledDiv = styled.article<LineCardProps>`
+const StyledDiv = styled.article<FlatCardProps>`
   padding: 1.7rem ${({ theme }) => theme.card.padding};
 
   ${variantStyle};
@@ -91,6 +91,6 @@ const StyledDiv = styled.article<LineCardProps>`
   ${styledSystem};
 `;
 
-export const LineCard: FC<LineCardProps> = (props) => <StyledDiv {...props} />;
+export const FlatCard: FC<FlatCardProps> = (props) => <StyledDiv {...props} />;
 
-export { LineCardHeader, LineCardContent, LineCardElement, LineCardEmptyList, LineCardRedirection };
+export { FlatCardHeader, FlatCardContent, FlatCardElement, FlatCardEmptyList, FlatCardRedirection };

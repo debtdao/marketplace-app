@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useAppTranslation } from '@hooks';
 import { Text } from '@components/common';
 
-const StyledLineCardEmptyList = styled.div<{ wrap?: string }>`
+const StyledFlatCardEmptyList = styled.div<{ wrap?: string }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,17 +15,17 @@ const StyledLineCardEmptyList = styled.div<{ wrap?: string }>`
   text-align: center;
 `;
 
-interface LineCardEmptyListProps {
+interface FlatCardEmptyListProps {
   text?: string;
   searching?: boolean;
   onClick?: () => void;
 }
 
-export const LineCardEmptyList: FC<LineCardEmptyListProps> = ({ children, text, searching, onClick, ...props }) => {
+export const FlatCardEmptyList: FC<FlatCardEmptyListProps> = ({ children, text, searching, onClick, ...props }) => {
   const { t } = useAppTranslation('common');
 
   return (
-    <StyledLineCardEmptyList onClick={onClick} {...props}>
+    <StyledFlatCardEmptyList onClick={onClick} {...props}>
       {text ?? (
         <Text>
           <Text center fontWeight="bold">
@@ -34,6 +34,6 @@ export const LineCardEmptyList: FC<LineCardEmptyListProps> = ({ children, text, 
           {searching && <Text center>{t('components.empty-list.searching-text')}</Text>}
         </Text>
       )}
-    </StyledLineCardEmptyList>
+    </StyledFlatCardEmptyList>
   );
 };

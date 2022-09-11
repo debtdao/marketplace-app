@@ -27,13 +27,13 @@ const SubHeader = styled.h3`
   padding: 0;
 `;
 
-interface LineCardElementProps {
+interface FlatCardElementProps {
   bigHeader?: string;
   header?: string;
   subHeader?: string;
 }
 
-export const LineCardHeader: FC<LineCardElementProps> = ({ children, bigHeader, header, subHeader, ...props }) => {
+export const FlatCardHeader: FC<FlatCardElementProps> = ({ children, bigHeader, header, subHeader, ...props }) => {
   return (
     <Container {...props}>
       {bigHeader && <BigHeader>{bigHeader}</BigHeader>}

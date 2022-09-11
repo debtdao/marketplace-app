@@ -1,19 +1,19 @@
 import styled from 'styled-components';
 
-import { LineCard, LineCardHeader, LineCardContent, Text, Icon, ChevronRightIcon } from '@components/common';
+import { FlatCard, FlatCardHeader, FlatCardContent, Text, Icon, ChevronRightIcon } from '@components/common';
 import { TokenIcon } from '@components/app';
 import { device } from '@src/client/themes/default';
 
 const TokenListIconSize = '1rem';
 
-const ContainerCard = styled(LineCard)`
+const ContainerCard = styled(FlatCard)`
   padding: ${({ theme }) => theme.card.padding} 0;
   width: 100%;
   min-width: 20vw;
   height: 100%;
 `;
 
-const StyledCardContent = styled(LineCardContent)`
+const StyledCardContent = styled(FlatCardContent)`
   align-items: stretch;
   justify-content: center;
   flex-wrap: wrap;
@@ -22,7 +22,7 @@ const StyledCardContent = styled(LineCardContent)`
   padding: 0 ${({ theme }) => theme.card.padding};
 `;
 
-const ItemCard = styled(LineCard)<{ onClick: any }>`
+const ItemCard = styled(FlatCard)<{ onClick: any }>`
   max-width: 33vw;
   @media (${device.tablet}) {
     max-width: 100%;
@@ -118,16 +118,16 @@ interface RecommendationsProps {
   // line: BasicLineData
 }
 
-export const LineCards = ({ header, subHeader, items, ...props }: RecommendationsProps) => {
+export const LineCard = ({ header, subHeader, items, ...props }: RecommendationsProps) => {
   if (items.length === 0) {
     return null;
   }
 
   return (
     <ContainerCard {...props}>
-      <LineCardHeader header={header} subHeader={subHeader} />
+      <FlatCardHeader header={header} subHeader={subHeader} />
 
-      <LineCardContent>
+      <FlatCardContent>
         {items.map((item, i) => (
           <ItemCard key={`${i}-${item.name}`} variant="primary" onClick={item.onAction ? item.onAction : undefined}>
             {item.header && <ItemHeader>{item.header}</ItemHeader>}
@@ -158,7 +158,7 @@ export const LineCards = ({ header, subHeader, items, ...props }: Recommendation
             {item.onAction && <TokenListIcon Component={ChevronRightIcon} />}
           </ItemCard>
         ))}
-      </LineCardContent>
+      </FlatCardContent>
     </ContainerCard>
   );
 };

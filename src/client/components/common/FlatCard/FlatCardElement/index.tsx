@@ -62,7 +62,7 @@ const Content = styled.div`
 `;
 
 type SortType = 'asc' | 'desc';
-interface LineCardElementProps {
+interface FlatCardElementProps {
   header?: string;
   sortable?: boolean;
   activeSort?: boolean;
@@ -76,7 +76,7 @@ interface LineCardElementProps {
   className?: string;
 }
 
-export const LineCardElement: FC<LineCardElementProps> = ({
+export const FlatCardElement: FC<FlatCardElementProps> = ({
   children,
   header,
   sortable,

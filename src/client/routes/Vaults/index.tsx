@@ -17,7 +17,7 @@ import { device } from '@themes/default';
 import {
   SummaryCard,
   DetailCard,
-  LineCards,
+  LineCard,
   ActionButtons,
   TokenIcon,
   SliderCard,
@@ -47,7 +47,7 @@ const StyledHelperCursor = styled.span`
   cursor: help;
 `;
 
-const StyledRecommendationsCard = styled(LineCards)``;
+const StyledRecommendationsCard = styled(LineCard)``;
 
 const StyledSliderCard = styled(SliderCard)`
   width: 100%;

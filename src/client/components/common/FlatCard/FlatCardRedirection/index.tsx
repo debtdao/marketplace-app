@@ -10,7 +10,7 @@ const Arrow = styled(Icon)`
   fill: currentColor;
 `;
 
-const StyledLineCardRedirection = styled.div`
+const StyledFlatCardRedirection = styled.div`
   display: flex;
   justify-content: center;
   cursor: pointer;
@@ -26,17 +26,17 @@ const StyledLineCardRedirection = styled.div`
   }
 `;
 
-interface LineCardRedirectionProps {
+interface FlatCardRedirectionProps {
   redirectTo: string;
   className?: string;
 }
 
-export const LineCardRedirection: FC<LineCardRedirectionProps> = ({ children, redirectTo, className, ...props }) => {
+export const FlatCardRedirection: FC<FlatCardRedirectionProps> = ({ children, redirectTo, className, ...props }) => {
   const history = useHistory();
 
   return (
-    <StyledLineCardRedirection className={className} {...props} onClick={() => history.push(`/${redirectTo}`)}>
+    <StyledFlatCardRedirection className={className} {...props} onClick={() => history.push(`/${redirectTo}`)}>
       <Arrow Component={ChevronRightIcon} />
-    </StyledLineCardRedirection>
+    </StyledFlatCardRedirection>
   );
 };

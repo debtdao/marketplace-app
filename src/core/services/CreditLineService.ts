@@ -170,7 +170,7 @@ export class CreditLineServiceImpl implements CreditLineService {
       await tx.wait();
       return tx
     } catch (e) {
-      console.log(`An error occured while ${methodName} with params [${params}] on CreditLine [${props?.contractAddress}], error = [${JSON.stringify(e)}]`);
+      console.log(`An error occured while ${methodName} with params [${params}] on CreditLine [${props?.contractAddress}], error = [${JSON.stringify(e)}] `);
       return Promise.reject(e);
     }
   }

@@ -1,16 +1,23 @@
-﻿import {
+﻿import { BytesLike } from '@ethersproject/bytes/src.ts';
+import { PopulatedTransaction } from 'ethers';
+
+import {
   YearnSdk,
   TransactionService,
   Web3Provider,
-  Config, ExecuteTransactionProps, Address, ISpigotSetting, SpigotedLineService,
+  Config,
+  ExecuteTransactionProps,
+  Address,
+  ISpigotSetting,
+  SpigotedLineService,
 } from '@types';
 import { getConfig } from '@config';
-import { SpigotedLineABI } from "./contracts";
-import { BytesLike } from "@ethersproject/bytes/src.ts";
-import { PopulatedTransaction } from "ethers";
-import { TransactionResponse } from "../types";
 
-export class SpigotedLineServiceImpl implements SpigotedLineService{
+import { TransactionResponse } from '../types';
+
+import { SpigotedLineABI } from './contracts';
+
+export class SpigotedLineServiceImpl implements SpigotedLineService {
   private graphUrl: string;
   private web3Provider: Web3Provider;
   private transactionService: TransactionService;
@@ -18,11 +25,11 @@ export class SpigotedLineServiceImpl implements SpigotedLineService{
   private readonly abi: Array<any>;
 
   constructor({
-                transactionService,
-                yearnSdk,
-                web3Provider,
-                config,
-              }: {
+    transactionService,
+    yearnSdk,
+    web3Provider,
+    config,
+  }: {
     transactionService: TransactionService;
     web3Provider: Web3Provider;
     yearnSdk: YearnSdk;
@@ -41,7 +48,7 @@ export class SpigotedLineServiceImpl implements SpigotedLineService{
     calldata: BytesLike,
     dryRun: boolean
   ): Promise<TransactionResponse | PopulatedTransaction> {
-    return await this.executeContractMethod("claimAndTrade", [claimToken, calldata], dryRun);
+    return await this.executeContractMethod('claimAndTrade', [claimToken, calldata], dryRun);
   }
 
   public async claimAndRepay(
@@ -49,7 +56,7 @@ export class SpigotedLineServiceImpl implements SpigotedLineService{
     calldata: BytesLike,
     dryRun: boolean
   ): Promise<TransactionResponse | PopulatedTransaction> {
-    return await this.executeContractMethod("claimAndRepay", [claimToken, calldata], dryRun);
+    return await this.executeContractMethod('claimAndRepay', [claimToken, calldata], dryRun);
   }
 
   public async addSpigot(
@@ -57,29 +64,33 @@ export class SpigotedLineServiceImpl implements SpigotedLineService{
     setting: ISpigotSetting,
     dryRun: boolean
   ): Promise<TransactionResponse | PopulatedTransaction> {
-    return await this.executeContractMethod("addSpigot", [revenueContract, setting], dryRun);
+    return await this.executeContractMethod('addSpigot', [revenueContract, setting], dryRun);
   }
 
   private async executeContractMethod(methodName: string, params: any[], dryRun: boolean) {
     let props: ExecuteTransactionProps | undefined = undefined;
     try {
       props = {
-        network: "mainnet",
+        network: 'mainnet',
         args: params,
         methodName: methodName,
         abi: this.abi,
-        contractAddress: "" // Either read from config or from params 
+        contractAddress: '', // Either read from config or from params
       };
       if (dryRun) {
-        return await this.transactionService.populateTransaction(props)
+        return await this.transactionService.populateTransaction(props);
       }
 
       let tx;
-      tx = await this.transactionService.execute(props)
+      tx = await this.transactionService.execute(props);
       await tx.wait();
-      return tx
+      return tx;
     } catch (e) {
-      console.log(`An error occured while ${methodName} with params [${params}] on SpigotedLine [${props?.contractAddress}], error = [${JSON.stringify(e)}]`);
+      console.log(
+        `An error occured while ${methodName} with params [${params}] on SpigotedLine [${
+          props?.contractAddress
+        }], error = [${JSON.stringify(e)}]`
+      );
       return Promise.reject(e);
     }
   }

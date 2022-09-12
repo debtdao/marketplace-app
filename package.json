@@ -81,6 +81,7 @@
   },
   "devDependencies": {
     "babel-plugin-styled-components": "2.0.7",
+    "eslint-plugin-import": "^2.26.0",
     "locize-cli": "7.10.1"
   },
   "resolutions": {

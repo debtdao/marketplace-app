@@ -1,3 +1,7 @@
+import { BigNumberish } from 'ethers';
+import { BytesLike } from '@ethersproject/bytes/src.ts';
+import { PopulatedTransaction } from '@ethersproject/contracts/src.ts';
+
 import {
   Vault,
   VaultDynamic,
@@ -19,9 +23,6 @@ import {
   Network,
   TokenAllowance,
 } from '@types';
-import { BigNumberish } from "ethers";
-import { BytesLike } from "@ethersproject/bytes/src.ts";
-import { PopulatedTransaction } from "@ethersproject/contracts/src.ts";
 
 // *************** USER ***************
 
@@ -129,18 +130,20 @@ export enum STATUS {
   ACTIVE,
   LIQUIDATABLE,
   REPAID,
-  INSOLVENT
+  INSOLVENT,
 }
 
 export interface CreditLineService {
   getCreditLines: (props: GetCreditLinesProps) => Promise<CreditLine[]>;
 
-  addCredit: (drate: BigNumberish,
-              frate: BigNumberish,
-              amount: BigNumberish,
-              token: Address,
-              lender: Address,
-              dryRun: boolean) => Promise<TransactionResponse | PopulatedTransaction>;
+  addCredit: (
+    drate: BigNumberish,
+    frate: BigNumberish,
+    amount: BigNumberish,
+    token: Address,
+    lender: Address,
+    dryRun: boolean
+  ) => Promise<TransactionResponse | PopulatedTransaction>;
   close: (id: BytesLike) => Promise<TransactionResponse>;
   setRates: (
     id: BytesLike,
@@ -148,7 +151,11 @@ export interface CreditLineService {
     frate: BigNumberish,
     dryRun: boolean
   ) => Promise<TransactionResponse | PopulatedTransaction>;
-  increaseCredit: (id: BytesLike, amount: BigNumberish, dryRun: boolean) => Promise<TransactionResponse | PopulatedTransaction>;
+  increaseCredit: (
+    id: BytesLike,
+    amount: BigNumberish,
+    dryRun: boolean
+  ) => Promise<TransactionResponse | PopulatedTransaction>;
   depositAndRepay: (amount: BigNumberish, dryRun: boolean) => Promise<TransactionResponse | PopulatedTransaction>;
   depositAndClose: (dryRun: boolean) => Promise<TransactionResponse | PopulatedTransaction>;
 
@@ -169,24 +176,24 @@ export interface SpigotedLineService {
     claimToken: Address,
     calldata: BytesLike,
     dryRun: boolean
-  ): Promise<TransactionResponse | PopulatedTransaction>
+  ): Promise<TransactionResponse | PopulatedTransaction>;
   claimAndRepay(
     claimToken: Address,
     calldata: BytesLike,
     dryRun: boolean
-  ): Promise<TransactionResponse | PopulatedTransaction>
+  ): Promise<TransactionResponse | PopulatedTransaction>;
   addSpigot(
     revenueContract: Address,
     setting: ISpigotSetting,
     dryRun: boolean
-  ): Promise<TransactionResponse | PopulatedTransaction>
+  ): Promise<TransactionResponse | PopulatedTransaction>;
 }
 
 export interface ISpigotSetting {
-  token: Address;                // token to claim as revenue from contract
-  ownerSplit: BigNumberish;             // x/100 % to Owner, rest to Treasury
-  claimFunction: BytesLike;         // function signature on contract to call and claim revenue
-  transferOwnerFunction: BytesLike; // function signature on conract to call and transfer ownership 
+  token: Address; // token to claim as revenue from contract
+  ownerSplit: BigNumberish; // x/100 % to Owner, rest to Treasury
+  claimFunction: BytesLike; // function signature on contract to call and claim revenue
+  transferOwnerFunction: BytesLike; // function signature on conract to call and transfer ownership
 }
 
 export interface EscrowService {
@@ -200,7 +207,7 @@ export interface EscrowService {
     token: Address,
     to: Address,
     dryRun: boolean
-  ): Promise<TransactionResponse | PopulatedTransaction>
+  ): Promise<TransactionResponse | PopulatedTransaction>;
 }
 // *************** TOKEN ***************
 export interface TokenService {

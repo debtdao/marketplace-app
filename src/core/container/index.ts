@@ -10,7 +10,8 @@ import {
   VaultServiceImpl,
   GasServiceImpl,
   TransactionServiceImpl,
-  SpigotedLineServiceImpl, EscrowServiceImpl,
+  SpigotedLineServiceImpl,
+  EscrowServiceImpl,
 } from '@services';
 import { getConfig } from '@config';
 import { DIContainer, ContextContainer, ServiceContainer, ConfigContainer } from '@types';

@@ -148,12 +148,30 @@ export class CreditLineServiceImpl implements CreditLineService {
       const contract = getContract(contractAddress, this.abi, this.web3Provider.getInstanceOf('ethereum'));
       return (await contract.status()) === STATUS.ACTIVE;
     } catch (e) {
-      console.log(
-        `An error occured while getting creditLine [${contractAddress}] status, error = [${JSON.stringify(e)}]`
-      );
-      return Promise.reject(false);
+      throw e;
     }
   }
+  
+  public async isBorrowing(contractAddress: Address): Promise<boolean> {
+    try {
+      const contract = getContract(contractAddress, this.abi, this.web3Provider.getInstanceOf('ethereum'));
+      return (await contract.count()) !== 0 &&  (await contract.credits(contract.ids(0))).principal !== 0;
+    } catch (e) {
+      throw e;
+    }
+  }
+  
+  
+  public async isBorrower(contractAddress: Address): Promise<boolean> {
+    try {
+      const contract = getContract(contractAddress, this.abi, this.web3Provider.getInstanceOf('ethereum'));
+      return (await this.web3Provider.getSigner().getAddress()) === contract.borrower();
+    } catch (e) {
+      throw e;
+    }
+  }
+
+
 
   public async isMutualConsent(
     contractAddress: Address,

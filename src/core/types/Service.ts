@@ -162,6 +162,8 @@ export interface CreditLineService {
   getCredit(contractAddress: Address, id: BytesLike): Promise<Address>;
 
   isActive: (contractAddress: Address) => Promise<boolean>;
+  isBorrowing: (contractAddress: Address) => Promise<boolean>;
+  isBorrower: (contractAddress: Address) => Promise<boolean>;
   isMutualConsent: (contractAddress: Address, trxData: string | undefined, lender: Address) => Promise<boolean>;
 }
 

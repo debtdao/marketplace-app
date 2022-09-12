@@ -1,4 +1,4 @@
-﻿import { BigNumberish } from 'ethers';
+﻿import { BigNumberish, ethers } from 'ethers';
 import { BytesLike } from '@ethersproject/bytes/src.ts';
 
 import {
@@ -31,20 +31,13 @@ export function borrower(
     lender: Address
   ): Promise<string> => {
     // check if status is ACTIVE
-    if (await creditLineService.isActive(props.creditLineAddress)) {
-      console.log(
-        `Adding credit is not possible. reason: "The given creditLine [${props.creditLineAddress}] is not active"`
-      );
-      // return "";
-      throw new Error('error');
+    if (!(await creditLineService.isActive(props.creditLineAddress))) {
+      throw new Error(`Adding credit is not possible. reason: "The given creditLine [${props.creditLineAddress}] is not active`);
     }
     const populatedTrx = await creditLineService.addCredit(drate, frate, amount, token, lender, true);
     // check mutualConsent
     if (!(await creditLineService.isMutualConsent(props.creditLineAddress, populatedTrx.data, lender))) {
-      console.log(
-        `Adding credit is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.creditLineAddress}]`
-      );
-      return '';
+      throw new Error( `Adding credit is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.creditLineAddress}]`);
     }
     return (<TransactionResponse>await creditLineService.addCredit(drate, frate, amount, token, lender, false)).hash;
   };
@@ -90,14 +83,27 @@ export function borrower(
   };
 
   const depositAndRepay = async (amount: BigNumberish): Promise<string> => {
+    if (!(await creditLineService.isBorrowing(props.creditLineAddress))) {
+      throw new Error('Deposit and repay is not possible because not borrowing');
+    }
+
     return (<TransactionResponse>await creditLineService.depositAndRepay(amount, false)).hash;
   };
 
   const depositAndClose = async (): Promise<string> => {
+    if (!(await creditLineService.isBorrowing(props.creditLineAddress))) {
+      throw new Error('Deposit and close is not possible because not borrowing');
+    }
     return (<TransactionResponse>await creditLineService.depositAndClose(false)).hash;
   };
 
   const claimAndTrade = async (claimToken: Address, calldata: BytesLike): Promise<string> => {
+    if (!(await creditLineService.isBorrowing(props.creditLineAddress))) {
+      throw new Error('Claim and trade is not possible because not borrowing');
+    }
+    if (!(await creditLineService.isBorrower(props.creditLineAddress))) {
+      throw new Error('Claim and trade is not possible because signer is not borrower');
+    }
     return (<TransactionResponse>await spigotedLineService.claimAndTrade(claimToken, calldata, false)).hash;
   };
 

@@ -13,6 +13,7 @@ import {
 } from '@types';
 import { getProviderType } from '@utils';
 import { getContract } from '@frameworks/ethers';
+import { PopulatedTransaction } from "@ethersproject/contracts/src.ts";
 
 export class TransactionServiceImpl implements TransactionService {
   private yearnSdk: YearnSdk;
@@ -20,10 +21,10 @@ export class TransactionServiceImpl implements TransactionService {
   private web3Provider: Web3Provider;
 
   constructor({
-    gasService,
-    yearnSdk,
-    web3Provider,
-  }: {
+                gasService,
+                yearnSdk,
+                web3Provider,
+              }: {
     gasService: GasService;
     yearnSdk: YearnSdk;
     web3Provider: Web3Provider;
@@ -98,12 +99,45 @@ export class TransactionServiceImpl implements TransactionService {
     }
   }
 
+  public async populateTransaction(props: ExecuteTransactionProps): Promise<PopulatedTransaction> {
+    const { network, methodName, abi, contractAddress, args, overrides } = props;
+
+    let gasFees: GasFees = {};
+    try {
+      if (network === 'mainnet') {
+        // TODO: Analyze if gas service required
+        // gasFees = await this.gasService.getGasFees();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+    try {
+      const txOverrides = {
+        maxFeePerGas: gasFees.maxFeePerGas,
+        maxPriorityFeePerGas: gasFees.maxPriorityFeePerGas,
+        ...overrides,
+      };
+      const txArgs = args ? [...args, txOverrides] : [txOverrides];
+
+      const contract = getContract(contractAddress, abi, this.web3Provider.getInstanceOf('ethereum'));
+
+      return await contract.populateTransaction[methodName](...txArgs);
+
+    } catch (error: any) {
+      console.log(error);
+      return Promise.reject(error);
+    }
+    
+  }
+  
+
   public handleTransaction = async ({
-    network,
-    tx,
-    useExternalService,
-    renderNotification = true,
-  }: HandleTransactionProps): Promise<TransactionReceipt> => {
+                                      network,
+                                      tx,
+                                      useExternalService,
+                                      renderNotification = true,
+                                    }: HandleTransactionProps): Promise<TransactionReceipt> => {
     const { NETWORK_SETTINGS } = getConfig();
     const currentNetworkSettings = NETWORK_SETTINGS[network];
     const useBlocknativeNotifyService = useExternalService && currentNetworkSettings.notifyEnabled;

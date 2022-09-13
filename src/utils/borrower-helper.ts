@@ -32,12 +32,16 @@ export function borrower(
   ): Promise<string> => {
     // check if status is ACTIVE
     if (!(await creditLineService.isActive(props.creditLineAddress))) {
-      throw new Error(`Adding credit is not possible. reason: "The given creditLine [${props.creditLineAddress}] is not active`);
+      throw new Error(
+        `Adding credit is not possible. reason: "The given creditLine [${props.creditLineAddress}] is not active`
+      );
     }
     const populatedTrx = await creditLineService.addCredit(drate, frate, amount, token, lender, true);
     // check mutualConsent
     if (!(await creditLineService.isMutualConsent(props.creditLineAddress, populatedTrx.data, lender))) {
-      throw new Error( `Adding credit is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.creditLineAddress}]`);
+      throw new Error(
+        `Adding credit is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.creditLineAddress}]`
+      );
     }
     return (<TransactionResponse>await creditLineService.addCredit(drate, frate, amount, token, lender, false)).hash;
   };

@@ -6,6 +6,7 @@ import {
   CreditLineService,
   YearnSdk,
   CreditLine,
+  DebtPosition,
   TransactionService,
   Web3Provider,
   Config,
@@ -46,6 +47,25 @@ export class CreditLineServiceImpl implements CreditLineService {
   }
 
   public async getCreditLines(params: GetCreditLinesProps): Promise<CreditLine[]> {
+    const result = await fetch(`${this.graphUrl}/subgraphs/name/LineOfCredit/loan`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: `
+      query {
+        Borrower {
+          id          
+        }
+        Lender {
+          id          
+        }
+    }`,
+      }),
+    });
+    return await result.json();
+  }
+
+  public async getDebtPosition(contractAddress: Address): Promise<DebtPosition> {
     const result = await fetch(`${this.graphUrl}/subgraphs/name/LineOfCredit/loan`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
@@ -151,17 +171,16 @@ export class CreditLineServiceImpl implements CreditLineService {
       throw e;
     }
   }
-  
+
   public async isBorrowing(contractAddress: Address): Promise<boolean> {
     try {
       const contract = getContract(contractAddress, this.abi, this.web3Provider.getInstanceOf('ethereum'));
-      return (await contract.count()) !== 0 &&  (await contract.credits(contract.ids(0))).principal !== 0;
+      return (await contract.count()) !== 0 && (await contract.credits(contract.ids(0))).principal !== 0;
     } catch (e) {
       throw e;
     }
   }
-  
-  
+
   public async isBorrower(contractAddress: Address): Promise<boolean> {
     try {
       const contract = getContract(contractAddress, this.abi, this.web3Provider.getInstanceOf('ethereum'));
@@ -170,8 +189,6 @@ export class CreditLineServiceImpl implements CreditLineService {
       throw e;
     }
   }
-
-
 
   public async isMutualConsent(
     contractAddress: Address,

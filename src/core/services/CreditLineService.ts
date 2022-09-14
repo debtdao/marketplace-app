@@ -65,25 +65,6 @@ export class CreditLineServiceImpl implements CreditLineService {
     return await result.json();
   }
 
-  public async getDebtPosition(contractAddress: Address): Promise<DebtPosition> {
-    const result = await fetch(`${this.graphUrl}/subgraphs/name/LineOfCredit/loan`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: `
-      query {
-        Borrower {
-          id          
-        }
-        Lender {
-          id          
-        }
-    }`,
-      }),
-    });
-    return await result.json();
-  }
-
   public async addCredit(
     drate: BigNumberish,
     frate: BigNumberish,

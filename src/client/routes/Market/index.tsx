@@ -2,7 +2,14 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 
-import { useAppSelector, useAppDispatch, useIsMounting, useAppTranslation, useQueryParams } from '@hooks';
+import {
+  useAppSelector,
+  useAppDispatch,
+  useIsMounting,
+  useAppTranslation,
+  useQueryParams,
+  useCreditLines,
+} from '@hooks';
 import {
   ModalsActions,
   ModalSelectors,
@@ -39,7 +46,7 @@ import {
   filterData,
 } from '@utils';
 import { getConfig } from '@config';
-import { VaultView } from '@src/core/types';
+import { CreditLine, VaultView, UseCreditLinesParams } from '@src/core/types';
 import { GoblinTown } from '@assets/images';
 
 const StyledHelperCursor = styled.span`
@@ -184,6 +191,26 @@ export const Market = () => {
     (appStatus.loading || vaultsStatus.loading || tokensStatus.loading || isMounting) && !activeModal;
   const opportunitiesLoading = generalLoading && !filteredVaults.length;
   const depositsLoading = generalLoading && !deposits.length;
+
+  const defaultLineCategories: UseCreditLinesParams = {
+    // using i18m translation as keys for easy display
+    'pages.marketplace.highest-credit': {
+      first: 5,
+      orderBy: 'deposit', // NOTE: might also want to specify that queue index == 1 or something
+      orderDirection: 'desc',
+    },
+    'pages.marketplace.highest-spigot': {
+      first: 5,
+      orderBy: 'totalVolumeUsd', // NOTE: gets individual revenue contracts, not entire SpigotController
+      orderDirection: 'desc',
+    },
+    'pages.marketplace.newest': {
+      first: 5,
+      orderBy: 'start', // NOTE: theoretically gets lines that start in the future, will have to refine query
+      orderDirection: 'desc',
+    },
+  };
+  const [lineCategoriesForDisplay, , areLinesLoading] = useCreditLines(defaultLineCategories);
 
   useEffect(() => {
     setSearch(queryParams.search ?? '');

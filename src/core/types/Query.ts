@@ -44,3 +44,12 @@ export interface GetLinesArgs {
   orderBy: string;
   orderDirection: 'asc' | 'desc';
 }
+
+// React hook args wrapping these queries
+export interface UseCreditLinesParams {
+  [key: string]: GetLinesArgs;
+}
+
+export interface UseCreditLineParams {
+  id: Address;
+}

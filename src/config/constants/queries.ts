@@ -18,9 +18,21 @@ const BASE_LINE_FRAGMENT = `
   }
 `;
 
+const LINE_PAGE_CREDIT_FRAGMENT = `
+  fragment LinePageCreditFrag on Credit {
+    lender, 
+    deposit,
+    principal,
+    interestRepaid,
+    interestAccrued,
+    drawnRate,
+    token { symbol, lastPriceUsd },
+  }
+`;
+
 // lewv = line event with value
-const LINE_EVENT_FRAGMENT = `
-    fragment lewv on LineEvent { amount, value }
+const CREDIT_EVENT_FRAGMENT = `
+    fragment lewv on LineEvent { __typename, amount, value }
     fragment LineEventFrag on LineEvent {
       timestamp,
       credit { id },
@@ -35,6 +47,7 @@ const LINE_EVENT_FRAGMENT = `
       ...on InterestAccruedEvent      { ...lewv },
       ...on RemoveCollateralEvent     { ...lewv },
       ...on SetRatesEvent {
+        __typename,
         drawnRate,
         facilityRate,
       },
@@ -45,8 +58,9 @@ const LINE_EVENT_FRAGMENT = `
 const SPIGOT_EVENT_FRAGMENT = `
     fragment SpigotEventFrag on SpigotEvent {
       ...on ClaimRevenueEvent {
+        __typename,
         timestamp,
-        revenueToken { id },
+        revenueToken { symbol, lastPriceUsd },
         escrowed,
         netIncome,
         value,
@@ -65,12 +79,13 @@ const ESCROW_FRAGMENT = `
 const ESCROW_EVENT_FRAGMENT = `
     fragment EscrowEventFrag on EscrowEvent {
       timestamp,
-      ...on AddCollateralEvent    { amount, value,  }
-      ...on RemoveCollateralEvent { amount, value, }
+      ...on AddCollateralEvent    { __typename, amount, value, }
+      ...on RemoveCollateralEvent { __typename, amount, value, }
     }
 `;
 
 // QUERIES
+// ave to add fragment vars before running your query for frags to be available inside
 export const GET_LINE_QUERY = `
   ${BASE_LINE_FRAGMENT}
   query getLine(id: $id) {
@@ -86,23 +101,29 @@ export const GET_LINE_PAGE_QUERY = `
   ${TOKEN_FRAGMENT}
   ${ESCROW_FRAGMENT}
   ${BASE_LINE_FRAGMENT}
-  ${LINE_EVENT_FRAGMENT}
+  ${CREDIT_EVENT_FRAGMENT}
   ${SPIGOT_EVENT_FRAGMENT}
   ${ESCROW_EVENT_FRAGMENT}
+  ${LINE_PAGE_CREDIT_FRAGMENT}
 
   query getLinePage(id: $id) {
     lines(id: $id) {
       ...BaseLineFrag,
-      events(first: 10)     { ...LineEventFrag },
+
+      credits {
+        ...LinePageCreditFrag 
+        events(first: 5)   { ...CreditEventFrag }
+      }
       
       escrow {
         ...EscrowFrag,
         deposits {
+          timestamp,
           amount,
           enabled,
-          token             { ...TokenFrag }, 
+          token            { ...TokenFrag }, 
         },
-        events(first: 10)   { ...EscrowEventFrag }
+        events(first: 3)   { ...EscrowEventFrag }
       }
 
       spigot {
@@ -111,9 +132,8 @@ export const GET_LINE_PAGE_QUERY = `
           active,
           contract,
           startTime,
-          ownerSplit,
-          token             { ...TokenFrag },
-          events(first: 10) { ...SpigotEventFrag }
+          token             { symbol, lastPriceUSD},
+          events(first: 3)  { ...SpigotEventFrag }
         }
       }
     }

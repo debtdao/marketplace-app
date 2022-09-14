@@ -1,40 +1,47 @@
-import axios from 'axios';
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { isEqual } from 'lodash';
 
 import { getEnv } from '@src/config/env';
-import { Address, CreditLine } from '@src/core/types';
+import { getLines } from '@core/frameworks/gql';
+import { CreditLine, GetLinesArgs, UseCreditLinesParams } from '@src/core/types';
 
 import { useSelectedCreditLine } from './useSelectedCreditLine';
 
-export const useCreditLines = (query?: string, params?: object) => {
+export const useCreditLines = (params: UseCreditLinesParams): [CreditLine[] | undefined, Function, Boolean] => {
   const [creditLines, setCreditLines] = useState<CreditLine[]>([]);
-  if (!query) return creditLines;
+  const [isLoading, setLoading] = useState<boolean>(false);
+  const [args, setArgs] = useState<UseCreditLinesParams>(params);
   const { DEBT_DAO_SUBGRAPH_KEY } = getEnv();
 
-  // memo used conditionally. should not use in react hook.
-  // memoize normally outside react (gql client?)
-  // useMemo(() => {
-  //   // TODO turn into gql utils file
-  //   axios
-  //     .post(
-  //       '', // subgraph endpoint
-  //       {
-  //         data: {
-  //           query, // import query
-  //           variables: params,
-  //         },
-  //       }
-  //     )
-  //     .then((res) => {
-  //       console.log('CreditLine from subgraph', res);
-  //       if (!res?.data) return;
-  //       else {
-  //         // format creditLine data to type
-  //         setCreditLines(res.data.creditLines);
-  //       }
-  //     })
-  //     .catch((error) => null);
-  // }, [query, params]);
+  useEffect(() => {
+    if (isEqual(params, args)) return;
+    setLoading(true);
 
-  return;
+    const categoryRequests = Object(args).entries(([key, val]: [string, GetLinesArgs]) => {
+      getLines(val)
+        .then((response: any) => {
+          console.log('get lines category res: ', key, response.data);
+          return { [key]: response };
+        })
+        .catch((err) => {
+          console.log('err useCreditLines', err);
+          setLoading(false);
+          return;
+        });
+    });
+    Promise.all(categoryRequests)
+      .then((res) => {
+        console.log('all getLines reses', res);
+        const categories = categoryRequests.reduce((lines: any, l: any) => ({ ...lines, ...l }), {});
+        setCreditLines(categories);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log('err useCreditLines all', err);
+        setLoading(false);
+        return;
+      });
+  }, [args]);
+
+  return [creditLines, setArgs, isLoading];
 };

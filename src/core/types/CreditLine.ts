@@ -11,8 +11,8 @@ export interface BaseCreditLine {
   status: string;
   borrower: Address;
 
-  principal?: string;
-  interest?: string;
+  principal?: number;
+  interest?: number;
 }
 
 export interface CreditLinePage extends BaseCreditLine {
@@ -22,12 +22,15 @@ export interface CreditLinePage extends BaseCreditLine {
   type?: string;
   status: string;
 
-  principal?: string;
-  interest?: string;
+  principal?: number;
+  interest?: number;
 
   borrower: Address;
-  escrow?: Escrow;
-  spigot?: Spigot;
+
+  // subgraph id -> depsoit/spigot
+  credits: { [key: string]: LinePageCreditPosition };
+  escrow?: { [key: string]: Escrow };
+  spigot?: { [key: string]: Spigot };
 
   events?: CreditLineEvents[];
 }
@@ -39,21 +42,34 @@ export interface CreditLine extends BaseCreditLine {
   type?: string;
   status: string;
 
-  principal?: string;
-  interest?: string;
+  principal?: number;
+  interest?: number;
 
   borrower: Address;
   escrow?: { id: Address };
   spigot?: { id: Address };
 }
 
-export interface CreditPosition {
+export interface BaseCreditPosition {
   lender: Address;
-  token: Address;
-  principal: string;
-  interest: string;
+  principal: number;
+  interest: number;
   interestClaimable: string;
   events?: CreditLineEvents[];
+}
+
+export interface LinePageCreditPosition extends BaseCreditPosition {
+  lender: Address;
+  principal: number;
+  deposit: number;
+  interest: number;
+  interestRepaid: number;
+  interestAccrued: number;
+  events?: CreditLineEvents[];
+  token: {
+    symbol: string;
+    lastPriceUsd: number;
+  };
 }
 
 type CreditLineEvents = BaseEvent | SetRateEvent;
@@ -101,6 +117,14 @@ export interface Spigot {
   spigots?: RevenueContract[];
 }
 
+export interface LinePageSpigot {
+  startTime: string;
+  active: boolean;
+  // aggregate token revenue accross all spigots
+  revenue: { [key: string]: number };
+  spigots?: RevenueContract[];
+}
+
 export interface RevenueContract {
   active: boolean;
   contract: Address;
@@ -127,4 +151,21 @@ export interface BaseToken {
   symbol: string;
   decimals: number;
   lastPriceUSD?: string;
+}
+
+type EscrowTypes = 'spigot' | 'escrow';
+export interface CollateralEvent {
+  type: EscrowTypes;
+  timestamp: string;
+  amount: string;
+  symbol: string;
+  value?: number;
+}
+
+export interface CreditEvent {
+  id: string; // position id
+  timestamp: string;
+  amount: string;
+  symbol: string;
+  value?: number;
 }

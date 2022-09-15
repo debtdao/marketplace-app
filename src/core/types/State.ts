@@ -103,6 +103,7 @@ export interface CreditLineState {
   creditLine: CreditLine | undefined;
   statusMap: {
     getCreditLines: Status;
+    addCredit: Status;
   };
 }
 

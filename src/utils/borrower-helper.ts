@@ -8,6 +8,7 @@ import {
   ISpigotSetting,
   SpigotedLineService,
   TransactionResponse,
+  AddCreditProps,
 } from '@types';
 import { EscrowServiceImpl, SpigotedLineServiceImpl } from '@services';
 
@@ -17,33 +18,27 @@ interface ContractAddressesProps {
   escrowAddress: string;
 }
 
-export function borrower(
+export function borrowerHelper(
   creditLineService: CreditLineService,
   spigotedLineService: SpigotedLineService,
   escrowService: EscrowService,
   props: ContractAddressesProps
 ) {
-  const addCredit = async (
-    drate: BigNumberish,
-    frate: BigNumberish,
-    amount: BigNumberish,
-    token: Address,
-    lender: Address
-  ): Promise<string> => {
+  const addCredit = async (addCreditProps: AddCreditProps): Promise<string> => {
     // check if status is ACTIVE
     if (!(await creditLineService.isActive(props.creditLineAddress))) {
       throw new Error(
         `Adding credit is not possible. reason: "The given creditLine [${props.creditLineAddress}] is not active`
       );
     }
-    const populatedTrx = await creditLineService.addCredit(drate, frate, amount, token, lender, true);
+    const populatedTrx = await creditLineService.addCredit(addCreditProps, true);
     // check mutualConsent
-    if (!(await creditLineService.isMutualConsent(props.creditLineAddress, populatedTrx.data, lender))) {
+    if (!(await creditLineService.isMutualConsent(props.creditLineAddress, populatedTrx.data, addCreditProps.lender))) {
       throw new Error(
         `Adding credit is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.creditLineAddress}]`
       );
     }
-    return (<TransactionResponse>await creditLineService.addCredit(drate, frate, amount, token, lender, false)).hash;
+    return (<TransactionResponse>await creditLineService.addCredit(addCreditProps, false)).hash;
   };
 
   const close = async (id: BytesLike): Promise<string> => {

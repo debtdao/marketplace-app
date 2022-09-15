@@ -1,7 +1,8 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 
 import { ThunkAPI } from '@frameworks/redux';
-import { TokenDynamicData, CreditLine, Balance, Integer, GetCreditLinesProps, Address } from '@types';
+import { TokenDynamicData, CreditLine, Balance, Integer, GetCreditLinesProps, AddCreditProps, Address } from '@types';
+import { borrowerHelper } from '@utils';
 
 /* -------------------------------------------------------------------------- */
 /*                                   Setters                                  */
@@ -29,6 +30,22 @@ const getCreditLines = createAsyncThunk<{ creditLinesData: CreditLine[] }, { par
     const { creditLineService } = extra.services;
     const creditLinesData: CreditLine[] = await creditLineService.getCreditLines(params);
     return { creditLinesData };
+  }
+);
+
+const borrowerProps = {
+  creditLineAddress: '0xAc913906c6d858BbE39Cfa774282C0143715E638',
+  spigotedLineAddress: '0x910116b3FB14D968eAF69292F23EA52A456F4183',
+  escrowAddress: '0xfaffe74894e36C6534Cc13b73af015b5666b4EA9',
+};
+
+const addCredit = createAsyncThunk<{ tx: string }, { params: AddCreditProps }, ThunkAPI>(
+  'creditLines/addCredit',
+  async ({ params }, { extra }) => {
+    const { creditLineService, spigotedLineService, escrowService } = extra.services;
+    const borrower = borrowerHelper(creditLineService, spigotedLineService, escrowService, borrowerProps);
+    const tx = await borrower.addCredit(params);
+    return { tx };
   }
 );
 
@@ -113,5 +130,6 @@ export const CreditLinesActions = {
   getCreditLines,
   clearSelectedCreditLine,
   clearCreditLinesData,
+  addCredit,
   // initSubscriptions,
 };

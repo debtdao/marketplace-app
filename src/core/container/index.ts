@@ -72,6 +72,8 @@ export class Container implements DIContainer {
       vaultService: this.container.cradle.vaultService,
       gasService: this.container.cradle.gasService,
       transactionService: this.container.cradle.transactionService,
+      spigotedLineService: this.container.cradle.spigotedLineService,
+      escrowService: this.container.cradle.escrowService,
     };
   }
 

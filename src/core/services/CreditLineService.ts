@@ -15,6 +15,7 @@ import {
   TransactionResponse,
   STATUS,
   ExecuteTransactionProps,
+  AddCreditProps,
 } from '@types';
 import { getConfig } from '@config';
 import { lineOfCreditABI } from '@services/contracts';
@@ -46,38 +47,31 @@ export class CreditLineServiceImpl implements CreditLineService {
     this.abi = lineOfCreditABI;
   }
 
-  public async getCreditLines(params: GetCreditLinesProps): Promise<CreditLine[]> {
+  public async getCreditLines(): Promise<CreditLine[]> {
     const result = await fetch(`${this.graphUrl}/subgraphs/name/LineOfCredit/loan`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         query: `
-      query {
-        Borrower {
-          id          
-        }
-        Lender {
-          id          
-        }
-    }`,
+          query {
+            Borrower {
+              id          
+            }
+            Lender {
+              id          
+            }
+        }`,
       }),
     });
     return await result.json();
   }
 
-  public async addCredit(
-    drate: BigNumberish,
-    frate: BigNumberish,
-    amount: BigNumberish,
-    token: Address,
-    lender: Address,
-    dryRun: boolean
-  ): Promise<TransactionResponse | PopulatedTransaction> {
+  public async addCredit(props: AddCreditProps, dryRun: boolean): Promise<TransactionResponse | PopulatedTransaction> {
     try {
       if (dryRun) {
         return await this.transactionService.populateTransaction({
           network: 'mainnet',
-          args: [drate, frate, amount, token, lender],
+          args: [props.drate, props.frate, props.amount, props.token, props.lender],
           methodName: 'addCredit',
           abi: this.abi,
           contractAddress: '', // Either read from config or from params
@@ -87,7 +81,7 @@ export class CreditLineServiceImpl implements CreditLineService {
       let tx;
       tx = await this.transactionService.execute({
         network: 'mainnet',
-        args: [drate, frate, amount, token, lender],
+        args: [props.drate, props.frate, props.amount, props.token, props.lender],
         methodName: 'addCredit',
         abi: this.abi,
         contractAddress: '', // Either read from config or from params

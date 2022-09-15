@@ -12,10 +12,11 @@ export const creditLinesInitialState: CreditLineState = {
   creditLine: undefined,
   statusMap: {
     getCreditLines: { ...initialStatus },
+    addCredit: { ...initialStatus },
   },
 };
 
-const { setSelectedCreditLineAddress, getCreditLines, clearSelectedCreditLine, clearCreditLinesData } =
+const { setSelectedCreditLineAddress, getCreditLines, clearSelectedCreditLine, clearCreditLinesData, addCredit } =
   CreditLinesActions;
 
 const creditLinesReducer = createReducer(creditLinesInitialState, (builder) => {
@@ -55,11 +56,25 @@ const creditLinesReducer = createReducer(creditLinesInitialState, (builder) => {
       });
       state.creditLinesAddresses = union(state.creditLinesAddresses, tokenAddresses);
       state.statusMap.getCreditLines = {};
-    });
+    })
 
-  /* -------------------------------------------------------------------------- */
-  /*                                Transactions                                */
-  /* -------------------------------------------------------------------------- */
+    /* -------------------------------------------------------------------------- */
+    /*                                Transactions                                */
+    /* -------------------------------------------------------------------------- */
+
+    /* -------------------------------- addCredit ------------------------------- */
+    .addCase(addCredit.pending, (state) => {
+      state.statusMap.addCredit = { loading: true };
+    })
+    .addCase(addCredit.rejected, (state, { error }) => {
+      state.statusMap.addCredit = {
+        loading: false,
+        error: error.message,
+      };
+    })
+    .addCase(addCredit.fulfilled, (state) => {
+      state.statusMap.addCredit = {};
+    });
 
   /* --------------------------------- approve -------------------------------- */
   // Note: approve pending/rejected statuses are handled on each asset (vault/ironbank/...) approve action.

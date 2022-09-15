@@ -9,6 +9,8 @@ import {
   GasService,
   TransactionService,
   SubscriptionService,
+  SpigotedLineService,
+  EscrowService,
   YearnSdk,
 } from '@types';
 
@@ -30,6 +32,8 @@ export interface ServiceContainer {
   creditLineService: CreditLineService;
   gasService: GasService;
   transactionService: TransactionService;
+  spigotedLineService: SpigotedLineService;
+  escrowService: EscrowService;
 }
 
 export interface ConfigContainer extends Config {}

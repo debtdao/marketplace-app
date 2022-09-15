@@ -136,14 +136,7 @@ export enum STATUS {
 export interface CreditLineService {
   getCreditLines: (props: GetCreditLinesProps) => Promise<CreditLine[]>;
 
-  addCredit: (
-    drate: BigNumberish,
-    frate: BigNumberish,
-    amount: BigNumberish,
-    token: Address,
-    lender: Address,
-    dryRun: boolean
-  ) => Promise<TransactionResponse | PopulatedTransaction>;
+  addCredit: (props: AddCreditProps, dryRun: boolean) => Promise<TransactionResponse | PopulatedTransaction>;
   close: (id: BytesLike) => Promise<TransactionResponse>;
   setRates: (
     id: BytesLike,
@@ -171,6 +164,14 @@ export interface GetCreditLinesProps {
   query: string;
   params?: object;
   network: Network;
+}
+
+export interface AddCreditProps {
+  drate: BigNumberish;
+  frate: BigNumberish;
+  amount: BigNumberish;
+  token: Address;
+  lender: Address;
 }
 
 export interface SpigotedLineService {

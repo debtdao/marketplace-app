@@ -12,6 +12,8 @@ import {
   WalletSelectors,
   AppSelectors,
   NetworkSelectors,
+  CreditLinesActions,
+  CreditLinesSelectors,
 } from '@store';
 import { device } from '@themes/default';
 import {
@@ -26,7 +28,7 @@ import {
   Amount,
   ApyTooltipData,
 } from '@components/app';
-import { SpinnerLoading, Text, Tooltip, Input, SearchIcon } from '@components/common';
+import { SpinnerLoading, Text, Tooltip, Input, SearchIcon, Button } from '@components/common';
 import {
   humanize,
   USDC_DECIMALS,
@@ -184,6 +186,7 @@ export const Market = () => {
     (appStatus.loading || vaultsStatus.loading || tokensStatus.loading || isMounting) && !activeModal;
   const opportunitiesLoading = generalLoading && !filteredVaults.length;
   const depositsLoading = generalLoading && !deposits.length;
+  const addCreditStatus = useAppSelector(CreditLinesSelectors.selectAddCreditStatus);
 
   useEffect(() => {
     setSearch(queryParams.search ?? '');
@@ -195,6 +198,17 @@ export const Market = () => {
     setFilteredVaults(filteredVaults);
     window.history.replaceState(null, '', `market${search ? `?search=${search}` : ''}`);
   }, [opportunities, search]);
+
+  const dispatchAddCredit = () => {
+    const params = {
+      drate: 0,
+      frate: 0,
+      amount: 0,
+      token: '',
+      lender: '',
+    };
+    dispatch(CreditLinesActions.addCredit({ params }));
+  };
 
   const depositHandler = (vaultAddress: string) => {
     dispatch(VaultsActions.setSelectedVaultAddress({ vaultAddress }));
@@ -227,6 +241,17 @@ export const Market = () => {
 
   return (
     <ViewContainer>
+      <Button onClick={dispatchAddCredit}>Add Credit</Button>
+      {addCreditStatus.loading === true && (
+        <div>
+          <p>.... loading......</p>
+        </div>
+      )}
+      {addCreditStatus.error && (
+        <div>
+          <p>.... ERROR: {addCreditStatus.error}</p>
+        </div>
+      )}
       <StyledSliderCard
         header={t('vaults:banner.header')}
         Component={

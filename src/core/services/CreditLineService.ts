@@ -128,7 +128,7 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   public async getCredit(contractAddress: Address, id: BytesLike): Promise<Address> {
     try {
-      const contract = getContract(contractAddress, this.abi, this.web3Provider.getInstanceOf('ethereum'));
+      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
       return (await contract.credits(id)).lender;
     } catch (e) {
       console.log(
@@ -140,7 +140,7 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   public async isActive(contractAddress: Address): Promise<boolean> {
     try {
-      const contract = getContract(contractAddress, this.abi, this.web3Provider.getInstanceOf('ethereum'));
+      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
       return (await contract.status()) === STATUS.ACTIVE;
     } catch (e) {
       throw e;
@@ -149,7 +149,7 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   public async isBorrowing(contractAddress: Address): Promise<boolean> {
     try {
-      const contract = getContract(contractAddress, this.abi, this.web3Provider.getInstanceOf('ethereum'));
+      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
       return (await contract.count()) !== 0 && (await contract.credits(contract.ids(0))).principal !== 0;
     } catch (e) {
       throw e;
@@ -158,7 +158,7 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   public async isBorrower(contractAddress: Address): Promise<boolean> {
     try {
-      const contract = getContract(contractAddress, this.abi, this.web3Provider.getInstanceOf('ethereum'));
+      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
       return (await this.web3Provider.getSigner().getAddress()) === contract.borrower();
     } catch (e) {
       throw e;

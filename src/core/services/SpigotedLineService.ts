@@ -45,10 +45,10 @@ export class SpigotedLineServiceImpl implements SpigotedLineService {
 
   public async claimAndTrade(
     claimToken: Address,
-    calldata: BytesLike,
+    zeroExTradeData: BytesLike,
     dryRun: boolean
   ): Promise<TransactionResponse | PopulatedTransaction> {
-    return await this.executeContractMethod('claimAndTrade', [claimToken, calldata], dryRun);
+    return await this.executeContractMethod('claimAndTrade', [claimToken, zeroExTradeData], dryRun);
   }
 
   public async claimAndRepay(

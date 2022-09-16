@@ -1,5 +1,5 @@
 ﻿import { BigNumberish, BigNumber, ethers } from 'ethers';
-import { BytesLike } from '@ethersproject/bytes/src.ts';
+import { BytesLike, Bytes } from '@ethersproject/bytes/src.ts';
 
 import {
   Address,
@@ -126,14 +126,14 @@ export function borrowerHelper(
     return (<TransactionResponse>await creditLineService.depositAndClose(false)).hash;
   };
 
-  const claimAndTrade = async (claimToken: Address, calldata: BytesLike): Promise<string> => {
-    if (!(await creditLineService.isBorrowing(props.creditLineAddress))) {
+  const claimAndTrade = async (claimToken: Address, zeroExTradeData: Bytes): Promise<string> => {
+    if (!(await creditLineService.isBorrowing(props.spigotedLineAddress))) {
       throw new Error('Claim and trade is not possible because not borrowing');
     }
     if (!(await creditLineService.isBorrower(props.creditLineAddress))) {
       throw new Error('Claim and trade is not possible because signer is not borrower');
     }
-    return (<TransactionResponse>await spigotedLineService.claimAndTrade(claimToken, calldata, false)).hash;
+    return (<TransactionResponse>await spigotedLineService.claimAndTrade(claimToken, zeroExTradeData, false)).hash;
   };
 
   const claimAndRepay = async (claimToken: Address, calldata: BytesLike): Promise<string> => {

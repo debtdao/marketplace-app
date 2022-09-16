@@ -197,7 +197,7 @@ export interface AddCreditProps {
 export interface SpigotedLineService {
   claimAndTrade(
     claimToken: Address,
-    calldata: BytesLike,
+    zeroExTradeData: BytesLike,
     dryRun: boolean
   ): Promise<TransactionResponse | PopulatedTransaction>;
   claimAndRepay(

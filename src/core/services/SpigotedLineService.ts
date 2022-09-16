@@ -1,5 +1,5 @@
 ﻿import { BytesLike } from '@ethersproject/bytes/src.ts';
-import { PopulatedTransaction } from 'ethers';
+import { ContractFunction, BigNumber, PopulatedTransaction } from 'ethers';
 
 import {
   YearnSdk,
@@ -13,6 +13,8 @@ import {
 } from '@types';
 import { getConfig } from '@config';
 
+import { getContract } from '@frameworks/ethers';
+
 import { TransactionResponse } from '../types';
 
 import { SpigotedLineABI } from './contracts';
@@ -23,17 +25,21 @@ export class SpigotedLineServiceImpl implements SpigotedLineService {
   private transactionService: TransactionService;
   private config: Config;
   private readonly abi: Array<any>;
+  private readonly contract: ContractFunction | any;
+  private readonly contractAddress: Address;
 
   constructor({
     transactionService,
     yearnSdk,
     web3Provider,
     config,
+    contractAddress,
   }: {
     transactionService: TransactionService;
     web3Provider: Web3Provider;
     yearnSdk: YearnSdk;
     config: Config;
+    contractAddress: Address;
   }) {
     this.transactionService = transactionService;
     this.web3Provider = web3Provider;
@@ -41,6 +47,8 @@ export class SpigotedLineServiceImpl implements SpigotedLineService {
     const { GRAPH_API_URL } = getConfig();
     this.graphUrl = GRAPH_API_URL || 'https://api.thegraph.com';
     this.abi = SpigotedLineABI;
+    this.contractAddress = contractAddress;
+    this.contract = getContract(contractAddress, SpigotedLineABI, this.web3Provider.getSigner().provider);
   }
 
   public async claimAndTrade(
@@ -67,6 +75,18 @@ export class SpigotedLineServiceImpl implements SpigotedLineService {
     return await this.executeContractMethod('addSpigot', [revenueContract, setting], dryRun);
   }
 
+  private async getSignerAddress(): Promise<Address> {
+    return await this.web3Provider.getSigner().getAddress();
+  }
+
+  public async isOwner(): Promise<boolean> {
+    return (await this.getSignerAddress()) === (await this.contract.owner());
+  }
+
+  public async maxSplit(): Promise<BigNumber> {
+    return await this.contract.MAX_SPLIT();
+  }
+
   private async executeContractMethod(methodName: string, params: any[], dryRun: boolean) {
     let props: ExecuteTransactionProps | undefined = undefined;
     try {
@@ -75,7 +95,7 @@ export class SpigotedLineServiceImpl implements SpigotedLineService {
         args: params,
         methodName: methodName,
         abi: this.abi,
-        contractAddress: '', // Either read from config or from params
+        contractAddress: this.contractAddress,
       };
       if (dryRun) {
         return await this.transactionService.populateTransaction(props);
@@ -88,7 +108,7 @@ export class SpigotedLineServiceImpl implements SpigotedLineService {
     } catch (e) {
       console.log(
         `An error occured while ${methodName} with params [${params}] on SpigotedLine [${
-          props?.contractAddress
+          this.contractAddress
         }], error = [${JSON.stringify(e)}]`
       );
       return Promise.reject(e);

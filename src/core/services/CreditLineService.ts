@@ -207,6 +207,15 @@ export class CreditLineServiceImpl implements CreditLineService {
     }
   }
 
+  public async isLender(contractAddress: Address): Promise<boolean> {
+    try {
+      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
+      return (await this.web3Provider.getSigner().getAddress()) === (await contract.lender());
+    } catch (e) {
+      throw e;
+    }
+  }
+
   public async isMutualConsent(
     contractAddress: Address,
     trxData: string | undefined,

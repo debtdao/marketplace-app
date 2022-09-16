@@ -33,6 +33,7 @@ const getCreditLines = createAsyncThunk<{ creditLinesData: CreditLine[] }, { par
   }
 );
 
+// todo: put this in constant file once we have deployed contracts on mainnet
 const borrowerProps = {
   creditLineAddress: '0xAc913906c6d858BbE39Cfa774282C0143715E638',
   spigotedLineAddress: '0x910116b3FB14D968eAF69292F23EA52A456F4183',

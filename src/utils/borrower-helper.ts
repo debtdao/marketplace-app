@@ -120,7 +120,7 @@ export function borrowerHelper(
     if (!(await creditLineService.isBorrowing(props.creditLineAddress))) {
       throw new Error('Deposit and close is not possible because not borrowing');
     }
-    if(!(await creditLineService.isBorrower(props.creditLineAddress))) {
+    if (!(await creditLineService.isBorrower(props.creditLineAddress))) {
       throw new Error('Deposit and close is not possible because signer is not borrower');
     }
     return (<TransactionResponse>await creditLineService.depositAndClose(false)).hash;
@@ -130,25 +130,61 @@ export function borrowerHelper(
     if (!(await creditLineService.isBorrowing(props.spigotedLineAddress))) {
       throw new Error('Claim and trade is not possible because not borrowing');
     }
-    if (!(await creditLineService.isBorrower(props.creditLineAddress))) {
+    if (!(await creditLineService.isBorrower(props.spigotedLineAddress))) {
       throw new Error('Claim and trade is not possible because signer is not borrower');
     }
     return (<TransactionResponse>await spigotedLineService.claimAndTrade(claimToken, zeroExTradeData, false)).hash;
   };
 
   const claimAndRepay = async (claimToken: Address, calldata: BytesLike): Promise<string> => {
+    if (!(await creditLineService.isBorrowing(props.spigotedLineAddress))) {
+      throw new Error('Claim and repay is not possible because not borrowing');
+    }
+
+    const isBorrower = await creditLineService.isBorrower(props.spigotedLineAddress);
+    const isLender = await creditLineService.isLender(props.spigotedLineAddress);
+    if (!isBorrower && !isLender) {
+      throw new Error('Claim and repay is not possible because signer is not borrower or lender');
+    }
     return (<TransactionResponse>await spigotedLineService.claimAndRepay(claimToken, calldata, false)).hash;
   };
 
   const addSpigot = async (revenueContract: Address, setting: ISpigotSetting): Promise<string> => {
+    if (!(await spigotedLineService.isOwner())) {
+      throw new Error('Cannot add spigot. Signer is not owner.');
+    }
+
+    if (revenueContract === props.spigotedLineAddress) {
+      throw new Error('Invalid revenue contract address. `revenueContract` address is same as `spigotedLineAddress`');
+    }
+
+    if (
+      setting.transferOwnerFunction.length === 0 ||
+      setting.ownerSplit.gt(await spigotedLineService.maxSplit()) ||
+      setting.token == ethers.constants.AddressZero
+    ) {
+      throw new Error('Bad setting');
+    }
+
     return (<TransactionResponse>await spigotedLineService.addSpigot(revenueContract, setting, false)).hash;
   };
 
-  const addCollateral = async (amount: BigNumberish, token: Address): Promise<string> => {
+  const addCollateral = async (amount: BigNumber, token: Address): Promise<string> => {
+    if (amount.lte(0)) {
+      throw new Error('Cannot add collateral. Amount is 0 or less');
+    }
     return (<TransactionResponse>await escrowService.addCollateral(amount, token, false)).hash;
   };
 
-  const releaseCollateral = async (amount: BigNumberish, token: Address, to: Address): Promise<string> => {
+  const releaseCollateral = async (amount: BigNumber, token: Address, to: Address): Promise<string> => {
+    if (amount.lte(0)) {
+      throw new Error('Cannot release collateral. Amount is 0 or less');
+    }
+
+    if (!(await escrowService.isBorrower())) {
+      throw new Error('Release collateral is not possible because signer is not borrower');
+    }
+
     return (<TransactionResponse>await escrowService.releaseCollateral(amount, token, to, false)).hash;
   };
 

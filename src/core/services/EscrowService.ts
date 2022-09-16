@@ -1,4 +1,4 @@
-﻿import { BigNumberish, PopulatedTransaction } from 'ethers';
+﻿import { BigNumberish, BigNumber, ContractFunction, PopulatedTransaction } from 'ethers';
 
 import {
   YearnSdk,
@@ -11,6 +11,8 @@ import {
 } from '@types';
 import { getConfig } from '@config';
 
+import { getContract } from '@frameworks/ethers';
+
 import { TransactionResponse } from '../types';
 
 import { EscrowABI } from './contracts';
@@ -21,17 +23,21 @@ export class EscrowServiceImpl implements EscrowService {
   private transactionService: TransactionService;
   private config: Config;
   private readonly abi: Array<any>;
+  private readonly contract: ContractFunction | any;
+  private readonly contractAddress: Address;
 
   constructor({
     transactionService,
     yearnSdk,
     web3Provider,
     config,
+    contractAddress,
   }: {
     transactionService: TransactionService;
     web3Provider: Web3Provider;
     yearnSdk: YearnSdk;
     config: Config;
+    contractAddress: Address;
   }) {
     this.transactionService = transactionService;
     this.web3Provider = web3Provider;
@@ -39,10 +45,12 @@ export class EscrowServiceImpl implements EscrowService {
     const { GRAPH_API_URL } = getConfig();
     this.graphUrl = GRAPH_API_URL || 'https://api.thegraph.com';
     this.abi = EscrowABI;
+    this.contractAddress = contractAddress;
+    this.contract = getContract(contractAddress, EscrowABI, this.web3Provider.getSigner().provider);
   }
 
   public async addCollateral(
-    amount: BigNumberish,
+    amount: BigNumber,
     token: Address,
     dryRun: boolean
   ): Promise<TransactionResponse | PopulatedTransaction> {
@@ -50,12 +58,20 @@ export class EscrowServiceImpl implements EscrowService {
   }
 
   public async releaseCollateral(
-    amount: BigNumberish,
+    amount: BigNumber,
     token: Address,
     to: Address,
     dryRun: boolean
   ): Promise<TransactionResponse | PopulatedTransaction> {
     return await this.executeContractMethod('releaseCollateral', [amount, token, to], dryRun);
+  }
+
+  private async getSignerAddress(): Promise<Address> {
+    return await this.web3Provider.getSigner().getAddress();
+  }
+
+  public async isBorrower(): Promise<boolean> {
+    return (await this.getSignerAddress()) === (await this.contract.borrower());
   }
 
   private async executeContractMethod(methodName: string, params: any[], dryRun: boolean) {
@@ -66,7 +82,7 @@ export class EscrowServiceImpl implements EscrowService {
         args: params,
         methodName: methodName,
         abi: this.abi,
-        contractAddress: '', // Either read from config or from params
+        contractAddress: this.contractAddress,
       };
       if (dryRun) {
         return await this.transactionService.populateTransaction(props);

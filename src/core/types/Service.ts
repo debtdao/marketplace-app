@@ -1,5 +1,5 @@
 import { BigNumberish, BigNumber } from 'ethers';
-import { BytesLike } from '@ethersproject/bytes/src.ts';
+import { Bytes, BytesLike } from '@ethersproject/bytes/src.ts';
 import { PopulatedTransaction } from '@ethersproject/contracts/src.ts';
 
 import {
@@ -165,6 +165,7 @@ export interface CreditLineService {
   isActive: (contractAddress: Address) => Promise<boolean>;
   isBorrowing: (contractAddress: Address) => Promise<boolean>;
   isBorrower: (contractAddress: Address) => Promise<boolean>;
+  isLender: (contractAddress: Address) => Promise<boolean>;
   isMutualConsent: (
     contractAddress: Address,
     trxData: string | undefined,
@@ -210,27 +211,30 @@ export interface SpigotedLineService {
     setting: ISpigotSetting,
     dryRun: boolean
   ): Promise<TransactionResponse | PopulatedTransaction>;
+  isOwner(): Promise<boolean>;
+  maxSplit(): Promise<BigNumber>;
 }
 
 export interface ISpigotSetting {
   token: Address; // token to claim as revenue from contract
-  ownerSplit: BigNumberish; // x/100 % to Owner, rest to Treasury
-  claimFunction: BytesLike; // function signature on contract to call and claim revenue
-  transferOwnerFunction: BytesLike; // function signature on conract to call and transfer ownership
+  ownerSplit: BigNumber; // x/100 % to Owner, rest to Treasury
+  claimFunction: Bytes; // function signature on contract to call and claim revenue
+  transferOwnerFunction: Bytes; // function signature on conract to call and transfer ownership
 }
 
 export interface EscrowService {
   addCollateral(
-    amount: BigNumberish,
+    amount: BigNumber,
     token: Address,
     dryRun: boolean
   ): Promise<TransactionResponse | PopulatedTransaction>;
   releaseCollateral(
-    amount: BigNumberish,
+    amount: BigNumber,
     token: Address,
     to: Address,
     dryRun: boolean
   ): Promise<TransactionResponse | PopulatedTransaction>;
+  isBorrower(): Promise<boolean>;
 }
 // *************** TOKEN ***************
 export interface TokenService {

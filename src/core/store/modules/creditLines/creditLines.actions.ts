@@ -37,13 +37,20 @@ const borrowerProps = {
   creditLineAddress: '0xAc913906c6d858BbE39Cfa774282C0143715E638',
   spigotedLineAddress: '0x910116b3FB14D968eAF69292F23EA52A456F4183',
   escrowAddress: '0xfaffe74894e36C6534Cc13b73af015b5666b4EA9',
+  interestRateCredit: '0x9B85812b22543Eb1A9e5Eed5F279d8160953c113',
 };
 
 const addCredit = createAsyncThunk<{ tx: string }, { params: AddCreditProps }, ThunkAPI>(
   'creditLines/addCredit',
   async ({ params }, { extra }) => {
-    const { creditLineService, spigotedLineService, escrowService } = extra.services;
-    const borrower = borrowerHelper(creditLineService, spigotedLineService, escrowService, borrowerProps);
+    const { creditLineService, spigotedLineService, escrowService, interestRateCreditService } = extra.services;
+    const borrower = borrowerHelper(
+      creditLineService,
+      interestRateCreditService,
+      spigotedLineService,
+      escrowService,
+      borrowerProps
+    );
     const tx = await borrower.addCredit(params);
     return { tx };
   }

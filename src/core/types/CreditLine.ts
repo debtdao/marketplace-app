@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers';
 import { Address, Event } from './Blockchain';
 import { TokenView } from './Token';
 
@@ -35,4 +36,14 @@ export interface Collateral {
   token: Address;
   amount: string; // figure out which BigNumber they use
   value: string;
+}
+
+export interface Credit {
+  deposit: BigNumber;
+  principal: BigNumber;
+  interestAccrued: BigNumber;
+  interestRepaid: BigNumber;
+  decimals: BigNumber;
+  token: Address;
+  lender: Address;
 }

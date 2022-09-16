@@ -1,4 +1,4 @@
-import { BigNumberish } from 'ethers';
+import { BigNumberish, BigNumber } from 'ethers';
 import { BytesLike } from '@ethersproject/bytes/src.ts';
 import { PopulatedTransaction } from '@ethersproject/contracts/src.ts';
 
@@ -22,6 +22,7 @@ import {
   Overrides,
   Network,
   TokenAllowance,
+  Credit,
 } from '@types';
 
 // *************** USER ***************
@@ -133,6 +134,10 @@ export enum STATUS {
   INSOLVENT,
 }
 
+export interface InterestRateCreditService {
+  accrueInterest: (props: InterestRateAccrueInterestProps) => Promise<BigNumber>;
+}
+
 export interface CreditLineService {
   getCreditLines: (props: GetCreditLinesProps) => Promise<CreditLine[]>;
 
@@ -149,15 +154,30 @@ export interface CreditLineService {
     amount: BigNumberish,
     dryRun: boolean
   ) => Promise<TransactionResponse | PopulatedTransaction>;
-  depositAndRepay: (amount: BigNumberish, dryRun: boolean) => Promise<TransactionResponse | PopulatedTransaction>;
+  depositAndRepay: (amount: BigNumber, dryRun: boolean) => Promise<TransactionResponse | PopulatedTransaction>;
   depositAndClose: (dryRun: boolean) => Promise<TransactionResponse | PopulatedTransaction>;
 
-  getCredit(contractAddress: Address, id: BytesLike): Promise<Address>;
-
+  // helpers
+  getFirstID(contractAddress: Address): Promise<BytesLike>;
+  getCredit(contractAddress: Address, id: BytesLike): Promise<Credit>;
+  getLenderByCreditID(contractAddress: Address, id: BytesLike): Promise<Address>;
+  borrower: (contractAddress: Address) => Promise<string>;
   isActive: (contractAddress: Address) => Promise<boolean>;
   isBorrowing: (contractAddress: Address) => Promise<boolean>;
   isBorrower: (contractAddress: Address) => Promise<boolean>;
-  isMutualConsent: (contractAddress: Address, trxData: string | undefined, lender: Address) => Promise<boolean>;
+  isMutualConsent: (
+    contractAddress: Address,
+    trxData: string | undefined,
+    signerOne: Address,
+    signerTwo: Address
+  ) => Promise<boolean>;
+  isSignerBorrowerOrLender: (contractAddress: Address, id: BytesLike) => Promise<boolean>;
+}
+
+export interface InterestRateAccrueInterestProps {
+  id: BytesLike;
+  drawnBalance: BigNumberish;
+  facilityBalance: BigNumberish;
 }
 
 export interface GetCreditLinesProps {

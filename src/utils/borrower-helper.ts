@@ -1,4 +1,4 @@
-﻿import { BigNumberish, ethers } from 'ethers';
+﻿import { BigNumberish, BigNumber, ethers } from 'ethers';
 import { BytesLike } from '@ethersproject/bytes/src.ts';
 
 import {
@@ -8,9 +8,9 @@ import {
   ISpigotSetting,
   SpigotedLineService,
   TransactionResponse,
+  InterestRateCreditService,
   AddCreditProps,
 } from '@types';
-import { EscrowServiceImpl, SpigotedLineServiceImpl } from '@services';
 
 interface ContractAddressesProps {
   creditLineAddress: string;
@@ -20,6 +20,7 @@ interface ContractAddressesProps {
 
 export function borrowerHelper(
   creditLineService: CreditLineService,
+  interestRateCreditService: InterestRateCreditService,
   spigotedLineService: SpigotedLineService,
   escrowService: EscrowService,
   props: ContractAddressesProps
@@ -33,7 +34,15 @@ export function borrowerHelper(
     }
     const populatedTrx = await creditLineService.addCredit(addCreditProps, true);
     // check mutualConsent
-    if (!(await creditLineService.isMutualConsent(props.creditLineAddress, populatedTrx.data, addCreditProps.lender))) {
+    const borrower = await creditLineService.borrower(props.creditLineAddress);
+    if (
+      !(await creditLineService.isMutualConsent(
+        props.creditLineAddress,
+        populatedTrx.data,
+        addCreditProps.lender,
+        borrower
+      ))
+    ) {
       throw new Error(
         `Adding credit is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.creditLineAddress}]`
       );
@@ -42,18 +51,21 @@ export function borrowerHelper(
   };
 
   const close = async (id: BytesLike): Promise<string> => {
+    if (!(await creditLineService.isSignerBorrowerOrLender(props.creditLineAddress, id))) {
+      throw new Error('Unable to close. Signer is not borrower or lender');
+    }
     return (await creditLineService.close(id)).hash;
   };
 
   const setRates = async (id: BytesLike, drate: BigNumberish, frate: BigNumberish): Promise<string> => {
     // check mutualConsentById
     const populatedTrx = await creditLineService.setRates(id, drate, frate, true);
-    const nonCaller = await creditLineService.getCredit(props.creditLineAddress, id);
-    if (!(await creditLineService.isMutualConsent(props.creditLineAddress, populatedTrx.data, nonCaller))) {
-      console.log(
+    const borrower = await creditLineService.borrower(props.creditLineAddress);
+    const lender = await creditLineService.getLenderByCreditID(props.creditLineAddress, id);
+    if (!(await creditLineService.isMutualConsent(props.creditLineAddress, populatedTrx.data, borrower, lender))) {
+      throw new Error(
         `Setting rate is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.creditLineAddress}]`
       );
-      return '';
     }
 
     return (<TransactionResponse>await creditLineService.setRates(id, drate, frate, false)).hash;
@@ -62,36 +74,54 @@ export function borrowerHelper(
   const increaseCredit = async (id: BytesLike, amount: BigNumberish): Promise<string> => {
     // if(status != LineLib.STATUS.ACTIVE) { revert NotActive(); }
     if (await creditLineService.isActive(props.creditLineAddress)) {
-      console.log(
+      throw new Error(
         `Increasing credit is not possible. reason: "The given creditLine [${props.creditLineAddress}] is not active"`
       );
-      return '';
     }
 
     // check mutualConsentById
     const populatedTrx = await creditLineService.increaseCredit(id, amount, true);
-    const nonCaller = await creditLineService.getCredit(props.creditLineAddress, id);
-    if (!(await creditLineService.isMutualConsent(props.creditLineAddress, populatedTrx.data, nonCaller))) {
-      console.log(
+    const borrower = await creditLineService.borrower(props.creditLineAddress);
+    const lender = await creditLineService.getLenderByCreditID(props.creditLineAddress, id);
+    if (!(await creditLineService.isMutualConsent(props.creditLineAddress, populatedTrx.data, borrower, lender))) {
+      throw new Error(
         `Increasing credit is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.creditLineAddress}]`
       );
-      return '';
     }
 
     return (<TransactionResponse>await creditLineService.increaseCredit(id, amount, false)).hash;
   };
 
-  const depositAndRepay = async (amount: BigNumberish): Promise<string> => {
+  const depositAndRepay = async (amount: BigNumber): Promise<string> => {
     if (!(await creditLineService.isBorrowing(props.creditLineAddress))) {
       throw new Error('Deposit and repay is not possible because not borrowing');
     }
 
+    const id = await creditLineService.getFirstID(props.creditLineAddress);
+    const credit = await creditLineService.getCredit(props.creditLineAddress, id);
+
+    // check interest accrual
+    // note: `accrueInterest` will not be called because it has a modifier that is expecting
+    // line of credit to be the msg.sender. We should probably update that modifier since
+    // it only does the calculation and doesn't change state.
+    const calcAccrue = await interestRateCreditService.accrueInterest({
+      id,
+      drawnBalance: credit.principal,
+      facilityBalance: credit.deposit,
+    });
+    const simulateAccrue = credit.interestAccrued.add(calcAccrue);
+    if (amount.gt(credit.principal.add(simulateAccrue))) {
+      throw new Error('Amount is greater than (principal + interest to be accrued). Enter lower amount.');
+    }
     return (<TransactionResponse>await creditLineService.depositAndRepay(amount, false)).hash;
   };
 
   const depositAndClose = async (): Promise<string> => {
     if (!(await creditLineService.isBorrowing(props.creditLineAddress))) {
       throw new Error('Deposit and close is not possible because not borrowing');
+    }
+    if(!(await creditLineService.isBorrower(props.creditLineAddress))) {
+      throw new Error('Deposit and close is not possible because signer is not borrower');
     }
     return (<TransactionResponse>await creditLineService.depositAndClose(false)).hash;
   };

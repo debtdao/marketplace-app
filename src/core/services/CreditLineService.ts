@@ -6,16 +6,15 @@ import {
   CreditLineService,
   YearnSdk,
   CreditLine,
-  DebtPosition,
   TransactionService,
   Web3Provider,
   Config,
-  GetCreditLinesProps,
   Address,
   TransactionResponse,
   STATUS,
   ExecuteTransactionProps,
   AddCreditProps,
+  Credit,
 } from '@types';
 import { getConfig } from '@config';
 import { lineOfCreditABI } from '@services/contracts';
@@ -126,59 +125,12 @@ export class CreditLineServiceImpl implements CreditLineService {
     return await this.executeContractMethod('depositAndClose', [], dryRun);
   }
 
-  public async getCredit(contractAddress: Address, id: BytesLike): Promise<Address> {
+  public async getLenderByCreditID(contractAddress: Address, id: BytesLike): Promise<Address> {
     try {
       const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
       return (await contract.credits(id)).lender;
     } catch (e) {
-      console.log(
-        `An error occured while getting credit [${contractAddress}] with id [${id}], error = [${JSON.stringify(e)}]`
-      );
-      return Promise.reject(false);
-    }
-  }
-
-  public async isActive(contractAddress: Address): Promise<boolean> {
-    try {
-      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
-      return (await contract.status()) === STATUS.ACTIVE;
-    } catch (e) {
       throw e;
-    }
-  }
-
-  public async isBorrowing(contractAddress: Address): Promise<boolean> {
-    try {
-      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
-      return (await contract.count()) !== 0 && (await contract.credits(contract.ids(0))).principal !== 0;
-    } catch (e) {
-      throw e;
-    }
-  }
-
-  public async isBorrower(contractAddress: Address): Promise<boolean> {
-    try {
-      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
-      return (await this.web3Provider.getSigner().getAddress()) === contract.borrower();
-    } catch (e) {
-      throw e;
-    }
-  }
-
-  public async isMutualConsent(
-    contractAddress: Address,
-    trxData: string | undefined,
-    lender: Address
-  ): Promise<boolean> {
-    try {
-      const contract = getContract(contractAddress, this.abi, this.web3Provider.getInstanceOf('ethereum'));
-      const expectedHash = keccak256(ethers.utils.solidityPack(['string', 'address'], [trxData, lender]));
-      return contract.mutualConsents(expectedHash);
-    } catch (e) {
-      console.log(
-        `An error occured while getting creditLine [${contractAddress}] status, error = [${JSON.stringify(e)}]`
-      );
-      return Promise.reject(false);
     }
   }
 
@@ -207,6 +159,80 @@ export class CreditLineServiceImpl implements CreditLineService {
         }], error = [${JSON.stringify(e)}] `
       );
       return Promise.reject(e);
+    }
+  }
+
+  /* ============================= Helpers =============================*/
+
+  public async getFirstID(contractAddress: string): Promise<BytesLike> {
+    const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
+    return await contract.ids(0);
+  }
+
+  public async getCredit(contractAddress: string, id: BytesLike): Promise<Credit> {
+    const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
+    return await contract.credits(id);
+  }
+
+  public async borrower(contractAddress: Address): Promise<string> {
+    const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
+    return await contract.borrower();
+  }
+
+  public async isActive(contractAddress: Address): Promise<boolean> {
+    try {
+      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
+      return (await contract.status()) === STATUS.ACTIVE;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  public async isBorrowing(contractAddress: Address): Promise<boolean> {
+    try {
+      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
+      const id = await contract.ids(0);
+      return (await contract.count()) !== 0 && (await contract.credits(id)).principal !== 0;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  public async isBorrower(contractAddress: Address): Promise<boolean> {
+    try {
+      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
+      return (await this.web3Provider.getSigner().getAddress()) === (await contract.borrower());
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  public async isMutualConsent(
+    contractAddress: Address,
+    trxData: string | undefined,
+    signerOne: Address,
+    signerTwo: Address
+  ): Promise<boolean> {
+    try {
+      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
+      const signer = await this.web3Provider.getSigner().getAddress();
+      const isSignerValid = signer === signerOne || signer === signerTwo;
+      const nonCaller = signer === signerOne ? signerTwo : signerOne;
+      const expectedHash = keccak256(ethers.utils.solidityPack(['string', 'address'], [trxData, nonCaller]));
+      return isSignerValid && contract.mutualConsents(expectedHash);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  public async isSignerBorrowerOrLender(contractAddress: Address, id: BytesLike): Promise<boolean> {
+    try {
+      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
+      const signer = await this.web3Provider.getSigner().getAddress();
+      const credit = await contract.credits(id);
+      return signer === credit.lender || signer === (await contract.borrower());
+    } catch (e) {
+      throw e;
     }
   }
 }

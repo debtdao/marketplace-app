@@ -26,7 +26,7 @@ const LINE_PAGE_CREDIT_FRAGMENT = `
     interestRepaid,
     interestAccrued,
     drawnRate,
-    token { symbol, lastPriceUsd },
+    token { symbol },
   }
 `;
 
@@ -60,7 +60,7 @@ const SPIGOT_EVENT_FRAGMENT = `
       ...on ClaimRevenueEvent {
         __typename,
         timestamp,
-        revenueToken { symbol, lastPriceUsd },
+        revenueToken { symbol, lastPriceUSD },
         escrowed,
         netIncome,
         value,

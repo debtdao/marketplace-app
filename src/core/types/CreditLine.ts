@@ -30,9 +30,13 @@ export interface CreditLinePage extends BaseCreditLine {
   // subgraph id -> depsoit/spigot
   credits: { [key: string]: LinePageCreditPosition };
   escrow?: { [key: string]: Escrow };
-  spigot?: { [key: string]: Spigot };
+  spigot?: {
+    revenue: { [key: string]: number };
+    spigots: { [key: string]: Spigot };
+  };
 
-  events?: CreditLineEvents[];
+  collateralEvents: CollateralEvent[];
+  creditEvents: CreditLineEvents[];
 }
 
 export interface CreditLine extends BaseCreditLine {
@@ -64,33 +68,18 @@ export interface LinePageCreditPosition extends BaseCreditPosition {
   deposit: number;
   interest: number;
   interestRepaid: number;
-  interestAccrued: number;
   events?: CreditLineEvents[];
   token: {
     symbol: string;
-    lastPriceUsd: number;
+    lastPriceUSD: number;
   };
 }
 
-type CreditLineEvents = BaseEvent | SetRateEvent;
-
-export interface SetRateEvent {
-  timestamp: number;
-  drawnRate: string;
-  facilityRate: string;
-}
-
+// Collateral Module Types
 export interface Collateral {
   token: Address;
   amount: string;
   value: string;
-}
-
-export interface BaseEvent {
-  timestamp: number;
-  amount?: string;
-  value?: string;
-  [key: string]: any;
 }
 
 export interface BaseEscrow {
@@ -135,16 +124,6 @@ export interface RevenueContract {
   events?: SpigotEvents[];
 }
 
-type SpigotEvents = BaseEvent | ClaimRevenueEvent;
-
-export interface ClaimRevenueEvent {
-  timestamp: number;
-  revenueToken: { id: string };
-  escrowed: string;
-  netIncome: string;
-  value: string;
-}
-
 export interface BaseToken {
   id: string;
   name: string;
@@ -153,19 +132,59 @@ export interface BaseToken {
   lastPriceUSD?: string;
 }
 
-type EscrowTypes = 'spigot' | 'escrow';
-export interface CollateralEvent {
-  type: EscrowTypes;
-  timestamp: string;
+type SPIGOT_NAME = 'spigot';
+export const SPIGOT_MODULE_NAME: SPIGOT_NAME = 'spigot';
+type ESCROW_NAME = 'escrow';
+export const ESCROW_MODULE_NAME: ESCROW_NAME = 'escrow';
+type CREDIT_NAME = 'credit';
+export const CREDIT_MODULE_NAME: CREDIT_NAME = 'credit';
+
+export type ModuleNames = SPIGOT_NAME | CREDIT_NAME | ESCROW_NAME;
+
+//  Events Types
+
+// Common
+export interface EventWithValue {
+  timestamp: number;
+  amount?: string;
+  symbol: string;
+  value?: number;
+  [key: string]: any;
+}
+
+// Credit Events
+export interface CreditEvent extends EventWithValue {
+  id: string; // position id
+  timestamp: number;
   amount: string;
   symbol: string;
   value?: number;
 }
 
-export interface CreditEvent {
-  id: string; // position id
-  timestamp: string;
+export interface SetRateEvent {
+  timestamp: number;
+  drawnRate: string;
+  facilityRate: string;
+}
+
+export type CreditLineEvents = CreditEvent | SetRateEvent;
+
+// Collateral Events
+export interface CollateralEvent extends EventWithValue {
+  type: ModuleNames;
+  timestamp: number;
   amount: string;
   symbol: string;
   value?: number;
+}
+
+// Spigot Events
+type SpigotEvents = EventWithValue | ClaimRevenueEvent;
+
+export interface ClaimRevenueEvent {
+  timestamp: number;
+  revenueToken: { id: string };
+  escrowed: string;
+  netIncome: string;
+  value: string;
 }

@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import { ApolloClient, InMemoryCache, gql, useQuery, DocumentNode, QueryResult } from '@apollo/client';
 
 import { getEnv } from '@config/env';
 import { GET_LINE_QUERY, GET_LINE_PAGE_QUERY, GET_LINES_QUERY } from '@config/constants/queries';
@@ -9,13 +9,13 @@ const {
   // DEBT_DAO_SUBGRAPH_NAME,
 } = getEnv();
 
-const APIURL = `https://api.studio.thegraph.com/query/${DEBT_DAO_SUBGRAPH_KEY}/debtdao/`; // <--SUBGRAPH_NAME here
+const GQL_API_URL = `https://api.studio.thegraph.com/query/${DEBT_DAO_SUBGRAPH_KEY}/debtdao/`; // <--SUBGRAPH_NAME here
 
 let client: any;
-const getClient = () => (client ? client : createClient());
+export const getClient = () => (client ? client : createClient());
 const createClient = (): typeof ApolloClient => {
   client = new ApolloClient({
-    uri: APIURL,
+    uri: GQL_API_URL,
     cache: new InMemoryCache(),
   });
 
@@ -26,10 +26,24 @@ const createClient = (): typeof ApolloClient => {
 // e.g. const getLine = createQuery(GET_LINE_QUERY); getLine({ id: "0x" });
 // TODO: allow types to be passed in as args in createQuery so we dont need two lines of code for each function
 // 1. for creating curried func and 2. for defining arg/return types of that func
+/**
+ *
+ * @param query - string of graph query
+ * @returns {
+ *  loading?: boolean; if
+ *  error?: object; JS error object?
+ *  data?: response data formatted to submitted query
+ * }
+ */
 export const createQuery =
   (query: string): Function =>
-  (variables: any): Promise<any> => {
-    return getClient().query({ query, variables });
+  (variables: any): any => {
+    return useQuery(
+      gql`
+        ${query}
+      `,
+      { variables }
+    );
   };
 
 const getLineQuery = createQuery(GET_LINE_QUERY);

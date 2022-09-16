@@ -1,8 +1,21 @@
+import { BaseCreditLine, CreditLinePage } from '@types';
+
 import { Address } from './Blockchain';
 
 export interface QueryVariables {
   [key: string]: string;
 }
+
+export interface QueryResponse {
+  loading: boolean;
+  error?: string | object;
+  data?: QueryResponseTypes;
+
+  // make backwards compatible with Apollos response type
+  [key: string]: any;
+}
+
+type QueryResponseTypes = BaseCreditLine | BaseCreditLine[] | CreditLinePage | undefined;
 
 /**
  * @typedef {object} Query

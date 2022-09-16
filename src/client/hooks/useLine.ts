@@ -11,7 +11,7 @@ export function useLine(id: Address): [BaseCreditLine | undefined, Boolean] {
     if (!line) {
       isLoading(true);
       getLine({ id })
-        .then((line) => {
+        .then(({ error, loading, data }) => {
           console.log('response from graphql', line);
           if (!line) throw Error('getLine failed');
           setLine(line);

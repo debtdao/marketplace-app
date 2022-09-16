@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache, gql, useQuery, DocumentNode, QueryResult }
 
 import { getEnv } from '@config/env';
 import { GET_LINE_QUERY, GET_LINE_PAGE_QUERY, GET_LINES_QUERY } from '@config/constants/queries';
-import { BaseCreditLine, CreditLine, GetLineArgs, GetLinePageArgs, GetLinesArgs } from '@src/core/types';
+import { BaseCreditLine, CreditLine, GetLineArgs, GetLinePageArgs, GetLinesArgs, QueryResponse } from '@src/core/types';
 
 const {
   DEBT_DAO_SUBGRAPH_KEY,
@@ -22,35 +22,28 @@ const createClient = (): typeof ApolloClient => {
   return client;
 };
 
-// curried factory func to export funcs for each query that can be reused anywhere
-// e.g. const getLine = createQuery(GET_LINE_QUERY); getLine({ id: "0x" });
-// TODO: allow types to be passed in as args in createQuery so we dont need two lines of code for each function
-// 1. for creating curried func and 2. for defining arg/return types of that func
 /**
- *
+ * @desc - curried factory func to export funcs for each query that can be reused anywhere
+ * @example - const getLine = createQuery(GET_LINE_QUERY); getLine({ id: "0x" });
  * @param query - string of graph query
  * @returns {
- *  loading?: boolean; if
+ *  loading?: boolean; if request has completed or not
  *  error?: object; JS error object?
  *  data?: response data formatted to submitted query
  * }
+ * @dev - TODO: allow types to be passed in as args in createQuery so we dont need two lines of code for each function
+ *        1. for creating curried func and 2. for defining arg/return types of that func
  */
 export const createQuery =
-  (query: string): Function =>
-  (variables: any): any => {
-    return useQuery(
-      gql`
-        ${query}
-      `,
-      { variables }
-    );
-  };
+  (query: DocumentNode): Function =>
+  (variables: any): QueryResponse =>
+    useQuery(query, { variables });
 
 const getLineQuery = createQuery(GET_LINE_QUERY);
-export const getLine = (arg: GetLineArgs): Promise<BaseCreditLine | undefined> => getLineQuery(arg);
+export const getLine = (arg: GetLineArgs): Promise<QueryResponse> => getLineQuery(arg);
 
 const getLinePageQuery = createQuery(GET_LINE_PAGE_QUERY);
-export const getLinePage = (arg: GetLinePageArgs): Promise<CreditLine | undefined> => getLinePageQuery(arg);
+export const getLinePage = (arg: GetLinePageArgs): Promise<QueryResponse> => getLinePageQuery(arg);
 
 const getLinesQuery = createQuery(GET_LINES_QUERY);
-export const getLines = (arg: GetLinesArgs): Promise<BaseCreditLine[] | undefined> => getLinesQuery(arg);
+export const getLines = (arg: GetLinesArgs): Promise<QueryResponse> => getLinesQuery(arg);

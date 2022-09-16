@@ -158,16 +158,15 @@ export interface CreditLineService {
   depositAndClose: (dryRun: boolean) => Promise<TransactionResponse | PopulatedTransaction>;
 
   // helpers
-  getFirstID(contractAddress: Address): Promise<BytesLike>;
-  getCredit(contractAddress: Address, id: BytesLike): Promise<Credit>;
-  getLenderByCreditID(contractAddress: Address, id: BytesLike): Promise<Address>;
-  borrower: (contractAddress: Address) => Promise<string>;
-  isActive: (contractAddress: Address) => Promise<boolean>;
-  isBorrowing: (contractAddress: Address) => Promise<boolean>;
-  isBorrower: (contractAddress: Address) => Promise<boolean>;
-  isLender: (contractAddress: Address) => Promise<boolean>;
+  getFirstID(): Promise<BytesLike>;
+  getCredit(id: BytesLike): Promise<Credit>;
+  getLenderByCreditID(id: BytesLike): Promise<Address>;
+  borrower: () => Promise<Address>;
+  isActive: () => Promise<boolean>;
+  isBorrowing: () => Promise<boolean>;
+  isBorrower: () => Promise<boolean>;
+  isLender: () => Promise<boolean>;
   isMutualConsent: (
-    contractAddress: Address,
     trxData: string | undefined,
     signerOne: Address,
     signerTwo: Address
@@ -213,6 +212,10 @@ export interface SpigotedLineService {
   ): Promise<TransactionResponse | PopulatedTransaction>;
   isOwner(): Promise<boolean>;
   maxSplit(): Promise<BigNumber>;
+  isBorrowing: () => Promise<boolean>;
+  isBorrower: () => Promise<boolean>;
+  borrower(): Promise<Address>;
+  isLender(): Promise<boolean>;
 }
 
 export interface ISpigotSetting {

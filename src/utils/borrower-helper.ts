@@ -27,17 +27,16 @@ export function borrowerHelper(
 ) {
   const addCredit = async (addCreditProps: AddCreditProps): Promise<string> => {
     // check if status is ACTIVE
-    if (!(await creditLineService.isActive(props.creditLineAddress))) {
+    if (!(await creditLineService.isActive())) {
       throw new Error(
         `Adding credit is not possible. reason: "The given creditLine [${props.creditLineAddress}] is not active`
       );
     }
     const populatedTrx = await creditLineService.addCredit(addCreditProps, true);
     // check mutualConsent
-    const borrower = await creditLineService.borrower(props.creditLineAddress);
+    const borrower = await creditLineService.borrower();
     if (
       !(await creditLineService.isMutualConsent(
-        props.creditLineAddress,
         populatedTrx.data,
         addCreditProps.lender,
         borrower
@@ -60,9 +59,9 @@ export function borrowerHelper(
   const setRates = async (id: BytesLike, drate: BigNumberish, frate: BigNumberish): Promise<string> => {
     // check mutualConsentById
     const populatedTrx = await creditLineService.setRates(id, drate, frate, true);
-    const borrower = await creditLineService.borrower(props.creditLineAddress);
-    const lender = await creditLineService.getLenderByCreditID(props.creditLineAddress, id);
-    if (!(await creditLineService.isMutualConsent(props.creditLineAddress, populatedTrx.data, borrower, lender))) {
+    const borrower = await creditLineService.borrower();
+    const lender = await creditLineService.getLenderByCreditID(id);
+    if (!(await creditLineService.isMutualConsent(populatedTrx.data, borrower, lender))) {
       throw new Error(
         `Setting rate is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.creditLineAddress}]`
       );
@@ -72,8 +71,7 @@ export function borrowerHelper(
   };
 
   const increaseCredit = async (id: BytesLike, amount: BigNumberish): Promise<string> => {
-    // if(status != LineLib.STATUS.ACTIVE) { revert NotActive(); }
-    if (await creditLineService.isActive(props.creditLineAddress)) {
+    if (await creditLineService.isActive()) {
       throw new Error(
         `Increasing credit is not possible. reason: "The given creditLine [${props.creditLineAddress}] is not active"`
       );
@@ -81,9 +79,9 @@ export function borrowerHelper(
 
     // check mutualConsentById
     const populatedTrx = await creditLineService.increaseCredit(id, amount, true);
-    const borrower = await creditLineService.borrower(props.creditLineAddress);
-    const lender = await creditLineService.getLenderByCreditID(props.creditLineAddress, id);
-    if (!(await creditLineService.isMutualConsent(props.creditLineAddress, populatedTrx.data, borrower, lender))) {
+    const borrower = await creditLineService.borrower();
+    const lender = await creditLineService.getLenderByCreditID(id);
+    if (!(await creditLineService.isMutualConsent(populatedTrx.data, borrower, lender))) {
       throw new Error(
         `Increasing credit is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.creditLineAddress}]`
       );
@@ -93,12 +91,12 @@ export function borrowerHelper(
   };
 
   const depositAndRepay = async (amount: BigNumber): Promise<string> => {
-    if (!(await creditLineService.isBorrowing(props.creditLineAddress))) {
+    if (!(await creditLineService.isBorrowing())) {
       throw new Error('Deposit and repay is not possible because not borrowing');
     }
 
-    const id = await creditLineService.getFirstID(props.creditLineAddress);
-    const credit = await creditLineService.getCredit(props.creditLineAddress, id);
+    const id = await creditLineService.getFirstID();
+    const credit = await creditLineService.getCredit(id);
 
     // check interest accrual
     // note: `accrueInterest` will not be called because it has a modifier that is expecting
@@ -117,32 +115,32 @@ export function borrowerHelper(
   };
 
   const depositAndClose = async (): Promise<string> => {
-    if (!(await creditLineService.isBorrowing(props.creditLineAddress))) {
+    if (!(await creditLineService.isBorrowing())) {
       throw new Error('Deposit and close is not possible because not borrowing');
     }
-    if (!(await creditLineService.isBorrower(props.creditLineAddress))) {
+    if (!(await creditLineService.isBorrower())) {
       throw new Error('Deposit and close is not possible because signer is not borrower');
     }
     return (<TransactionResponse>await creditLineService.depositAndClose(false)).hash;
   };
 
   const claimAndTrade = async (claimToken: Address, zeroExTradeData: Bytes): Promise<string> => {
-    if (!(await creditLineService.isBorrowing(props.spigotedLineAddress))) {
+    if (!(await spigotedLineService.isBorrowing())) {
       throw new Error('Claim and trade is not possible because not borrowing');
     }
-    if (!(await creditLineService.isBorrower(props.spigotedLineAddress))) {
+    if (!(await spigotedLineService.isBorrower())) {
       throw new Error('Claim and trade is not possible because signer is not borrower');
     }
     return (<TransactionResponse>await spigotedLineService.claimAndTrade(claimToken, zeroExTradeData, false)).hash;
   };
 
   const claimAndRepay = async (claimToken: Address, calldata: BytesLike): Promise<string> => {
-    if (!(await creditLineService.isBorrowing(props.spigotedLineAddress))) {
+    if (!(await spigotedLineService.isBorrowing())) {
       throw new Error('Claim and repay is not possible because not borrowing');
     }
 
-    const isBorrower = await creditLineService.isBorrower(props.spigotedLineAddress);
-    const isLender = await creditLineService.isLender(props.spigotedLineAddress);
+    const isBorrower = await spigotedLineService.isBorrower();
+    const isLender = await spigotedLineService.isLender();
     if (!isBorrower && !isLender) {
       throw new Error('Claim and repay is not possible because signer is not borrower or lender');
     }

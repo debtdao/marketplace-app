@@ -79,6 +79,23 @@ export class SpigotedLineServiceImpl implements SpigotedLineService {
     return await this.web3Provider.getSigner().getAddress();
   }
 
+  public async borrower(): Promise<Address> {
+    return await this.contract.borrower();
+  }
+
+  public async isBorrowing(): Promise<boolean> {
+    const id = await this.contract.ids(0);
+    return (await this.contract.count()) !== 0 && (await this.contract.credits(id)).principal !== 0;
+  }
+
+  public async isBorrower(): Promise<boolean> {
+    return (await this.getSignerAddress()) === (await this.contract.borrower());
+  }
+
+  public async isLender(): Promise<boolean> {
+    return (await this.getSignerAddress()) === (await this.contract.lender());
+  }
+
   public async isOwner(): Promise<boolean> {
     return (await this.getSignerAddress()) === (await this.contract.owner());
   }

@@ -1,4 +1,4 @@
-import { BigNumberish, ethers, PopulatedTransaction } from 'ethers';
+import { BigNumberish, ContractFunction, ethers, PopulatedTransaction } from 'ethers';
 import { BytesLike } from '@ethersproject/bytes/src.ts';
 import { keccak256 } from 'ethers/lib/utils';
 
@@ -26,17 +26,21 @@ export class CreditLineServiceImpl implements CreditLineService {
   private transactionService: TransactionService;
   private config: Config;
   private readonly abi: Array<any>;
+  private readonly contract: ContractFunction | any;
+  private readonly contractAddress: Address;
 
   constructor({
     transactionService,
     yearnSdk,
     web3Provider,
     config,
+    contractAddress,
   }: {
     transactionService: TransactionService;
     web3Provider: Web3Provider;
     yearnSdk: YearnSdk;
     config: Config;
+    contractAddress: Address;
   }) {
     this.transactionService = transactionService;
     this.web3Provider = web3Provider;
@@ -44,6 +48,12 @@ export class CreditLineServiceImpl implements CreditLineService {
     const { GRAPH_API_URL } = getConfig();
     this.graphUrl = GRAPH_API_URL || 'https://api.thegraph.com';
     this.abi = lineOfCreditABI;
+    this.contractAddress = contractAddress;
+    this.contract = getContract(contractAddress, lineOfCreditABI, this.web3Provider.getSigner().provider);
+  }
+
+  private async getSignerAddress(): Promise<Address> {
+    return await this.web3Provider.getSigner().getAddress();
   }
 
   public async getCreditLines(): Promise<CreditLine[]> {
@@ -73,7 +83,7 @@ export class CreditLineServiceImpl implements CreditLineService {
           args: [props.drate, props.frate, props.amount, props.token, props.lender],
           methodName: 'addCredit',
           abi: this.abi,
-          contractAddress: '', // Either read from config or from params
+          contractAddress: this.contractAddress,
         });
       }
 
@@ -83,7 +93,7 @@ export class CreditLineServiceImpl implements CreditLineService {
         args: [props.drate, props.frate, props.amount, props.token, props.lender],
         methodName: 'addCredit',
         abi: this.abi,
-        contractAddress: '', // Either read from config or from params
+        contractAddress: this.contractAddress,
       });
       await tx.wait();
       return tx;
@@ -125,15 +135,6 @@ export class CreditLineServiceImpl implements CreditLineService {
     return await this.executeContractMethod('depositAndClose', [], dryRun);
   }
 
-  public async getLenderByCreditID(contractAddress: Address, id: BytesLike): Promise<Address> {
-    try {
-      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
-      return (await contract.credits(id)).lender;
-    } catch (e) {
-      throw e;
-    }
-  }
-
   private async executeContractMethod(methodName: string, params: any[], dryRun: boolean) {
     let props: ExecuteTransactionProps | undefined = undefined;
     try {
@@ -142,7 +143,7 @@ export class CreditLineServiceImpl implements CreditLineService {
         args: params,
         methodName: methodName,
         abi: this.abi,
-        contractAddress: '', // Either read from config or from params
+        contractAddress: this.contractAddress,
       };
       if (dryRun) {
         return await this.transactionService.populateTransaction(props);
@@ -164,84 +165,54 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   /* ============================= Helpers =============================*/
 
-  public async getFirstID(contractAddress: string): Promise<BytesLike> {
-    const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
-    return await contract.ids(0);
+  public async getLenderByCreditID(id: BytesLike): Promise<Address> {
+    return (await this.contract.credits(id)).lender;
   }
 
-  public async getCredit(contractAddress: string, id: BytesLike): Promise<Credit> {
-    const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
-    return await contract.credits(id);
+  public async getFirstID(): Promise<BytesLike> {
+    return await this.contract.ids(0);
   }
 
-  public async borrower(contractAddress: Address): Promise<string> {
-    const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
-    return await contract.borrower();
+  public async getCredit(id: BytesLike): Promise<Credit> {
+    return await this.contract.credits(id);
   }
 
-  public async isActive(contractAddress: Address): Promise<boolean> {
-    try {
-      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
-      return (await contract.status()) === STATUS.ACTIVE;
-    } catch (e) {
-      throw e;
-    }
+  public async borrower(): Promise<Address> {
+    return await this.contract.borrower();
   }
 
-  public async isBorrowing(contractAddress: Address): Promise<boolean> {
-    try {
-      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
-      const id = await contract.ids(0);
-      return (await contract.count()) !== 0 && (await contract.credits(id)).principal !== 0;
-    } catch (e) {
-      throw e;
-    }
+  public async isActive(): Promise<boolean> {
+    return (await this.contract.status()) === STATUS.ACTIVE;
   }
 
-  public async isBorrower(contractAddress: Address): Promise<boolean> {
-    try {
-      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
-      return (await this.web3Provider.getSigner().getAddress()) === (await contract.borrower());
-    } catch (e) {
-      throw e;
-    }
+  public async isBorrowing(): Promise<boolean> {
+    const id = await this.contract.ids(0);
+    return (await this.contract.count()) !== 0 && (await this.contract.credits(id)).principal !== 0;
   }
 
-  public async isLender(contractAddress: Address): Promise<boolean> {
-    try {
-      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
-      return (await this.web3Provider.getSigner().getAddress()) === (await contract.lender());
-    } catch (e) {
-      throw e;
-    }
+  public async isBorrower(): Promise<boolean> {
+    return (await this.getSignerAddress()) === (await this.contract.borrower());
+  }
+
+  public async isLender(): Promise<boolean> {
+    return (await this.getSignerAddress()) === (await this.contract.lender());
   }
 
   public async isMutualConsent(
-    contractAddress: Address,
     trxData: string | undefined,
     signerOne: Address,
     signerTwo: Address
   ): Promise<boolean> {
-    try {
-      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
-      const signer = await this.web3Provider.getSigner().getAddress();
-      const isSignerValid = signer === signerOne || signer === signerTwo;
-      const nonCaller = signer === signerOne ? signerTwo : signerOne;
-      const expectedHash = keccak256(ethers.utils.solidityPack(['string', 'address'], [trxData, nonCaller]));
-      return isSignerValid && contract.mutualConsents(expectedHash);
-    } catch (e) {
-      throw e;
-    }
+    const signer = await this.getSignerAddress();
+    const isSignerValid = signer === signerOne || signer === signerTwo;
+    const nonCaller = signer === signerOne ? signerTwo : signerOne;
+    const expectedHash = keccak256(ethers.utils.solidityPack(['string', 'address'], [trxData, nonCaller]));
+    return isSignerValid && this.contract.mutualConsents(expectedHash);
   }
 
-  public async isSignerBorrowerOrLender(contractAddress: Address, id: BytesLike): Promise<boolean> {
-    try {
-      const contract = getContract(contractAddress, this.abi, this.web3Provider.getSigner().provider);
-      const signer = await this.web3Provider.getSigner().getAddress();
-      const credit = await contract.credits(id);
-      return signer === credit.lender || signer === (await contract.borrower());
-    } catch (e) {
-      throw e;
-    }
+  public async isSignerBorrowerOrLender(id: BytesLike): Promise<boolean> {
+    const signer = await this.getSignerAddress();
+    const credit = await this.contract.credits(id);
+    return signer === credit.lender || signer === (await this.contract.borrower());
   }
 }

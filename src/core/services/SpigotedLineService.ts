@@ -92,16 +92,22 @@ export class SpigotedLineServiceImpl implements SpigotedLineService {
     return (await this.getSignerAddress()) === (await this.contract.borrower());
   }
 
-  public async isLender(): Promise<boolean> {
-    return (await this.getSignerAddress()) === (await this.contract.lender());
-  }
-
   public async isOwner(): Promise<boolean> {
     return (await this.getSignerAddress()) === (await this.contract.owner());
   }
 
   public async maxSplit(): Promise<BigNumber> {
     return await this.contract.MAX_SPLIT();
+  }
+
+  public async getFirstID(): Promise<BytesLike> {
+    return await this.contract.ids(0);
+  }
+
+  public async isSignerBorrowerOrLender(id: BytesLike): Promise<boolean> {
+    const signer = await this.getSignerAddress();
+    const credit = await this.contract.credits(id);
+    return signer === credit.lender || signer === (await this.contract.borrower());
   }
 
   private async executeContractMethod(methodName: string, params: any[], dryRun: boolean) {

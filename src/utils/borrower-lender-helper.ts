@@ -18,7 +18,7 @@ interface ContractAddressesProps {
   escrowAddress: string;
 }
 
-export function borrowerHelper(
+export function borrowerLenderHelper(
   creditLineService: CreditLineService,
   interestRateCreditService: InterestRateCreditService,
   spigotedLineService: SpigotedLineService,
@@ -133,9 +133,7 @@ export function borrowerHelper(
       throw new Error('Claim and repay is not possible because not borrowing');
     }
 
-    const isBorrower = await spigotedLineService.isBorrower();
-    const isLender = await spigotedLineService.isLender();
-    if (!isBorrower && !isLender) {
+    if (!(await spigotedLineService.isSignerBorrowerOrLender(await spigotedLineService.getFirstID()))) {
       throw new Error('Claim and repay is not possible because signer is not borrower or lender');
     }
     return (<TransactionResponse>await spigotedLineService.claimAndRepay(claimToken, calldata, false)).hash;
@@ -180,9 +178,17 @@ export function borrowerHelper(
     return (<TransactionResponse>await escrowService.releaseCollateral(amount, token, to, false)).hash;
   };
 
+  const withdraw = async (id: Bytes, amount: BigNumber): Promise<string> => {
+    if (!(await creditLineService.isLender(id))) {
+      throw new Error('Cannot withdraw. Signer is not lender');
+    }
+    return (await creditLineService.withdraw(id, amount)).hash;
+  };
+
   return {
     addCredit,
     close,
+    withdraw,
     setRates,
     increaseCredit,
     depositAndRepay,

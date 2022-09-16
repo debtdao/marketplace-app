@@ -1,6 +1,6 @@
-import { BigNumberish, ContractFunction, ethers, PopulatedTransaction } from 'ethers';
+import { BigNumber, BigNumberish, ContractFunction, ethers, PopulatedTransaction } from 'ethers';
 import { BytesLike } from '@ethersproject/bytes/src.ts';
-import { keccak256 } from 'ethers/lib/utils';
+import { Bytes, keccak256 } from 'ethers/lib/utils';
 
 import {
   CreditLineService,
@@ -107,6 +107,10 @@ export class CreditLineServiceImpl implements CreditLineService {
     return <TransactionResponse>await this.executeContractMethod('close', [id], false);
   }
 
+  public async withdraw(id: Bytes, amount: BigNumber): Promise<TransactionResponse> {
+    return <TransactionResponse>await this.executeContractMethod('withdraw', [id, amount], false);
+  }
+
   public async setRates(
     id: BytesLike,
     drate: BigNumberish,
@@ -194,8 +198,8 @@ export class CreditLineServiceImpl implements CreditLineService {
     return (await this.getSignerAddress()) === (await this.contract.borrower());
   }
 
-  public async isLender(): Promise<boolean> {
-    return (await this.getSignerAddress()) === (await this.contract.lender());
+  public async isLender(id: BytesLike): Promise<boolean> {
+    return (await this.getSignerAddress()) === (await this.getLenderByCreditID(id));
   }
 
   public async isMutualConsent(trxData: string | undefined, signerOne: Address, signerTwo: Address): Promise<boolean> {

@@ -2,7 +2,7 @@ import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 
 import { ThunkAPI } from '@frameworks/redux';
 import { TokenDynamicData, CreditLine, Balance, Integer, GetCreditLinesProps, AddCreditProps, Address } from '@types';
-import { borrowerHelper } from '@utils';
+import { borrowerLenderHelper } from '@utils';
 
 /* -------------------------------------------------------------------------- */
 /*                                   Setters                                  */
@@ -45,14 +45,14 @@ const addCredit = createAsyncThunk<{ tx: string }, { params: AddCreditProps }, T
   'creditLines/addCredit',
   async ({ params }, { extra }) => {
     const { creditLineService, spigotedLineService, escrowService, interestRateCreditService } = extra.services;
-    const borrower = borrowerHelper(
+    const helper = borrowerLenderHelper(
       creditLineService,
       interestRateCreditService,
       spigotedLineService,
       escrowService,
       borrowerProps
     );
-    const tx = await borrower.addCredit(params);
+    const tx = await helper.addCredit(params);
     return { tx };
   }
 );

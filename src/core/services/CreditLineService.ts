@@ -198,11 +198,7 @@ export class CreditLineServiceImpl implements CreditLineService {
     return (await this.getSignerAddress()) === (await this.contract.lender());
   }
 
-  public async isMutualConsent(
-    trxData: string | undefined,
-    signerOne: Address,
-    signerTwo: Address
-  ): Promise<boolean> {
+  public async isMutualConsent(trxData: string | undefined, signerOne: Address, signerTwo: Address): Promise<boolean> {
     const signer = await this.getSignerAddress();
     const isSignerValid = signer === signerOne || signer === signerTwo;
     const nonCaller = signer === signerOne ? signerTwo : signerOne;

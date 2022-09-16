@@ -166,11 +166,7 @@ export interface CreditLineService {
   isBorrowing: () => Promise<boolean>;
   isBorrower: () => Promise<boolean>;
   isLender: () => Promise<boolean>;
-  isMutualConsent: (
-    trxData: string | undefined,
-    signerOne: Address,
-    signerTwo: Address
-  ) => Promise<boolean>;
+  isMutualConsent: (trxData: string | undefined, signerOne: Address, signerTwo: Address) => Promise<boolean>;
   isSignerBorrowerOrLender: (contractAddress: Address, id: BytesLike) => Promise<boolean>;
 }
 

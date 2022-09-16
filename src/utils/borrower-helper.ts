@@ -35,13 +35,7 @@ export function borrowerHelper(
     const populatedTrx = await creditLineService.addCredit(addCreditProps, true);
     // check mutualConsent
     const borrower = await creditLineService.borrower();
-    if (
-      !(await creditLineService.isMutualConsent(
-        populatedTrx.data,
-        addCreditProps.lender,
-        borrower
-      ))
-    ) {
+    if (!(await creditLineService.isMutualConsent(populatedTrx.data, addCreditProps.lender, borrower))) {
       throw new Error(
         `Adding credit is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.creditLineAddress}]`
       );

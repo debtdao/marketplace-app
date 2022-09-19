@@ -6,7 +6,6 @@ import { PartnerId } from './Partner';
 import { Theme } from './Settings';
 import { Status } from './Status';
 import { LineActionsStatusMap, UserLineMetadataStatusMap, BaseCreditLine, PositionSummary } from './CreditLine';
-
 import {
   Position,
   Token,
@@ -29,7 +28,7 @@ export interface RootState {
   vaults: VaultsState;
   wallet: WalletState;
   tokens: TokensState;
-  creditLines: CreditLineState;
+  lines: CreditLineState;
   settings: SettingsState;
   // user: UserState;
   partner: PartnerState;
@@ -105,13 +104,13 @@ export interface CreditLineState {
     activeLines: Address[];
     linePositions: { [positionId: string]: PositionSummary };
     lineAllowances: AllowancesMap;
-  }
+  };
   statusMap: {
     getLines: Status;
     getLine: Status;
     getLinePage: Status;
     getAllowances: Status;
-    user: UserLineMetadataStatusMap
+    user: UserLineMetadataStatusMap;
   };
 }
 

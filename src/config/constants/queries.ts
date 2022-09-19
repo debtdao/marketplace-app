@@ -165,7 +165,7 @@ export const GET_LINE_QUERY = gql`
 export const GET_USER_POSITIONS_QUERY = gql`
   ${BASE_LINE_FRAGMENT}
   query getUserPositions($id: ID!) {
-    borrower(id: $id)  {
+    borrower(id: $id) {
       debts {
         ...BaseLineFrag
       }

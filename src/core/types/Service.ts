@@ -18,6 +18,7 @@ import {
   Overrides,
   Network,
   TokenAllowance,
+  GetLineArgs,
 } from '@types';
 
 // *************** USER ***************
@@ -120,14 +121,13 @@ export interface MigrateProps {
   migrationContractAddress: Address;
 }
 
-// *************** LOAN ***************
+// *************** LINE ***************
 export interface CreditLineService {
-  getCreditLines: (props: GetCreditLinesProps) => Promise<CreditLine[]>;
+  getLine: (props: GetCreditLinesProps) => Promise<CreditLine>;
 }
 
 export interface GetCreditLinesProps {
-  query: string;
-  params?: object;
+  params: GetLineArgs;
   network: Network;
 }
 

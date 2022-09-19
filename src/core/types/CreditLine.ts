@@ -3,7 +3,6 @@ import { Token } from 'graphql';
 import { Address } from './Blockchain';
 import { TokenView } from './Token';
 import { Status } from './Status';
-import { NumericDictionary } from 'lodash';
 
 export interface BaseCreditLine {
   id: Address;
@@ -187,7 +186,6 @@ export interface ClaimRevenueEvent {
   value: string;
 }
 
-
 // Redux State
 export interface LineActionsStatusMap {
   get: Status;
@@ -202,10 +200,11 @@ export interface UserLineMetadataStatusMap {
 }
 
 export interface PositionSummary {
+  borrower: Address;
+  lender: Address;
   token: Address;
   deposit: string;
   principal: string;
   drate: number;
   frate: number;
 }
-

@@ -2,7 +2,15 @@ import { ApolloClient, InMemoryCache, gql, useQuery, DocumentNode, QueryResult }
 
 import { getEnv } from '@config/env';
 import { GET_LINE_QUERY, GET_LINE_PAGE_QUERY, GET_LINES_QUERY } from '@config/constants/queries';
-import { BaseCreditLine, CreditLine, GetLineArgs, GetLinePageArgs, GetLinesArgs, QueryResponse } from '@src/core/types';
+import {
+  BaseCreditLine,
+  CreditLine,
+  GetLineArgs,
+  GetLinePageArgs,
+  GetLinesArgs,
+  GetUserLinePositionsArgs,
+  QueryResponse,
+} from '@src/core/types';
 
 const {
   DEBT_DAO_SUBGRAPH_KEY,
@@ -47,3 +55,7 @@ export const getLinePage = (arg: GetLinePageArgs): Promise<QueryResponse> => get
 
 const getLinesQuery = createQuery(GET_LINES_QUERY);
 export const getLines = (arg: GetLinesArgs): Promise<QueryResponse> => getLinesQuery(arg);
+
+const getUserLinePositionsQuery = createQuery(GET_LINES_QUERY);
+export const getUserLinePositions = (arg: GetUserLinePositionsArgs): Promise<QueryResponse> =>
+  getUserLinePositionsQuery(arg);

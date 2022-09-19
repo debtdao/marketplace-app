@@ -1,13 +1,7 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { difference, groupBy, keyBy, union } from 'lodash';
 
-import {
-  initialStatus,
-  Position,
-  CreditLineState,
-  UserLineMetadataStatusMap,
-  LineActionsStatusMap,
-} from '@types';
+import { initialStatus, Position, CreditLineState, UserLineMetadataStatusMap, LineActionsStatusMap, PositionSummary } from '@types';
 
 import { LinesActions } from './lines.actions';
 
@@ -43,10 +37,9 @@ export const linesInitialState: CreditLineState = {
 const {
   approveDeposit,
   depositLine,
-  approveZapOut,
-  signZapOut,
+  // approveZapOut,
+  // signZapOut,
   withdrawLine,
-  approveMigrate,
   // migrateLine,
   getLines,
   initiateSaveLines,
@@ -56,7 +49,6 @@ const {
   clearUserData,
   getExpectedTransactionOutcome,
   clearTransactionData,
-  getUserLinePositions,
   getUserLinesMetadata,
   clearSelectedLineAndStatus,
   clearLineStatus,
@@ -77,7 +69,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     /* -------------------------------------------------------------------------- */
     .addCase(clearLinesData, (state) => {
       state.linesMap = {};
-
     })
     .addCase(clearUserData, (state) => {
       state.user.activeLines = [];
@@ -145,6 +136,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(getUserLinePositions.fulfilled, (state, { meta, payload: { userLinesPositions } }) => {
       // old yearn code
       // const linesPositionsMap = parsePositionsIntoMap(userLinesPositions);
+
       const lineAddresses = meta.arg.lineAddresses;
       lineAddresses?.forEach((address) => {
         state.statusMap.user.getUserLinePositions = {};
@@ -170,7 +162,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
           state.user.linePositions = { ...userLinesPositionsMapClone };
         });
       } else {
-        state.user.linePositions = { ...state.user.linePositions, /* ...linesPositionsMap */ };
+        state.user.linePositions = { ...state.user.linePositions /* ...linesPositionsMap */ };
       }
 
       state.statusMap.user.getUserLinePositions = {};
@@ -187,8 +179,8 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(getUserLinePositions.pending, (state) => {
       state.statusMap.user.getUserLinePositions = { loading: true };
     })
-    .addCase(getUserLinePositions.fulfilled, (state, { payload: { linePositions } }) => {
-      state.user.linePositions = linePositions;
+    .addCase(getUserLinePositions.fulfilled, (state, { payload: { userLinesPositions } }) => {
+      state.user.linePositions = userLinesPositions.reduce((map, line) => ({ ...map, [line]: state.linesMap[line]}), {});
       state.statusMap.user.getUserLinePositions = {};
     })
     .addCase(getUserLinePositions.rejected, (state, { error }) => {
@@ -240,7 +232,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.user.linesActionsStatusMap[lineAddress].deposit = { error: error.message };
     })
 
-
     /* ------------------------------ withdrawLine ----------------------------- */
     .addCase(withdrawLine.pending, (state, { meta }) => {
       const lineAddress = meta.arg.lineAddress;
@@ -253,7 +244,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(withdrawLine.rejected, (state, { error, meta }) => {
       const lineAddress = meta.arg.lineAddress;
       state.statusMap.user.linesActionsStatusMap[lineAddress].withdraw = { error: error.message };
-    })
+    });
 });
 
 // old yearn code

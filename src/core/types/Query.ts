@@ -59,13 +59,12 @@ export interface GetLinesArgs {
 }
 
 /**
- * @typedef {object} GetUserPositionsArgs
- * @property {Address} GetUserPositionsArgs.id - address of line contract
+ * @typedef {object} GetUserLinePositionsArgs
+ * @property {Address} GetUserLinePositionsArgs.id - address to look up credit.debit positions for
  */
-export interface GetUserPositionsArgs {
+export interface GetUserLinePositionsArgs {
   id: Address;
 }
-
 
 // React hook args wrapping these queries
 export interface UseCreditLinesParams {

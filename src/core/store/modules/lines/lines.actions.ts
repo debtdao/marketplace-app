@@ -12,6 +12,9 @@ import {
   Address,
   Wei,
   TokenAllowance,
+  GetLinesArgs,
+  GetLinePageArgs,
+  PositionSummary,
 } from '@types';
 import {
   calculateSharesAmount,
@@ -51,32 +54,32 @@ const clearLineStatus = createAction<{ lineAddress: string }>('lines/clearLineSt
 const initiateSaveLines = createAsyncThunk<void, string | undefined, ThunkAPI>(
   'lines/initiateSaveLines',
   async (_arg, { dispatch }) => {
-    await dispatch(getLines({}));
+    await dispatch(getLines([]));
   }
 );
 
-const getLines = createAsyncThunk<{ linesData: CreditLine[] }, { addresses?: string[] }, ThunkAPI>(
+const getLines = createAsyncThunk<{ linesData: CreditLine[][] }, GetLinesArgs[], ThunkAPI>(
   'lines/getLines',
-  async ({ addresses }, { getState, extra }) => {
+  async (categories, { getState, extra }) => {
     const { network } = getState();
     const { creditLineService } = extra.services;
-    const linesData = await creditLineService.getSupportedLines({ network: network.current, addresses });
+    const linesData = await creditLineService.getLines({ network: network.current, categories });
     return { linesData };
   }
 );
 
-const getLinePage = createAsyncThunk<{ linesDynamicData: CreditLinePage[] }, { addresses: string[] }, ThunkAPI>(
+const getLinePage = createAsyncThunk<{ linesDynamicData: CreditLinePage }, GetLinePageArgs, ThunkAPI>(
   'lines/getLinePage',
-  async ({ addresses }, { getState, extra }) => {
+  async ({ id }, { getState, extra }) => {
     const { network } = getState();
     const { creditLineService } = extra.services;
-    const linesDynamicData = await creditLineService.getLinesDynamicData({ network: network.current, addresses });
+    const linesDynamicData = await creditLineService.getLinePage({ network: network.current, id });
     return { linesDynamicData };
   }
 );
 
 const getUserLinePositions = createAsyncThunk<
-  { userLinesPositions: Position[] },
+  { userLinesPositions: PositionSummary[] },
   { lineAddresses?: string[] },
   ThunkAPI
 >('lines/getUserLinePositions', async ({ lineAddresses }, { extra, getState }) => {
@@ -92,43 +95,6 @@ const getUserLinePositions = createAsyncThunk<
     lineAddresses,
   });
   return { userLinesPositions };
-});
-
-const getUserLinesSummary = createAsyncThunk<{ userLinesSummary: LinesUserSummary }, void, ThunkAPI>(
-  'lines/getUserLinesSummary',
-  async (args, { extra, getState }) => {
-    const { network, wallet } = getState();
-    const { services } = extra;
-    const userAddress = wallet.selectedAddress;
-    if (!userAddress) {
-      throw new Error('WALLET NOT CONNECTED');
-    }
-    const userLinesSummary = await services.creditLineService.getUserLinesSummary({
-      network: network.current,
-      userAddress,
-    });
-    return { userLinesSummary };
-  }
-);
-
-const getUserLinesMetadata = createAsyncThunk<
-  { userLinesMetadata: LineUserMetadata[] },
-  { linesAddresses?: string[] },
-  ThunkAPI
->('lines/getUserLinesMetadata', async ({ linesAddresses }, { extra, getState }) => {
-  const { network, wallet } = getState();
-  const { creditLineService } = extra.services;
-  const userAddress = wallet.selectedAddress;
-  if (!userAddress) {
-    throw new Error('WALLET NOT CONNECTED');
-  }
-  const userLinesMetadata = await creditLineService.getUserLinesMetadata({
-    network: network.current,
-    userAddress,
-    linesAddresses,
-  });
-
-  return { userLinesMetadata };
 });
 
 export interface GetExpectedTransactionOutcomeProps {
@@ -203,62 +169,66 @@ const approveDeposit = createAsyncThunk<void, { lineAddress: string; tokenAddres
   }
 );
 
-const approveZapOut = createAsyncThunk<void, { lineAddress: string; tokenAddress: string }, ThunkAPI>(
-  'lines/approveZapOut',
-  async ({ lineAddress, tokenAddress }, { getState, dispatch, extra }) => {
-    const { wallet, network } = getState();
-    const { creditLineService, transactionService } = extra.services;
-    const amount = extra.config.MAX_UINT256;
+/////
+// øld yearn<>zapper code. Keep for future zaps re-integration
+/////
 
-    const accountAddress = wallet.selectedAddress;
-    if (!accountAddress) throw new Error('WALLET NOT CONNECTED');
+// const approveZapOut = createAsyncThunk<void, { lineAddress: string; tokenAddress: string }, ThunkAPI>(
+//   'lines/approveZapOut',
+//   async ({ lineAddress, tokenAddress }, { getState, dispatch, extra }) => {
+//     const { wallet, network } = getState();
+//     const { creditLineService, transactionService } = extra.services;
+//     const amount = extra.config.MAX_UINT256;
 
-    const tx = await creditLineService.approveZapOut({
-      network: network.current,
-      accountAddress,
-      amount,
-      lineAddress,
-      tokenAddress,
-    });
+//     const accountAddress = wallet.selectedAddress;
+//     if (!accountAddress) throw new Error('WALLET NOT CONNECTED');
 
-    await transactionService.handleTransaction({ tx, network: network.current });
+//     const tx = await creditLineService.approveZapOut({
+//       network: network.current,
+//       accountAddress,
+//       amount,
+//       lineAddress,
+//       tokenAddress,
+//     });
 
-    await dispatch(getWithdrawAllowance({ tokenAddress, lineAddress }));
-  },
-  {
-    // serializeError: parseError,
-  }
-);
+//     await transactionService.handleTransaction({ tx, network: network.current });
 
-const signZapOut = createAsyncThunk<{ signature: string }, { lineAddress: string }, ThunkAPI>(
-  'lines/signZapOut',
-  async ({ lineAddress }, { getState, extra }) => {
-    const { network, wallet } = getState();
-    const { creditLineService } = extra.services;
-    const { CONTRACT_ADDRESSES } = extra.config;
+//     await dispatch(getWithdrawAllowance({ tokenAddress, lineAddress }));
+//   },
+//   {
+//     // serializeError: parseError,
+//   }
+// );
 
-    // NOTE: this values are hardcoded on zappers zapOut contract
-    const amount = '79228162514260000000000000000'; // https://etherscan.io/address/0xd6b88257e91e4E4D4E990B3A858c849EF2DFdE8c#code#F8#L83
-    const deadline = '0xf000000000000000000000000000000000000000000000000000000000000000'; // https://etherscan.io/address/0xd6b88257e91e4E4D4E990B3A858c849EF2DFdE8c#code#F8#L80
+// const signZapOut = createAsyncThunk<{ signature: string }, { lineAddress: string }, ThunkAPI>(
+//   'lines/signZapOut',
+//   async ({ lineAddress }, { getState, extra }) => {
+//     const { network, wallet } = getState();
+//     const { creditLineService } = extra.services;
+//     const { CONTRACT_ADDRESSES } = extra.config;
 
-    const accountAddress = wallet.selectedAddress;
-    if (!accountAddress) throw new Error('WALLET NOT CONNECTED');
+//     // NOTE: this values are hardcoded on zappers zapOut contract
+//     const amount = '79228162514260000000000000000'; // https://etherscan.io/address/0xd6b88257e91e4E4D4E990B3A858c849EF2DFdE8c#code#F8#L83
+//     const deadline = '0xf000000000000000000000000000000000000000000000000000000000000000'; // https://etherscan.io/address/0xd6b88257e91e4E4D4E990B3A858c849EF2DFdE8c#code#F8#L80
 
-    const signature = await creditLineService.signPermit({
-      network: network.current,
-      accountAddress,
-      lineAddress,
-      spenderAddress: CONTRACT_ADDRESSES.zapOut,
-      amount,
-      deadline,
-    });
+//     const accountAddress = wallet.selectedAddress;
+//     if (!accountAddress) throw new Error('WALLET NOT CONNECTED');
 
-    return { signature };
-  },
-  {
-    // serializeError: parseError,
-  }
-);
+//     const signature = await creditLineService.signPermit({
+//       network: network.current,
+//       accountAddress,
+//       lineAddress,
+//       spenderAddress: CONTRACT_ADDRESSES.zapOut,
+//       amount,
+//       deadline,
+//     });
+
+//     return { signature };
+//   },
+//   {
+//     // serializeError: parseError,
+//   }
+// );
 
 const depositLine = createAsyncThunk<
   void,
@@ -319,7 +289,7 @@ const depositLine = createAsyncThunk<
     });
     const notifyEnabled = app.servicesEnabled.notify;
     await transactionService.handleTransaction({ tx, network: network.current, useExternalService: notifyEnabled });
-    dispatch(getLinePage({ addresses: [lineAddress] }));
+    dispatch(getLinePage({ id: lineAddress }));
     dispatch(getUserLinesSummary());
     dispatch(getUserLinePositions({ lineAddresses: [lineAddress] }));
     dispatch(getUserLinesMetadata({ linesAddresses: [lineAddress] }));
@@ -389,7 +359,7 @@ const withdrawLine = createAsyncThunk<
     });
     const notifyEnabled = app.servicesEnabled.notify;
     await transactionService.handleTransaction({ tx, network: network.current, useExternalService: notifyEnabled });
-    dispatch(getLinePage({ addresses: [lineAddress] }));
+    dispatch(getLinePage({ id: lineAddress }));
     dispatch(getUserLinesSummary());
     dispatch(getUserLinePositions({ lineAddresses: [lineAddress] }));
     dispatch(getUserLinesMetadata({ linesAddresses: [lineAddress] }));
@@ -399,16 +369,6 @@ const withdrawLine = createAsyncThunk<
     // serializeError: parseError,
   }
 );
-
-const approveMigrate = createAsyncThunk<
-  void,
-  { lineFromAddress: string; migrationContractAddress?: string },
-  ThunkAPI
->('lines/approveMigrate', async ({ lineFromAddress, migrationContractAddress }, { dispatch }) => {
-  const spenderAddress = migrationContractAddress ?? getConfig().CONTRACT_ADDRESSES.trustedLineMigrator;
-  const result = await dispatch(TokensActions.approve({ tokenAddress: lineFromAddress, spenderAddress }));
-  unwrapResult(result);
-});
 
 const getDepositAllowance = createAsyncThunk<
   TokenAllowance,
@@ -478,66 +438,6 @@ const getWithdrawAllowance = createAsyncThunk<
   return tokenAllowance;
 });
 
-// const migrateLine = createAsyncThunk<
-//   void,
-//   { lineFromAddress: string; lineToAddress: string; migrationContractAddress: string },
-//   ThunkAPI
-// >(
-//   'lines/migrateLine',
-//   async ({ lineFromAddress, lineToAddress, migrationContractAddress }, { extra, getState, dispatch }) => {
-//     const { network, wallet, lines, tokens, app } = getState();
-//     const { services, config } = extra;
-//     const { trustedLineMigrator } = config.CONTRACT_ADDRESSES;
-
-//     const userAddress = wallet.selectedAddress;
-//     if (!userAddress) throw new Error('WALLET NOT CONNECTED');
-
-//     const { error: networkError } = validateNetwork({
-//       currentNetwork: network.current,
-//       walletNetwork: wallet.networkVersion ? getNetwork(wallet.networkVersion) : undefined,
-//     });
-//     if (networkError) throw networkError;
-
-//     const lineData = lines.linesMap[lineFromAddress];
-//     const userDepositPositionData = lines.user.userLinesPositionsMap[lineFromAddress].DEPOSIT;
-//     const tokenAllowancesMap = tokens.user.userTokensAllowancesMap[lineFromAddress] ?? {};
-//     const migrationContractAddressToUse = migrationContractAddress ?? trustedLineMigrator;
-
-//     // TODO: ADD VALIDATION FOR VALID MIGRATABLE VAULTS AND WITH BALANCE
-
-//     const { error: allowanceError } = validateMigrateLineAllowance({
-//       amount: toBN(userDepositPositionData.balance),
-//       lineAddress: lineFromAddress,
-//       lineDecimals: lineData.decimals,
-//       lineAllowancesMap: tokenAllowancesMap,
-//       migrationContractAddress: migrationContractAddressToUse,
-//     });
-
-//     const error = allowanceError;
-//     if (error) throw new Error(error);
-
-//     const { creditLineService, transactionService } = services;
-//     const tx = await creditLineService.migrate({
-//       network: network.current,
-//       accountAddress: userAddress,
-//       lineFromAddress,
-//       lineToAddress,
-//       migrationContractAddress: migrationContractAddressToUse,
-//     });
-
-//     const notifyEnabled = app.servicesEnabled.notify;
-//     await transactionService.handleTransaction({ tx, network: network.current, useExternalService: notifyEnabled });
-//     dispatch(getLinePage({ addresses: [lineFromAddress, lineToAddress] }));
-//     dispatch(getUserLinesSummary());
-//     dispatch(getUserLinePositions({ lineAddresses: [lineFromAddress, lineToAddress] }));
-//     dispatch(getUserLinesMetadata({ linesAddresses: [lineFromAddress, lineToAddress] }));
-//     dispatch(TokensActions.getUserTokens({ addresses: [lineFromAddress, lineToAddress] }));
-//   },
-//   {
-//     // serializeError: parseError,
-//   }
-// );
-
 /* -------------------------------------------------------------------------- */
 /*                                Subscriptions                               */
 /* -------------------------------------------------------------------------- */
@@ -575,10 +475,9 @@ export const LinesActions = {
   getLines,
   approveDeposit,
   depositLine,
-  approveZapOut,
-  signZapOut,
+  // approveZapOut,
+  // signZapOut,
   withdrawLine,
-  approveMigrate,
   // migrateLine,
   getLinePage,
   getUserLinePositions,

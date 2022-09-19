@@ -2,7 +2,14 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 
-import { useAppSelector, useAppDispatch, useIsMounting, useAppTranslation, useQueryParams } from '@hooks';
+import {
+  useAppSelector,
+  useAppDispatch,
+  useIsMounting,
+  useAppTranslation,
+  useQueryParams,
+  useCreditLines,
+} from '@hooks';
 import {
   ModalsActions,
   ModalSelectors,
@@ -41,7 +48,7 @@ import {
   filterData,
 } from '@utils';
 import { getConfig } from '@config';
-import { VaultView } from '@src/core/types';
+import { CreditLine, VaultView, UseCreditLinesParams, GetLinesArgs } from '@src/core/types';
 import { GoblinTown } from '@assets/images';
 
 const StyledHelperCursor = styled.span`
@@ -188,6 +195,26 @@ export const Market = () => {
   const depositsLoading = generalLoading && !deposits.length;
   const addCreditStatus = useAppSelector(CreditLinesSelectors.selectAddCreditStatus);
 
+  const defaultLineCategories: UseCreditLinesParams = {
+    // using i18m translation as keys for easy display
+    'pages.market.highest-credit': {
+      first: 5,
+      orderBy: 'deposit', // NOTE: might also want to specify that queue index == 1 or something
+      orderDirection: 'desc',
+    },
+    'pages.market.highest-spigot': {
+      first: 5,
+      orderBy: 'totalVolumeUsd', // NOTE: gets individual revenue contracts, not entire SpigotController
+      orderDirection: 'desc',
+    },
+    'pages.market.newest': {
+      first: 5,
+      orderBy: 'start', // NOTE: theoretically gets lines that start in the future, will have to refine query
+      orderDirection: 'desc',
+    },
+  };
+  const [lineCategoriesForDisplay /* setArgs */, , areLinesLoading] = useCreditLines(defaultLineCategories);
+
   useEffect(() => {
     setSearch(queryParams.search ?? '');
   }, [queryParams.search]);
@@ -267,16 +294,33 @@ export const Market = () => {
 
       {!generalLoading && !walletIsConnected && <StyledNoWalletCard />}
 
+      {areLinesLoading || !lineCategoriesForDisplay ? (
+        <SpinnerLoading flex="1" width="100%" />
+      ) : (
+        Object.entries(lineCategoriesForDisplay!).map(([key, val]: [string, CreditLine[]]) => (
+          <StyledRecommendationsCard
+            header={t(key)}
+            items={lineCategoriesForDisplay[key].map(({ borrower, spigot, escrow }) => ({
+              icon: '',
+              name: borrower,
+              info: `spigot: ${spigot?.id} & escrow: ${escrow?.id} `,
+              infoDetail: 'EYY',
+              onAction: () => history.push(`/lines/${borrower}`),
+            }))}
+          />
+        ))
+      )}
+
       {!opportunitiesLoading && (
         <>
-          {/* <StyledRecommendationsCard
+          <StyledRecommendationsCard
             header={t('components.recent-recommendations.header')}
             items={recommendations.map(({ displayName, displayIcon, apyData, apyType, address }) => ({
               icon: displayIcon,
               name: displayName,
               info: formatApy(apyData, apyType),
               infoDetail: 'EYY',
-              onAction: () => history.push(`/creditLine/${address}`),
+              onAction: () => history.push(`/vaults/${address}`),
             }))}
           />
 
@@ -287,9 +331,9 @@ export const Market = () => {
               name: displayName,
               info: formatApy(apyData, apyType),
               infoDetail: 'EYY',
-              onAction: () => history.push(`/creditLine/${address}`),
+              onAction: () => history.push(`/vaults/${address}`),
             }))}
-          /> */}
+          />
 
           {!opportunitiesLoading && (
             <OpportunitiesCard

@@ -23,6 +23,7 @@ import {
   Network,
   TokenAllowance,
   Credit,
+  GetLineArgs,
 } from '@types';
 
 // *************** USER ***************
@@ -125,7 +126,7 @@ export interface MigrateProps {
   migrationContractAddress: Address;
 }
 
-// *************** LOAN ***************
+// *************** LINE ***************
 export enum STATUS {
   UNINITIALIZED,
   ACTIVE,
@@ -139,7 +140,7 @@ export interface InterestRateCreditService {
 }
 
 export interface CreditLineService {
-  getCreditLines: (props: GetCreditLinesProps) => Promise<CreditLine[]>;
+  getLine: (props: GetCreditLinesProps) => Promise<CreditLine>;
 
   addCredit: (props: AddCreditProps, dryRun: boolean) => Promise<TransactionResponse | PopulatedTransaction>;
   close: (id: BytesLike) => Promise<TransactionResponse>;
@@ -178,8 +179,7 @@ export interface InterestRateAccrueInterestProps {
 }
 
 export interface GetCreditLinesProps {
-  query: string;
-  params?: object;
+  params: GetLineArgs;
   network: Network;
 }
 

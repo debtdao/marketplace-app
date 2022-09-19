@@ -5,6 +5,8 @@ import { CreditLine } from './CreditLine';
 import { PartnerId } from './Partner';
 import { Theme } from './Settings';
 import { Status } from './Status';
+import { LineActionsStatusMap, UserLineMetadataStatusMap, BaseCreditLine, PositionSummary } from './CreditLine';
+
 import {
   Position,
   Token,
@@ -97,12 +99,19 @@ export interface VaultTransaction {
 }
 
 export interface CreditLineState {
-  creditLinesAddresses: string[];
-  creditLinesMap: { [address: string]: CreditLine };
-  selectedCreditLineAddress: string | undefined;
-  creditLine: CreditLine | undefined;
+  selectedLineAddress: string | undefined;
+  linesMap: { [lineAddress: string]: BaseCreditLine };
+  user: {
+    activeLines: Address[];
+    linePositions: { [positionId: string]: PositionSummary };
+    lineAllowances: AllowancesMap;
+  }
   statusMap: {
-    getCreditLines: Status;
+    getLines: Status;
+    getLine: Status;
+    getLinePage: Status;
+    getAllowances: Status;
+    user: UserLineMetadataStatusMap
   };
 }
 

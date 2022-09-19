@@ -58,6 +58,15 @@ export interface GetLinesArgs {
   orderDirection: 'asc' | 'desc';
 }
 
+/**
+ * @typedef {object} GetUserPositionsArgs
+ * @property {Address} GetUserPositionsArgs.id - address of line contract
+ */
+export interface GetUserPositionsArgs {
+  id: Address;
+}
+
+
 // React hook args wrapping these queries
 export interface UseCreditLinesParams {
   [key: string]: GetLinesArgs;

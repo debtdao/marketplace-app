@@ -7,8 +7,8 @@ import { CreditLinesActions } from './creditLines.actions';
 
 export const creditLinesInitialState: CreditLineState = {
   creditLinesAddresses: [],
-  creditLinesMap: {},
-  selectedCreditLineAddress: undefined,
+  linesMap: {},
+  selectedLineAddress: undefined,
   creditLine: undefined,
   statusMap: {
     getCreditLines: { ...initialStatus },
@@ -25,14 +25,14 @@ const creditLinesReducer = createReducer(creditLinesInitialState, (builder) => {
     /*                                   Setters                                  */
     /* -------------------------------------------------------------------------- */
     .addCase(setSelectedCreditLineAddress, (state, { payload: { creditLineAddress } }) => {
-      state.selectedCreditLineAddress = creditLineAddress;
+      state.selectedLineAddress = creditLineAddress;
     })
 
     /* -------------------------------------------------------------------------- */
     /*                                 Clear State                                */
     /* -------------------------------------------------------------------------- */
     .addCase(clearCreditLinesData, (state) => {
-      state.creditLinesMap = {};
+      state.linesMap = {};
       state.creditLinesAddresses = [];
     })
     .addCase(clearSelectedCreditLine, (state) => {
@@ -50,7 +50,7 @@ const creditLinesReducer = createReducer(creditLinesInitialState, (builder) => {
     .addCase(getCreditLines.fulfilled, (state, { payload: { creditLinesData } }) => {
       const tokenAddresses: string[] = [];
       creditLinesData.forEach((creditLine) => {
-        state.creditLinesMap[creditLine.id] = creditLine;
+        state.linesMap[creditLine.id] = creditLine;
         tokenAddresses.push(creditLine.id);
       });
       state.creditLinesAddresses = union(state.creditLinesAddresses, tokenAddresses);

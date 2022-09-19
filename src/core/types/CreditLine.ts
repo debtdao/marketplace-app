@@ -2,21 +2,20 @@ import { Token } from 'graphql';
 
 import { Address } from './Blockchain';
 import { TokenView } from './Token';
+import { Status } from './Status';
+import { NumericDictionary } from 'lodash';
 
 export interface BaseCreditLine {
-  id: string;
-  end: string;
-  start: string;
+  id: Address;
   type?: string;
   status: string;
   borrower: Address;
 
   principal?: number;
-  interest?: number;
 }
 
 export interface CreditLinePage extends BaseCreditLine {
-  id: string;
+  id: Address;
   end: string;
   start: string;
   type?: string;
@@ -40,14 +39,13 @@ export interface CreditLinePage extends BaseCreditLine {
 }
 
 export interface CreditLine extends BaseCreditLine {
-  id: string;
+  id: Address;
   end: string;
   start: string;
   type?: string;
   status: string;
 
   principal?: number;
-  interest?: number;
 
   borrower: Address;
   escrow?: { id: Address };
@@ -125,7 +123,7 @@ export interface RevenueContract {
 }
 
 export interface BaseToken {
-  id: string;
+  id: Address;
   name: string;
   symbol: string;
   decimals: number;
@@ -188,3 +186,26 @@ export interface ClaimRevenueEvent {
   netIncome: string;
   value: string;
 }
+
+
+// Redux State
+export interface LineActionsStatusMap {
+  get: Status;
+  approve: Status;
+  deposit: Status;
+  withdraw: Status;
+}
+
+export interface UserLineMetadataStatusMap {
+  getUserLinePositions: Status;
+  linesActionsStatusMap: { [lineAddress: Address]: LineActionsStatusMap };
+}
+
+export interface PositionSummary {
+  token: Address;
+  deposit: string;
+  principal: string;
+  drate: number;
+  frate: number;
+}
+

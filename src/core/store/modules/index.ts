@@ -53,8 +53,8 @@ import { SettingsSelectors } from './settings/settings.selectors';
 import partnerReducer, { partnerInitialState } from './partner/partner.reducer';
 import { PartnerActions } from './partner/partner.actions';
 import { PartnerSelectors } from './partner/partner.selectors';
-// CreditLines State
-import creditLinesReducer, { creditLinesInitialState } from './creditLines/creditLines.reducer';
+// CreditLine
+import linesReducer, { linesInitialState } from './lines/lines.reducer';
 import { CreditLinesActions } from './creditLines/creditLines.actions';
 import { CreditLinesSelectors } from './creditLines/creditLines.selectors';
 
@@ -68,11 +68,9 @@ const rootReducer: Reducer<RootState> = combineReducers({
   vaults: vaultsReducer,
   wallet: walletReducer,
   tokens: tokensReducer,
-  // labs: labsReducer,
+  lines: linesReducer,
   settings: settingsReducer,
-  // user: userReducer,
   partner: partnerReducer,
-  creditLines: creditLinesReducer,
 });
 
 export default rootReducer;
@@ -127,5 +125,5 @@ export {
   settingsInitialState,
   // userInitialState,
   partnerInitialState,
-  creditLinesInitialState,
+  linesInitialState,
 };

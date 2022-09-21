@@ -111,7 +111,6 @@ export interface CreditLineState {
     getLinePage: Status;
     getAllowances: Status;
     user: UserLineMetadataStatusMap;
-    addCredit: Status;
   };
 }
 

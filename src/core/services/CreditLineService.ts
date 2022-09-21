@@ -15,6 +15,7 @@ import {
   ExecuteTransactionProps,
   AddCreditProps,
   Credit,
+  GetCreditLinesProps,
 } from '@types';
 import { getConfig } from '@config';
 import { lineOfCreditABI } from '@services/contracts';
@@ -56,8 +57,9 @@ export class CreditLineServiceImpl implements CreditLineService {
     return await this.web3Provider.getSigner().getAddress();
   }
 
-  public async getCreditLines(): Promise<CreditLine[]> {
-    const result = await fetch(`${this.graphUrl}/subgraphs/name/LineOfCredit/loan`, {
+  public async getLine(props: GetCreditLinesProps): Promise<CreditLine> {
+    const result = await fetch(`${this.graphUrl}/subgraphs/`, {
+      // todo: URL
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

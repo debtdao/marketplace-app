@@ -1,7 +1,14 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { difference, groupBy, keyBy, union } from 'lodash';
 
-import { initialStatus, Position, CreditLineState, UserLineMetadataStatusMap, LineActionsStatusMap, PositionSummary } from '@types';
+import {
+  initialStatus,
+  Position,
+  CreditLineState,
+  UserLineMetadataStatusMap,
+  LineActionsStatusMap,
+  PositionSummary,
+} from '@types';
 
 import { LinesActions } from './lines.actions';
 
@@ -180,7 +187,10 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.user.getUserLinePositions = { loading: true };
     })
     .addCase(getUserLinePositions.fulfilled, (state, { payload: { userLinesPositions } }) => {
-      state.user.linePositions = userLinesPositions.reduce((map, line) => ({ ...map, [line]: state.linesMap[line]}), {});
+      state.user.linePositions = userLinesPositions.reduce(
+        (map, line) => ({ ...map, [line]: state.linesMap[line] }),
+        {}
+      );
       state.statusMap.user.getUserLinePositions = {};
     })
     .addCase(getUserLinePositions.rejected, (state, { error }) => {

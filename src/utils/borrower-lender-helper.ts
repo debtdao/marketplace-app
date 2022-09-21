@@ -151,12 +151,12 @@ export function borrowerLenderHelper(
     if (
       setting.transferOwnerFunction.length === 0 ||
       setting.ownerSplit.gt(await spigotedLineService.maxSplit()) ||
-      setting.token == ethers.constants.AddressZero
+      setting.token === ethers.constants.AddressZero
     ) {
       throw new Error('Bad setting');
     }
 
-    return (<TransactionResponse>await spigotedLineService.addSpigot(revenueContract, setting, false)).hash;
+    return ((await spigotedLineService.addSpigot(revenueContract, setting, false)) as TransactionResponse).hash;
   };
 
   const addCollateral = async (amount: BigNumber, token: Address): Promise<string> => {

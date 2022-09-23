@@ -1,4 +1,4 @@
-import { BaseCreditLine, CreditLinePage } from '@types';
+import { BaseCreditLine, CreditLinePage, BaseToken, Escrow, Spigot, LinePageCreditPosition } from '@types';
 
 import { Address } from './Blockchain';
 
@@ -44,6 +44,44 @@ export interface GetLineArgs {
  */
 export interface GetLinePageArgs {
   id: Address;
+}
+
+export interface LineEventFrag {
+  __typename: string;
+  timestamp: number;
+  credit: {
+    id: string;
+  };
+  // events with value
+  value?: number;
+  amount?: number;
+  // events with rates
+  drawnRate?: number;
+  facilityRate?: number;
+}
+
+export interface GetLinePageResponse {
+  end: number;
+  type: string;
+  start: number;
+  status: number;
+  borrower: Address;
+
+  credits?: LinePageCreditPosition &
+    {
+      // merge custom format w/ subgraph structure
+      events?: {
+        // cant use our type because we flatten structure for easier use
+        __typename: string;
+        timestamp: number;
+        credit: {
+          id: string;
+        };
+      }[];
+    }[];
+
+  escrow?: Escrow;
+  spigot?: Spigot;
 }
 
 /**

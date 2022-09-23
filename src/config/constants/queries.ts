@@ -43,11 +43,11 @@ const LINE_PAGE_CREDIT_FRAGMENT = gql`
 // lewv = line event with value
 const CREDIT_EVENT_FRAGMENT = gql`
   fragment lewv on LineEvent {
-    __typename
     amount
     value
   }
   fragment LineEventFrag on LineEvent {
+    __typename
     timestamp
     credit {
       id
@@ -83,7 +83,6 @@ const CREDIT_EVENT_FRAGMENT = gql`
       ...lewv
     }
     ... on SetRatesEvent {
-      __typename
       drawnRate
       facilityRate
     }
@@ -130,14 +129,13 @@ const ESCROW_FRAGMENT = gql`
 
 const ESCROW_EVENT_FRAGMENT = gql`
   fragment EscrowEventFrag on EscrowEvent {
+    __typename
     timestamp
     ... on AddCollateralEvent {
-      __typename
       amount
       value
     }
     ... on RemoveCollateralEvent {
-      __typename
       amount
       value
     }
@@ -162,16 +160,17 @@ export const GET_LINE_QUERY = gql`
   }
 `;
 
+// use deposit > 0 for all non-closed positions
 export const GET_USER_POSITIONS_QUERY = gql`
   ${BASE_LINE_FRAGMENT}
   query getUserPositions($id: ID!) {
     borrower(id: $id) {
-      debts {
+      debts(where: { deposit_gt: 0 }) {
         ...BaseLineFrag
       }
     }
     lender(id: $id) {
-      credits {
+      credits(where: { deposit_gt: 0 }) {
         ...BaseLineFrag
       }
     }
@@ -195,7 +194,7 @@ export const GET_LINE_PAGE_QUERY = gql`
       credits {
         ...LinePageCreditFrag
         events(first: 5) {
-          ...CreditEventFrag
+          ...LineEventFrag
         }
       }
 
@@ -215,9 +214,8 @@ export const GET_LINE_PAGE_QUERY = gql`
       }
 
       spigot {
-        id
         spigots {
-          ...BaseSpigotfrag
+          ...BaseSpigotFrag
           events(first: 3) {
             ...SpigotEventFrag
           }
@@ -250,4 +248,4 @@ export const GET_SPIGOT_QUERY = gql`
   query getSpigot($id: ID!) {
     ...BaseSpigotFrag
   }
-`; // to get total outstanding debt we need
+`;

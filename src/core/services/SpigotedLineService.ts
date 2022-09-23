@@ -75,6 +75,18 @@ export class SpigotedLineServiceImpl implements SpigotedLineService {
     return await this.executeContractMethod('addSpigot', [revenueContract, setting], dryRun);
   }
 
+  public async releaseSpigot(
+    spigot: Address,
+    status: string,
+    borrower: Address,
+    arbiter: Address,
+    dryRun: boolean
+  ): Promise<TransactionResponse | PopulatedTransaction>{
+    return await this.executeContractMethod('releaseSpigot', [spigot, status, borrower, arbiter,], dryRun)
+  }
+
+
+
   private async getSignerAddress(): Promise<Address> {
     return await this.web3Provider.getSigner().getAddress();
   }
@@ -108,6 +120,18 @@ export class SpigotedLineServiceImpl implements SpigotedLineService {
     const signer = await this.getSignerAddress();
     const credit = await this.contract.credits(id);
     return signer === credit.lender || signer === (await this.contract.borrower());
+  }
+
+  public async sweep(
+    to: Address,
+    token: Address,
+    amount: BigNumber,
+    status:  string,
+    borrower: Address,
+    arbiter: Address,
+    dryRun: boolean
+  )  : Promise<TransactionResponse | PopulatedTransaction> {
+    return await this.executeContractMethod('sweep', [to, token, amount, status,  borrower, arbiter], dryRun)
   }
 
   private async executeContractMethod(methodName: string, params: any[], dryRun: boolean) {

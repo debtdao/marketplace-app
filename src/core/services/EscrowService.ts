@@ -10,7 +10,6 @@ import {
   EscrowService,
 } from '@types';
 import { getConfig } from '@config';
-
 import { getContract } from '@frameworks/ethers';
 
 import { TransactionResponse } from '../types';

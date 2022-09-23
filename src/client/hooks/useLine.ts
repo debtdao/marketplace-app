@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
+
 import { getLine } from '@src/core/frameworks/gql';
 import { GET_LINE_QUERY, GET_LINE_PAGE_QUERY, GET_LINES_QUERY } from '@config/constants/queries';
 import { Address, GetLineArgs, GetLinePageArgs, GetLinesArgs, BaseCreditLine } from '@types';

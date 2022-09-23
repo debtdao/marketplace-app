@@ -53,10 +53,10 @@ import { SettingsSelectors } from './settings/settings.selectors';
 import partnerReducer, { partnerInitialState } from './partner/partner.reducer';
 import { PartnerActions } from './partner/partner.actions';
 import { PartnerSelectors } from './partner/partner.selectors';
-// CreditLines State
-import creditLinesReducer, { creditLinesInitialState } from './creditLines/creditLines.reducer';
-import { CreditLinesActions } from './creditLines/creditLines.actions';
-import { CreditLinesSelectors } from './creditLines/creditLines.selectors';
+// Lines State
+import linesReducer, { linesInitialState } from './lines/lines.reducer';
+import { LinesActions } from './lines/lines.actions';
+import { LinesSelectors } from './lines/lines.selectors';
 
 const rootReducer: Reducer<RootState> = combineReducers({
   app: appReducer,
@@ -72,7 +72,7 @@ const rootReducer: Reducer<RootState> = combineReducers({
   settings: settingsReducer,
   // user: userReducer,
   partner: partnerReducer,
-  creditLines: creditLinesReducer,
+  lines: linesReducer,
 });
 
 export default rootReducer;
@@ -92,7 +92,7 @@ export {
   SettingsActions,
   // UserActions,
   PartnerActions,
-  CreditLinesActions,
+  LinesActions,
 };
 
 // Selectors
@@ -109,7 +109,7 @@ export {
   // LabsSelectors,
   // UserSelectors,
   PartnerSelectors,
-  CreditLinesSelectors,
+  LinesSelectors,
 };
 
 // initialState
@@ -127,5 +127,5 @@ export {
   settingsInitialState,
   // userInitialState,
   partnerInitialState,
-  creditLinesInitialState,
+  linesInitialState,
 };

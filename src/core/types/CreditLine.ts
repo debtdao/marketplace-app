@@ -13,30 +13,6 @@ export interface BaseCreditLine {
   principal?: number;
 }
 
-export interface CreditLinePage extends BaseCreditLine {
-  id: Address;
-  end: string;
-  start: string;
-  type?: string;
-  status: string;
-
-  principal?: number;
-  interest?: number;
-
-  borrower: Address;
-
-  // subgraph id -> depsoit/spigot
-  credits: { [key: string]: LinePageCreditPosition };
-  escrow?: { [key: string]: Escrow };
-  spigot?: {
-    revenue: { [key: string]: number };
-    spigots: { [key: string]: Spigot };
-  };
-
-  collateralEvents: CollateralEvent[];
-  creditEvents: CreditLineEvents[];
-}
-
 export interface CreditLine extends BaseCreditLine {
   id: Address;
   end: string;
@@ -51,25 +27,76 @@ export interface CreditLine extends BaseCreditLine {
   spigot?: { id: Address };
 }
 
+export interface CreditLinePage extends BaseCreditLine {
+  id: Address;
+  end: string;
+  start: string;
+  type?: string;
+  status: string;
+  borrower: Address;
+
+  // real-time aggregate usd value across all credits
+  principal?: number;
+  interest?: number;
+  // id, symbol, APY (4 decimals
+  highestApy: [string, string, number];
+  // aggregated revenue in USD by token across all spigots
+  tokenRevenue: { [key: string]: number };
+
+  // subgraph id -> depsoit/spigot
+  credits: { [key: string]: LinePageCreditPosition };
+  escrow?: { [key: string]: Escrow };
+  spigot?: {
+    revenue: { [key: string]: number };
+    spigots: { [key: string]: Spigot };
+  };
+
+  collateralEvents: CollateralEvent[];
+  creditEvents: CreditLineEvents[];
+}
+
 export interface BaseCreditPosition {
+  id: string;
   lender: Address;
   principal: number;
-  interest: number;
-  interestClaimable: string;
+  interestAccrued: number;
+  interestRepaid: number;
   events?: CreditLineEvents[];
 }
 
 export interface LinePageCreditPosition extends BaseCreditPosition {
+  id: string;
   lender: Address;
-  principal: number;
   deposit: number;
-  interest: number;
+  principal: number;
+  interestAccrued: number;
   interestRepaid: number;
-  events?: CreditLineEvents[];
+  drawnRate: number;
   token: {
     symbol: string;
-    lastPriceUSD: number;
+    lastPriceUSD?: number; // Can be live data not from subgraph
   };
+  events?: CreditLineEvents[];
+}
+
+export interface PositionSummary {
+  id: string;
+  borrower: Address;
+  lender: Address;
+  line: Address;
+  token: Address;
+  deposit: string;
+  principal: string;
+  drate: number;
+  frate: number;
+}
+
+// bare minimum to display about a user on a position
+export interface LineUserMetadata {
+  token: Address;
+  isBorrower: boolean; // borrower/lender
+  amount: number; // principal/deposit
+  available: number; // borrowerable/withdrawable
 }
 
 // Collateral Module Types
@@ -89,10 +116,16 @@ export interface Escrow extends BaseEscrow {
   cratio: string;
   minCRatio: string;
   collateralValue: string;
-  deposits: {
+  deposits?: {
     amount: string;
     enabled: boolean;
     token: BaseToken;
+  }[];
+  events?: {
+    __typename: string;
+    timestamp: number;
+    amount?: number;
+    value?: number;
   }[];
 }
 
@@ -142,6 +175,7 @@ export type ModuleNames = SPIGOT_NAME | CREDIT_NAME | ESCROW_NAME;
 
 // Common
 export interface EventWithValue {
+  __typename?: string;
   timestamp: number;
   amount?: string;
   symbol: string;
@@ -151,6 +185,7 @@ export interface EventWithValue {
 
 // Credit Events
 export interface CreditEvent extends EventWithValue {
+  __typename: string;
   id: string; // position id
   timestamp: number;
   amount: string;
@@ -159,6 +194,8 @@ export interface CreditEvent extends EventWithValue {
 }
 
 export interface SetRateEvent {
+  __typename: string;
+  id: string; // position id
   timestamp: number;
   drawnRate: string;
   facilityRate: string;
@@ -197,14 +234,4 @@ export interface LineActionsStatusMap {
 export interface UserLineMetadataStatusMap {
   getUserLinePositions: Status;
   linesActionsStatusMap: { [lineAddress: Address]: LineActionsStatusMap };
-}
-
-export interface PositionSummary {
-  borrower: Address;
-  lender: Address;
-  token: Address;
-  deposit: string;
-  principal: string;
-  drate: number;
-  frate: number;
 }

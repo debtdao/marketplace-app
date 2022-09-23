@@ -1,11 +1,19 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { difference, groupBy, keyBy, union } from 'lodash';
 
-import { initialStatus, Position, CreditLineState, UserLineMetadataStatusMap, LineActionsStatusMap, PositionSummary } from '@types';
+import {
+  initialStatus,
+  Position,
+  CreditLineState,
+  UserLineMetadataStatusMap,
+  LineActionsStatusMap,
+  PositionSummary,
+  CreditLine,
+} from '@types';
 
 import { LinesActions } from './lines.actions';
 
-export const initialLineActionsStatusMap: LineActionsStatusMap = {
+export const initialLinesActionsStatusMap: LineActionsStatusMap = {
   get: initialStatus,
   approve: initialStatus,
   deposit: initialStatus,
@@ -21,7 +29,7 @@ export const linesInitialState: CreditLineState = {
   selectedLineAddress: undefined,
   linesMap: {},
   user: {
-    activeLines: [],
+    activeLines: [], // TODO can remove and derive from linePositions.
     linePositions: {},
     lineAllowances: {},
   },
@@ -83,12 +91,12 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(clearSelectedLineAndStatus, (state) => {
       if (!state.selectedLineAddress) return;
       const currentAddress = state.selectedLineAddress;
-      // state.statusMap.linesActionsStatusMap[currentAddress] = initialLineActionsStatusMap;
+      // state.statusMap.linesActionsStatusMap[currentAddress] = initialLinesActionsStatusMap;
       state.selectedLineAddress = undefined;
     })
 
     .addCase(clearLineStatus, (state, { payload: { lineAddress } }) => {
-      // state.statusMap.linesActionsStatusMap[lineAddress] = initialLineActionsStatusMap;
+      // state.statusMap.linesActionsStatusMap[lineAddress] = initialLinesActionsStatusMap;
     })
 
     /* -------------------------------------------------------------------------- */
@@ -112,12 +120,21 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
     .addCase(getLines.fulfilled, (state, { payload: { linesData } }) => {
       const linesAddresses: string[] = [];
-      linesData.forEach((line) => {
-        linesAddresses.push(line.id);
-        state.linesMap[line.id] = line;
-        // state.statusMap.linesActionsStatusMap[line.id] = initialLineActionsStatusMap;
-        state.statusMap.user.linesActionsStatusMap[line.id] = initialLineActionsStatusMap;
-      });
+      const processLines = (cat: { [key: string]: CreditLine }, line: CreditLine) => {
+        // init new line with actions
+        state.statusMap.user.linesActionsStatusMap[line.id] = initialLinesActionsStatusMap;
+        // merge array into obj
+        return { ...cat, [line.id]: line };
+      };
+      const allNewLines = linesData.reduce(
+        (all, category) => ({
+          ...all,
+          ...category.reduce(processLines, {}),
+        }),
+        {}
+      );
+
+      state.linesMap = { ...state.linesMap, ...allNewLines };
       state.statusMap.getLines = {};
     })
     .addCase(getLines.rejected, (state, { error }) => {
@@ -134,37 +151,8 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.user.getUserLinePositions = { loading: true };
     })
     .addCase(getUserLinePositions.fulfilled, (state, { meta, payload: { userLinesPositions } }) => {
-      // old yearn code
-      // const linesPositionsMap = parsePositionsIntoMap(userLinesPositions);
-
-      const lineAddresses = meta.arg.lineAddresses;
-      lineAddresses?.forEach((address) => {
-        state.statusMap.user.getUserLinePositions = {};
-      });
-
-      const positionsAddresses: string[] = [];
-
-      userLinesPositions.forEach((position) => {
-        const address = position.assetAddress;
-        positionsAddresses.push(address);
-        const allowancesMap: any = {};
-        position.assetAllowances.forEach((allowance) => (allowancesMap[allowance.spender] = allowance.amount));
-
-        state.user.lineAllowances[address] = allowancesMap;
-      });
-
-      const notIncludedAddresses = difference(lineAddresses ?? [], positionsAddresses);
-      if (!positionsAddresses.length || notIncludedAddresses.length) {
-        const addresses = union(positionsAddresses, notIncludedAddresses);
-        addresses.forEach((address) => {
-          const userLinesPositionsMapClone = { ...state.user.linePositions };
-          delete userLinesPositionsMapClone[address];
-          state.user.linePositions = { ...userLinesPositionsMapClone };
-        });
-      } else {
-        state.user.linePositions = { ...state.user.linePositions /* ...linesPositionsMap */ };
-      }
-
+      const linesPositionsMap = userLinesPositions.reduce((obj, a) => ({ ...obj, [a.id]: a }), {});
+      state.user.linePositions = { ...state.user.linePositions, ...linesPositionsMap };
       state.statusMap.user.getUserLinePositions = {};
     })
     .addCase(getUserLinePositions.rejected, (state, { meta, error }) => {
@@ -180,7 +168,8 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.user.getUserLinePositions = { loading: true };
     })
     .addCase(getUserLinePositions.fulfilled, (state, { payload: { userLinesPositions } }) => {
-      state.user.linePositions = userLinesPositions.reduce((map, line) => ({ ...map, [line]: state.linesMap[line]}), {});
+      // TODO fix data missmatch between types PositionSummary and BasicCreditLine
+      // state.user.linePositions = userLinesPositions.reduce((map, line) => ({ ...map, [line]: state.linesMap[line]}), {});
       state.statusMap.user.getUserLinePositions = {};
     })
     .addCase(getUserLinePositions.rejected, (state, { error }) => {
@@ -260,7 +249,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 function checkAndInitUserLineStatus(state: CreditLineState, lineAddress: string) {
   const actionsMap = state.statusMap.user.linesActionsStatusMap[lineAddress];
   if (actionsMap) return;
-  state.statusMap.user.linesActionsStatusMap[lineAddress] = { ...initialLineActionsStatusMap };
+  state.statusMap.user.linesActionsStatusMap[lineAddress] = { ...initialLinesActionsStatusMap };
 }
 
 export default linesReducer;

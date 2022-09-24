@@ -9,17 +9,24 @@ import {
   Token,
   Balance,
   AllowancesMap,
-  LinePositionsMap,
+  BaseCreditLine,
+  GetLinePageResponse,
   LineUserMetadata,
   Address,
   CreditLinePage, // prev. GeneralVaultView, Super indepth data, CreditLinePage is most similar atm
   PositionSummary,
+  Spigot,
+  CollateralEvent,
+  CreditLineEvents,
+  ModuleNames,
+  SPIGOT_MODULE_NAME,
+  ESCROW_MODULE_NAME,
 } from '@types';
 import { toBN } from '@utils';
 
 import { createToken } from '../tokens/tokens.selectors';
 
-import { initiaLinesActionsStatusMap } from './lines.reducer';
+import { initialLineActionsStatusMap } from './lines.reducer';
 
 /* ---------------------------------- State --------------------------------- */
 const selectLinesState = (state: RootState) => state.lines;
@@ -32,23 +39,22 @@ const selectUserTokensAllowancesMap = (state: RootState) => state.tokens.user.us
 const selectLinesAllowancesMap = (state: RootState) => state.lines.user.lineAllowances;
 const selectTokensMap = (state: RootState) => state.tokens.tokensMap;
 const selectSelectedLineAddress = (state: RootState) => state.lines.selectedLineAddress;
-const selectLinesActionsStatusMap = (state: RootState) => state.lines.statusMap.linesActionsStatusMap;
+const selectLinesActionsStatusMap = (state: RootState) => state.lines.statusMap.user.linesActionsStatusMap;
 const selectLinesStatusMap = (state: RootState) => state.lines.statusMap;
 // const selectExpectedTxOutcome = (state: RootState) => state.lines.transaction.expectedOutcome;
 // const selectExpectedTxOutcomeStatus = (state: RootState) => state.lines.statusMap.getExpectedTransactionOutcome;
 const selectUserLinesSummary = (state: RootState) => state.lines.user.linePositions;
 
 const selectGetLinesStatus = (state: RootState) => state.lines.statusMap.getLines;
-const selectGetUserLinesPositionsStatus = (state: RootState) => state.lines.statusMap.user.getUserLinesPositions;
+const selectGetUserLinesPositionsStatus = (state: RootState) => state.lines.statusMap.user.getUserLinePositions;
 
 /* ----------------------------- Main Selectors ----------------------------- */
 const selectLines = createSelector(
   [
     selectLinesMap,
     selectLinesAddresses,
-    selectTokensMap,
     selectUserLinesPositionsMap,
-    selectUserLinesMetadataMap,
+    // selectUserLinesMetadataMap,
     selectUserTokensMap,
     selectLinesAllowancesMap,
     selectUserTokensAllowancesMap,
@@ -56,25 +62,29 @@ const selectLines = createSelector(
   (
     linesMap,
     linesAddresses,
-    tokensMap,
     linePositions,
-    userLinesMetadataMap,
+    // userLinesMetadataMap,
     userTokensMap,
     lineAllowances, // NOTE: For now we are gonna get the allowance from TokenState.user.tokenAllowances[]
     userTokensAllowancesMap
   ) => {
     const lines = linesAddresses.map((address) => {
       const lineData = linesMap[address];
-      const tokenData = tokensMap[lineData.tokenId];
-      const userTokenData = userTokensMap[lineData.tokenId];
+      // const positions = positions
+      // const userTokenData = userTokensMap[lineData.tokenId];
       const tokenAllowancesMap = userTokensAllowancesMap[lineData.token] ?? {};
       const lineAllowancesMap = userTokensAllowancesMap[address] ?? {};
-      return createLinePage({
+      const positions = Object.keys(linePositions)
+        .filter((id) => lineData.activeIds.includes(id))
+        .reduce((obj, id) => {
+          return { ...obj, [id]: linePositions[id] };
+        }, {});
+
+      return createLine({
         lineData,
-        tokenData,
-        userTokenData,
-        userLinePositionsMap: linePositions[address],
-        userLinesMetadataMap: userLinesMetadataMap[address],
+        // userTokenData,
+        positions,
+        // userLinesMetadataMap: userLinesMetadataMap[address],
         lineAllowancesMap,
         tokenAllowancesMap,
       });
@@ -87,8 +97,8 @@ const selectLines = createSelector(
   }
 );
 
-const selectLiveLines = createSelector([selectLines], (lines): CreditLinePage[] => {
-  return lines.filter((line: CreditLinePage) => !line.hideIfNoDeposits);
+const selectLiveLines = createSelector([selectLines], (lines): CreditLine[] => {
+  return lines.filter((line: CreditLine) => line.end < Date.now() / 1000);
 });
 
 // Not needed yet. TODO: Select all past-term lines
@@ -128,7 +138,7 @@ const selectSummaryData = createSelector([selectUserLinesSummary], (userLinesSum
 
 const selectRecommendations = createSelector([selectLiveLines], (lines) => {
   // const stableCoinsSymbols = ['DAI', 'USDC', 'USDT', 'sUSD'];
-  // const stableLines: CreditLinePage[] = [];
+  // const stableLines: CreditLine[] = [];
   // stableCoinsSymbols.forEach((symbol) => {
   //   const line = lines.find((line) => line.token.symbol === symbol);
   //   if (!line) return;
@@ -136,7 +146,7 @@ const selectRecommendations = createSelector([selectLiveLines], (lines) => {
   // });
 
   // let max = toBN('0');
-  // let stableLine: CreditLinePage = stableLines[0];
+  // let stableLine: CreditLine = stableLines[0];
   // stableLines.forEach((line) => {
   //   if (max.gte(line.apyData)) return;
   //   max = toBN(line.apyData);
@@ -159,18 +169,16 @@ const selectRecommendations = createSelector([selectLiveLines], (lines) => {
 const selectLine = createSelector(
   [
     selectLinesMap,
-    selectTokensMap,
     selectUserLinesPositionsMap,
-    selectUserLinesMetadataMap,
+    // selectUserLinesMetadataMap,
     selectUserTokensMap,
     selectLinesAllowancesMap,
     selectUserTokensAllowancesMap,
   ],
   (
     linesMap,
-    tokensMap,
-    linePositions,
-    userLinesMetadataMap,
+    positions,
+    // userLinesMetadataMap,
     userTokensMap,
     lineAllowances, // NOTE: For now we are gonna get the allowance from TokenState.user.tokenAllowances[]
     userTokensAllowancesMap
@@ -178,24 +186,25 @@ const selectLine = createSelector(
     memoize((lineAddress: string) => {
       const lineData = linesMap[lineAddress];
       if (!lineData) return undefined;
-      const tokenData = tokensMap[lineData.tokenId];
+      // const tokenData = tokensMap[lineData.tokenId];
+      // const positions = positions
       const userTokenData = userTokensMap[lineData.tokenId];
       const tokenAllowancesMap = userTokensAllowancesMap[lineData.token] ?? {};
       const lineAllowancesMap = userTokensAllowancesMap[lineAddress] ?? {};
-      return createLinePage({
+      return createLine({
         lineData,
         tokenData,
         userTokenData,
-        userLinePositionsMap: linePositions[lineAddress],
-        userLinesMetadataMap: userLinesMetadataMap[lineAddress],
+        positions,
+        // userLinesMetadataMap: userLinesMetadataMap[lineAddress],
         lineAllowancesMap,
         tokenAllowancesMap,
       });
     })
 );
 
-const selectUnderlyingTokensAddresses = createSelector([selectLinesMap], (lines): Address[] => {
-  return Object.values(lines).map((line) => line.tokenId);
+const selectUnderlyingTokensAddresses = createSelector([selectUserLinesPositionsMap], (lines): Address[] => {
+  return Object.values(lines).map((line) => line.token);
 });
 
 /* -------------------------------- Statuses -------------------------------- */
@@ -209,7 +218,7 @@ const selectSelectedLine = createSelector([selectLines, selectSelectedLineAddres
   if (!selectedLineAddress) {
     return undefined;
   }
-  return lines.find((line) => line.address === selectedLineAddress);
+  return lines.find((line) => line.id === selectedLineAddress);
 });
 
 const selectLinesStatus = createSelector(
@@ -223,20 +232,201 @@ const selectLinesStatus = createSelector(
 );
 
 /* --------------------------------- Helper --------------------------------- */
-interface CreateLinePageProps {
-  lineData: CreditLinePage;
+interface CreateLineProps {
+  lineData: BaseCreditLine;
   tokenAllowancesMap: AllowancesMap;
-  userLinePositionsMap: LinePositionsMap;
-  userLinesMetadataMap: LineUserMetadata;
+  positions: { [key: string]: PositionSummary };
+  // userLinesMetadataMap: LineUserMetadata;
   lineAllowancesMap: AllowancesMap;
 }
+function createLine(props: CreateLineProps): CreditLine {
+  const {
+    lineData,
+    tokenAllowancesMap,
+    lineAllowancesMap,
+    positions,
+    // userLinesMetadataMap,
+  } = props;
 
+  return {
+    ...lineData,
+  };
+}
+
+interface CreateLinePageProps {
+  lineData: GetLinePageResponse;
+  tokenAllowancesMap: AllowancesMap;
+  positions: { [key: string]: PositionSummary };
+  // userLinesMetadataMap: LineUserMetadata;
+  lineAllowancesMap: AllowancesMap;
+}
 function createLinePage(props: CreateLinePageProps): CreditLinePage {
-  const { tokenAllowancesMap, lineData, lineAllowancesMap, userLinePositionsMap, userLinesMetadataMap } = props;
+  const {
+    tokenAllowancesMap,
+    lineData,
+    lineAllowancesMap,
+    positions,
+    // userLinesMetadataMap,
+  } = props;
   const lineAddress = lineData.id;
   const currentAllowance = tokenAllowancesMap[lineAddress] ?? '0';
 
-  return {};
+  console.log('get lines category res: ', lineAddress, response.data);
+  const { start, end, status, borrower, credits, spigot, escrow } = response.data;
+
+  // dreivative or aggregated data we need to compute and store while mapping position data
+
+  // position id and APY
+  const highestApy: [string, number] = ['', 0];
+  // aggregated revenue in USD by token across all spigots
+  const tokenRevenue: { [key: string]: number } = {};
+  const principal = 0;
+  const interest = 0;
+
+  //  all recent Spigot and Escrow events
+  let collateralEvents: CollateralEvent[] = [];
+  /**
+   * @function
+   * @name mergeCollateralEvents
+   * @desc - takes all events for a single deposit/spigot and merges them into global list
+   * @dev  - expects all events to be in the same token
+   * @param type - the type of module used as collateral
+   * @param symbol - the token in event
+   * @param price - the price to use for events. Generally current price for escrow and time of event for spigot
+   * @param events - the events to process
+   */
+  const mergeCollateralEvents = (type: ModuleNames, symbol: string, price: number = 0, events: CollateralEvent[]) => {
+    let totalVal = 0;
+    const newEvents: CollateralEvent[] = events.map((e: any): CollateralEvent => {
+      const value = price * e.amount;
+      if (type === SPIGOT_MODULE_NAME) {
+        // aggregate token revenue. not needed for escrow bc its already segmented by token
+        // use price at time of revenue for more accuracy
+        tokenRevenue[symbol] += value;
+      }
+      totalVal += value;
+      return {
+        type,
+        __typename: e.__typename,
+        timestamp: e.timestamp,
+        symbol: symbol || 'UNKNOWN',
+        amount: e.amount,
+        value,
+      };
+    });
+
+    collateralEvents = [...collateralEvents, ...newEvents];
+    return totalVal;
+  };
+
+  //  all recent borrow/lend events
+  let creditEvents: CreditLineEvents[] = [];
+  /**
+   * @function
+   * @name mergeCollateralEvents
+   * @desc - takes all events for a single deposit/spigot and merges them into global list
+   * @dev  - expects all events to be in the same token
+   * @param type - the type of module used as collateral
+   * @param symbol - the token in event
+   * @param price - the price to use for events. Generally current price for escrow and time of event for spigot
+   * @param events - the events to process
+   */
+  const mergeCreditEvents = (symbol: string, price: number = 0, events: CreditLineEvents[]) => {
+    const newEvents: CreditLineEvents[] = events.map((e: any): CreditLineEvents => {
+      const { id, __typename, amount, timestamp, value: val } = e;
+      let value = amount * price;
+      if (__typename === 'InterestRepaidEvent') {
+        // only use value at time of repayment for repayment events
+        // use current price for all other events
+        value = val;
+      }
+
+      return {
+        id,
+        __typename,
+        timestamp,
+        symbol: symbol || 'UNKNOWN',
+        amount,
+        value,
+      };
+    });
+
+    // TODO promise.all token price fetching for better performance
+
+    creditEvents = [...creditEvents, ...newEvents];
+  };
+
+  const pageData: CreditLinePage = {
+    // metadata
+    id: lineAddress as Address,
+    start,
+    end,
+    status,
+    borrower,
+    // debt data
+    principal,
+    interest,
+    credits: credits.reduce((obj: any, c: any) => {
+      const { deposit, drawnRate, id, lender, symbol, events, principal, interest, interestRepaid, token } = c;
+      // const currentPrice = await fetchTokenPrice(symbol, Date.now())
+      const currentPrice = 1e8;
+      mergeCreditEvents(c.token.symbol, currentPrice, events);
+      return {
+        ...obj,
+        [id]: {
+          id,
+          lender,
+          deposit,
+          drawnRate,
+          principal,
+          interest,
+          interestRepaid,
+          token,
+        },
+      };
+    }),
+    // collateral data
+    spigot: spigot?.id
+      ? undefined
+      : {
+          revenue: tokenRevenue,
+          spigots: spigot.spigots.reduce((obj: any, s: any): { [key: string]: Spigot } => {
+            const {
+              id,
+              token: { symbol, lastPriceUSD },
+              active,
+              contract,
+              startTime,
+              events,
+            } = s;
+            mergeCollateralEvents(SPIGOT_MODULE_NAME, symbol, lastPriceUSD, events); // normalize and save events
+            return { ...obj, [id]: { active, contract, symbol, startTime, lastPriceUSD } };
+          }, {}),
+        },
+    escrow: escrow?.id
+      ? undefined
+      : {
+          deposits: escrow.deposits.reduce((obj: any, d: any) => {
+            const {
+              id,
+              amount,
+              enabled,
+              token: { symbol },
+              events,
+            } = d;
+            // TODO promise.all token price fetching for better performance
+            // const currentUsdPrice = await fetchTokenPrice(symbol, Datre.now());
+            const currentUsdPrice = 1e8;
+            mergeCollateralEvents(ESCROW_MODULE_NAME, symbol, currentUsdPrice, events); // normalize and save events
+            return { ...obj, [id]: { symbol, currentUsdPrice, amount, enabled } };
+          }, {}),
+        },
+    // all recent events
+    collateralEvents,
+    creditEvents,
+  };
+
+  return pageData;
 }
 
 export const LinesSelectors = {

@@ -7,7 +7,7 @@ import {
   CreditLine,
   CreditLinePage,
   TransactionOutcome,
-  LinesUserSummary,
+  // LinesUserSummary,
   LineUserMetadata,
   Address,
   Wei,
@@ -264,18 +264,18 @@ const depositLine = createAsyncThunk<
     const decimals = toBN(tokenData.decimals);
     const ONE_UNIT = toBN('10').pow(decimals);
 
-    const { error: depositError } = validateLineDeposit({
-      sellTokenAmount: amount,
-      depositLimit: lineData?.metadata.depositLimit ?? '0',
-      emergencyShutdown: lineData?.metadata.emergencyShutdown || false,
-      sellTokenDecimals: tokenData?.decimals ?? '0',
-      userTokenBalance: userTokenData?.balance ?? '0',
-      lineUnderlyingBalance: lineData?.underlyingTokenBalance.amount ?? '0',
-      targetUnderlyingTokenAmount,
-    });
+    // const { error: depositError } = validateLineDeposit({
+    //   sellTokenAmount: amount,
+    //   depositLimit: lineData?.metadata.depositLimit ?? '0',
+    //   emergencyShutdown: lineData?.metadata.emergencyShutdown || false,
+    //   sellTokenDecimals: tokenData?.decimals ?? '0',
+    //   userTokenBalance: userTokenData?.balance ?? '0',
+    //   lineUnderlyingBalance: lineData?.underlyingTokenBalance.amount ?? '0',
+    //   targetUnderlyingTokenAmount,
+    // });
 
-    const error = depositError;
-    if (error) throw new Error(error);
+    // const error = depositError;
+    // if (error) throw new Error(error);
 
     const amountInWei = amount.multipliedBy(ONE_UNIT);
     const { creditLineService, transactionService } = services;
@@ -290,9 +290,9 @@ const depositLine = createAsyncThunk<
     const notifyEnabled = app.servicesEnabled.notify;
     await transactionService.handleTransaction({ tx, network: network.current, useExternalService: notifyEnabled });
     dispatch(getLinePage({ id: lineAddress }));
-    dispatch(getUserLinesSummary());
+    // dispatch(getUserLinesSummary());
     dispatch(getUserLinePositions({ lineAddresses: [lineAddress] }));
-    dispatch(getUserLinesMetadata({ linesAddresses: [lineAddress] }));
+    // dispatch(getUserLinesMetadata({ linesAddresses: [lineAddress] }));
     dispatch(TokensActions.getUserTokens({ addresses: [tokenAddress, lineAddress] }));
   },
   {
@@ -326,26 +326,21 @@ const withdrawLine = createAsyncThunk<
     if (networkError) throw networkError;
 
     const lineData = lines.linesMap[lineAddress];
-    const tokenData = tokens.tokensMap[lineData.tokenId];
-    const userLineData = lines.user.userLinesPositionsMap[lineAddress]?.DEPOSIT;
+    const userLineData = lines.user.linePositions[lineAddress];
+    // selector for LineUserMetadata to get available liquidity
+    const available = userLineData.deposit - userLineData.principal;
+    // if requesting more than available or max available
+    const withdrawAll = amount.eq(config.MAX_UINT256) || amount.gte(available);
+    const amountOfShares = withdrawAll ? available : amount;
 
-    const withdrawAll = amount.eq(config.MAX_UINT256);
-    const amountOfShares = withdrawAll
-      ? userLineData.balance
-      : calculateSharesAmount({
-          amount,
-          decimals: tokenData.decimals,
-          pricePerShare: lineData.metadata.pricePerShare,
-        });
+    // const { error: withdrawError } = validateLineWithdraw({
+    //   amount: toBN(normalizeAmount(amountOfShares, parseInt(tokenData.decimals))),
+    //   line: userLineData.balance ?? '0',
+    //   token: tokenData.decimals.toString() ?? '0', // check if its ok to use underlyingToken decimals as line decimals
+    // });
 
-    const { error: withdrawError } = validateLineWithdraw({
-      yvTokenAmount: toBN(normalizeAmount(amountOfShares, parseInt(tokenData.decimals))),
-      userYvTokenBalance: userLineData.balance ?? '0',
-      yvTokenDecimals: tokenData.decimals.toString() ?? '0', // check if its ok to use underlyingToken decimals as line decimals
-    });
-
-    const error = withdrawError;
-    if (error) throw new Error(error);
+    // const error = withdrawError;
+    // if (error) throw new Error(error);
 
     const { creditLineService, transactionService } = services;
     const tx = await creditLineService.withdraw({
@@ -360,9 +355,9 @@ const withdrawLine = createAsyncThunk<
     const notifyEnabled = app.servicesEnabled.notify;
     await transactionService.handleTransaction({ tx, network: network.current, useExternalService: notifyEnabled });
     dispatch(getLinePage({ id: lineAddress }));
-    dispatch(getUserLinesSummary());
+    // dispatch(getUserLinesSummary());
     dispatch(getUserLinePositions({ lineAddresses: [lineAddress] }));
-    dispatch(getUserLinesMetadata({ linesAddresses: [lineAddress] }));
+    // dispatch(getUserLinesMetadata({ linesAddresses: [lineAddress] }));
     dispatch(TokensActions.getUserTokens({ addresses: [targetTokenAddress, lineAddress] }));
   },
   {
@@ -486,8 +481,8 @@ export const LinesActions = {
   clearUserData,
   getExpectedTransactionOutcome,
   clearTransactionData,
-  getUserLinesSummary,
-  getUserLinesMetadata,
+  // getUserLinesSummary,
+  // getUserLinesMetadata,
   clearSelectedLineAndStatus,
   clearLineStatus,
   getDepositAllowance,

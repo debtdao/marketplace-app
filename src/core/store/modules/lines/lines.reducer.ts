@@ -13,7 +13,7 @@ import {
 
 import { LinesActions } from './lines.actions';
 
-export const initialLinesActionsStatusMap: LineActionsStatusMap = {
+export const initialLineActionsStatusMap: LineActionsStatusMap = {
   get: initialStatus,
   approve: initialStatus,
   deposit: initialStatus,
@@ -57,7 +57,7 @@ const {
   clearUserData,
   getExpectedTransactionOutcome,
   clearTransactionData,
-  getUserLinesMetadata,
+  // getUserLinesMetadata,
   clearSelectedLineAndStatus,
   clearLineStatus,
 } = LinesActions;
@@ -91,12 +91,12 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(clearSelectedLineAndStatus, (state) => {
       if (!state.selectedLineAddress) return;
       const currentAddress = state.selectedLineAddress;
-      // state.statusMap.linesActionsStatusMap[currentAddress] = initialLinesActionsStatusMap;
+      // state.statusMap.linesActionsStatusMap[currentAddress] = initialLineActionsStatusMap;
       state.selectedLineAddress = undefined;
     })
 
     .addCase(clearLineStatus, (state, { payload: { lineAddress } }) => {
-      // state.statusMap.linesActionsStatusMap[lineAddress] = initialLinesActionsStatusMap;
+      // state.statusMap.linesActionsStatusMap[lineAddress] = initialLineActionsStatusMap;
     })
 
     /* -------------------------------------------------------------------------- */
@@ -122,7 +122,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       const linesAddresses: string[] = [];
       const processLines = (cat: { [key: string]: CreditLine }, line: CreditLine) => {
         // init new line with actions
-        state.statusMap.user.linesActionsStatusMap[line.id] = initialLinesActionsStatusMap;
+        state.statusMap.user.linesActionsStatusMap[line.id] = initialLineActionsStatusMap;
         // merge array into obj
         return { ...cat, [line.id]: line };
       };
@@ -249,7 +249,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 function checkAndInitUserLineStatus(state: CreditLineState, lineAddress: string) {
   const actionsMap = state.statusMap.user.linesActionsStatusMap[lineAddress];
   if (actionsMap) return;
-  state.statusMap.user.linesActionsStatusMap[lineAddress] = { ...initialLinesActionsStatusMap };
+  state.statusMap.user.linesActionsStatusMap[lineAddress] = { ...initialLineActionsStatusMap };
 }
 
 export default linesReducer;

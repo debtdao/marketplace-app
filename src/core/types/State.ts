@@ -1,11 +1,10 @@
 import { Alert } from './Alerts';
 import { Address, Network } from './Blockchain';
 import { ExternalServiceId } from './General';
-import { CreditLine } from './CreditLine';
 import { PartnerId } from './Partner';
 import { Theme } from './Settings';
 import { Status } from './Status';
-import { LineActionsStatusMap, UserLineMetadataStatusMap, BaseCreditLine, PositionSummary } from './CreditLine';
+import { LineActionsStatusMap, UserLineMetadataStatusMap, CreditLine, PositionSummary } from './CreditLine';
 import {
   Position,
   Token,
@@ -99,7 +98,7 @@ export interface VaultTransaction {
 
 export interface CreditLineState {
   selectedLineAddress: string | undefined;
-  linesMap: { [lineAddress: string]: BaseCreditLine };
+  linesMap: { [lineAddress: string]: CreditLine };
   user: {
     activeLines: Address[];
     linePositions: { [positionId: string]: PositionSummary };

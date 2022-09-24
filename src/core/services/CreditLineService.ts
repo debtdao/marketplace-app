@@ -15,6 +15,12 @@ import {
   GetLineProps,
   GetLinesProps,
   GetLinePageProps,
+  LineStatusTypes,
+  UNINITIALIZED_STATUS,
+  ACTIVE_STATUS,
+  LIQUIDATABLE_STATUS,
+  REPAID_STATUS,
+  INSOLVENT_STATUS,
 } from '@types';
 import { getConfig } from '@config';
 import { getLine, getLinePage, getLines, getUserLinePositions } from '@frameworks/gql';
@@ -81,5 +87,22 @@ export class CreditLineServiceImpl implements CreditLineService {
   }
   public async getWithdrawAllowance(): Promise<any> {
     return null;
+  }
+
+  public mapStatusToString(status: number): LineStatusTypes {
+    switch (status) {
+      case 0:
+        return UNINITIALIZED_STATUS;
+      case 2:
+        return ACTIVE_STATUS;
+      case 3:
+        return LIQUIDATABLE_STATUS;
+      case 4:
+        return REPAID_STATUS;
+      case 5:
+        return INSOLVENT_STATUS;
+      default:
+        return 'no status';
+    }
   }
 }

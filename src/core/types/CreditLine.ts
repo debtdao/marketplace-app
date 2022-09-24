@@ -7,10 +7,31 @@ import { Status } from './Status';
 // TODO
 // import { BigNumber } from '../frameworks/ethers';
 
+type UninitializedStatus = 'uninitialized';
+export const UNINITIALIZED_STATUS: UninitializedStatus = 'uninitialized';
+type ActiveStatus = 'active';
+export const ACTIVE_STATUS: ActiveStatus = 'active';
+type LiquidatableStatus = 'liquidatable';
+export const LIQUIDATABLE_STATUS: LiquidatableStatus = 'liquidatable';
+type RepaidStatus = 'repaid';
+export const REPAID_STATUS: RepaidStatus = 'repaid';
+type InsolventStatus = 'insolvent';
+export const INSOLVENT_STATUS: InsolventStatus = 'insolvent';
+type NoStatus = 'no status';
+export const NO_STATUS: NoStatus = 'no status';
+
+export type LineStatusTypes =
+  | UninitializedStatus
+  | ActiveStatus
+  | LiquidatableStatus
+  | RepaidStatus
+  | InsolventStatus
+  | NoStatus;
+
 export interface BaseCreditLine {
   id: Address;
   type?: string;
-  status: string;
+  status: LineStatusTypes;
   borrower: Address;
 
   principal?: number;
@@ -24,7 +45,7 @@ export interface CreditLine extends BaseCreditLine {
   end: number;
   start: number;
   type?: string;
-  status: string;
+  status: LineStatusTypes;
   borrower: Address;
 
   principal?: number;
@@ -39,7 +60,7 @@ export interface CreditLinePage extends BaseCreditLine {
   end: number;
   start: number;
   type?: string;
-  status: string;
+  status: LineStatusTypes;
   borrower: Address;
 
   // real-time aggregate usd value across all credits
@@ -87,22 +108,44 @@ export interface LinePageCreditPosition extends BaseCreditPosition {
   events?: CreditLineEvents[];
 }
 
+// bare minimum to display about a user on a position
+
+type LenderRole = 'lender';
+export const LENDER_POSITION_ROLE: LenderRole = 'lender';
+type BorrowerRole = 'borrower';
+export const BORROWER_POSITION_ROLE: BorrowerRole = 'borrower';
+type ArbiterRole = 'arbiter';
+export const ARBITER_POSITION_ROLE: ArbiterRole = 'arbiter';
+type PositionRole = LenderRole | BorrowerRole | ArbiterRole;
+
+export interface UserPositionMetadata {
+  role: PositionRole;
+  amount: number; // principal/deposit
+  available: number; // borrowerable/withdrawable
+}
+
 export interface PositionSummary {
   id: string;
   borrower: Address;
   lender: Address;
-  line: Address;
   token: Address;
+  line: Address;
   deposit: number;
   principal: number;
   drate: number;
   frate: number;
 }
 
-// bare minimum to display about a user on a position
-export interface LineUserMetadata {
+export interface UserPositionSummary extends PositionSummary, UserPositionMetadata {
+  id: string;
+  borrower: Address;
+  lender: Address;
+  line: Address;
   token: Address;
-  isBorrower: boolean; // borrower/lender
+  drate: number;
+  frate: number;
+  // if connected wallet is lender/borrower
+  role: PositionRole;
   amount: number; // principal/deposit
   available: number; // borrowerable/withdrawable
 }

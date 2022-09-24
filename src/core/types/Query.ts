@@ -3,7 +3,7 @@ import {
   CreditLinePage,
   BaseToken,
   Escrow,
-  Spigot,
+  LinePageSpigot,
   LinePageCreditPosition,
   DocumentNode,
   QueryResponse,
@@ -136,5 +136,5 @@ export interface GetLinePageResponse {
     }[];
 
   escrow?: Escrow;
-  spigot?: Spigot;
+  spigot?: LinePageSpigot;
 }

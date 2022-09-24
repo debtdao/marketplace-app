@@ -8,7 +8,7 @@ import {
   CreditLinePage,
   TransactionOutcome,
   // LinesUserSummary,
-  LineUserMetadata,
+  UserPositionMetadata,
   Address,
   Wei,
   TokenAllowance,
@@ -327,7 +327,7 @@ const withdrawLine = createAsyncThunk<
 
     const lineData = lines.linesMap[lineAddress];
     const userLineData = lines.user.linePositions[lineAddress];
-    // selector for LineUserMetadata to get available liquidity
+    // selector for UserPositionMetadata to get available liquidity
     const available = userLineData.deposit - userLineData.principal;
     // if requesting more than available or max available
     const withdrawAll = amount.eq(config.MAX_UINT256) || amount.gte(available);

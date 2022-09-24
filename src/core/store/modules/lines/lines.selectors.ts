@@ -11,16 +11,18 @@ import {
   AllowancesMap,
   BaseCreditLine,
   GetLinePageResponse,
-  LineUserMetadata,
+  UserPositionMetadata,
   Address,
   CreditLinePage, // prev. GeneralVaultView, Super indepth data, CreditLinePage is most similar atm
   PositionSummary,
+  UserPositionSummary,
   Spigot,
   CollateralEvent,
   CreditLineEvents,
   ModuleNames,
   SPIGOT_MODULE_NAME,
   ESCROW_MODULE_NAME,
+  LENDER_POSITION_ROLE,
 } from '@types';
 import { toBN } from '@utils';
 
@@ -29,6 +31,7 @@ import { createToken } from '../tokens/tokens.selectors';
 import { initialLineActionsStatusMap } from './lines.reducer';
 
 /* ---------------------------------- State --------------------------------- */
+const selectUserWallet = (state: RootState) => state.wallet.selectedAddress;
 const selectLinesState = (state: RootState) => state.lines;
 const selectUserLinesPositionsMap = (state: RootState) => state.lines.user.linePositions;
 // const selectUserLinesMetadataMap = (state: RootState) => state.lines.user.userLinesMetadataMap;
@@ -49,53 +52,9 @@ const selectGetLinesStatus = (state: RootState) => state.lines.statusMap.getLine
 const selectGetUserLinesPositionsStatus = (state: RootState) => state.lines.statusMap.user.getUserLinePositions;
 
 /* ----------------------------- Main Selectors ----------------------------- */
-const selectLines = createSelector(
-  [
-    selectLinesMap,
-    selectLinesAddresses,
-    selectUserLinesPositionsMap,
-    // selectUserLinesMetadataMap,
-    selectUserTokensMap,
-    selectLinesAllowancesMap,
-    selectUserTokensAllowancesMap,
-  ],
-  (
-    linesMap,
-    linesAddresses,
-    linePositions,
-    // userLinesMetadataMap,
-    userTokensMap,
-    lineAllowances, // NOTE: For now we are gonna get the allowance from TokenState.user.tokenAllowances[]
-    userTokensAllowancesMap
-  ) => {
-    const lines = linesAddresses.map((address) => {
-      const lineData = linesMap[address];
-      // const positions = positions
-      // const userTokenData = userTokensMap[lineData.tokenId];
-      const tokenAllowancesMap = userTokensAllowancesMap[lineData.token] ?? {};
-      const lineAllowancesMap = userTokensAllowancesMap[address] ?? {};
-      const positions = Object.keys(linePositions)
-        .filter((id) => lineData.activeIds.includes(id))
-        .reduce((obj, id) => {
-          return { ...obj, [id]: linePositions[id] };
-        }, {});
-
-      return createLine({
-        lineData,
-        // userTokenData,
-        positions,
-        // userLinesMetadataMap: userLinesMetadataMap[address],
-        lineAllowancesMap,
-        tokenAllowancesMap,
-      });
-    });
-
-    lines.sort((a, b) => {
-      return toBN(b.token.balance).minus(a.token.balance).toNumber();
-    });
-    return lines;
-  }
-);
+const selectLines = createSelector([selectLinesMap], (linesMap) => {
+  return Object.values(linesMap);
+});
 
 const selectLiveLines = createSelector([selectLines], (lines): CreditLine[] => {
   return lines.filter((line: CreditLine) => line.end < Date.now() / 1000);
@@ -105,20 +64,23 @@ const selectLiveLines = createSelector([selectLines], (lines): CreditLine[] => {
 // const selectDeprecatedLines = createSelector([selectLines], (lines): PositionSummary[] => {
 //   const deprecatedLines = lines
 //     .filter((line) => line.hideIfNoDeposits)
-//     .map(({ DEPOSIT, token, ...rest }) => ({ token, ...DEPOSIT, ...rest }));
+//     .map(({ token, ...rest }) => ({ token, ...rest }));
 //   return deprecatedLines.filter((line) => toBN(line.userDeposited).gt(0));
 // });
 
-const selectDepositedLines = createSelector([selectLiveLines], (lines): PositionSummary[] => {
-  const depositLines = lines.map(({ DEPOSIT, token, ...rest }) => ({ token, ...DEPOSIT, ...rest }));
-  return depositLines.filter((line) => toBN(line.userDeposited).gt(0));
-});
-
-const selectLinesOpportunities = createSelector([selectLiveLines], (lines): PositionSummary[] => {
-  const depositLines = lines.map(({ DEPOSIT, token, ...rest }) => ({ token, ...DEPOSIT, ...rest }));
-  const opportunities = depositLines.filter((line) => toBN(line.userDeposited).lte(0));
-  return opportunities;
-});
+const selectDepositedLines = createSelector(
+  [selectUserLinesPositionsMap, selectUserWallet],
+  (positions, wallet): UserPositionSummary[] => {
+    return Object.values(positions)
+      .filter((p) => p.lender === wallet)
+      .map((p) => ({
+        ...p,
+        role: LENDER_POSITION_ROLE,
+        available: p.deposit - p.principal,
+        amount: p.deposit,
+      }));
+  }
+);
 
 const selectSelectedLineActionsStatusMap = createSelector(
   [selectLinesActionsStatusMap, selectSelectedLineAddress],
@@ -136,71 +98,33 @@ const selectSummaryData = createSelector([selectUserLinesSummary], (userLinesSum
   };
 });
 
-const selectRecommendations = createSelector([selectLiveLines], (lines) => {
-  // const stableCoinsSymbols = ['DAI', 'USDC', 'USDT', 'sUSD'];
-  // const stableLines: CreditLine[] = [];
+const selectRecommendations = createSelector([selectLiveLines, selectLinesMap], (activeLines, linesMap) => {
+  const stableCoinSymbols = ['DAI', 'sUSD'];
+  const targetTokenSymbols = ['ETH'];
+  const stableLines: CreditLinePage[] = [];
+  const tokenLines: CreditLinePage[] = [];
   // stableCoinsSymbols.forEach((symbol) => {
   //   const line = lines.find((line) => line.token.symbol === symbol);
   //   if (!line) return;
   //   stableLines.push(line);
   // });
 
-  // let max = toBN('0');
-  // let stableLine: CreditLine = stableLines[0];
-  // stableLines.forEach((line) => {
-  //   if (max.gte(line.apyData)) return;
-  //   max = toBN(line.apyData);
-  //   stableLine = line;
-  // });
-
-  // const derivativeLines = differenceBy(lines, stableLines, 'address');
-
-  // derivativeLines.sort((a, b) => {
-  //   return toBN(b.apyData).minus(a.apyData).toNumber();
+  // targetTokenSymbols.forEach((symbol) => {
+  //   const line = lines.find((line) => line.token.symbol === symbol);
+  //   if (!line) return;
+  //   tokenLines.push(line);
   // });
 
   // return [stableLine, derivativeLines[1], derivativeLines[0]].filter((item) => !!item);
-  const sortedLines = [...lines].sort((a, b) => {
-    return toBN(b.apyData).minus(a.apyData).toNumber();
-  });
-  return sortedLines.slice(0, 3);
+  // const sortedLines = [...lines].sort((a, b) => {
+  //   return toBN(b.apyData).minus(a.apyData).toNumber();
+  // });
+
+  // return object with fields for categories
 });
 
-const selectLine = createSelector(
-  [
-    selectLinesMap,
-    selectUserLinesPositionsMap,
-    // selectUserLinesMetadataMap,
-    selectUserTokensMap,
-    selectLinesAllowancesMap,
-    selectUserTokensAllowancesMap,
-  ],
-  (
-    linesMap,
-    positions,
-    // userLinesMetadataMap,
-    userTokensMap,
-    lineAllowances, // NOTE: For now we are gonna get the allowance from TokenState.user.tokenAllowances[]
-    userTokensAllowancesMap
-  ) =>
-    memoize((lineAddress: string) => {
-      const lineData = linesMap[lineAddress];
-      if (!lineData) return undefined;
-      // const tokenData = tokensMap[lineData.tokenId];
-      // const positions = positions
-      const userTokenData = userTokensMap[lineData.tokenId];
-      const tokenAllowancesMap = userTokensAllowancesMap[lineData.token] ?? {};
-      const lineAllowancesMap = userTokensAllowancesMap[lineAddress] ?? {};
-      return createLine({
-        lineData,
-        tokenData,
-        userTokenData,
-        positions,
-        // userLinesMetadataMap: userLinesMetadataMap[lineAddress],
-        lineAllowancesMap,
-        tokenAllowancesMap,
-      });
-    })
+const selectLine = createSelector([selectLinesMap], (linesMap) =>
+  memoize((lineAddress: string) => linesMap[lineAddress])
 );
 
 const selectUnderlyingTokensAddresses = createSelector([selectUserLinesPositionsMap], (lines): Address[] => {
@@ -209,8 +133,8 @@ const selectUnderlyingTokensAddresses = createSelector([selectUserLinesPositions
 
 /* -------------------------------- Statuses -------------------------------- */
 const selectLinesGeneralStatus = createSelector([selectLinesStatusMap], (statusMap): Status => {
-  const loading = statusMap.getLines.loading || statusMap.initiateSaveLines.loading;
-  const error = statusMap.getLines.error || statusMap.initiateSaveLines.error;
+  const loading = statusMap.getLines.loading;
+  const error = statusMap.getLines.error;
   return { loading, error };
 });
 
@@ -232,32 +156,32 @@ const selectLinesStatus = createSelector(
 );
 
 /* --------------------------------- Helper --------------------------------- */
-interface CreateLineProps {
-  lineData: BaseCreditLine;
-  tokenAllowancesMap: AllowancesMap;
-  positions: { [key: string]: PositionSummary };
-  // userLinesMetadataMap: LineUserMetadata;
-  lineAllowancesMap: AllowancesMap;
-}
-function createLine(props: CreateLineProps): CreditLine {
-  const {
-    lineData,
-    tokenAllowancesMap,
-    lineAllowancesMap,
-    positions,
-    // userLinesMetadataMap,
-  } = props;
+// interface CreateLineProps {
+//   lineData: BaseCreditLine;
+//   // tokenAllowancesMap: AllowancesMap;
+//   positions: { [key: string]: PositionSummary };
+//   // userLinesMetadataMap: UserPositionMetadata;
+//   lineAllowancesMap: AllowancesMap;
+// }
+// function createLine(props: CreateLineProps): CreditLine {
+//   const {
+//     lineData,
+//     // tokenAllowancesMap,
+//     lineAllowancesMap,
+//     positions,
+//     // userLinesMetadataMap,
+//   } = props;
 
-  return {
-    ...lineData,
-  };
-}
+//   return {
+//     ...lineData,
+//   };
+// }
 
 interface CreateLinePageProps {
   lineData: GetLinePageResponse;
   tokenAllowancesMap: AllowancesMap;
   positions: { [key: string]: PositionSummary };
-  // userLinesMetadataMap: LineUserMetadata;
+  // userLinesMetadataMap: UserPositionMetadata;
   lineAllowancesMap: AllowancesMap;
 }
 function createLinePage(props: CreateLinePageProps): CreditLinePage {
@@ -271,8 +195,8 @@ function createLinePage(props: CreateLinePageProps): CreditLinePage {
   const lineAddress = lineData.id;
   const currentAllowance = tokenAllowancesMap[lineAddress] ?? '0';
 
-  console.log('get lines category res: ', lineAddress, response.data);
-  const { start, end, status, borrower, credits, spigot, escrow } = response.data;
+  console.log('get lines category res: ', lineAddress, lineData);
+  const { start, end, status, borrower, credits, spigot, escrow } = lineData;
 
   // dreivative or aggregated data we need to compute and store while mapping position data
 
@@ -361,12 +285,12 @@ function createLinePage(props: CreateLinePageProps): CreditLinePage {
     id: lineAddress as Address,
     start,
     end,
-    status,
+    status: creditLineService.mapStatusToString(status),
     borrower,
     // debt data
     principal,
     interest,
-    credits: credits.reduce((obj: any, c: any) => {
+    credits: credits?.reduce((obj: any, c: any) => {
       const { deposit, drawnRate, id, lender, symbol, events, principal, interest, interestRepaid, token } = c;
       // const currentPrice = await fetchTokenPrice(symbol, Date.now())
       const currentPrice = 1e8;
@@ -386,11 +310,11 @@ function createLinePage(props: CreateLinePageProps): CreditLinePage {
       };
     }),
     // collateral data
-    spigot: spigot?.id
+    spigot: spigot
       ? undefined
       : {
           revenue: tokenRevenue,
-          spigots: spigot.spigots.reduce((obj: any, s: any): { [key: string]: Spigot } => {
+          spigots: spigot?.spigots.reduce((obj: any, s: any): { [key: string]: Spigot } => {
             const {
               id,
               token: { symbol, lastPriceUSD },
@@ -445,7 +369,6 @@ export const LinesSelectors = {
   selectSelectedLine,
   selectSelectedLineActionsStatusMap,
   selectDepositedLines,
-  selectLinesOpportunities,
   selectSummaryData,
   selectRecommendations,
   selectLinesStatus,

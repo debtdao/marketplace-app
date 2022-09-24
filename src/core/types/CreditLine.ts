@@ -4,6 +4,9 @@ import { Address } from './Blockchain';
 import { TokenView } from './Token';
 import { Status } from './Status';
 
+// TODO
+// import { BigNumber } from '../frameworks/ethers';
+
 export interface BaseCreditLine {
   id: Address;
   type?: string;
@@ -11,26 +14,30 @@ export interface BaseCreditLine {
   borrower: Address;
 
   principal?: number;
+  activeIds: string[]; // ids for all open positions
 }
 
 export interface CreditLine extends BaseCreditLine {
+  // TODO: beef up this type so it has everything we need for homepage cards
+  // TODO: replace BaseCreditLine with CreditLine in State.CreditLine and actinos/selectors
   id: Address;
-  end: string;
-  start: string;
+  end: number;
+  start: number;
   type?: string;
   status: string;
+  borrower: Address;
 
   principal?: number;
+  activeIds: string[];
 
-  borrower: Address;
   escrow?: { id: Address };
   spigot?: { id: Address };
 }
 
 export interface CreditLinePage extends BaseCreditLine {
   id: Address;
-  end: string;
-  start: string;
+  end: number;
+  start: number;
   type?: string;
   status: string;
   borrower: Address;
@@ -44,6 +51,7 @@ export interface CreditLinePage extends BaseCreditLine {
   tokenRevenue: { [key: string]: number };
 
   // subgraph id -> depsoit/spigot
+  activeIds: string[];
   credits: { [key: string]: LinePageCreditPosition };
   escrow?: { [key: string]: Escrow };
   spigot?: {
@@ -85,8 +93,8 @@ export interface PositionSummary {
   lender: Address;
   line: Address;
   token: Address;
-  deposit: string;
-  principal: string;
+  deposit: number;
+  principal: number;
   drate: number;
   frate: number;
 }
@@ -102,22 +110,22 @@ export interface LineUserMetadata {
 // Collateral Module Types
 export interface Collateral {
   token: Address;
-  amount: string;
-  value: string;
+  amount: number;
+  value: number;
 }
 
 export interface BaseEscrow {
-  cratio: string;
-  minCRatio: string;
-  collateralValue: string;
+  cratio: number;
+  minCRatio: number;
+  collateralValue: number;
 }
 
 export interface Escrow extends BaseEscrow {
-  cratio: string;
-  minCRatio: string;
-  collateralValue: string;
+  cratio: number;
+  minCRatio: number;
+  collateralValue: number;
   deposits?: {
-    amount: string;
+    amount: number;
     enabled: boolean;
     token: BaseToken;
   }[];
@@ -147,7 +155,7 @@ export interface LinePageSpigot {
 export interface RevenueContract {
   active: boolean;
   contract: Address;
-  startTime: string;
+  startTime: number;
   ownerSplit: number;
   token: BaseToken;
 
@@ -159,7 +167,7 @@ export interface BaseToken {
   name: string;
   symbol: string;
   decimals: number;
-  lastPriceUSD?: string;
+  lastPriceUSD?: number;
 }
 
 type SPIGOT_NAME = 'spigot';
@@ -177,7 +185,7 @@ export type ModuleNames = SPIGOT_NAME | CREDIT_NAME | ESCROW_NAME;
 export interface EventWithValue {
   __typename?: string;
   timestamp: number;
-  amount?: string;
+  amount?: number;
   symbol: string;
   value?: number;
   [key: string]: any;
@@ -188,7 +196,7 @@ export interface CreditEvent extends EventWithValue {
   __typename: string;
   id: string; // position id
   timestamp: number;
-  amount: string;
+  amount: number;
   symbol: string;
   value?: number;
 }
@@ -197,8 +205,8 @@ export interface SetRateEvent {
   __typename: string;
   id: string; // position id
   timestamp: number;
-  drawnRate: string;
-  facilityRate: string;
+  drawnRate: number;
+  facilityRate: number;
 }
 
 export type CreditLineEvents = CreditEvent | SetRateEvent;
@@ -207,7 +215,7 @@ export type CreditLineEvents = CreditEvent | SetRateEvent;
 export interface CollateralEvent extends EventWithValue {
   type: ModuleNames;
   timestamp: number;
-  amount: string;
+  amount: number;
   symbol: string;
   value?: number;
 }
@@ -218,9 +226,9 @@ type SpigotEvents = EventWithValue | ClaimRevenueEvent;
 export interface ClaimRevenueEvent {
   timestamp: number;
   revenueToken: { id: string };
-  escrowed: string;
-  netIncome: string;
-  value: string;
+  escrowed: number;
+  netIncome: number;
+  value: number;
 }
 
 // Redux State

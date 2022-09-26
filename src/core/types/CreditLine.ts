@@ -73,11 +73,10 @@ export interface CreditLinePage extends BaseCreditLine {
 
   // subgraph id -> depsoit/spigot
   activeIds: string[];
-  credits: { [key: string]: LinePageCreditPosition };
+  credits?: { [key: string]: LinePageCreditPosition };
   escrow?: { [key: string]: Escrow };
   spigot?: {
-    revenue: { [key: string]: number };
-    spigots: { [key: string]: Spigot };
+    spigots?: { [key: string]: Spigot };
   };
 
   collateralEvents: CollateralEvent[];
@@ -103,9 +102,8 @@ export interface LinePageCreditPosition extends BaseCreditPosition {
   drawnRate: number;
   token: {
     symbol: string;
-    lastPriceUSD?: number; // Can be live data not from subgraph
+    lastPriceUSD?: number; // Can be live data or from subgraph
   };
-  events?: CreditLineEvents[];
 }
 
 // bare minimum to display about a user on a position
@@ -158,12 +156,14 @@ export interface Collateral {
 }
 
 export interface BaseEscrow {
+  id: Address;
   cratio: number;
   minCRatio: number;
   collateralValue: number;
 }
 
 export interface Escrow extends BaseEscrow {
+  id: Address;
   cratio: number;
   minCRatio: number;
   collateralValue: number;
@@ -191,7 +191,6 @@ export interface LinePageSpigot {
   startTime: string;
   active: boolean;
   // aggregate token revenue accross all spigots
-  revenue: { [key: string]: number };
   spigots?: RevenueContract[];
 }
 
@@ -225,12 +224,24 @@ export type ModuleNames = SPIGOT_NAME | CREDIT_NAME | ESCROW_NAME;
 //  Events Types
 
 // Common
+
+/**
+ *
+ *
+ * @export
+ * @typedef {Object} EventWithValue
+ * @interface EventWithValue
+ * @property timestamp - unix (seconds) time that event happened at
+ * @property value     - value of total amount at time of event
+ * @property valueNow  - value of total amount of tokens at present time
+ */
 export interface EventWithValue {
   __typename?: string;
   timestamp: number;
   amount?: number;
   symbol: string;
   value?: number;
+  valueNow?: number;
   [key: string]: any;
 }
 
@@ -241,7 +252,8 @@ export interface CreditEvent extends EventWithValue {
   timestamp: number;
   amount: number;
   symbol: string;
-  value?: number;
+  valueAtTime?: number;
+  valueNow?: number;
 }
 
 export interface SetRateEvent {
@@ -284,5 +296,5 @@ export interface LineActionsStatusMap {
 
 export interface UserLineMetadataStatusMap {
   getUserLinePositions: Status;
-  linesActionsStatusMap: { [lineAddress: Address]: LineActionsStatusMap };
+  linesActionsStatusMap: { [lineAddress: string]: LineActionsStatusMap };
 }

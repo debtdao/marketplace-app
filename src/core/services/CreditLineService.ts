@@ -15,12 +15,6 @@ import {
   GetLineProps,
   GetLinesProps,
   GetLinePageProps,
-  LineStatusTypes,
-  UNINITIALIZED_STATUS,
-  ACTIVE_STATUS,
-  LIQUIDATABLE_STATUS,
-  REPAID_STATUS,
-  INSOLVENT_STATUS,
 } from '@types';
 import { getConfig } from '@config';
 import { getLine, getLinePage, getLines, getUserLinePositions } from '@frameworks/gql';
@@ -49,60 +43,43 @@ export class CreditLineServiceImpl implements CreditLineService {
     this.graphUrl = GRAPH_API_URL || 'https://api.thegraph.com';
   }
 
-  public async getLine(prop: GetLineProps): Promise<CreditLine> {
+  public async getLine(prop: GetLineProps): Promise<CreditLine | undefined> {
     // graphURL
-    return (await getLine(prop.params)).data;
+    return (await getLine(prop.params))?.data;
   }
 
-  public async getLines(prop: GetLinesProps): Promise<CreditLine[]> {
+  public async getLines(prop: GetLinesProps): Promise<CreditLine[] | undefined> {
     return [];
   }
 
-  public async getLinePage(prop: GetLinePageProps): Promise<CreditLinePage> {
-    return {};
+  public async getLinePage(prop: GetLinePageProps): Promise<CreditLinePage | undefined> {
+    return;
   }
-  public async getUserLinePositions(): Promise<any> {
-    return null;
+  public async getUserLinePositions(): Promise<any | undefined> {
+    return;
   }
-  public async getExpectedTransactionOutcome(): Promise<any> {
-    return null;
+  public async getExpectedTransactionOutcome(): Promise<any | undefined> {
+    return;
   }
-  public async approveDeposit(): Promise<any> {
-    return null;
+  public async approveDeposit(): Promise<any | undefined> {
+    return;
   }
   // public async approveZapOu:  () => Promise<any>t: {
-  //   return null;
+  //   return;
   // };
   // public async signPermi:  () => Promise<any>t: {
-  //   return null;
+  //   return;
   // };
-  public async deposit(): Promise<any> {
-    return null;
+  public async deposit(): Promise<any | undefined> {
+    return;
   }
-  public async withdraw(): Promise<any> {
-    return null;
+  public async withdraw(): Promise<any | undefined> {
+    return;
   }
-  public async getDepositAllowance(): Promise<any> {
-    return null;
+  public async getDepositAllowance(): Promise<any | undefined> {
+    return;
   }
-  public async getWithdrawAllowance(): Promise<any> {
-    return null;
-  }
-
-  public mapStatusToString(status: number): LineStatusTypes {
-    switch (status) {
-      case 0:
-        return UNINITIALIZED_STATUS;
-      case 2:
-        return ACTIVE_STATUS;
-      case 3:
-        return LIQUIDATABLE_STATUS;
-      case 4:
-        return REPAID_STATUS;
-      case 5:
-        return INSOLVENT_STATUS;
-      default:
-        return 'no status';
-    }
+  public async getWithdrawAllowance(): Promise<any | undefined> {
+    return;
   }
 }

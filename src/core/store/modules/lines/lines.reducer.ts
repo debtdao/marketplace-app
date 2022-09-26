@@ -50,7 +50,7 @@ const {
   withdrawLine,
   // migrateLine,
   getLines,
-  initiateSaveLines,
+  // initiateSaveLines,
   setSelectedLineAddress,
   getUserLinePositions,
   clearLinesData,
@@ -129,7 +129,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       const allNewLines = linesData.reduce(
         (all, category) => ({
           ...all,
-          ...category.reduce(processLines, {}),
+          ...category?.reduce(processLines, {}),
         }),
         {}
       );
@@ -163,18 +163,18 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.user.getUserLinePositions = { error: error.message };
     })
 
-    /* -------------------------- getUserLinePositions -------------------------- */
-    .addCase(getUserLinePositions.pending, (state) => {
-      state.statusMap.user.getUserLinePositions = { loading: true };
-    })
-    .addCase(getUserLinePositions.fulfilled, (state, { payload: { userLinesPositions } }) => {
-      // TODO fix data missmatch between types PositionSummary and BasicCreditLine
-      // state.user.linePositions = userLinesPositions.reduce((map, line) => ({ ...map, [line]: state.linesMap[line]}), {});
-      state.statusMap.user.getUserLinePositions = {};
-    })
-    .addCase(getUserLinePositions.rejected, (state, { error }) => {
-      state.statusMap.user.getUserLinePositions = { error: error.message };
-    })
+    // /* -------------------------- getUserLinePositions -------------------------- */
+    // .addCase(getUserLinePositions.pending, (state) => {
+    //   state.statusMap.user.getUserLinePositions = { loading: true };
+    // })
+    // .addCase(getUserLinePositions.fulfilled, (state, { payload: { userLinesPositions } }) => {
+    //   // TODO fix data missmatch between types PositionSummary and BasicCreditLine
+    //   // state.user.linePositions = userLinesPositions.reduce((map, line) => ({ ...map, [line]: state.linesMap[line]}), {});
+    //   state.statusMap.user.getUserLinePositions = {};
+    // })
+    // .addCase(getUserLinePositions.rejected, (state, { error }) => {
+    //   state.statusMap.user.getUserLinePositions = { error: error.message };
+    // })
 
     /* ---------------------- getExpectedTransactionOutcome --------------------- */
     // .addCase(getExpectedTransactionOutcome.pending, (state) => {

@@ -51,29 +51,34 @@ const clearLineStatus = createAction<{ lineAddress: string }>('lines/clearLineSt
 /*                                 Fetch Data                                 */
 /* -------------------------------------------------------------------------- */
 
-const initiateSaveLines = createAsyncThunk<void, string | undefined, ThunkAPI>(
-  'lines/initiateSaveLines',
-  async (_arg, { dispatch }) => {
-    await dispatch(getLines([]));
-  }
-);
+// const initiateSaveLines = createAsyncThunk<void, string | undefined, ThunkAPI>(
+//   'lines/initiateSaveLines',
+//   async (_arg, { dispatch }) => {
+//     await dispatch(getLines([]));
+//   }
+// );
 
-const getLines = createAsyncThunk<{ linesData: CreditLine[][] }, GetLinesArgs[], ThunkAPI>(
+const getLines = createAsyncThunk<{ linesData: (CreditLine[] | undefined)[] }, GetLinesArgs[], ThunkAPI>(
   'lines/getLines',
   async (categories, { getState, extra }) => {
     const { network } = getState();
     const { creditLineService } = extra.services;
-    const linesData = await creditLineService.getLines({ network: network.current, categories });
+    const linesData = await Promise.all(
+      categories.map((params) => creditLineService.getLines({ network: network.current, params }))
+    );
     return { linesData };
   }
 );
 
-const getLinePage = createAsyncThunk<{ linesDynamicData: CreditLinePage }, GetLinePageArgs, ThunkAPI>(
+const getLinePage = createAsyncThunk<{ linesDynamicData: CreditLinePage | undefined }, GetLinePageArgs, ThunkAPI>(
   'lines/getLinePage',
   async ({ id }, { getState, extra }) => {
     const { network } = getState();
     const { creditLineService } = extra.services;
-    const linesDynamicData = await creditLineService.getLinePage({ network: network.current, id });
+    const linesDynamicData = await creditLineService.getLinePage({
+      network: network.current,
+      params: { id },
+    });
     return { linesDynamicData };
   }
 );
@@ -92,7 +97,6 @@ const getUserLinePositions = createAsyncThunk<
   const userLinesPositions = await services.creditLineService.getUserLinePositions({
     network: network.current,
     userAddress,
-    lineAddresses,
   });
   return { userLinesPositions };
 });
@@ -466,7 +470,7 @@ const getWithdrawAllowance = createAsyncThunk<
 
 export const LinesActions = {
   setSelectedLineAddress,
-  initiateSaveLines,
+  // initiateSaveLines,
   getLines,
   approveDeposit,
   depositLine,

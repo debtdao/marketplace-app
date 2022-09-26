@@ -1,13 +1,4 @@
-import {
-  BaseCreditLine,
-  CreditLinePage,
-  BaseToken,
-  Escrow,
-  LinePageSpigot,
-  LinePageCreditPosition,
-  DocumentNode,
-  QueryResponse,
-} from '@types';
+import { BaseCreditLine, CreditLinePage, BaseToken, Escrow, LinePageSpigot, LinePageCreditPosition } from '@types';
 
 import { Address } from './Blockchain';
 

@@ -127,20 +127,20 @@ export interface MigrateProps {
 
 // *************** LINE ***************
 export interface CreditLineService {
-  getLine: (props: GetLineProps) => Promise<CreditLine>;
-  getLines: (props: GetLinesProps) => Promise<CreditLine[]>;
-  getLinePage: (props: GetLinePageProps) => Promise<CreditLinePage>;
+  getLine: (props: GetLineProps) => Promise<CreditLine | undefined>;
+  getLines: (props: GetLinesProps) => Promise<CreditLine[] | undefined>;
+  getLinePage: (props: GetLinePageProps) => Promise<CreditLinePage | undefined>;
 
   // TODO change types from `any`
-  getUserLinePositions: (...args: any) => Promise<any>;
-  getExpectedTransactionOutcome: (...args: any) => Promise<any>;
-  approveDeposit: (...args: any) => Promise<any>;
-  // approveZapOut: (...args: any) => Promise<any>;
-  // signPermit: (...args: any) => Promise<any>;
-  deposit: (...args: any) => Promise<any>;
-  withdraw: (...args: any) => Promise<any>;
-  getDepositAllowance: (...args: any) => Promise<any>;
-  getWithdrawAllowance: (...args: any) => Promise<any>;
+  getUserLinePositions: (...args: any) => Promise<any | undefined>;
+  getExpectedTransactionOutcome: (...args: any) => Promise<any | undefined>;
+  approveDeposit: (...args: any) => Promise<any | undefined>;
+  // approveZapOut: (...args: any) => Promise<any | undefined>;
+  // signPermit: (...args: any) => Promise<any | undefined>;
+  deposit: (...args: any) => Promise<any | undefined>;
+  withdraw: (...args: any) => Promise<any | undefined>;
+  getDepositAllowance: (...args: any) => Promise<any | undefined>;
+  getWithdrawAllowance: (...args: any) => Promise<any | undefined>;
 }
 export interface GetLineProps {
   params: GetLineArgs;

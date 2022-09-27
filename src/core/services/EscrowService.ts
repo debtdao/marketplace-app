@@ -70,7 +70,6 @@ export class EscrowServiceImpl implements EscrowService {
     targetToken: Address, 
     dryRun: boolean
     ): Promise<TransactionResponse | PopulatedTransaction> { 
-      const to = await this.contract.arbiter()
       return await this.executeContractMethod('liquidate', [amount, targetToken, to], dryRun);
     }
 

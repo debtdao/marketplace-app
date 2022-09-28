@@ -23,7 +23,7 @@ export const useCreditLines = (
   const [creditLines, setCreditLines] = useState<{ [key: string]: CreditLine[] }>();
   const [isLoading, setLoading] = useState<boolean>(false);
   const [args, setArgs] = useState<UseCreditLinesParams>(params);
-  const { DEBT_DAO_SUBGRAPH_KEY } = getEnv();
+  const { GRAPH_API_URL } = getEnv();
 
   useEffect(() => {
     if (isEqual(params, args)) return;

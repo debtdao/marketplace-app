@@ -29,7 +29,6 @@ export const linesInitialState: CreditLineState = {
   selectedLineAddress: undefined,
   linesMap: {},
   user: {
-    activeLines: [], // TODO can remove and derive from linePositions.
     linePositions: {},
     lineAllowances: {},
   },
@@ -49,6 +48,8 @@ const {
   // signZapOut,
   withdrawLine,
   // migrateLine,
+  getLine,
+  getLinePage,
   getLines,
   // initiateSaveLines,
   setSelectedLineAddress,
@@ -79,7 +80,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.linesMap = {};
     })
     .addCase(clearUserData, (state) => {
-      state.user.activeLines = [];
       state.user.linePositions = {};
       state.user.lineAllowances = {};
     })
@@ -113,7 +113,19 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     // .addCase(initiateSaveLines.rejected, (state, { error }) => {
     //   state.statusMap.initiateSaveLines = { error: error.message };
     // })
-
+    /* -------------------------------- getLine ------------------------------- */
+    .addCase(getLine.pending, (state) => {
+      state.statusMap.getLine = { loading: true };
+    })
+    .addCase(getLine.fulfilled, (state, { payload: { lineData } }) => {
+      if (lineData) {
+        state.linesMap = { ...state.linesMap, [lineData.id]: lineData };
+      }
+      state.statusMap.getLine = {};
+    })
+    .addCase(getLine.rejected, (state, { error }) => {
+      state.statusMap.getLine = { error: error.message };
+    })
     /* -------------------------------- getLines ------------------------------- */
     .addCase(getLines.pending, (state) => {
       state.statusMap.getLines = { loading: true };
@@ -126,6 +138,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
         // merge array into obj
         return { ...cat, [line.id]: line };
       };
+      // NOTE: does not save data to state in expected expectedx for actual getLines() use of {key: CreditLines[[}
       const allNewLines = linesData.reduce(
         (all, category) => ({
           ...all,
@@ -140,7 +153,20 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(getLines.rejected, (state, { error }) => {
       state.statusMap.getLines = { error: error.message };
     })
+    /* -------------------------------- getLinePage ------------------------------- */
+    .addCase(getLinePage.pending, (state) => {
+      state.statusMap.getLinePage = { loading: true };
+    })
+    .addCase(getLinePage.fulfilled, (state, { payload: { linePageData } }) => {
+      if (linePageData) {
+        state.linesMap = { ...state.linesMap, [linePageData.id]: linePageData as CreditLine };
+      }
 
+      state.statusMap.getLinePage = {};
+    })
+    .addCase(getLinePage.rejected, (state, { error }) => {
+      state.statusMap.getLinePage = { error: error.message };
+    })
     /* ------------------------- getUserLinePositions ------------------------- */
     .addCase(getUserLinePositions.pending, (state, { meta }) => {
       const lineAddresses = meta.arg.lineAddresses || [];

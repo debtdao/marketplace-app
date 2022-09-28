@@ -100,7 +100,6 @@ export interface CreditLineState {
   selectedLineAddress: string | undefined;
   linesMap: { [lineAddress: string]: CreditLine };
   user: {
-    activeLines: Address[];
     linePositions: { [positionId: string]: PositionSummary };
     lineAllowances: { [line: string]: { [token: string]: Integer } };
   };

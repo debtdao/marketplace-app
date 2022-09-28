@@ -12,6 +12,7 @@ import {
   Address,
   Wei,
   TokenAllowance,
+  GetLineArgs,
   GetLinesArgs,
   GetLinePageArgs,
   PositionSummary,
@@ -58,6 +59,16 @@ const clearLineStatus = createAction<{ lineAddress: string }>('lines/clearLineSt
 //   }
 // );
 
+const getLine = createAsyncThunk<{ lineData: CreditLine | undefined }, GetLineArgs, ThunkAPI>(
+  'lines/getLine',
+  async (params, { getState, extra }) => {
+    const { network } = getState();
+    const { creditLineService } = extra.services;
+    const lineData = await creditLineService.getLine({ network: network.current, params });
+    return { lineData };
+  }
+);
+
 const getLines = createAsyncThunk<{ linesData: (CreditLine[] | undefined)[] }, GetLinesArgs[], ThunkAPI>(
   'lines/getLines',
   async (categories, { getState, extra }) => {
@@ -70,16 +81,16 @@ const getLines = createAsyncThunk<{ linesData: (CreditLine[] | undefined)[] }, G
   }
 );
 
-const getLinePage = createAsyncThunk<{ linesDynamicData: CreditLinePage | undefined }, GetLinePageArgs, ThunkAPI>(
+const getLinePage = createAsyncThunk<{ linePageData: CreditLinePage | undefined }, GetLinePageArgs, ThunkAPI>(
   'lines/getLinePage',
   async ({ id }, { getState, extra }) => {
     const { network } = getState();
     const { creditLineService } = extra.services;
-    const linesDynamicData = await creditLineService.getLinePage({
+    const linePageData = await creditLineService.getLinePage({
       network: network.current,
       params: { id },
     });
-    return { linesDynamicData };
+    return { linePageData };
   }
 );
 
@@ -471,15 +482,16 @@ const getWithdrawAllowance = createAsyncThunk<
 export const LinesActions = {
   setSelectedLineAddress,
   // initiateSaveLines,
+  getLine,
   getLines,
+  getLinePage,
+  getUserLinePositions,
   approveDeposit,
   depositLine,
   // approveZapOut,
   // signZapOut,
   withdrawLine,
   // migrateLine,
-  getLinePage,
-  getUserLinePositions,
   // initSubscriptions,
   clearLinesData,
   clearUserData,

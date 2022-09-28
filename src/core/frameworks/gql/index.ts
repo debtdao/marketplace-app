@@ -16,18 +16,13 @@ import {
   PositionSummary,
 } from '@src/core/types';
 
-const {
-  DEBT_DAO_SUBGRAPH_KEY,
-  // DEBT_DAO_SUBGRAPH_NAME,
-} = getEnv();
-
-const GQL_API_URL = `https://api.studio.thegraph.com/query/${DEBT_DAO_SUBGRAPH_KEY}/debtdao/`; // <--SUBGRAPH_NAME here
+const { GRAPH_API_URL, GRAPH_TEST_API_URL } = getEnv();
 
 let client: any;
 export const getClient = () => (client ? client : createClient());
 const createClient = (): typeof ApolloClient => {
   client = new ApolloClient({
-    uri: GQL_API_URL,
+    uri: GRAPH_API_URL || GRAPH_TEST_API_URL,
     cache: new InMemoryCache(),
   });
 

@@ -55,23 +55,23 @@ export class EscrowServiceImpl implements EscrowService {
   ): Promise<TransactionResponse | PopulatedTransaction> {
     return await this.executeContractMethod('addCollateral', [amount, token], dryRun);
   }
-  
 
   public async enableCollateral(
     amount: BigNumber,
     token: Address,
     dryRun: boolean
-  ): Promise<TransactionResponse | PopulatedTransaction>{
+  ): Promise<TransactionResponse | PopulatedTransaction> {
     return await this.executeContractMethod('enableCollateral', [amount, token], dryRun);
   }
 
   public async liquidate(
-    amount: BigNumber, 
-    targetToken: Address, 
+    amount: BigNumber,
+    targetToken: Address,
+    to: Address,
     dryRun: boolean
-    ): Promise<TransactionResponse | PopulatedTransaction> { 
-      return await this.executeContractMethod('liquidate', [amount, targetToken, to], dryRun);
-    }
+  ): Promise<TransactionResponse | PopulatedTransaction> {
+    return await this.executeContractMethod('liquidate', [amount, targetToken, to], dryRun);
+  }
 
   public async releaseCollateral(
     amount: BigNumber,

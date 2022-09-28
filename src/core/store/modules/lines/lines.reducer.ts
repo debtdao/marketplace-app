@@ -13,7 +13,7 @@ import {
 
 import { LinesActions } from './lines.actions';
 
-export const initialLinesActionsStatusMap: LineActionsStatusMap = {
+export const initialLineActionsStatusMap: LineActionsStatusMap = {
   get: initialStatus,
   approve: initialStatus,
   deposit: initialStatus,
@@ -29,7 +29,6 @@ export const linesInitialState: CreditLineState = {
   selectedLineAddress: undefined,
   linesMap: {},
   user: {
-    activeLines: [], // TODO can remove and derive from linePositions.
     linePositions: {},
     lineAllowances: {},
   },
@@ -44,20 +43,22 @@ export const linesInitialState: CreditLineState = {
 
 const {
   approveDeposit,
-  depositLine,
+  depositAndRepay,
   // approveZapOut,
   // signZapOut,
   withdrawLine,
   // migrateLine,
+  getLine,
+  getLinePage,
   getLines,
-  initiateSaveLines,
+  // initiateSaveLines,
   setSelectedLineAddress,
   getUserLinePositions,
   clearLinesData,
   clearUserData,
   getExpectedTransactionOutcome,
   clearTransactionData,
-  getUserLinesMetadata,
+  // getUserLinesMetadata,
   clearSelectedLineAndStatus,
   clearLineStatus,
 } = LinesActions;
@@ -79,7 +80,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.linesMap = {};
     })
     .addCase(clearUserData, (state) => {
-      state.user.activeLines = [];
       state.user.linePositions = {};
       state.user.lineAllowances = {};
     })
@@ -91,12 +91,12 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(clearSelectedLineAndStatus, (state) => {
       if (!state.selectedLineAddress) return;
       const currentAddress = state.selectedLineAddress;
-      // state.statusMap.linesActionsStatusMap[currentAddress] = initialLinesActionsStatusMap;
+      // state.statusMap.linesActionsStatusMap[currentAddress] = initialLineActionsStatusMap;
       state.selectedLineAddress = undefined;
     })
 
     .addCase(clearLineStatus, (state, { payload: { lineAddress } }) => {
-      // state.statusMap.linesActionsStatusMap[lineAddress] = initialLinesActionsStatusMap;
+      // state.statusMap.linesActionsStatusMap[lineAddress] = initialLineActionsStatusMap;
     })
 
     /* -------------------------------------------------------------------------- */
@@ -113,7 +113,19 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     // .addCase(initiateSaveLines.rejected, (state, { error }) => {
     //   state.statusMap.initiateSaveLines = { error: error.message };
     // })
-
+    /* -------------------------------- getLine ------------------------------- */
+    .addCase(getLine.pending, (state) => {
+      state.statusMap.getLine = { loading: true };
+    })
+    .addCase(getLine.fulfilled, (state, { payload: { lineData } }) => {
+      if (lineData) {
+        state.linesMap = { ...state.linesMap, [lineData.id]: lineData };
+      }
+      state.statusMap.getLine = {};
+    })
+    .addCase(getLine.rejected, (state, { error }) => {
+      state.statusMap.getLine = { error: error.message };
+    })
     /* -------------------------------- getLines ------------------------------- */
     .addCase(getLines.pending, (state) => {
       state.statusMap.getLines = { loading: true };
@@ -122,14 +134,15 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       const linesAddresses: string[] = [];
       const processLines = (cat: { [key: string]: CreditLine }, line: CreditLine) => {
         // init new line with actions
-        state.statusMap.user.linesActionsStatusMap[line.id] = initialLinesActionsStatusMap;
+        state.statusMap.user.linesActionsStatusMap[line.id] = initialLineActionsStatusMap;
         // merge array into obj
         return { ...cat, [line.id]: line };
       };
+      // NOTE: does not save data to state in expected expectedx for actual getLines() use of {key: CreditLines[[}
       const allNewLines = linesData.reduce(
         (all, category) => ({
           ...all,
-          ...category.reduce(processLines, {}),
+          ...category?.reduce(processLines, {}),
         }),
         {}
       );
@@ -140,7 +153,20 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(getLines.rejected, (state, { error }) => {
       state.statusMap.getLines = { error: error.message };
     })
+    /* -------------------------------- getLinePage ------------------------------- */
+    .addCase(getLinePage.pending, (state) => {
+      state.statusMap.getLinePage = { loading: true };
+    })
+    .addCase(getLinePage.fulfilled, (state, { payload: { linePageData } }) => {
+      if (linePageData) {
+        state.linesMap = { ...state.linesMap, [linePageData.id]: linePageData as CreditLine };
+      }
 
+      state.statusMap.getLinePage = {};
+    })
+    .addCase(getLinePage.rejected, (state, { error }) => {
+      state.statusMap.getLinePage = { error: error.message };
+    })
     /* ------------------------- getUserLinePositions ------------------------- */
     .addCase(getUserLinePositions.pending, (state, { meta }) => {
       const lineAddresses = meta.arg.lineAddresses || [];
@@ -163,18 +189,18 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.user.getUserLinePositions = { error: error.message };
     })
 
-    /* -------------------------- getUserLinePositions -------------------------- */
-    .addCase(getUserLinePositions.pending, (state) => {
-      state.statusMap.user.getUserLinePositions = { loading: true };
-    })
-    .addCase(getUserLinePositions.fulfilled, (state, { payload: { userLinesPositions } }) => {
-      // TODO fix data missmatch between types PositionSummary and BasicCreditLine
-      // state.user.linePositions = userLinesPositions.reduce((map, line) => ({ ...map, [line]: state.linesMap[line]}), {});
-      state.statusMap.user.getUserLinePositions = {};
-    })
-    .addCase(getUserLinePositions.rejected, (state, { error }) => {
-      state.statusMap.user.getUserLinePositions = { error: error.message };
-    })
+    // /* -------------------------- getUserLinePositions -------------------------- */
+    // .addCase(getUserLinePositions.pending, (state) => {
+    //   state.statusMap.user.getUserLinePositions = { loading: true };
+    // })
+    // .addCase(getUserLinePositions.fulfilled, (state, { payload: { userLinesPositions } }) => {
+    //   // TODO fix data missmatch between types PositionSummary and BasicCreditLine
+    //   // state.user.linePositions = userLinesPositions.reduce((map, line) => ({ ...map, [line]: state.linesMap[line]}), {});
+    //   state.statusMap.user.getUserLinePositions = {};
+    // })
+    // .addCase(getUserLinePositions.rejected, (state, { error }) => {
+    //   state.statusMap.user.getUserLinePositions = { error: error.message };
+    // })
 
     /* ---------------------- getExpectedTransactionOutcome --------------------- */
     // .addCase(getExpectedTransactionOutcome.pending, (state) => {
@@ -207,16 +233,16 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.user.linesActionsStatusMap[lineAddress].approve = { error: error.message };
     })
 
-    /* ------------------------------ depositLine ------------------------------ */
-    .addCase(depositLine.pending, (state, { meta }) => {
+    /* ------------------------------ depositAndRepay ------------------------------ */
+    .addCase(depositAndRepay.pending, (state, { meta }) => {
       const lineAddress = meta.arg.lineAddress;
       state.statusMap.user.linesActionsStatusMap[lineAddress].deposit = { loading: true };
     })
-    .addCase(depositLine.fulfilled, (state, { meta }) => {
+    .addCase(depositAndRepay.fulfilled, (state, { meta }) => {
       const lineAddress = meta.arg.lineAddress;
       state.statusMap.user.linesActionsStatusMap[lineAddress].deposit = {};
     })
-    .addCase(depositLine.rejected, (state, { error, meta }) => {
+    .addCase(depositAndRepay.rejected, (state, { error, meta }) => {
       const lineAddress = meta.arg.lineAddress;
       state.statusMap.user.linesActionsStatusMap[lineAddress].deposit = { error: error.message };
     })
@@ -249,7 +275,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 function checkAndInitUserLineStatus(state: CreditLineState, lineAddress: string) {
   const actionsMap = state.statusMap.user.linesActionsStatusMap[lineAddress];
   if (actionsMap) return;
-  state.statusMap.user.linesActionsStatusMap[lineAddress] = { ...initialLinesActionsStatusMap };
+  state.statusMap.user.linesActionsStatusMap[lineAddress] = { ...initialLineActionsStatusMap };
 }
 
 export default linesReducer;

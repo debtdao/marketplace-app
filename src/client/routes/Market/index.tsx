@@ -19,8 +19,8 @@ import {
   WalletSelectors,
   AppSelectors,
   NetworkSelectors,
-  CreditLinesActions,
-  CreditLinesSelectors,
+  LinesActions,
+  LinesSelectors,
 } from '@store';
 import { device } from '@themes/default';
 import {
@@ -193,7 +193,8 @@ export const Market = () => {
     (appStatus.loading || vaultsStatus.loading || tokensStatus.loading || isMounting) && !activeModal;
   const opportunitiesLoading = generalLoading && !filteredVaults.length;
   const depositsLoading = generalLoading && !deposits.length;
-  const addCreditStatus = useAppSelector(CreditLinesSelectors.selectAddCreditStatus);
+  // TODO not neeed here
+  const addCreditStatus = useAppSelector(LinesSelectors.selectLinesActionsStatusMap);
 
   const defaultLineCategories: UseCreditLinesParams = {
     // using i18m translation as keys for easy display
@@ -233,8 +234,9 @@ export const Market = () => {
       amount: 0,
       token: '',
       lender: '',
+      line: '',
     };
-    dispatch(CreditLinesActions.addCredit({ params }));
+    dispatch(LinesActions.addCredit({ ...params }));
   };
 
   const depositHandler = (vaultAddress: string) => {
@@ -269,11 +271,11 @@ export const Market = () => {
   return (
     <ViewContainer>
       <Button onClick={dispatchAddCredit}>Add Credit</Button>
-      {addCreditStatus.loading === true && (
+      {/* {addCreditStatus.loading === true && (
         <div>
           <p>.... loading......</p>
         </div>
-      )}
+      )} */}
       {addCreditStatus.error && (
         <div>
           <p>.... ERROR: {addCreditStatus.error}</p>

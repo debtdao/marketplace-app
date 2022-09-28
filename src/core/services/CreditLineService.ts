@@ -15,11 +15,16 @@ import {
   ExecuteTransactionProps,
   AddCreditProps,
   Credit,
-  GetCreditLinesProps,
+  Network,
+  CreditLinePage,
+  GetLineProps,
+  GetLinesProps,
+  GetLinePageProps,
 } from '@types';
 import { getConfig } from '@config';
-import { lineOfCreditABI } from '@services/contracts';
+import { LineOfCreditABI } from '@services/contracts';
 import { getContract } from '@frameworks/ethers';
+import { getLine, getLinePage, getLines, getUserLinePositions } from '@frameworks/gql';
 
 export class CreditLineServiceImpl implements CreditLineService {
   private graphUrl: string;
@@ -48,16 +53,16 @@ export class CreditLineServiceImpl implements CreditLineService {
     this.config = config;
     const { GRAPH_API_URL } = getConfig();
     this.graphUrl = GRAPH_API_URL || 'https://api.thegraph.com';
-    this.abi = lineOfCreditABI;
+    this.abi = LineOfCreditABI;
     this.contractAddress = contractAddress;
-    this.contract = getContract(contractAddress, lineOfCreditABI, this.web3Provider.getSigner().provider);
+    this.contract = getContract(contractAddress, LineOfCreditABI, this.web3Provider.getSigner().provider);
   }
 
   private async getSignerAddress(): Promise<Address> {
     return await this.web3Provider.getSigner().getAddress();
   }
 
-  public async getLine(props: GetCreditLinesProps): Promise<CreditLine> {
+  public async getLine(props: GetLineProps): Promise<CreditLine | undefined> {
     const result = await fetch(`${this.graphUrl}/subgraphs/`, {
       // todo: URL
       method: 'GET',
@@ -109,7 +114,7 @@ export class CreditLineServiceImpl implements CreditLineService {
     return <TransactionResponse>await this.executeContractMethod('close', [id], false);
   }
 
-  public async withdraw(id: Bytes, amount: BigNumber): Promise<TransactionResponse> {
+  public async withdraw(id: BytesLike, amount: BigNumber): Promise<TransactionResponse> {
     return <TransactionResponse>await this.executeContractMethod('withdraw', [id, amount], false);
   }
 
@@ -131,13 +136,14 @@ export class CreditLineServiceImpl implements CreditLineService {
   }
 
   public async depositAndRepay(
+    id: BytesLike,
     amount: BigNumberish,
     dryRun: boolean
   ): Promise<TransactionResponse | PopulatedTransaction> {
     return await this.executeContractMethod('depositAndRepay', [amount], dryRun);
   }
 
-  public async depositAndClose(dryRun: boolean): Promise<TransactionResponse | PopulatedTransaction> {
+  public async depositAndClose(id: BytesLike, dryRun: boolean): Promise<TransactionResponse | PopulatedTransaction> {
     return await this.executeContractMethod('depositAndClose', [], dryRun);
   }
 
@@ -216,5 +222,33 @@ export class CreditLineServiceImpl implements CreditLineService {
     const signer = await this.getSignerAddress();
     const credit = await this.contract.credits(id);
     return signer === credit.lender || signer === (await this.contract.borrower());
+  }
+
+  public async getLines(prop: GetLinesProps): Promise<CreditLine[] | undefined> {
+    return [];
+  }
+  public async getLinePage(prop: GetLinePageProps): Promise<CreditLinePage | undefined> {
+    return;
+  }
+  public async getUserLinePositions(): Promise<any | undefined> {
+    return;
+  }
+  public async getExpectedTransactionOutcome(): Promise<any | undefined> {
+    return;
+  }
+  public async approveDeposit(): Promise<any | undefined> {
+    return;
+  }
+  // public async approveZapOu:  () => Promise<any>t: {
+  //   return;
+  // };
+  // public async signPermi:  () => Promise<any>t: {
+  //   return;
+  // };
+  public async getDepositAllowance(): Promise<any | undefined> {
+    return;
+  }
+  public async getWithdrawAllowance(): Promise<any | undefined> {
+    return;
   }
 }

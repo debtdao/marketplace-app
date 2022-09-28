@@ -10,20 +10,19 @@ import {
   GetLinesArgs,
   GetUserLinePositionsArgs,
   QueryResponse,
+  QueryCreator,
+  QueryArgOption,
+  CreditLinePage,
+  PositionSummary,
 } from '@src/core/types';
 
-const {
-  DEBT_DAO_SUBGRAPH_KEY,
-  // DEBT_DAO_SUBGRAPH_NAME,
-} = getEnv();
-
-const GQL_API_URL = `https://api.studio.thegraph.com/query/${DEBT_DAO_SUBGRAPH_KEY}/debtdao/`; // <--SUBGRAPH_NAME here
+const { GRAPH_API_URL, GRAPH_TEST_API_URL } = getEnv();
 
 let client: any;
 export const getClient = () => (client ? client : createClient());
 const createClient = (): typeof ApolloClient => {
   client = new ApolloClient({
-    uri: GQL_API_URL,
+    uri: GRAPH_API_URL || GRAPH_TEST_API_URL,
     cache: new InMemoryCache(),
   });
 
@@ -44,18 +43,29 @@ const createClient = (): typeof ApolloClient => {
  */
 export const createQuery =
   (query: DocumentNode): Function =>
-  (variables: any): QueryResponse =>
+  <A, R>(variables: A): QueryResponse<R> =>
     useQuery(query, { variables });
 
 const getLineQuery = createQuery(GET_LINE_QUERY);
-export const getLine = (arg: GetLineArgs): Promise<QueryResponse> => getLineQuery(arg);
+
+export const getLine: QueryCreator<GetLineArgs, CreditLine> = <GetLineArgs, CreditLine>(
+  arg: GetLineArgs
+): QueryResponse<CreditLine> => getLineQuery(arg);
 
 const getLinePageQuery = createQuery(GET_LINE_PAGE_QUERY);
-export const getLinePage = (arg: GetLinePageArgs): Promise<QueryResponse> => getLinePageQuery(arg);
+export const getLinePage: QueryCreator<GetLinePageArgs, CreditLinePage[]> = <GetLinePageArgs, CreditLinePage>(
+  arg: GetLinePageArgs
+): QueryResponse<CreditLinePage[]> => getLinePageQuery(arg);
 
 const getLinesQuery = createQuery(GET_LINES_QUERY);
-export const getLines = (arg: GetLinesArgs): Promise<QueryResponse> => getLinesQuery(arg);
+export const getLines: QueryCreator<GetLinesArgs, CreditLine[]> = <GetLinesArgs, CreditLine>(
+  arg: GetLinesArgs
+): QueryResponse<CreditLine[]> => getLinesQuery(arg);
 
 const getUserLinePositionsQuery = createQuery(GET_LINES_QUERY);
-export const getUserLinePositions = (arg: GetUserLinePositionsArgs): Promise<QueryResponse> =>
-  getUserLinePositionsQuery(arg);
+export const getUserLinePositions: QueryCreator<GetUserLinePositionsArgs, PositionSummary[]> = <
+  GetUserLinePositionsArgs,
+  PositionSummary
+>(
+  arg: GetUserLinePositionsArgs
+) => getUserLinePositionsQuery(arg);

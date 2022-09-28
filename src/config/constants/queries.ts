@@ -18,6 +18,7 @@ const TOKEN_FRAGMENT = gql`
 
 const BASE_LINE_FRAGMENT = gql`
   fragment BaseLineFrag on Line {
+    id
     end
     type
     start

@@ -98,7 +98,6 @@ export const getConstants = memoize((): Constants => {
     DEFAULT_LANG: 'en',
     SUPPORTED_LANGS: ['en', 'es', 'ja', 'zh'],
     DUST_AMOUNT_USD: '10000000',
-    DEBT_DAO_SUBGRAPH_ID: '5xMSe3wTNLgFQqsAc5SCVVwT4MiRb5AogJCuSN9PjzXF',
     ASSETS_ICON_URL: 'https://raw.githubusercontent.com/yearn/yearn-assets/master/icons/multichain-tokens/1/',
     // ZAPPER_AUTH_TOKEN: encode({ str: `${ZAPPER_API_KEY}:`, encoding: 'base64' }),
   };

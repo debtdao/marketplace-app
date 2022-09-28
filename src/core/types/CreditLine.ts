@@ -3,35 +3,60 @@ import { BigNumber } from 'ethers';
 import { Address } from './Blockchain';
 import { Status } from './Status';
 
+type UninitializedStatus = 'uninitialized';
+export const UNINITIALIZED_STATUS: UninitializedStatus = 'uninitialized';
+type ActiveStatus = 'active';
+export const ACTIVE_STATUS: ActiveStatus = 'active';
+type LiquidatableStatus = 'liquidatable';
+export const LIQUIDATABLE_STATUS: LiquidatableStatus = 'liquidatable';
+type RepaidStatus = 'repaid';
+export const REPAID_STATUS: RepaidStatus = 'repaid';
+type InsolventStatus = 'insolvent';
+export const INSOLVENT_STATUS: InsolventStatus = 'insolvent';
+type NoStatus = 'no status';
+export const NO_STATUS: NoStatus = 'no status';
+
+export type LineStatusTypes =
+  | UninitializedStatus
+  | ActiveStatus
+  | LiquidatableStatus
+  | RepaidStatus
+  | InsolventStatus
+  | NoStatus;
+
 export interface BaseCreditLine {
   id: Address;
   type?: string;
-  status: string;
+  status: LineStatusTypes;
   borrower: Address;
 
   principal?: number;
+  activeIds: string[]; // ids for all open positions
 }
 
 export interface CreditLine extends BaseCreditLine {
+  // TODO: beef up this type so it has everything we need for homepage cards
+  // TODO: replace BaseCreditLine with CreditLine in State.CreditLine and actinos/selectors
   id: Address;
-  end: string;
-  start: string;
+  end: number;
+  start: number;
   type?: string;
-  status: string;
+  status: LineStatusTypes;
+  borrower: Address;
 
   principal?: number;
+  activeIds: string[];
 
-  borrower: Address;
   escrow?: { id: Address };
   spigot?: { id: Address };
 }
 
 export interface CreditLinePage extends BaseCreditLine {
   id: Address;
-  end: string;
-  start: string;
+  end: number;
+  start: number;
   type?: string;
-  status: string;
+  status: LineStatusTypes;
   borrower: Address;
 
   // real-time aggregate usd value across all credits
@@ -43,17 +68,26 @@ export interface CreditLinePage extends BaseCreditLine {
   tokenRevenue: { [key: string]: number };
 
   // subgraph id -> depsoit/spigot
-  credits: { [key: string]: LinePageCreditPosition };
+  activeIds: string[];
+  credits?: { [key: string]: LinePageCreditPosition };
   escrow?: { [key: string]: Escrow };
   spigot?: {
-    revenue: { [key: string]: number };
-    spigots: { [key: string]: Spigot };
+    spigots?: { [key: string]: Spigot };
   };
 
   collateralEvents: CollateralEvent[];
   creditEvents: CreditLineEvents[];
 }
 
+// TODO consolidate Credit and BaseCreditPosition and resolve type conflicts across codebase
+export interface BaseCreditPosition {
+  id: string;
+  lender: Address;
+  principal: number;
+  interestAccrued: number;
+  interestRepaid: number;
+  events?: CreditLineEvents[];
+}
 export interface Credit {
   deposit: BigNumber;
   principal: BigNumber;
@@ -62,15 +96,6 @@ export interface Credit {
   decimals: BigNumber;
   token: Address;
   lender: Address;
-}
-
-export interface BaseCreditPosition {
-  id: string;
-  lender: Address;
-  principal: number;
-  interestAccrued: number;
-  interestRepaid: number;
-  events?: CreditLineEvents[];
 }
 
 export interface LinePageCreditPosition extends BaseCreditPosition {
@@ -83,27 +108,48 @@ export interface LinePageCreditPosition extends BaseCreditPosition {
   drawnRate: number;
   token: {
     symbol: string;
-    lastPriceUSD?: number; // Can be live data not from subgraph
+    lastPriceUSD?: number; // Can be live data or from subgraph
   };
-  events?: CreditLineEvents[];
+}
+
+// bare minimum to display about a user on a position
+
+type LenderRole = 'lender';
+export const LENDER_POSITION_ROLE: LenderRole = 'lender';
+type BorrowerRole = 'borrower';
+export const BORROWER_POSITION_ROLE: BorrowerRole = 'borrower';
+type ArbiterRole = 'arbiter';
+export const ARBITER_POSITION_ROLE: ArbiterRole = 'arbiter';
+type PositionRole = LenderRole | BorrowerRole | ArbiterRole;
+
+export interface UserPositionMetadata {
+  role: PositionRole;
+  amount: number; // principal/deposit
+  available: number; // borrowerable/withdrawable
 }
 
 export interface PositionSummary {
   id: string;
   borrower: Address;
   lender: Address;
-  line: Address;
   token: Address;
-  deposit: string;
-  principal: string;
+  line: Address;
+  deposit: number;
+  principal: number;
   drate: number;
   frate: number;
 }
 
-// bare minimum to display about a user on a position
-export interface LineUserMetadata {
+export interface UserPositionSummary extends PositionSummary, UserPositionMetadata {
+  id: string;
+  borrower: Address;
+  lender: Address;
+  line: Address;
   token: Address;
-  isBorrower: boolean; // borrower/lender
+  drate: number;
+  frate: number;
+  // if connected wallet is lender/borrower
+  role: PositionRole;
   amount: number; // principal/deposit
   available: number; // borrowerable/withdrawable
 }
@@ -111,22 +157,24 @@ export interface LineUserMetadata {
 // Collateral Module Types
 export interface Collateral {
   token: Address;
-  amount: string;
-  value: string;
+  amount: number;
+  value: number;
 }
 
 export interface BaseEscrow {
-  cratio: string;
-  minCRatio: string;
-  collateralValue: string;
+  id: Address;
+  cratio: number;
+  minCRatio: number;
+  collateralValue: number;
 }
 
 export interface Escrow extends BaseEscrow {
-  cratio: string;
-  minCRatio: string;
-  collateralValue: string;
+  id: Address;
+  cratio: number;
+  minCRatio: number;
+  collateralValue: number;
   deposits?: {
-    amount: string;
+    amount: number;
     enabled: boolean;
     token: BaseToken;
   }[];
@@ -149,14 +197,13 @@ export interface LinePageSpigot {
   startTime: string;
   active: boolean;
   // aggregate token revenue accross all spigots
-  revenue: { [key: string]: number };
   spigots?: RevenueContract[];
 }
 
 export interface RevenueContract {
   active: boolean;
   contract: Address;
-  startTime: string;
+  startTime: number;
   ownerSplit: number;
   token: BaseToken;
 
@@ -168,7 +215,7 @@ export interface BaseToken {
   name: string;
   symbol: string;
   decimals: number;
-  lastPriceUSD?: string;
+  lastPriceUSD?: number;
 }
 
 type SPIGOT_NAME = 'spigot';
@@ -183,12 +230,24 @@ export type ModuleNames = SPIGOT_NAME | CREDIT_NAME | ESCROW_NAME;
 //  Events Types
 
 // Common
+
+/**
+ *
+ *
+ * @export
+ * @typedef {Object} EventWithValue
+ * @interface EventWithValue
+ * @property timestamp - unix (seconds) time that event happened at
+ * @property value     - value of total amount at time of event
+ * @property valueNow  - value of total amount of tokens at present time
+ */
 export interface EventWithValue {
   __typename?: string;
   timestamp: number;
-  amount?: string;
+  amount?: number;
   symbol: string;
   value?: number;
+  valueNow?: number;
   [key: string]: any;
 }
 
@@ -197,17 +256,18 @@ export interface CreditEvent extends EventWithValue {
   __typename: string;
   id: string; // position id
   timestamp: number;
-  amount: string;
+  amount: number;
   symbol: string;
-  value?: number;
+  valueAtTime?: number;
+  valueNow?: number;
 }
 
 export interface SetRateEvent {
   __typename: string;
   id: string; // position id
   timestamp: number;
-  drawnRate: string;
-  facilityRate: string;
+  drawnRate: number;
+  facilityRate: number;
 }
 
 export type CreditLineEvents = CreditEvent | SetRateEvent;
@@ -216,7 +276,7 @@ export type CreditLineEvents = CreditEvent | SetRateEvent;
 export interface CollateralEvent extends EventWithValue {
   type: ModuleNames;
   timestamp: number;
-  amount: string;
+  amount: number;
   symbol: string;
   value?: number;
 }
@@ -227,9 +287,9 @@ type SpigotEvents = EventWithValue | ClaimRevenueEvent;
 export interface ClaimRevenueEvent {
   timestamp: number;
   revenueToken: { id: string };
-  escrowed: string;
-  netIncome: string;
-  value: string;
+  escrowed: number;
+  netIncome: number;
+  value: number;
 }
 
 // Redux State
@@ -242,5 +302,5 @@ export interface LineActionsStatusMap {
 
 export interface UserLineMetadataStatusMap {
   getUserLinePositions: Status;
-  linesActionsStatusMap: { [lineAddress: Address]: LineActionsStatusMap };
+  linesActionsStatusMap: { [lineAddress: string]: LineActionsStatusMap };
 }

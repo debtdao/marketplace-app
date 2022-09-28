@@ -105,17 +105,17 @@ export function borrowerLenderHelper(
     if (amount.gt(credit.principal.add(simulateAccrue))) {
       throw new Error('Amount is greater than (principal + interest to be accrued). Enter lower amount.');
     }
-    return (<TransactionResponse>await creditLineService.depositAndRepay(amount, false)).hash;
+    return (<TransactionResponse>await creditLineService.depositAndRepay(id, amount, false)).hash;
   };
 
-  const depositAndClose = async (): Promise<string> => {
+  const depositAndClose = async (id: string): Promise<string> => {
     if (!(await creditLineService.isBorrowing())) {
       throw new Error('Deposit and close is not possible because not borrowing');
     }
     if (!(await creditLineService.isBorrower())) {
       throw new Error('Deposit and close is not possible because signer is not borrower');
     }
-    return (<TransactionResponse>await creditLineService.depositAndClose(false)).hash;
+    return (<TransactionResponse>await creditLineService.depositAndClose(id, false)).hash;
   };
 
   const claimAndTrade = async (claimToken: Address, zeroExTradeData: Bytes): Promise<string> => {

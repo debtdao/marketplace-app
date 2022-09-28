@@ -80,11 +80,9 @@ export class SpigotedLineServiceImpl implements SpigotedLineService {
     borrower: Address,
     arbiter: Address,
     dryRun: boolean
-  ): Promise<TransactionResponse | PopulatedTransaction>{
-    return await this.executeContractMethod('releaseSpigot', [spigot, status, borrower, arbiter,], dryRun)
+  ): Promise<TransactionResponse | PopulatedTransaction> {
+    return await this.executeContractMethod('releaseSpigot', [spigot, status, borrower, arbiter], dryRun);
   }
-
-
 
   private async getSignerAddress(): Promise<Address> {
     return await this.web3Provider.getSigner().getAddress();
@@ -125,12 +123,12 @@ export class SpigotedLineServiceImpl implements SpigotedLineService {
     to: Address,
     token: Address,
     amount: BigNumber,
-    status:  string,
+    status: string,
     borrower: Address,
     arbiter: Address,
     dryRun: boolean
-  )  : Promise<TransactionResponse | PopulatedTransaction> {
-    return await this.executeContractMethod('sweep', [to, token, amount, status,  borrower, arbiter], dryRun)
+  ): Promise<TransactionResponse | PopulatedTransaction> {
+    return await this.executeContractMethod('sweep', [to, token, amount, status, borrower, arbiter], dryRun);
   }
 
   private async executeContractMethod(methodName: string, params: any[], dryRun: boolean) {

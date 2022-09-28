@@ -23,23 +23,26 @@ export const useCreditLines = (
   const [creditLines, setCreditLines] = useState<{ [key: string]: CreditLine[] }>();
   const [isLoading, setLoading] = useState<boolean>(false);
   const [args, setArgs] = useState<UseCreditLinesParams>(params);
-  const { DEBT_DAO_SUBGRAPH_KEY } = getEnv();
+  const { GRAPH_API_URL } = getEnv();
 
   useEffect(() => {
     if (isEqual(params, args)) return;
     setLoading(true);
 
-    const categoryRequests = Object.entries(args).map(([key, val]: [string, GetLinesArgs]) => {
-      getLines(val)
-        .then((response: any) => {
-          console.log('get lines category res: ', key, response.data);
-          return { [key]: response };
+    const categoryRequests: Promise<object>[] = Object.entries(args).map(
+      ([key, val]: [string, GetLinesArgs]): Promise<object> =>
+        new Promise((resolve, reject) => {
+          const { loading, error, data } = getLines(val);
+          while (loading) {}
+          if (error) {
+            return reject(error);
+          }
+          if (!loading && !error) {
+            return resolve({ [key]: data });
+          }
         })
-        .catch((err) => {
-          console.log('err useCreditLines', err);
-          return;
-        });
-    });
+    );
+
     Promise.all(categoryRequests)
       .then((res) => {
         console.log('all getLines reses', res);

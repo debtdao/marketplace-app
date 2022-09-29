@@ -161,8 +161,7 @@ export class SpigotedLineServiceImpl implements SpigotedLineService {
         return await this.transactionService.populateTransaction(props);
       }
 
-      let tx;
-      tx = await this.transactionService.execute(props);
+      const tx = await this.transactionService.execute(props);
       await tx.wait();
       return tx;
     } catch (e) {

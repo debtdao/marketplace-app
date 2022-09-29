@@ -1,5 +1,5 @@
 ﻿import { BytesLike } from '@ethersproject/bytes/src.ts';
-import { ContractFunction, BigNumber, PopulatedTransaction } from 'ethers';
+import { BigNumber, PopulatedTransaction } from 'ethers';
 
 import {
   YearnSdk,

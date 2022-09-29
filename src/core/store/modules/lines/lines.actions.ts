@@ -1,5 +1,5 @@
+import { BigNumber } from 'ethers';
 import { createAction, createAsyncThunk, unwrapResult } from '@reduxjs/toolkit';
-import BigNumber from 'bignumber.js';
 
 import { ThunkAPI } from '@frameworks/redux';
 import {
@@ -17,6 +17,7 @@ import {
   GetLinePageArgs,
   PositionSummary,
   AddCreditProps,
+  UseCreditLinesParams,
 } from '@types';
 import {
   calculateSharesAmount,
@@ -65,22 +66,33 @@ const getLine = createAsyncThunk<{ lineData: CreditLine | undefined }, GetLineAr
   async (params, { getState, extra }) => {
     const { network } = getState();
     const { creditLineService } = extra.services;
-    const lineData = await creditLineService.getLine({ network: network.current, params });
+    const lineData = await creditLineService.getLine({ network: network.current, ...params });
     return { lineData };
   }
 );
 
-const getLines = createAsyncThunk<{ linesData: (CreditLine[] | undefined)[] }, GetLinesArgs[], ThunkAPI>(
-  'lines/getLines',
-  async (categories, { getState, extra }) => {
-    const { network } = getState();
-    const { creditLineService } = extra.services;
-    const linesData = await Promise.all(
-      categories.map((params) => creditLineService.getLines({ network: network.current, params }))
-    );
-    return { linesData };
-  }
-);
+const getLines = createAsyncThunk<
+  { linesData: { [category: string]: CreditLine[] | undefined } },
+  UseCreditLinesParams,
+  ThunkAPI
+>('lines/getLines', async (categories, { getState, extra }) => {
+  const { network } = getState();
+  const { creditLineService } = extra.services;
+  const promises = await Promise.all(
+    Object.values(categories).map((params: GetLinesArgs) =>
+      creditLineService.getLines({ network: network.current, ...params })
+    )
+  );
+  const linesData = Object.keys(categories).reduce(
+    (all, category, i) => ({
+      ...all,
+      // @dev assumes promises is same order as categories
+      [category]: promises[i],
+    }),
+    {}
+  );
+  return { linesData };
+});
 
 const getLinePage = createAsyncThunk<{ linePageData: CreditLinePage | undefined }, GetLinePageArgs, ThunkAPI>(
   'lines/getLinePage',
@@ -89,7 +101,7 @@ const getLinePage = createAsyncThunk<{ linePageData: CreditLinePage | undefined 
     const { creditLineService } = extra.services;
     const linePageData = await creditLineService.getLinePage({
       network: network.current,
-      params: { id },
+      id,
     });
     return { linePageData };
   }
@@ -173,7 +185,7 @@ const approveDeposit = createAsyncThunk<void, { lineAddress: string; tokenAddres
       accountAddress,
       tokenAddress,
       lineAddress,
-      amount,
+      amount: BigNumber.from(amount),
     });
 
     await transactionService.handleTransaction({ tx, network: network.current });
@@ -187,7 +199,7 @@ const approveDeposit = createAsyncThunk<void, { lineAddress: string; tokenAddres
 
 const addCredit = createAsyncThunk<void, AddCreditProps, ThunkAPI>(
   'lines/addCredit',
-  async ({ line, drate, frate, amount, token, lender }, { extra, getState, dispatch }) => {
+  async ({ lineAddress, drate, frate, amount, token, lender }, { extra, getState, dispatch }) => {
     const { network, wallet, lines, tokens, app } = getState();
     const { services } = extra;
 
@@ -200,7 +212,7 @@ const addCredit = createAsyncThunk<void, AddCreditProps, ThunkAPI>(
     });
     if (networkError) throw networkError;
 
-    const userLineData = lines.user.linePositions[line];
+    const userLineData = lines.user.linePositions[lineAddress];
     const tokenData = tokens.tokensMap[token];
     const userTokenData = tokens.user.userTokensMap[token];
     const decimals = toBN(tokenData.decimals);
@@ -226,11 +238,11 @@ const addCredit = createAsyncThunk<void, AddCreditProps, ThunkAPI>(
     // const notifyEnabled = app.servicesEnabled.notify;
     // await transactionService.handleTransaction({ tx, network: network.current, useExternalService: notifyEnabled });
 
-    dispatch(getLinePage({ id: line }));
+    dispatch(getLinePage({ id: lineAddress }));
     // dispatch(getUserLinesSummary());
-    dispatch(getUserLinePositions({ lineAddresses: [line] }));
+    dispatch(getUserLinePositions({ lineAddresses: [lineAddress] }));
     // dispatch(getUserLinesMetadata({ linesAddresses: [line] }));
-    dispatch(TokensActions.getUserTokens({ addresses: [token, line] }));
+    dispatch(TokensActions.getUserTokens({ addresses: [token, lineAddress] }));
   },
   {
     // serializeError: parseError,
@@ -457,11 +469,11 @@ const getDepositAllowance = createAsyncThunk<
 const getWithdrawAllowance = createAsyncThunk<
   TokenAllowance,
   {
-    tokenAddress: string;
+    id: string;
     lineAddress: string;
   },
   ThunkAPI
->('lines/getWithdrawAllowance', async ({ lineAddress, tokenAddress }, { extra, getState, dispatch }) => {
+>('lines/getWithdrawAllowance', async ({ lineAddress, id }, { extra, getState, dispatch }) => {
   const {
     services: { creditLineService },
   } = extra;
@@ -473,7 +485,7 @@ const getWithdrawAllowance = createAsyncThunk<
   const tokenAllowance = await creditLineService.getWithdrawAllowance({
     network: network.current,
     lineAddress,
-    tokenAddress,
+    id,
     accountAddress,
   });
 

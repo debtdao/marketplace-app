@@ -1,6 +1,8 @@
+import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
+import { BigNumber } from 'ethers';
 
 import {
   useAppSelector,
@@ -48,7 +50,7 @@ import {
   filterData,
 } from '@utils';
 import { getConfig } from '@config';
-import { CreditLine, VaultView, UseCreditLinesParams, GetLinesArgs } from '@src/core/types';
+import { CreditLine, VaultView, UseCreditLinesParams, GetLinesArgs, AddCreditProps } from '@src/core/types';
 import { GoblinTown } from '@assets/images';
 
 const StyledHelperCursor = styled.span`
@@ -195,17 +197,18 @@ export const Market = () => {
   const depositsLoading = generalLoading && !deposits.length;
   // TODO not neeed here
   const addCreditStatus = useAppSelector(LinesSelectors.selectLinesActionsStatusMap);
-
   const defaultLineCategories: UseCreditLinesParams = {
     // using i18m translation as keys for easy display
     'pages.market.highest-credit': {
       first: 5,
-      orderBy: 'deposit', // NOTE: might also want to specify that queue index == 1 or something
-      orderDirection: 'desc',
+      // NOTE: terrible proxy for total credit (oldest = most). Currently getLines only allows filtering by line metadata not modules'
+      orderBy: 'start',
+      orderDirection: 'asc',
     },
     'pages.market.highest-spigot': {
       first: 5,
-      orderBy: 'totalVolumeUsd', // NOTE: gets individual revenue contracts, not entire SpigotController
+      // NOTE: terrible proxy for total revenue earned (highest % = highest notional). Currently getLines only allows filtering by line metadata not modules'
+      orderBy: 'defaultSplit',
       orderDirection: 'desc',
     },
     'pages.market.newest': {
@@ -214,11 +217,24 @@ export const Market = () => {
       orderDirection: 'desc',
     },
   };
-  const [lineCategoriesForDisplay /* setArgs */, , areLinesLoading] = useCreditLines(defaultLineCategories);
+  const fetchMarketData = () => dispatch(LinesActions.getLines(defaultLineCategories));
+  const lineCategoriesForDisplay = useAppSelector(LinesSelectors.selectLinesForCategories);
+  const getLinesStatus = useAppSelector(LinesSelectors.selectLinesStatusMap).getLines;
+  console.log('ready', getLinesStatus || _.isEmpty(lineCategoriesForDisplay));
 
   useEffect(() => {
     setSearch(queryParams.search ?? '');
-  }, [queryParams.search]);
+
+    const expectedCategories = _.keys(defaultLineCategories);
+    const cuirrentCategories = _.keys(lineCategoriesForDisplay);
+
+    // const shouldFetch = expectedCategories.reduce((bool, cat) => bool && cuirrentCategories.includes(cat), true);
+    let shouldFetch: boolean = false;
+    expectedCategories.forEach((cat) => (shouldFetch = shouldFetch || !cuirrentCategories.includes(cat)));
+
+    console.log('should fetch', shouldFetch, cuirrentCategories);
+    if (shouldFetch) fetchMarketData();
+  }, [queryParams.search, lineCategoriesForDisplay]);
 
   useEffect(() => {
     const searchableKeys = ['name', 'displayName', 'token.symbol', 'token.name'];
@@ -228,13 +244,14 @@ export const Market = () => {
   }, [opportunities, search]);
 
   const dispatchAddCredit = () => {
-    const params = {
+    const params: AddCreditProps = {
       drate: 0,
       frate: 0,
-      amount: 0,
+      amount: BigNumber.from(0),
       token: '',
       lender: '',
-      line: '',
+      lineAddress: '',
+      dryRun: true,
     };
     dispatch(LinesActions.addCredit({ ...params }));
   };
@@ -296,12 +313,13 @@ export const Market = () => {
 
       {!generalLoading && !walletIsConnected && <StyledNoWalletCard />}
 
-      {areLinesLoading || !lineCategoriesForDisplay ? (
+      {getLinesStatus.loading || _.isEmpty(lineCategoriesForDisplay) ? (
         <SpinnerLoading flex="1" width="100%" />
       ) : (
         Object.entries(lineCategoriesForDisplay!).map(([key, val]: [string, CreditLine[]]) => (
           <StyledRecommendationsCard
             header={t(key)}
+            key={key}
             items={lineCategoriesForDisplay[key].map(({ borrower, spigot, escrow }) => ({
               icon: '',
               name: borrower,

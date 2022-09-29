@@ -267,6 +267,49 @@ export interface EscrowService {
   isBorrower(): Promise<boolean>;
 }
 
+// *************** FACTORY *************
+
+export interface LineFactoryService {
+  deploySpigot(
+    owner: Address,
+    borrower: Address,
+    operator: Address
+  ): Promise<TransactionResponse | PopulatedTransaction>;
+
+  deployEscrow(
+    minCRatio: BigNumber,
+    oracle: Address,
+    owner: Address,
+    borrower: Address
+  ): Promise<TransactionResponse | PopulatedTransaction>;
+
+  deploySecuredLine(
+    oracle: Address,
+    arbiter: Address,
+    borrower: Address,
+    ttl: BigNumber,
+    swapTarget: Address
+  ): Promise<TransactionResponse | PopulatedTransaction>;
+
+  deploySecuredLineWtihConfig(
+    oracle: Address,
+    arbiter: Address,
+    borrower: Address,
+    ttl: BigNumber,
+    revenueSplit: BigNumber,
+    cratio: BigNumber,
+    swapTarget: Address
+  ): Promise<TransactionResponse | PopulatedTransaction>;
+
+  rolloverSecuredLine(
+    oldLine: Address,
+    borrower: Address,
+    oracle: Address,
+    arbiter: Address,
+    ttl: BigNumber
+  ): Promise<TransactionResponse | PopulatedTransaction>;
+}
+
 // *************** TOKEN ***************
 export interface TokenService {
   getSupportedTokens: (props: GetSupportedTokensProps) => Promise<Token[]>;

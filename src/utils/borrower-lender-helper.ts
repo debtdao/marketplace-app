@@ -185,6 +185,15 @@ export function borrowerLenderHelper(
     return (await creditLineService.withdraw(id, amount)).hash;
   };
 
+  // const deploySpigot =  async () => {};
+
+  // const deployEscrow = async () => {};
+
+  // const deploySecuredLine = async () => {};
+
+  // const deploySecuredLineWithConfig = async () => {};
+
+  // const rolloverSecuredLine = async () => {};
   return {
     addCredit,
     close,

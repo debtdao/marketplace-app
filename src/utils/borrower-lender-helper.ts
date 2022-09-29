@@ -16,13 +16,15 @@ import {
   CloseProps,
   DepositAndCloseProps,
   WithdrawLineProps,
+  LineFactoryService
 } from '@types';
 
 export function borrowerLenderHelper(
   creditLineService: CreditLineService,
   interestRateCreditService: InterestRateCreditService,
   spigotedLineService: SpigotedLineService,
-  escrowService: EscrowService
+  escrowService: EscrowService,
+  factoryService: LineFactoryService
 ) {
   // CreditLineService
 
@@ -208,15 +210,62 @@ export function borrowerLenderHelper(
     return (<TransactionResponse>await escrowService.releaseCollateral(contractAddress, amount, token, to, false)).hash;
   };
 
-  // const deploySpigot =  async () => {};
+  // Factory Service
 
-  // const deployEscrow = async () => {};
+  const deploySpigot =  async (
+    contractAddress: string,
+    owner: Address,
+    borrower: Address,
+    operator: Address
+  ): Promise<string> => {
+    return (<TransactionResponse>await factoryService.deploySpigot(contractAddress, owner, borrower, operator, false)).hash;
+  };
 
-  // const deploySecuredLine = async () => {};
+  const deployEscrow = async (
+    contractAddress: string,
+    minCRatio: BigNumber,
+    oracle: Address,
+    owner: Address,
+    borrower: Address
+  ): Promise<string> => {
+    return (<TransactionResponse>await factoryService.deployEscrow(contractAddress, minCRatio, oracle, owner, borrower, false)).hash;
+  };
 
-  // const deploySecuredLineWithConfig = async () => {};
+  const deploySecuredLine = async (
+    contractAddress: string,
+    oracle: Address,
+    arbiter: Address,
+    borrower: Address,
+    ttl: BigNumber,
+    swapTarget: Address
+  ) : Promise<string> => {
+    return (<TransactionResponse>await factoryService.deploySecuredLine(contractAddress, oracle, arbiter, borrower, ttl, swapTarget, false)).hash;
+  };
 
-  // const rolloverSecuredLine = async () => {};
+  const deploySecuredLineWithConfig = async (
+    contractAddress: string,
+    oracle: Address,
+    arbiter: Address,
+    borrower: Address,
+    ttl: BigNumber,
+    revenueSplit: BigNumber,
+    cratio: BigNumber,
+    swapTarget: Address
+  ) : Promise<string> => {
+    return (<TransactionResponse>await factoryService.deploySecuredLineWtihConfig(contractAddress, oracle, arbiter, borrower, ttl, revenueSplit,cratio, swapTarget, false)).hash;
+  };
+
+  const rolloverSecuredLine = async (
+    contractAddress: string,
+    oldLine: Address,
+    borrower: Address,
+    oracle: Address,
+    arbiter: Address,
+    ttl: BigNumber
+  ) : Promise<string> => {
+    return (<TransactionResponse>await factoryService.rolloverSecuredLine(contractAddress, oldLine, borrower, oracle, arbiter, ttl, false)).hash;
+  };
+
   return {
     addCredit,
     close,
@@ -230,5 +279,10 @@ export function borrowerLenderHelper(
     addSpigot,
     addCollateral,
     releaseCollateral,
+    deploySpigot,
+    deployEscrow,
+    deploySecuredLine,
+    deploySecuredLineWithConfig,
+    rolloverSecuredLine
   };
 }

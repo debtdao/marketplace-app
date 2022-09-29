@@ -26,7 +26,7 @@ export class LineFactoryServiceImpl implements LineFactoryService {
   private config: Config;
   private readonly abi: Array<any>;
   private readonly contract: ContractFunction | any;
-  private readonly contractAddress: Address;
+
 
   constructor({
     transactionService,
@@ -47,60 +47,70 @@ export class LineFactoryServiceImpl implements LineFactoryService {
     const { GRAPH_API_URL } = getConfig();
     this.graphUrl = GRAPH_API_URL || 'https://api.thegraph.com';
     this.abi = LineFactoryABI;
-    this.contractAddress = contractAddress;
-    this.contract = getContract(contractAddress, LineFactoryABI, this.web3Provider.getSigner().provider);
+
   }
 
 
   public async deploySpigot(
+    contractAddress: Address,
     owner: string, 
     borrower: string, 
-    operator: string
+    operator: string,
+    dryRun: boolean
     ): Promise<TransactionResponse | PopulatedTransaction> {
-      
+    return await this.executeContractMethod(contractAddress, 'deploySpigot', [owner, borrower, operator], dryRun)
   }
 
   public async deployEscrow(
+    contractAddress: Address,
     minCRatio: BigNumber, 
     oracle: string, 
     owner: string, 
-    borrower: string
+    borrower: string,
+    dryRun: boolean
     ): Promise<TransactionResponse | PopulatedTransaction> {
-      
+    return await this.executeContractMethod(contractAddress, 'deployEscrow', [minCRatio, oracle, owner, borrower], dryRun)
   }
 
   public async deploySecuredLine(
-    oracle: string, arbiter: 
-    string, borrower: string, 
+    contractAddress: Address,
+    oracle: string, 
+    arbiter: string, 
+    borrower: string, 
     ttl: BigNumber, 
-    swapTarget: string
+    swapTarget: string,
+    dryRun: boolean
     ): Promise<TransactionResponse | PopulatedTransaction> {
-      
+    return await this.executeContractMethod(contractAddress, 'deploySecuredLine', [oracle, arbiter, borrower, ttl, swapTarget], dryRun)
   }
 
   public async deploySecuredLineWtihConfig(
+    contractAddress: Address,
     oracle: string, 
     arbiter: string, 
     borrower: string, 
     ttl: BigNumber, 
     revenueSplit: BigNumber, 
     cratio: BigNumber, 
-    swapTarget: string
+    swapTarget: string,
+    dryRun: boolean
     ): Promise<TransactionResponse | PopulatedTransaction> {
-      
+    return await this.executeContractMethod(contractAddress, 'deploySecuredLineWithConfig', [oracle, arbiter, borrower, ttl, revenueSplit, cratio, swapTarget], dryRun)
   }
 
   public async rolloverSecuredLine(
+    contractAddress: Address,
     oldLine: string, 
     borrower: string, 
     oracle: string, 
     arbiter: string, 
-    ttl: BigNumber
+    ttl: BigNumber,
+    dryRun: boolean
     ): Promise<TransactionResponse | PopulatedTransaction> {
-      
+    return await this.executeContractMethod(contractAddress, 'rolloverSecuredLine', [oldLine, borrower, oracle, arbiter, ttl], dryRun)
   }
 
-  private async executeContractMethod(methodName: string, params: any[], dryRun: boolean) {
+  private async executeContractMethod(contractAddress: string, methodName: string, params: any[], dryRun: boolean) {
     let props: ExecuteTransactionProps | undefined = undefined;
     try {
       props = {
@@ -108,7 +118,7 @@ export class LineFactoryServiceImpl implements LineFactoryService {
         args: params,
         methodName: methodName,
         abi: this.abi,
-        contractAddress: this.contractAddress,
+        contractAddress: contractAddress,
       };
       if (dryRun) {
         return await this.transactionService.populateTransaction(props);

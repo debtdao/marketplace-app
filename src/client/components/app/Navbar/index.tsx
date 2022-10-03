@@ -138,7 +138,6 @@ export const Navbar = ({
           {secondTitleEnabled && <StyledText>{subTitle}</StyledText>}
         </>
       )}
-
       <StyledNavbarActions>
         {!hideDisabledControls && (
           /* turn this into not a list because we only support mainnet right now */

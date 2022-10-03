@@ -33,6 +33,7 @@ describe('Network', () => {
         ${'2'}     | ${'morden'}
         ${'3'}     | ${'ropsten'}
         ${'4'}     | ${'rinkeby'}
+        ${'5'}     | ${'goerli'}
         ${'42'}    | ${'kovan'}
         ${'250'}   | ${'fantom'}
         ${'42161'} | ${'arbitrum'}

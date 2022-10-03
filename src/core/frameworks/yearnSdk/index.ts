@@ -4,6 +4,7 @@ import { getNetworkId, getProviderType, isLedgerLive } from '@utils';
 import { YearnSdk, SdkNetwork, Web3Provider, Network, Config } from '@types';
 
 export class YearnSdkImpl implements YearnSdk {
+  //@ts-ignore
   private instances: Map<Network, Yearn<SdkNetwork>> = new Map<Network, Yearn<SdkNetwork>>();
 
   constructor({ web3Provider, config }: { web3Provider: Web3Provider; config: Config }) {

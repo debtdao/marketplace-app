@@ -335,7 +335,6 @@ export interface LineFactoryService {
     dryRun: boolean
   ): Promise<TransactionResponse | PopulatedTransaction>;
 
-  
   deploySecuredLineWtihConfig(
     contractAddress: string,
     oracle: Address,

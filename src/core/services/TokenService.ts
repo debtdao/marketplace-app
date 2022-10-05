@@ -48,8 +48,8 @@ export class TokenServiceImpl implements TokenService {
   /* -------------------------------------------------------------------------- */
   /*                                Fetch Methods                               */
   /* -------------------------------------------------------------------------- */
-  public async getSupportedTokens({ network }: GetSupportedTokensProps): Promise<Token[]> {
-    const { WETH } = this.config.CONTRACT_ADDRESSES;
+  public async getSupportedTokens({ network, contractAddress }: GetSupportedTokensProps): Promise<Token[]> {
+    const WETH = contractAddress;
     const yearn = this.yearnSdk.getInstanceOf(network);
 
     const supportedTokens = await yearn.tokens.supported();

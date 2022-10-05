@@ -14,7 +14,6 @@ import {
   STATUS,
   ExecuteTransactionProps,
   Credit,
-  Network,
   CreditLinePage,
   GetLineProps,
   GetLinesProps,
@@ -31,7 +30,7 @@ import {
 import { getConfig } from '@config';
 import { LineOfCreditABI } from '@services/contracts';
 import { getContract } from '@frameworks/ethers';
-import { getLine, getLinePage, getLines, getUserLinePositions } from '@frameworks/gql';
+import { getLines } from '@frameworks/gql';
 import { mapStatusToString } from '@src/utils';
 
 export class CreditLineServiceImpl implements CreditLineService {
@@ -86,7 +85,7 @@ export class CreditLineServiceImpl implements CreditLineService {
       const borrower = await this.borrower(line);
       if (!(await this.isMutualConsent(line, populatedTrx.data, props.lender, borrower))) {
         throw new Error(
-          `Adding credit is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.lineAddress}]`
+          `Adding credit is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${line}]"`
         );
       }
 
@@ -145,7 +144,7 @@ export class CreditLineServiceImpl implements CreditLineService {
       const lender = await this.getLenderByCreditID(line, id);
       if (!(await this.isMutualConsent(line, populatedTrx.data, borrower, lender))) {
         throw new Error(
-          `Setting rate is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.lineAddress}]`
+          `Setting rate is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.lineAddress}]"`
         );
       }
 
@@ -161,7 +160,7 @@ export class CreditLineServiceImpl implements CreditLineService {
   public async increaseCredit(props: IncreaseCreditProps): Promise<string> {
     try {
       const line = props.lineAddress;
-      if (await this.isActive(line)) {
+      if (!(await this.isActive(line))) {
         throw new Error(`Increasing credit is not possible. reason: "The given creditLine [${line}] is not active"`);
       }
 
@@ -177,7 +176,7 @@ export class CreditLineServiceImpl implements CreditLineService {
       const lender = await this.getLenderByCreditID(line, props.id);
       if (!(await this.isMutualConsent(line, populatedTrx.data, borrower, lender))) {
         throw new Error(
-          `Increasing credit is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.lineAddress}]`
+          `Increasing credit is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.lineAddress}]"`
         );
       }
 

@@ -30,11 +30,9 @@ describe('Network', () => {
       it.each`
         networkId  | network
         ${'1'}     | ${'mainnet'}
-        ${'2'}     | ${'morden'}
         ${'3'}     | ${'ropsten'}
         ${'4'}     | ${'rinkeby'}
         ${'42'}    | ${'kovan'}
-        ${'250'}   | ${'fantom'}
         ${'42161'} | ${'arbitrum'}
       `(`should return "$network" when given "$networkId" (string)`, ({ networkId, network }) => {
         expect(getNetwork(networkId)).toBe(network);
@@ -45,11 +43,9 @@ describe('Network', () => {
       it.each`
         networkId | network
         ${1}      | ${'mainnet'}
-        ${2}      | ${'morden'}
         ${3}      | ${'ropsten'}
         ${4}      | ${'rinkeby'}
         ${42}     | ${'kovan'}
-        ${250}    | ${'fantom'}
         ${42161}  | ${'arbitrum'}
       `(`should return "$network" when given $networkId (number)`, ({ networkId, network }) => {
         expect(getNetwork(networkId)).toBe(network);

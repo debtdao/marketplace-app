@@ -2,7 +2,6 @@ import { Suspense } from 'react';
 import { Provider } from 'react-redux';
 import { createGlobalStyle } from 'styled-components';
 import { ApolloProvider } from '@apollo/client';
-import '@i18n';
 
 import { Container } from '@container';
 import { getStore } from '@frameworks/redux';

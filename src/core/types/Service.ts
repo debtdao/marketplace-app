@@ -195,7 +195,6 @@ export interface AddCreditProps {
   drate: BigNumber;
   frate: BigNumber;
   amount: BigNumber;
-  dryRun: boolean;
 }
 
 export interface CloseProps {
@@ -203,13 +202,11 @@ export interface CloseProps {
   id: string;
 }
 export interface WithdrawLineProps {
-  dryRun: boolean;
   lineAddress: string;
   id: string;
   amount: BigNumber;
 }
 export interface SetRatesProps {
-  dryRun: boolean;
   lineAddress: string;
   id: string;
   frate: BigNumber;
@@ -315,6 +312,7 @@ export interface TokenService {
 }
 
 export interface GetSupportedTokensProps {
+  contractAddress: Address
   network: Network;
 }
 

@@ -1,0 +1,52 @@
+name: Demo
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+    branches:
+      - main
+  workflow_call:
+
+jobs:
+  test:
+    name: Test application
+    runs-on: ubuntu-latest
+    steps:
+      - name: "☁️ checkout repository"
+        uses: actions/checkout@v2
+
+      - name: "🔧 setup node"
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: 16
+
+      - name: "🔧 install npm@latest"
+        run: npm i -g npm@latest
+
+      - name: "📦 install dependencies"
+        uses: bahmutov/npm-install@v1
+        with:
+          useLockFile: false
+          useRollingCache: true
+
+      - name: "🔍 run tests"
+        run: npm run test --if-present
+  
+  deploy:
+    runs-on: ubuntu-latest
+    name: A job to test the action-deploy action by deploying a test site
+    if: ${{ success() }}
+    needs: [test]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy test site
+        id: deploy
+        uses: fleekhq/action-deploy@v1
+        with:
+          apiKey: ${{ secrets.FLEEK_API_KEY }}
+      - name: Get the output url
+        run: echo "Deploy url is ${{ steps.deploy.outputs.deployUrl }}"        

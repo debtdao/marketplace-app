@@ -28,10 +28,12 @@ import {
   InterestRateCreditService,
 } from '@types';
 import { getConfig } from '@config';
-import { LineOfCreditABI } from '@services/contracts';
+import { LineOfCreditABI, LineFactoryABI } from '@services/contracts';
 import { getContract } from '@frameworks/ethers';
 import { getLines } from '@frameworks/gql';
 import { mapStatusToString } from '@src/utils';
+
+const { GRAPH_API_URL, Arbiter_GOERLI, Oracle_GOERLI, SwapTarget_GOERLI, LineFactory_GOERLI } = getConfig();
 
 export class CreditLineServiceImpl implements CreditLineService {
   private graphUrl: string;
@@ -55,7 +57,7 @@ export class CreditLineServiceImpl implements CreditLineService {
     this.transactionService = transactionService;
     this.web3Provider = web3Provider;
     this.config = config;
-    const { GRAPH_API_URL } = getConfig();
+
     this.graphUrl = GRAPH_API_URL || 'https://api.thegraph.com';
     this.abi = LineOfCreditABI;
   }
@@ -247,26 +249,26 @@ export class CreditLineServiceImpl implements CreditLineService {
     dryRun: boolean = false
   ): Promise<TransactionResponse | PopulatedTransaction> {
     let props: ExecuteTransactionProps | undefined = undefined;
+
+    // TODO. pass network as param all the way down from actions
+    // const { getSigner } = this.web3Provider;
+    // const user = getSigner();
+
     try {
       props = {
-        network: 'mainnet',
+        network: 'goerli',
         contractAddress: contractAddress,
         abi: this.abi,
         args: params,
         methodName: methodName,
       };
-      if (dryRun) {
-        return await this.transactionService.populateTransaction(props);
-      }
 
       const tx = await this.transactionService.execute(props);
       await tx.wait();
       return tx;
     } catch (e) {
       console.log(
-        `An error occured while ${methodName} with params [${params}] on CreditLine [${
-          props?.contractAddress
-        }], error = [${JSON.stringify(e)}] `
+        `An error occured while ${methodName} with params [${params}] on CreditLine [${props?.contractAddress}], error = ${e} `
       );
       return Promise.reject(e);
     }

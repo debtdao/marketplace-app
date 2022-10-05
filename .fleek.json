@@ -1,0 +1,12 @@
+{
+  "site": {
+    "id": "8d117863-c774-47a2-a321-706be9380cc6",
+    "team": "800bfb5a-553d-4c28-9069-929eb113258e",
+    "platform": "ipfs",
+    "source": "ipfs",
+    "name": "solitary-band-3117"
+  },
+ "build": {
+   "baseDir": "build"
+ }
+}

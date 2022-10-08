@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 
-import { GeneralLabView, SummaryData, Unit, Wei } from '@types';
+import { Unit, Wei } from '@types';
 
 import { toBN, toUnit } from './format';
 

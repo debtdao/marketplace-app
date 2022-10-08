@@ -1,4 +1,4 @@
-import { LineStatusTypes, AggregatedCreditLine, CreditLinePage } from '@types';
+import { LineStatusTypes } from '@types';
 
 import { Address } from './Blockchain';
 
@@ -81,7 +81,7 @@ export interface UseCreditLineParams {
 /*
   Query Responses Types
 */
-type QueryResponseTypes = AggregatedCreditLine | AggregatedCreditLine[] | CreditLinePage;
+//type QueryResponseTypes = AggregatedCreditLine | AggregatedCreditLine[] | CreditLinePage;
 
 export interface BaseLineFragResponse {
   id: Address;

@@ -22,11 +22,10 @@ import {
   BaseCreditFragResponse,
   BaseEscrowDepositFragResponse,
   SpigotRevenueSummaryFragresponse,
-  Address,
   GetLinePageAuxDataResponse,
 } from '@types';
 
-const { parseUnits, parseEther } = utils;
+const { parseUnits } = utils;
 
 export const mapStatusToString = (status: number): LineStatusTypes => {
   switch (status) {
@@ -154,8 +153,6 @@ export function formatGetLinePageAuxData(
   line: AggregatedCreditLine,
   tokenPrices: { [token: string]: BigNumber }
 ): GetLinePageAuxDataResponse | undefined {
-  const { ...rest } = response;
-  // TODO for Line Page
   return;
 }
 

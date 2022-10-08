@@ -1,13 +1,11 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { difference, groupBy, keyBy, union } from 'lodash';
+//import { difference, groupBy, keyBy, union } from 'lodash';
 
 import {
   initialStatus,
-  Position,
   CreditLineState,
   UserLineMetadataStatusMap,
   LineActionsStatusMap,
-  PositionSummary,
   AggregatedCreditLine,
 } from '@types';
 
@@ -61,8 +59,8 @@ const {
   getUserLinePositions,
   clearLinesData,
   clearUserData,
-  getExpectedTransactionOutcome,
-  clearTransactionData,
+  //getExpectedTransactionOutcome,
+  //clearTransactionData,
   // getUserLinesMetadata,
   clearSelectedLineAndStatus,
   clearLineStatus,
@@ -95,7 +93,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 
     .addCase(clearSelectedLineAndStatus, (state) => {
       if (!state.selectedLineAddress) return;
-      const currentAddress = state.selectedLineAddress;
+      //const currentAddress = state.selectedLineAddress;
       // state.statusMap.linesActionsStatusMap[currentAddress] = initialLineActionsStatusMap;
       state.selectedLineAddress = undefined;
     })
@@ -150,6 +148,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
           state.statusMap.user.linesActionsStatusMap[l.id] = initialLineActionsStatusMap;
           // save line id to category for reference
           categories[category] = [...(categories[category] || []), l.id];
+          return lines;
         })
       );
 

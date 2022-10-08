@@ -1,5 +1,4 @@
 import { createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { ethers } from 'ethers';
 
 import { ThunkAPI } from '@frameworks/redux';
 import { notify } from '@frameworks/blocknative';
@@ -11,7 +10,7 @@ import { WalletActions, ChangeWalletNetworkResult } from '../wallet/wallet.actio
 const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network }, ThunkAPI>(
   'network/changeNetwork',
   async ({ network }, { dispatch, extra, getState }) => {
-    const { context, config } = extra;
+    const { context } = extra;
     const { wallet, web3Provider, yearnSdk } = context;
 
     if (wallet.isCreated) {

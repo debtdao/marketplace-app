@@ -8,7 +8,6 @@ import {
   TokenService,
   GasService,
   TransactionService,
-  SubscriptionService,
   SpigotedLineService,
   EscrowService,
   LineServices,

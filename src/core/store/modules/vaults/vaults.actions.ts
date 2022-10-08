@@ -21,7 +21,6 @@ import {
   validateNetwork,
   validateVaultDeposit,
   validateVaultWithdraw,
-  validateMigrateVaultAllowance,
   // parseError,
 } from '@utils';
 import { getConfig } from '@config';

@@ -4,13 +4,7 @@ import { ExternalServiceId } from './General';
 import { PartnerId } from './Partner';
 import { Theme } from './Settings';
 import { Status } from './Status';
-import {
-  LineActionsStatusMap,
-  CreditLinePage,
-  UserLineMetadataStatusMap,
-  AggregatedCreditLine,
-  PositionSummary,
-} from './CreditLine';
+import { CreditLinePage, UserLineMetadataStatusMap, AggregatedCreditLine, PositionSummary } from './CreditLine';
 import {
   Position,
   Token,

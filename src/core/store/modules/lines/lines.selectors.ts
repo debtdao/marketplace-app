@@ -9,22 +9,22 @@ import {
   Address,
   CreditLinePage, // prev. GeneralVaultView, Super indepth data, CreditLinePage is most similar atm
 } from '@types';
-import { toBN, mapStatusToString, formatCreditEvents, formatCollateralEvents } from '@utils';
+// import { toBN, mapStatusToString, formatCreditEvents, formatCollateralEvents } from '@utils';
 
 import { initialLineActionsStatusMap } from './lines.reducer';
 
 /* ---------------------------------- State --------------------------------- */
-const selectUserWallet = (state: RootState) => state.wallet.selectedAddress;
+//const selectUserWallet = (state: RootState) => state.wallet.selectedAddress;
 const selectLinesState = (state: RootState) => state.lines;
 const selectUserLinesPositionsMap = (state: RootState) => state.lines.user.linePositions;
 // const selectUserLinesMetadataMap = (state: RootState) => state.lines.user.userLinesMetadataMap;
 const selectLinesMap = (state: RootState) => state.lines.linesMap;
 const selectLinePagesMap = (state: RootState) => state.lines.pagesMap;
 const selectLineCategories = (state: RootState) => state.lines.categories;
-const selectLinesAddresses = (state: RootState) => Object.keys(state.lines.linesMap);
+//const selectLinesAddresses = (state: RootState) => Object.keys(state.lines.linesMap);
 const selectUserTokensMap = (state: RootState) => state.tokens.user.userTokensMap;
-const selectUserTokensAllowancesMap = (state: RootState) => state.tokens.user.userTokensAllowancesMap;
-const selectLinesAllowancesMap = (state: RootState) => state.lines.user.lineAllowances;
+//const selectUserTokensAllowancesMap = (state: RootState) => state.tokens.user.userTokensAllowancesMap;
+//const selectLinesAllowancesMap = (state: RootState) => state.lines.user.lineAllowances;
 const selectTokensMap = (state: RootState) => state.tokens.tokensMap;
 const selectSelectedLineAddress = (state: RootState) => state.lines.selectedLineAddress;
 const selectLinesActionsStatusMap = (state: RootState) => state.lines.statusMap.user.linesActionsStatusMap;
@@ -97,27 +97,24 @@ const selectSummaryData = createSelector([selectUserLinesSummary], (userLinesSum
 });
 
 const selectRecommendations = createSelector([selectLiveLines, selectLinesMap], (activeLines, linesMap) => {
-  const stableCoinSymbols = ['DAI', 'sUSD'];
-  const targetTokenSymbols = ['ETH'];
-  const stableLines: CreditLinePage[] = [];
-  const tokenLines: CreditLinePage[] = [];
+  //const stableCoinSymbols = ['DAI', 'sUSD'];
+  //const targetTokenSymbols = ['ETH'];
+  //const stableLines: CreditLinePage[] = [];
+  //const tokenLines: CreditLinePage[] = [];
   // stableCoinsSymbols.forEach((symbol) => {
   //   const line = lines.find((line) => line.token.symbol === symbol);
   //   if (!line) return;
   //   stableLines.push(line);
   // });
-
   // targetTokenSymbols.forEach((symbol) => {
   //   const line = lines.find((line) => line.token.symbol === symbol);
   //   if (!line) return;
   //   tokenLines.push(line);
   // });
-
   // return [stableLine, derivativeLines[1], derivativeLines[0]].filter((item) => !!item);
   // const sortedLines = [...lines].sort((a, b) => {
   //   return toBN(b.apyData).minus(a.apyData).toNumber();
   // });
-
   // return object with fields for categories
 });
 

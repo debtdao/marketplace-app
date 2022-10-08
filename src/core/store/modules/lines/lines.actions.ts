@@ -1,14 +1,14 @@
 import { BigNumber, utils } from 'ethers';
-import { createAction, createAsyncThunk, unwrapResult } from '@reduxjs/toolkit';
+import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 
 import { ThunkAPI } from '@frameworks/redux';
 import {
-  Position,
+  //Position,
   AggregatedCreditLine,
   CreditLinePage,
   TransactionOutcome,
   // LinesUserSummary,
-  UserPositionMetadata,
+  //UserPositionMetadata,
   Address,
   Wei,
   TokenAllowance,
@@ -18,23 +18,23 @@ import {
   PositionSummary,
   AddCreditProps,
   UseCreditLinesParams,
-  GetLinePageResponse,
+  //GetLinePageResponse,
 } from '@types';
 import {
-  calculateSharesAmount,
-  normalizeAmount,
+  //calculateSharesAmount,
+  //normalizeAmount,
   toBN,
   getNetwork,
   validateNetwork,
   formatGetLinesData,
   formatLinePageData,
-  all,
+  //all,
   // validateLineDeposit,
   // validateLineWithdraw,
   // validateMigrateLineAllowance,
   // parseError,
 } from '@utils';
-import { getConfig } from '@config';
+//import { getConfig } from '@config';
 import { unnullify } from '@utils';
 
 import { TokensActions } from '../tokens/tokens.actions';
@@ -229,7 +229,7 @@ const deploySecuredLine = createAsyncThunk<
   },
   ThunkAPI
 >('lines/deploySecredLine', async (deployData, { getState, extra }) => {
-  const { network } = getState();
+  //const { network } = getState();
   const { lineServices } = extra.services;
   const deployedLineData = await lineServices.deploySecuredLine({
     network: 'goerli',
@@ -249,8 +249,8 @@ const approveDeposit = createAsyncThunk<
   },
   ThunkAPI
 >('lines/approveDeposit', async ({ amount, tokenAddress }, { getState, dispatch, extra }) => {
-  const { wallet, network } = getState();
-  const { creditLineService, tokenService } = extra.services;
+  const { wallet } = getState();
+  const { tokenService } = extra.services;
 
   const accountAddress = wallet.selectedAddress;
   if (!accountAddress) throw new Error('WALLET NOT CONNECTED');
@@ -268,21 +268,21 @@ const approveDeposit = createAsyncThunk<
 const addCredit = createAsyncThunk<void, AddCreditProps, ThunkAPI>(
   'lines/addCredit',
   async ({ lineAddress, drate, frate, amount, token, lender }, { extra, getState, dispatch }) => {
-    const { network, wallet, lines, tokens, app } = getState();
+    const { network, wallet, tokens } = getState();
     const { services } = extra;
     console.log('look here', network, wallet, lineAddress, drate, frate, amount, token, lender);
     const userAddress = wallet.selectedAddress;
     if (!userAddress) throw new Error('WALLET NOT CONNECTED');
 
-    const userLineData = lines.user.linePositions[lineAddress];
+    //const userLineData = lines.user.linePositions[lineAddress];
     const tokenData = tokens.tokensMap[token];
-    const userTokenData = tokens.user.userTokensMap[token];
-    const decimals = toBN(tokenData.decimals);
-    const ONE_UNIT = toBN('10').pow(decimals);
+    //const userTokenData = tokens.user.userTokensMap[token];
+    //const decimals = toBN(tokenData.decimals);
+    //const ONE_UNIT = toBN('10').pow(decimals);
 
     // TODO: fix BigNumber type difference issues
     // const amountInWei = amount.multipliedBy(ONE_UNIT);
-    const { creditLineService, transactionService } = services;
+    const { creditLineService } = services;
     const tx = await creditLineService.addCredit({
       lineAddress: lineAddress,
       drate: drate,
@@ -371,13 +371,8 @@ const depositAndRepay = createAsyncThunk<
   ThunkAPI
 >(
   'lines/depositAndRepay',
-  async (
-    { lineAddress, tokenAddress, amount, targetUnderlyingTokenAmount, slippageTolerance },
-    { extra, getState, dispatch }
-  ) => {
-    const { network, wallet, lines, tokens, app } = getState();
-    const { services } = extra;
-
+  async ({ lineAddress, tokenAddress }, { getState, dispatch }) => {
+    const { network, wallet, lines, tokens } = getState();
     const userAddress = wallet.selectedAddress;
     if (!userAddress) throw new Error('WALLET NOT CONNECTED');
 
@@ -387,11 +382,11 @@ const depositAndRepay = createAsyncThunk<
     });
     if (networkError) throw networkError;
 
-    const userLineData = lines.user.linePositions[lineAddress];
+    //const userLineData = lines.user.linePositions[lineAddress];
     const tokenData = tokens.tokensMap[tokenAddress];
-    const userTokenData = tokens.user.userTokensMap[tokenAddress];
+    //const userTokenData = tokens.user.userTokensMap[tokenAddress];
     const decimals = toBN(tokenData.decimals);
-    const ONE_UNIT = toBN('10').pow(decimals);
+    //const ONE_UNIT = toBN('10').pow(decimals);
 
     // const { error: depositError } = validateLineDeposit({
     //   sellTokenAmount: amount,
@@ -435,9 +430,8 @@ const withdrawLine = createAsyncThunk<
   ThunkAPI
 >(
   'lines/withdrawLine',
-  async ({ lineAddress, amount, targetTokenAddress, slippageTolerance, signature }, { extra, getState, dispatch }) => {
-    const { network, wallet, lines, tokens, app } = getState();
-    const { services, config } = extra;
+  async ({ lineAddress, targetTokenAddress }, { getState, dispatch }) => {
+    const { network, wallet, lines } = getState();
 
     const userAddress = wallet.selectedAddress;
     if (!userAddress) throw new Error('WALLET NOT CONNECTED');
@@ -448,13 +442,13 @@ const withdrawLine = createAsyncThunk<
     });
     if (networkError) throw networkError;
 
-    const lineData = lines.linesMap[lineAddress];
+    //const lineData = lines.linesMap[lineAddress];
     const userLineData = lines.user.linePositions[lineAddress];
     // selector for UserPositionMetadata to get available liquidity
     const available = utils.parseUnits(userLineData.deposit, 'wei').sub(userLineData.principal);
     // if requesting more than available or max available
-    const withdrawAll = amount.eq(config.MAX_UINT256) || amount.gte(available);
-    const amountOfShares = withdrawAll ? available : amount;
+    //const withdrawAll = amount.eq(config.MAX_UINT256) || amount.gte(available);
+    //const amountOfShares = withdrawAll ? available : amount;
 
     // const { error: withdrawError } = validateLineWithdraw({
     //   amount: toBN(normalizeAmount(amountOfShares, parseInt(tokenData.decimals))),

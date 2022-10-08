@@ -61,7 +61,6 @@ export class CreditLineServiceImpl implements CreditLineService {
     this.transactionService = transactionService;
     this.web3Provider = web3Provider;
     this.config = config;
-
     this.graphUrl = GRAPH_API_URL || 'https://api.thegraph.com';
     this.abi = LineOfCreditABI;
   }

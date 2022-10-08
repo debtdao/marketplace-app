@@ -24,10 +24,12 @@ import {
 
 import { Network } from './Blockchain';
 
-type SdkNetwork = 1 | 250;
+type SdkNetwork = 1 | 250 | 5;
 interface YearnSdk {
   hasInstanceOf: (network: Network) => boolean;
+  //@ts-ignore
   getInstanceOf: (network: Network) => Yearn<SdkNetwork>;
+  //@ts-ignore
   register: (network: Network, instance: Yearn<SdkNetwork>) => void;
 }
 

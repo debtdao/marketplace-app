@@ -11,6 +11,8 @@ export const getNetworkId = (network: Network): number => {
       return 4;
     case 'kovan':
       return 42;
+    case 'goerli':
+      return 5;
     case 'arbitrum':
       return 42161;
     default:
@@ -30,6 +32,8 @@ export const getNetwork = (networkId: number | string): Network => {
       return 'kovan';
     case '42161':
       return 'arbitrum';
+    case '5':
+      return 'goerli';
     default:
       console.warn(`Unknown networkId: ${networkId} (as ${typeof networkId})`);
       return 'other';
@@ -37,12 +41,14 @@ export const getNetwork = (networkId: number | string): Network => {
 };
 
 export const getNetworkRpc = (network: Network): string => {
-  const { WEB3_PROVIDER_HTTPS, ARBITRUM_PROVIDER_HTTPS } = getConfig();
+  const { WEB3_PROVIDER_HTTPS, ARBITRUM_PROVIDER_HTTPS, GOERLI_PROVIDER_HTTPS } = getConfig();
   switch (network) {
     case 'mainnet':
       return WEB3_PROVIDER_HTTPS;
     case 'arbitrum':
       return ARBITRUM_PROVIDER_HTTPS;
+    case 'goerli':
+      return GOERLI_PROVIDER_HTTPS;
     default:
       throw Error('Unknown Network');
   }
@@ -54,6 +60,8 @@ export const getProviderType = (network: Network): ProviderType => {
       return 'ethereum';
     case 'arbitrum':
       return 'arbitrum';
+    case 'goerli':
+      return 'goerli';
     default:
       throw Error('Unknown Network');
   }

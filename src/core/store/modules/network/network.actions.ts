@@ -1,4 +1,5 @@
 import { createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { ethers } from 'ethers';
 
 import { ThunkAPI } from '@frameworks/redux';
 import { notify } from '@frameworks/blocknative';
@@ -13,8 +14,6 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
     const { context, config } = extra;
     const { wallet, web3Provider, yearnSdk } = context;
 
-    if (!config.SUPPORTED_NETWORKS.includes(network)) throw Error('Network Not Supported');
-
     if (wallet.isCreated) {
       const action = (await dispatch(
         WalletActions.changeWalletNetwork({ network })
@@ -25,6 +24,7 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
     if (web3Provider.hasInstanceOf('wallet')) {
       const providerType = getProviderType(network);
       const provider = web3Provider.getInstanceOf(providerType);
+      console.log('instance free of yearn', provider);
       const yearn = yearnSdk.getInstanceOf(network);
       yearn.context.setProvider({
         read: provider,

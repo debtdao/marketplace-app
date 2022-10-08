@@ -60,7 +60,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const [transactionApproved, setTransactionApproved] = useState(true);
   const [transactionLoading, setLoading] = useState(false);
   const [targetTokenAmount, setTargetTokenAmount] = useState('1');
-
+  const [selectedCreditEx, setSelectedCreditEx] = useState('0xb71de8f02215fb0128cc31db0bb738c87ebec5f9');
   const [drate, setDrate] = useState('0.00');
   const [frate, setFrate] = useState('0.00');
 
@@ -168,7 +168,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
 
     dispatch(
       LinesActions.addCredit({
-        lineAddress: selectedCredit.id,
+        lineAddress: selectedCreditEx,
         drate: ethers.utils.parseEther(drate),
         frate: ethers.utils.parseEther(frate),
         amount: ethers.utils.parseEther(targetTokenAmount),

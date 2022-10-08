@@ -4,6 +4,7 @@ import { getNetworkId, getProviderType, isLedgerLive } from '@utils';
 import { YearnSdk, SdkNetwork, Web3Provider, Network, Config } from '@types';
 
 export class YearnSdkImpl implements YearnSdk {
+  //@ts-ignore
   private instances: Map<Network, Yearn<SdkNetwork>> = new Map<Network, Yearn<SdkNetwork>>();
 
   constructor({ web3Provider, config }: { web3Provider: Web3Provider; config: Config }) {
@@ -14,6 +15,7 @@ export class YearnSdkImpl implements YearnSdk {
       const providerType = getProviderType(network);
       const provider = web3Provider.getInstanceOf(providerType);
       const networkId = getNetworkId(network) as SdkNetwork;
+      //@ts-ignore
       const sdkInstance = new Yearn(networkId, {
         provider,
         partnerId: isLedger && networkId === 1 ? CONTRACT_ADDRESSES.LEDGER_PARTNER_ID : undefined,
@@ -32,7 +34,7 @@ export class YearnSdkImpl implements YearnSdk {
   public hasInstanceOf(network: Network): boolean {
     return this.instances.has(network);
   }
-
+  //@ts-ignore
   public getInstanceOf(network: Network): Yearn<SdkNetwork> {
     const instance = this.instances.get(network);
 
@@ -42,7 +44,7 @@ export class YearnSdkImpl implements YearnSdk {
 
     return instance;
   }
-
+  //@ts-ignore
   public register(network: Network, instance: Yearn<SdkNetwork>): void {
     this.instances.set(network, instance);
   }

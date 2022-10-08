@@ -1,4 +1,4 @@
-import { DebtDAO } from '@src/utils/debtdaot';
+import { DebtDAO } from '../../utils/debtdao';
 
 import { JsonRpcProvider, JsonRpcSigner } from '@ethersproject/providers';
 

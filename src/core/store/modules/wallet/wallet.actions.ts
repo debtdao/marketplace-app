@@ -59,7 +59,7 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
         wallet: (wallet) => {
           web3Provider.register('wallet', getEthersProvider(wallet.provider));
           const providerType = getProviderType(network);
-          const sdkInstance = yearnSdk.getInstanceOf(network);
+          const sdkInstance = web3Provider.getNetworkInstanceOf(network);
           sdkInstance.context.setProvider({
             read: web3Provider.getInstanceOf(providerType),
             write: web3Provider.getInstanceOf('wallet'),

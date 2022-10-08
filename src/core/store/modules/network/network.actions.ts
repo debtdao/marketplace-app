@@ -24,8 +24,8 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
       const providerType = getProviderType(network);
       const provider = web3Provider.getInstanceOf(providerType);
       console.log('instance free of yearn', provider);
-      const yearn = yearnSdk.getInstanceOf(network);
-      yearn.context.setProvider({
+      const dd_network = web3Provider.getNetworkInstanceOf(network);
+      dd_network.context.setProvider({
         read: provider,
         write: web3Provider.getInstanceOf('wallet'),
       });

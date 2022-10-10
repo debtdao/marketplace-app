@@ -73,9 +73,7 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
           }
         },
         network: (networkId) => {
-          const supportedNetworkSettings = DEBT_DAO_NETWORKS.find(
-            (network) => NETWORK_SETTINGS[network].networkId === networkId
-          );
+          const supportedNetworkSettings = DEBT_DAO_NETWORKS;
           if (wallet.isConnected && supportedNetworkSettings) {
             web3Provider.register('wallet', getEthersProvider(wallet.provider as ExternalProvider));
             const network = getNetwork(networkId);
@@ -85,6 +83,7 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
               read: web3Provider.getInstanceOf(providerType),
               write: web3Provider.getInstanceOf('wallet'),
             });
+            console.log(network, 'hre');
             dispatch(NetworkActions.changeNetwork({ network }));
           }
         },

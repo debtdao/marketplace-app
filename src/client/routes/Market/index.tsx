@@ -187,6 +187,8 @@ export const Market = () => {
   const [search, setSearch] = useState('');
   const activeModal = useAppSelector(ModalSelectors.selectActiveModal);
 
+  console.log(currentNetworkSettings, currentNetwork, 'network settings');
+
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
   const vaultsStatus = useAppSelector(VaultsSelectors.selectVaultsGeneralStatus);
   const tokensStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);

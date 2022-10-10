@@ -51,6 +51,8 @@ export class BlocknativeWalletImpl implements Wallet {
     const rpcUrl = getNetworkRpc(network);
     const appName = 'Debt DAO';
 
+    console.log(networkId, rpcUrl, 'in Onboard');
+
     const wallets = [
       { walletName: 'metamask' },
       {

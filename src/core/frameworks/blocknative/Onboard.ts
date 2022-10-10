@@ -45,7 +45,7 @@ export class BlocknativeWalletImpl implements Wallet {
   }
 
   public create(network: Network, subscriptions: Subscriptions, theme?: Theme): boolean {
-    const networkId = 5;
+    const networkId = getNetworkId(network);
     const { BLOCKNATIVE_KEY, FORTMATIC_KEY, PORTIS_KEY } = getConfig();
 
     const rpcUrl = getNetworkRpc(network);
@@ -56,7 +56,7 @@ export class BlocknativeWalletImpl implements Wallet {
       {
         walletName: 'walletConnect',
         rpc: {
-          [networkId]: 'https://eth-goerli.public.blastapi.io',
+          [networkId]: rpcUrl,
         },
       },
       {
@@ -105,7 +105,7 @@ export class BlocknativeWalletImpl implements Wallet {
     const walletCheck = [{ checkName: 'derivationPath' }, { checkName: 'connect' }, { checkName: 'accounts' }];
 
     this.onboard = Onboard({
-      networkId: 5,
+      networkId,
       dappId: BLOCKNATIVE_KEY,
       darkMode: theme !== 'light',
       subscriptions,

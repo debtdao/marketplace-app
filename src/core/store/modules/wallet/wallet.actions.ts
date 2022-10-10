@@ -6,6 +6,7 @@ import { Theme, RootState, DIContainer, Subscriptions, Network } from '@types';
 import { isValidAddress, getProviderType, getNetwork } from '@utils';
 
 import { NetworkActions } from '../network/network.actions';
+import { NetworkSelectors } from '../network/network.selectors';
 
 const walletChange = createAction<{ walletName: string }>('wallet/walletChange');
 const addressChange = createAction<{ address: string }>('wallet/addressChange');
@@ -51,7 +52,7 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
   async ({ walletName, network }, { dispatch, getState, extra }) => {
     const { context, config } = extra;
     const { wallet, web3Provider, yearnSdk } = context;
-    const { NETWORK, ALLOW_DEV_MODE, SUPPORTED_NETWORKS, NETWORK_SETTINGS } = config;
+    const { NETWORK, ALLOW_DEV_MODE, DEBT_DAO_NETWORKS, NETWORK_SETTINGS } = config;
     const { theme, settings } = getState();
 
     if (!wallet.isCreated) {
@@ -72,14 +73,14 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
           }
         },
         network: (networkId) => {
-          const supportedNetworkSettings = SUPPORTED_NETWORKS.find(
+          const supportedNetworkSettings = DEBT_DAO_NETWORKS.find(
             (network) => NETWORK_SETTINGS[network].networkId === networkId
           );
           if (wallet.isConnected && supportedNetworkSettings) {
             web3Provider.register('wallet', getEthersProvider(wallet.provider as ExternalProvider));
             const network = getNetwork(networkId);
             const providerType = getProviderType(network);
-            const sdkInstance = yearnSdk.getInstanceOf(network);
+            const sdkInstance = web3Provider.getNetworkInstanceOf(network);
             sdkInstance.context.setProvider({
               read: web3Provider.getInstanceOf(providerType),
               write: web3Provider.getInstanceOf('wallet'),

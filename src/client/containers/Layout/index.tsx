@@ -91,7 +91,7 @@ export const Layout: FC = ({ children }) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
   const location = useLocation();
-  const { SUPPORTED_NETWORKS } = getConfig();
+  const { DEBT_DAO_NETWORKS } = getConfig();
   const { isMobile } = useWindowDimensions();
   const partner = useAppSelector(PartnerSelectors.selectPartnerState);
   const selectedAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
@@ -119,6 +119,10 @@ export const Layout: FC = ({ children }) => {
 
   // TODO This is only assetAddress on the vault page
   const assetAddress: string | undefined = location.pathname.split('/')[2];
+
+  useEffect(() => {
+    console.log(currentNetwork, 'here');
+  }, [currentNetwork]);
 
   // Used to check zapper api
   // const { ZAPPER_AUTH_TOKEN } = getConfig();
@@ -199,7 +203,7 @@ export const Layout: FC = ({ children }) => {
           onWalletClick={() => dispatch(WalletActions.walletSelect({ network: currentNetwork }))}
           disableWalletSelect={hideControls || isCoinbaseApp()}
           selectedNetwork={currentNetwork}
-          networkOptions={SUPPORTED_NETWORKS}
+          networkOptions={DEBT_DAO_NETWORKS}
           onNetworkChange={(network) => dispatch(NetworkActions.changeNetwork({ network: network as Network }))}
           disableNetworkChange={hideControls}
           hideDisabledControls={hideControls}

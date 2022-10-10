@@ -10,8 +10,11 @@ import { WalletActions, ChangeWalletNetworkResult } from '../wallet/wallet.actio
 const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network }, ThunkAPI>(
   'network/changeNetwork',
   async ({ network }, { dispatch, extra, getState }) => {
-    const { context } = extra;
-    const { wallet, web3Provider, yearnSdk } = context;
+    const { context, config } = extra;
+    const { wallet, web3Provider } = context;
+    console.log(config.DEBT_DAO_NETWORKS);
+    console.log(network);
+    if (!config.DEBT_DAO_NETWORKS.includes(network)) throw Error('Network Not Supported');
 
     if (wallet.isCreated) {
       const action = (await dispatch(

@@ -129,7 +129,7 @@ export const Navbar = ({
   const secondTitleEnabled = !!subTitle?.length;
 
   const titleText = secondTitleEnabled ? <>{title}&nbsp;/&nbsp;</> : title;
-
+  console.log(networkOptions);
   return (
     <StyledNavbar className={className}>
       {title && (

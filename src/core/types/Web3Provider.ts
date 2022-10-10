@@ -1,7 +1,6 @@
-import { DebtDAO } from '../../utils/debtdao';
-
 import { JsonRpcProvider, JsonRpcSigner } from '@ethersproject/providers';
 
+import { DebtDAO } from '../../utils/debtdao';
 
 import { Network } from './Blockchain';
 
@@ -18,9 +17,3 @@ export interface Web3Provider {
   registerNetwork: (network: Network, instance: DebtDAO<newSdkNetwork>) => void;
   getSigner: () => JsonRpcSigner;
 }
-
-
-
-
-
-

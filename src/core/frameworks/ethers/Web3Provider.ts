@@ -1,9 +1,10 @@
-import { JsonRpcProvider, JsonRpcSigner} from '@ethersproject/providers';
+import { JsonRpcProvider, JsonRpcSigner } from '@ethersproject/providers';
 
+import { getProviderType, getNetworkRpc, getNetworkId, Context } from '@utils';
+import { Network, ProviderType, Web3Provider, newSdkNetwork } from '@types';
 import { getConfig } from '@config';
-import { getProviderType, getNetworkRpc, getNetworkId, Context, DebtDAO } from '@utils';
-import { Network, ProviderType, Web3Provider , newSdkNetwork } from '@types';
-
+import type { DebtDAO } from '@utils';
+import { DebtDAOObj } from '@utils';
 
 import { getJsonRpcProvider } from './';
 
@@ -16,19 +17,18 @@ export class EthersWeb3ProviderImpl implements Web3Provider {
     SUPPORTED_NETWORKS.forEach((network) => {
       const rpcUrl = getNetworkRpc(network);
       const context = Context;
-      console.log(context)
       const provider = getJsonRpcProvider(rpcUrl);
       const providerType = getProviderType(network);
       const networkId = getNetworkId(network) as newSdkNetwork;
+      console.log(rpcUrl, provider, networkId, 'testing list');
       this.register(providerType, provider);
-      const newSdkNetwork = new DebtDAO(networkId, {
-        provider: provider
-      })
-      this.registerNetwork(network, newSdkNetwork)
+      const newSdkNetwork = new DebtDAOObj(networkId, {
+        provider: provider,
+      });
+      this.registerNetwork(network, newSdkNetwork);
     });
     if (USE_MAINNET_FORK) this.register('custom', getJsonRpcProvider(CUSTOM_PROVIDER_HTTPS));
   }
- 
 
   public hasInstanceOf(type: ProviderType): boolean {
     return this.instances.has(type);

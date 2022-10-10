@@ -81,7 +81,7 @@ export const getConstants = memoize((): Constants => {
     MAX_UINT256: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
     DEBT_DAO_API: 'https://api.yearn.finance/v1/chains/1/vaults/all',
     DEBT_DAO_ALERTS_API: 'http://yearn-alerts-balancer-2019386215.us-east-1.elb.amazonaws.com',
-    SUPPORTED_NETWORKS: ['mainnet', 'arbitrum'],
+    SUPPORTED_NETWORKS: ['mainnet', 'arbitrum', 'goerli'],
     NETWORK_SETTINGS,
     WEB3_PROVIDER_HTTPS: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     WEB3_PROVIDER_WSS: `wss://eth-mainnet.ws.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,

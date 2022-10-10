@@ -1,10 +1,12 @@
-import { JsonRpcProvider } from "@ethersproject/providers";
-import EventEmitter from "events";
-import { ChainId } from "./chain";
+import EventEmitter from 'events';
 
-import { Address } from "../core/types";
+import { JsonRpcProvider } from '@ethersproject/providers';
 
-export declare class DebtDAO<T extends ChainId> {
+import { Address } from '../core/types';
+
+import { ChainId } from './chain';
+
+declare class DebtDAO<T extends ChainId> {
   _ctxValue: ContextValue;
   context: Context;
   ready: Promise<void[]>;
@@ -18,6 +20,12 @@ export declare class DebtDAO<T extends ChainId> {
   constructor(chainId: T, context: ContextValue);
   setChainId(chainId: ChainId): void;
 }
+
+export type { DebtDAO };
+
+const DebtDAOObj = new DebtDAO();
+
+export { DebtDAOObj };
 
 export class CustomError extends Error {
   error_type: string;
@@ -36,10 +44,10 @@ export class CustomError extends Error {
  */
 export class SdkError extends CustomError {
   error_code?: string;
-  static NO_SLIPPAGE = "no_slippage";
+  static NO_SLIPPAGE = 'no_slippage';
 
   constructor(message: string, error_code?: string) {
-    super(message, "sdk");
+    super(message, 'sdk');
     this.error_code = error_code;
   }
 }
@@ -98,16 +106,12 @@ export interface SubgraphConfiguration {
  */
 export interface ContextValue {
   provider?: JsonRpcProvider | ReadWriteProvider;
-
-  
 }
 
 const DefaultContext: ContextValue = {
   // Public API key provided by zapper.
   // see https://docs.zapper.fi/zapper-api/endpoints
-
   // The default tenderly dashboard for Yearn
-  
 };
 
 /**
@@ -116,10 +120,10 @@ const DefaultContext: ContextValue = {
  * that the SDK aggregates.
  *
  * [[Context]] **should not** be instantiated by users, as it's managed by
- * {@link Yearn.context}.
+ * //{@link Yearn.context}.
  */
-export class Context implements ContextValue  {
-  static PROVIDER = "refresh:provider";
+export class Context implements ContextValue {
+  static PROVIDER = 'refresh:provider';
 
   private ctx: ContextValue;
 
@@ -150,9 +154,7 @@ export class Context implements ContextValue  {
 
   get provider(): ReadWriteProvider {
     if (this.ctx.provider) return this.ctx.provider as ReadWriteProvider;
-    throw new SdkError("provider must be undefined in Context for this feature to work.");
+    throw new SdkError('provider must be undefined in Context for this feature to work.');
   }
 }
-
-
-
+export {};

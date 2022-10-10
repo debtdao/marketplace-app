@@ -3,8 +3,7 @@ import { JsonRpcProvider, JsonRpcSigner } from '@ethersproject/providers';
 import { getProviderType, getNetworkRpc, getNetworkId, Context } from '@utils';
 import { Network, ProviderType, Web3Provider, newSdkNetwork } from '@types';
 import { getConfig } from '@config';
-import type { DebtDAO } from '@utils';
-import { DebtDAOObj } from '@utils';
+import { DebtDAO } from '@utils';
 
 import { getJsonRpcProvider } from './';
 
@@ -22,7 +21,7 @@ export class EthersWeb3ProviderImpl implements Web3Provider {
       const networkId = getNetworkId(network) as newSdkNetwork;
       console.log(rpcUrl, provider, networkId, 'testing list');
       this.register(providerType, provider);
-      const newSdkNetwork = new DebtDAOObj(networkId, {
+      const newSdkNetwork = new DebtDAO(networkId, {
         provider: provider,
       });
       this.registerNetwork(network, newSdkNetwork);

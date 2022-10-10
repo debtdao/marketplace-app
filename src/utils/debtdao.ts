@@ -6,7 +6,7 @@ import { Address } from '../core/types';
 
 import { ChainId } from './chain';
 
-declare class DebtDAO<T extends ChainId> {
+export class DebtDAO<T extends ChainId> {
   _ctxValue: ContextValue;
   context: Context;
   ready: Promise<void[]>;
@@ -20,12 +20,6 @@ declare class DebtDAO<T extends ChainId> {
   constructor(chainId: T, context: ContextValue);
   setChainId(chainId: ChainId): void;
 }
-
-export type { DebtDAO };
-
-const DebtDAOObj = new DebtDAO();
-
-export { DebtDAOObj };
 
 export class CustomError extends Error {
   error_type: string;

@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -101,6 +101,7 @@ export const Layout: FC = ({ children }) => {
   const collapsedSidebar = useAppSelector(SettingsSelectors.selectSidebarCollapsed);
   const previousAddress = usePrevious(selectedAddress);
   const previousNetwork = usePrevious(currentNetwork);
+  const walletNetworkChain = useAppSelector(WalletSelectors.selectWalletNetwork);
   const selectedVault = useAppSelector(VaultsSelectors.selectSelectedVault);
   // const path = useAppSelector(({ route }) => route.path);
   const path = location.pathname.toLowerCase().split('/')[1] as Route;
@@ -108,6 +109,11 @@ export const Layout: FC = ({ children }) => {
   const isIframe = isInIframe();
   const hideControls = isIframe || isLedgerLive;
   const hideOptionalLinks = isLedgerLive;
+  const [walletNetwork, selectWalletNetwork] = useState('');
+
+  useEffect(() => {
+    console.log('testing network and wallet return', walletNetworkChain, currentNetwork);
+  }, []);
 
   let vaultName;
   let titleLink;
@@ -202,7 +208,7 @@ export const Layout: FC = ({ children }) => {
           addressEnsName={addressEnsName}
           onWalletClick={() => dispatch(WalletActions.walletSelect({ network: currentNetwork }))}
           disableWalletSelect={hideControls || isCoinbaseApp()}
-          selectedNetwork={currentNetwork}
+          selectedNetwork={walletNetworkChain || currentNetwork}
           networkOptions={DEBT_DAO_NETWORKS}
           onNetworkChange={(network) => dispatch(NetworkActions.changeNetwork({ network: network as Network }))}
           disableNetworkChange={hideControls}

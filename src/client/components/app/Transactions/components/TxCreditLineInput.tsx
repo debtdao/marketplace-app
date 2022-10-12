@@ -343,7 +343,7 @@ export const TxCreditLineInput: FC<TxCreditLineInputProps> = ({
           </CreditLineSelector>
           <CreditLineData>
             <AmountTitle> Borrower Name / ENS </AmountTitle>
-            <AmountTitle> {selectedCredit?.borrower || `0xDebf...1dao`}</AmountTitle>
+            <AmountTitle> {selectedCredit.id || `0xDebf...1dao`}</AmountTitle>
           </CreditLineData>
         </CreditLineInfo>
       </>

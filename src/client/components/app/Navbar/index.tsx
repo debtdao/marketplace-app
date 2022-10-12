@@ -120,7 +120,10 @@ export const Navbar = ({
     label: NETWORK_SETTINGS[selectedNetwork].name,
     Icon: getNetworkIcon(selectedNetwork),
   };
-  const dropdownNetworkOptions = networkOptions.map((network, i) => ({
+
+  const SupportedDebtDAOnetworks = networkOptions.filter((network) => network === 'goerli');
+
+  const dropdownNetworkOptions = SupportedDebtDAOnetworks.map((network, i) => ({
     value: network,
     label: NETWORK_SETTINGS[network].name,
     Icon: getNetworkIcon(network),

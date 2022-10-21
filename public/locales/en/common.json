@@ -127,7 +127,7 @@
         "header": "Setup deal terms",
         "select-credit": "1. Select a borrower to lend to",
         "select-token": "2. Select token and amount",
-        "select-rates": "3. Set interest rates"
+        "select-rates": "3. Set interest rates."
       },
       "arbiter-liquidate": {
         "header": "Liquidate Borrowers",

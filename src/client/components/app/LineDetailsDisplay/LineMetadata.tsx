@@ -25,7 +25,7 @@ const SectionHeader = styled.h3`
     font-size: ${theme.fonts.sizes.xl};
     font-weight: 600;
     margin: ${theme.spacing.xl} 0;
-    color: ${theme.colors.primary};
+    color: ${theme.colors.titles};
   `}
 `;
 
@@ -40,7 +40,7 @@ const MetricName = styled.h3`
     font-size: ${theme.fonts.sizes.lg};
     font-weight: 600;
     margin-bottom: ${theme.spacing.md};
-    color: ${theme.colors.primary};
+    color: ${theme.colors.titles};
   `}
 `;
 

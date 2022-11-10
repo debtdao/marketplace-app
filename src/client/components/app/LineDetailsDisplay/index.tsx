@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { AggregatedCreditLine, CreditLinePage } from '@src/core/types';
+import { AggregatedCreditLine, CreditLinePage, LinePageCreditPosition } from '@src/core/types';
 import { useAppTranslation } from '@hooks';
 import { Text } from '@components/common';
 
 import { LineMetadata } from './LineMetadata';
-import { CreditEventsTable } from './CreditEventsTable';
+import { CreditPositionsTable } from './CreditPositionsTable';
 
 interface LineDetailsProps {
   line?: AggregatedCreditLine;
@@ -24,6 +24,7 @@ const Header = styled.h1`
   ${({ theme }) => `
     margin-bottom: ${theme.spacing.xl};
     font-size: ${theme.fonts.sizes.xl};
+    color: ${theme.colors.titles};
   `};
 `;
 
@@ -37,7 +38,7 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
 
   const [allDataLoaded, setAllDataLoaded] = useState(false);
   const [lineData, setLineData] = useState<AggregatedCreditLine | CreditLinePage>(line!);
-  const [positions, setPositions] = useState<[]>();
+  const [positions, setPositions] = useState<LinePageCreditPosition[]>();
 
   useEffect(() => {
     if (page && page.positions) {
@@ -75,7 +76,7 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
           startTime={start}
           endTime={end}
         />
-        <CreditEventsTable events={positions} />
+        <CreditPositionsTable positions={positions} />
       </Container>
     );
   } else {

@@ -9,8 +9,8 @@ import {
   LineActionsStatusMap,
   AggregatedCreditLine,
   Address,
+  CreditPosition,
   CreditLinePage,
-  PositionInt,
   UserPositionMetadata,
   BORROWER_POSITION_ROLE,
   LENDER_POSITION_ROLE,
@@ -26,11 +26,8 @@ const { ZERO_ADDRESS } = getConstants();
 /* ---------------------------------- State --------------------------------- */
 const selectUserWallet = (state: RootState) => state.wallet.selectedAddress;
 const selectLinesState = (state: RootState) => state.lines;
-const selectUserLinesPositionsMap = (state: RootState) =>
-  _.filter(
-    state.lines.user.linePositions,
-    (p) => state.wallet.selectedAddress !== p.lender || state.wallet.selectedAddress !== p.borrower
-  );
+const selectUserLinesPositionsMap = (state: RootState) => state.lines.user.linePositions;
+
 // const selectUserLinesMetadataMap = (state: RootState) => state.lines.user.userLinesMetadataMap;
 const selectLinesMap = (state: RootState) => state.lines.linesMap;
 const selectLinePagesMap = (state: RootState) => state.lines.pagesMap;
@@ -196,7 +193,7 @@ const selectPositionData = createSelector(
 
     let selectedPositionData = _.find(
       line?.positions,
-      (position: PositionInt) => position.id === selectSelectedPosition
+      (position: CreditPosition) => position.id === selectSelectedPosition
     );
     return selectedPositionData;
   }

@@ -13,7 +13,7 @@ import {
   TransactionResponse,
   STATUS,
   ExecuteTransactionProps,
-  Credit,
+  CreditPosition,
   GetLineProps,
   GetLinesProps,
   GetLinePageProps,
@@ -108,7 +108,7 @@ export class CreditLineServiceImpl implements CreditLineService {
       const populatedTrx = await this.executeContractMethod(
         props.lineAddress,
         'setRates',
-        [props.id, props.drate, props.frate],
+        [props.id, props.dRate, props.fRate],
         'goerli',
         true
       );
@@ -121,7 +121,7 @@ export class CreditLineServiceImpl implements CreditLineService {
       }
       //@ts-ignore
       return (<TransactionResponse>(
-        await this.executeContractMethod(props.lineAddress, 'setRates', [props.id, props.drate, props.frate], 'goerli')
+        await this.executeContractMethod(props.lineAddress, 'setRates', [props.id, props.dRate, props.fRate], 'goerli')
       )).hash;
     } catch (e) {
       console.log(`An error occured while setting rate, error = [${JSON.stringify(e)}]`);
@@ -226,15 +226,15 @@ export class CreditLineServiceImpl implements CreditLineService {
       //const populatedTrx = await this.executeContractMethod(
       //props.lineAddress,
       //'addCredit',
-      //[props.drate, props.frate, props.amount, props.token, props.lender],
+      //[props.dRate, props.fRate, props.amount, props.token, props.lender],
       //true
       //);
       // check mutualConsent
       console.log('this is line address', line);
 
       let data = {
-        drate: props.drate,
-        frate: props.frate,
+        dRate: props.dRate,
+        fRate: props.fRate,
         amount: props.amount,
         token: props.token,
         lender: props.lender,
@@ -245,7 +245,7 @@ export class CreditLineServiceImpl implements CreditLineService {
         await this.executeContractMethod(
           line,
           'addCredit',
-          [data.drate, data.frate, data.amount, data.token, data.lender],
+          [data.dRate, data.fRate, data.amount, data.token, data.lender],
           props.network,
           true
         )
@@ -323,7 +323,7 @@ export class CreditLineServiceImpl implements CreditLineService {
     return await this._getContract(contractAddress).ids(0);
   }
 
-  public async getCredit(contractAddress: string, id: BytesLike): Promise<Credit> {
+  public async getCredit(contractAddress: string, id: BytesLike): Promise<CreditPosition> {
     return await this._getContract(contractAddress).credits(id);
   }
 

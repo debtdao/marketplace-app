@@ -119,8 +119,8 @@ const StyledTxTokenInput = styled(TransitionGroup)`
 `;
 
 export interface TxRateInputProps {
-  frate?: string;
-  drate?: string;
+  fRate?: string;
+  dRate?: string;
   headerText: string;
   amount: string;
   maxAmount?: string;
@@ -141,8 +141,8 @@ export interface TxRateInputProps {
 }
 
 export const TxRateInput: FC<TxRateInputProps> = ({
-  frate,
-  drate,
+  fRate,
+  dRate,
   headerText,
   inputError,
   amount,
@@ -193,7 +193,7 @@ export const TxRateInput: FC<TxRateInputProps> = ({
                 </AmountTitle>
                 <InterestRateInputContainer>
                   <StyledAmountInput
-                    value={frate}
+                    value={fRate}
                     onChange={setRateChange ? (e) => setRateChange('f', e.target.value) : undefined}
                     placeholder={'15.00'}
                     readOnly={readOnly}
@@ -208,7 +208,7 @@ export const TxRateInput: FC<TxRateInputProps> = ({
                 <AmountTitle ellipsis>{'Facility Rate' || t('components.transaction.deposit.rates-title')}</AmountTitle>
                 <InterestRateInputContainer>
                   <StyledAmountInput
-                    value={drate}
+                    value={dRate}
                     onChange={setRateChange ? (e) => setRateChange('d', e.target.value) : undefined}
                     placeholder={'25.00'}
                     readOnly={readOnly}

@@ -2,6 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
 import { useHistory } from 'react-router-dom';
+import _ from 'lodash';
 
 import { formatAmount, normalizeAmount, isAddress, toWei } from '@utils';
 import {
@@ -11,9 +12,16 @@ import {
   useAppSelector,
   useSelectedSellToken,
 } from '@hooks';
-import { ACTIVE_STATUS, BORROWER_POSITION_ROLE, PositionInt } from '@src/core/types';
+import { ACTIVE_STATUS, BORROWER_POSITION_ROLE } from '@src/core/types';
 import { getConstants } from '@src/config/constants';
-import { TokensActions, TokensSelectors, WalletSelectors, LinesSelectors, LinesActions } from '@store';
+import {
+  TokensActions,
+  TokensSelectors,
+  WalletSelectors,
+  LinesSelectors,
+  LinesActions,
+  selectDepositTokenOptionsByAsset,
+} from '@store';
 import { Button } from '@components/common';
 
 import { TxContainer } from './components/TxContainer';
@@ -128,8 +136,8 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const [transactionApproved, setTransactionApproved] = useState(true);
   const [transactionLoading, setLoading] = useState(false);
   const [targetTokenAmount, setTargetTokenAmount] = useState('1');
-  const [drate, setDrate] = useState('0.00');
-  const [frate, setFrate] = useState('0.00');
+  const [dRate, setDrate] = useState('0.00');
+  const [fRate, setFrate] = useState('0.00');
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
   const [lenderAddress, setLenderAddress] = useState(walletAddress ? walletAddress : '');
   const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
@@ -138,12 +146,9 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const acceptingOffer = props.acceptingOffer || (userMetadata.role === BORROWER_POSITION_ROLE && !!selectedPosition);
 
   //main net logic
-  const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
-  const initialToken: string = selectedSellTokenAddress || DAI;
-  const { selectedSellToken, sourceAssetOptions } = useSelectedSellToken({
-    selectedSellTokenAddress: initialToken,
-    allowTokenSelect: true,
-  });
+  const selectedCreditTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
+  const creditTokenlOptions = [...useAppSelector(selectDepositTokenOptionsByAsset)(), ...testTokens];
+  const selectedCreditToken = _.find(creditTokenlOptions, (t) => t.address === selectedCreditTokenAddress);
 
   useEffect(() => {
     if (selectedPosition && userMetadata.role === BORROWER_POSITION_ROLE) {
@@ -152,29 +157,29 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       let deposit = normalizeAmount(selectedPosition.deposit, 18);
       setTargetTokenAmount(deposit);
       setTestnetTokenAmount(deposit);
-      setSelectedTokenAddress(selectedPosition.tokenAddress);
-      setTestnetToken(selectedPosition.tokenAddress);
-      setDrate(selectedPosition.drate);
-      setFrate(selectedPosition.frate);
+      setSelectedTokenAddress(selectedPosition.token.address);
+      setTestnetToken(selectedPosition.token.address);
+      setDrate(selectedPosition.dRate);
+      setFrate(selectedPosition.fRate);
       setLenderAddress(selectedPosition.lender);
     }
   }, [selectedPosition]);
 
   useEffect(() => {
-    if (!selectedSellToken) {
+    if (!selectedCreditToken) {
       dispatch(
         TokensActions.setSelectedTokenAddress({
-          tokenAddress: sourceAssetOptions[0].address,
+          tokenAddress: creditTokenlOptions[0].address,
         })
       );
     }
-    if (selectedTokenAddress === '' && selectedSellToken) {
-      setSelectedTokenAddress(selectedSellToken.address);
+    if (selectedTokenAddress === '' && selectedCreditToken) {
+      setSelectedTokenAddress(selectedCreditToken.address);
     }
 
     if (
       !selectedCredit ||
-      !selectedSellToken
+      !selectedCreditToken
       // toBN(targetTokenAmount).lte(0) ||
       // inputError ||
     ) {
@@ -184,7 +189,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       setTestnetToken(selectedSellTestToken.address);
     }
     // dispatch(CreditLineActions.getCreditLinesDynamicData({ addresses: [initialToken] })); // pulled from DepositTX, not sure why data not already filled
-  }, [selectedSellToken, walletNetwork]);
+  }, [selectedCreditToken, walletNetwork]);
 
   // Event Handlers
 
@@ -234,9 +239,11 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
     }
     console.log(testnetTokenAmount, 'this is raw amount');
     console.log(ethers.utils.parseEther(testnetTokenAmount).toString(), 'this is BN');
+
+    // TODO Sero remove tesnet logic
     let approvalOBj = {
       spenderAddress: selectedCredit.id,
-      tokenAddress: walletNetwork === 'goerli' ? testnetToken : selectedSellTokenAddress,
+      tokenAddress: walletNetwork === 'goerli' ? testnetToken : selectedCreditTokenAddress,
       amount: walletNetwork === 'goerli' ? ethers.utils.parseEther(testnetTokenAmount) : toWei(targetTokenAmount, 18),
       network: walletNetwork,
     };
@@ -264,7 +271,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const addCreditPosition = async () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    if (!selectedCredit?.id || !drate || !frate || lenderAddress === '') {
+    if (!selectedCredit?.id || !dRate || !fRate || lenderAddress === '') {
       setLoading(false);
       return;
     }
@@ -277,10 +284,10 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
     console.log(ethers.utils.parseEther(testnetTokenAmount).toString());
     let TransactionObj = {
       lineAddress: selectedCredit.id,
-      drate: drate,
-      frate: frate,
+      dRate,
+      fRate,
       amount: walletNetwork === 'goerli' ? ethers.utils.parseEther(testnetTokenAmount) : toWei(targetTokenAmount, 18),
-      token: walletNetwork === 'goerli' ? testnetToken : selectedSellTokenAddress,
+      token: walletNetwork === 'goerli' ? testnetToken : selectedCreditTokenAddress,
       lender: lenderAddress,
       network: walletNetwork,
       dryRun: false,
@@ -327,10 +334,10 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
           },
         ];
 
-  if (!selectedSellToken) return null;
+  if (!selectedCreditToken) return null;
   if (!selectedCredit) return null;
 
-  const targetBalance = normalizeAmount(selectedSellToken.balance, selectedSellToken.decimals);
+  const targetBalance = normalizeAmount(selectedCreditToken.balance, selectedCreditToken.decimals);
   const tokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(targetBalance, 4)}`;
 
   if (transactionCompleted === 1) {
@@ -409,9 +416,9 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
             onAmountChange={onAmountChange}
             amountValue={String(10000000 * Number(targetTokenAmount))}
             maxAmount={acceptingOffer ? targetTokenAmount : targetBalance}
-            selectedToken={selectedSellToken}
+            selectedToken={selectedCreditToken}
             onSelectedTokenChange={onSelectedSellTokenChange}
-            tokenOptions={sourceAssetOptions}
+            tokenOptions={creditTokenlOptions}
             // inputError={!!sourceStatus.error}
             readOnly={acceptingOffer}
             // displayGuidance={displaySourceGuidance}
@@ -450,11 +457,11 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       <TokenInput />
 
       <TxRateInput
-        key={'frate'}
+        key={'fRate'}
         headerText={t('components.transaction.add-credit.select-rates')}
-        frate={frate}
-        drate={drate}
-        amount={frate}
+        fRate={fRate}
+        dRate={dRate}
+        amount={fRate}
         maxAmount={MAX_INTEREST_RATE.toString()}
         // setRateChange={onFrateChange}
         setRateChange={onRateChange}

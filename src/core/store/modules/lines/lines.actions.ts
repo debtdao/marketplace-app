@@ -13,7 +13,7 @@ import {
   GetLineArgs,
   GetLinesArgs,
   GetLinePageArgs,
-  PositionSummary,
+  UserPositionSummary,
   AddCreditProps,
   UseCreditLinesParams,
   BorrowCreditProps,
@@ -140,7 +140,7 @@ const getLinePage = createAsyncThunk<{ linePageData: CreditLinePage | undefined 
 );
 
 const getUserLinePositions = createAsyncThunk<
-  { userLinesPositions: PositionSummary[] },
+  { userLinesPositions: UserPositionSummary[] },
   { lineAddresses?: string[] },
   ThunkAPI
 >('lines/getUserLinePositions', async ({ lineAddresses }, { extra, getState }) => {
@@ -239,6 +239,7 @@ const approveDeposit = createAsyncThunk<
     spenderAddress: spenderAddress,
     amount: unnullify(amount, true),
   });
+  console.log('approve deposit', tokenAddress, accountAddress, spenderAddress);
   console.log('this is approval', approveDepositTx);
 });
 
@@ -263,7 +264,7 @@ const borrowCredit = createAsyncThunk<void, BorrowCreditProps, ThunkAPI>(
 
 const addCredit = createAsyncThunk<void, AddCreditProps, ThunkAPI>(
   'lines/addCredit',
-  async ({ lineAddress, drate, frate, amount, token, lender, network }, { extra, getState, dispatch }) => {
+  async ({ lineAddress, dRate, fRate, amount, token, lender, network }, { extra, getState, dispatch }) => {
     const { wallet } = getState();
     const { services } = extra;
     const userAddress = wallet.selectedAddress;
@@ -274,8 +275,8 @@ const addCredit = createAsyncThunk<void, AddCreditProps, ThunkAPI>(
     const { creditLineService } = services;
     const tx = await creditLineService.addCredit({
       lineAddress: lineAddress,
-      drate: drate,
-      frate: frate,
+      dRate: dRate,
+      fRate: fRate,
       amount: amount,
       token: token,
       lender: lender,

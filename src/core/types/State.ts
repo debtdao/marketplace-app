@@ -9,7 +9,7 @@ import {
   CreditLinePage,
   UserLineMetadataStatusMap,
   AggregatedCreditLine,
-  PositionSummary,
+  UserPositionSummary,
 } from './CreditLine';
 import {
   Position,
@@ -39,6 +39,7 @@ export interface RootState {
   // debt dao
   lines: CreditLineState;
   collateral: CollateralState;
+  // chainMetadataState: ChainMetdataState;
 }
 
 export interface AppState {
@@ -104,6 +105,11 @@ export interface VaultTransaction {
   expectedOutcome: TransactionOutcome | undefined;
 }
 
+export interface ChainMetdataState {
+  abis: { [contract: string]: Array<any> };
+  ensNames: { [address: string]: string };
+}
+
 export interface CreditLineState {
   selectedLineAddress: string | undefined;
   selectedPosition: string | undefined;
@@ -112,7 +118,7 @@ export interface CreditLineState {
   pagesMap: { [lineAddress: string]: CreditLinePage };
   categories: { [category: string]: string[] };
   user: {
-    linePositions: { [positionId: string]: PositionSummary };
+    linePositions: { [positionId: string]: UserPositionSummary };
     lineAllowances: { [line: string]: { [token: string]: Integer } };
   };
   statusMap: {

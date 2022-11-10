@@ -25,7 +25,7 @@ const ItemCard = styled(FlatCard)<{ onClick: any }>`
   ${({ onClick, theme }) => `
     box-shadow: 0px 4px 10px 2px rgba(0, 0, 0, 0.5);
     background: ${theme.colors.background};
-    color: ${theme.colors.primary};
+    color: ${theme.colors.titles};
 
     ${
       onClick &&
@@ -34,7 +34,7 @@ const ItemCard = styled(FlatCard)<{ onClick: any }>`
       &:hover {
         filter: brightness(85%);
         ${TokenListIcon} {
-          color: ${theme.colors.primary};
+          color: ${theme.colors.titles};
         }
       }`
     }

@@ -23,7 +23,7 @@ import {
   Network,
   TokenAllowance,
   AggregatedCreditLine,
-  Credit,
+  CreditPosition,
   GetLineArgs,
   GetLinesArgs,
   GetLinePageArgs,
@@ -175,7 +175,7 @@ export interface CreditLineService {
 
   // helpers
   getFirstID: (contractAddress: string) => Promise<BytesLike>;
-  getCredit: (contractAddress: string, id: BytesLike) => Promise<Credit>;
+  getCredit: (contractAddress: string, id: BytesLike) => Promise<CreditPosition>;
   getLenderByCreditID: (contractAddress: string, id: BytesLike) => Promise<Address>;
   getInterestRateContract: (contractAddress: string) => Promise<Address>;
   borrower: (contractAddress: string) => Promise<Address>;
@@ -202,8 +202,8 @@ export interface CreditLineService {
 export interface AddCreditProps {
   lineAddress: string;
   token: Address;
-  drate: BigNumber;
-  frate: BigNumber;
+  dRate: BigNumber;
+  fRate: BigNumber;
   amount: BigNumber;
   lender: Address;
   network: Network;
@@ -232,8 +232,8 @@ export interface SetRatesProps {
   dryRun?: boolean;
   lineAddress: string;
   id: string;
-  frate: string;
-  drate: string;
+  fRate: string;
+  dRate: string;
 }
 export interface IncreaseCreditProps {
   lineAddress: string;

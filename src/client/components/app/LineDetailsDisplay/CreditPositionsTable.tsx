@@ -7,7 +7,13 @@ import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { device } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer, SliderCard } from '@components/app';
 import { Input, SearchIcon, Text, Button } from '@components/common';
-import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE } from '@src/core/types';
+import {
+  ARBITER_POSITION_ROLE,
+  BORROWER_POSITION_ROLE,
+  CreditEvent,
+  CreditPosition,
+  LENDER_POSITION_ROLE,
+} from '@src/core/types';
 import { humanize } from '@src/utils';
 
 const PositionsCard = styled(DetailCard)`
@@ -40,12 +46,12 @@ const TableHeader = styled.h3`
     font-size: ${theme.fonts.sizes.xl};
     font-weight: 600;
     margin: ${theme.spacing.xl} 0;
-    color: ${theme.colors.primary};
+    color: ${theme.colors.titles};
   `}
 `;
 
-interface CreditEventsTableProps {
-  events: [];
+interface CreditPositionsTableProps {
+  positions: CreditPosition[];
 }
 
 const BannerCtaButton = styled(Button)`
@@ -54,14 +60,14 @@ const BannerCtaButton = styled(Button)`
   margin-top: 1em;
 `;
 
-export const CreditEventsTable = (props: CreditEventsTableProps) => {
+export const CreditPositionsTable = (props: CreditPositionsTableProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const userRoleMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const selectedPosition = useAppSelector(LinesSelectors.selectPositionData);
   const [actions, setActions] = useState([]);
-  const { events } = props;
+  const { positions } = props;
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -150,19 +156,19 @@ export const CreditEventsTable = (props: CreditEventsTableProps) => {
     dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
   };
 
-  console.log('credit events table', events);
+  console.log('credit events table', positions);
   return (
     <>
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
-      {isEmpty(events) ? (
+      {isEmpty(positions) ? (
         <SliderCard
-          header={t('lineDetails:positions-events.header')}
+          header={t('lineDetails:positions-table.header')}
           Component={
             <Text>
-              <p>{t('lineDetails:positions-events.no-data')}</p>
+              <p>{t('lineDetails:positions-table.no-data')}</p>
 
               <BannerCtaButton styling="primary" onClick={depositHandler}>
-                {t('lineDetails:positions-events.propose-position')}
+                {t('lineDetails:positions-table.propose-position')}
               </BannerCtaButton>
             </Text>
           }
@@ -171,7 +177,7 @@ export const CreditEventsTable = (props: CreditEventsTableProps) => {
         <ViewContainer>
           <PositionsCard
             header={t('components.positions-card.positions')}
-            data-testid="vaults-opportunities-list"
+            data-testid="line-positions-table"
             metadata={[
               /** @TODO add tags e.g. spigot here */
               {
@@ -203,15 +209,15 @@ export const CreditEventsTable = (props: CreditEventsTableProps) => {
                 className: 'col-assets',
               },
               {
-                key: 'drate',
-                header: t('components.positions-card.drate'),
+                key: 'dRate',
+                header: t('components.positions-card.dRate'),
                 sortable: true,
                 width: '7rem',
                 className: 'col-assets',
               },
               {
-                key: 'frate',
-                header: t('components.positions-card.frate'),
+                key: 'fRate',
+                header: t('components.positions-card.fRate'),
                 sortable: true,
                 width: '7rem',
                 className: 'col-assets',
@@ -223,21 +229,21 @@ export const CreditEventsTable = (props: CreditEventsTableProps) => {
                 grow: '1',
               },
             ]}
-            data={events.map((event) => ({
+            data={positions.map(({ id, status, deposit, dRate, fRate, lender, token }) => ({
               // this needs to be humanized to correct amount depending on the token.
-              deposit: humanize('amount', event['deposit'], 18, 2),
-              drate: `${event['drate']} %`,
-              frate: `${event['frate']} %`,
-              status: event['status'],
-              lender: event['lender'],
-              token: event['tokenSymbol'],
+              deposit: humanize('amount', deposit, 18, 2),
+              dRate: `${dRate} %`,
+              fRate: `${fRate} %`,
+              status: status,
+              lender: lender,
+              token: token.symbol,
               actions: (
                 <ActionButtons
-                  value={event['id']}
+                  value={id}
                   actions={
-                    event['status'] === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE
+                    status === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE
                       ? [ApproveMutualConsent]
-                      : event['lender'] === userWallet
+                      : lender === userWallet
                       ? actions
                       : userRoleMetadata.role === BORROWER_POSITION_ROLE
                       ? actions

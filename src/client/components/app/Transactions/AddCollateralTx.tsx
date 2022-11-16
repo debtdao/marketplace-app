@@ -136,14 +136,21 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
         <BadLineErrorContainer>
           <BadLineErrorBody>{t('components.transaction.add-collateral.no-assets-enabled.body')}</BadLineErrorBody>
           {userMetadata.role !== ARBITER_POSITION_ROLE ? (
-            <>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexDirection: 'row',
+              }}
+            >
               <StyledTxActionButton color="primary" onClick={onClose}>
                 {t('components.transaction.add-collateral.no-assets-enabled.find-cta')}
               </StyledTxActionButton>
               <StyledTxActionButton color="primary" onClick={onClose}>
                 {t('components.transaction.add-collateral.no-assets-enabled.login-cta')}
               </StyledTxActionButton>
-            </>
+            </div>
           ) : (
             <StyledTxActionButton color="primary" onClick={onClose}>
               {t('components.transaction.add-collateral.no-assets-enabled.enable-cta')}

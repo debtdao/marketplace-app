@@ -158,8 +158,8 @@ export interface CreditLineService {
   getUserLinePositions: (...args: any) => Promise<any | undefined>;
   getExpectedTransactionOutcome: (...args: any) => Promise<any | undefined>;
   depositAndRepay: (
-    props: DepositAndRepayProps,
-    interest: InterestRateCreditService
+    props: DepositAndRepayProps
+    //interest: InterestRateCreditService
   ) => Promise<TransactionResponse | PopulatedTransaction>;
   depositAndClose: (props: DepositAndCloseProps) => Promise<TransactionResponse | PopulatedTransaction>;
   addCredit: (props: AddCreditProps) => Promise<TransactionResponse | PopulatedTransaction>;

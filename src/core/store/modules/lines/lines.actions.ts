@@ -306,7 +306,6 @@ const depositAndRepay = createAsyncThunk<
   void,
   {
     lineAddress: string;
-    tokenAddress: string;
     amount: BigNumber;
     network: Network;
     slippageTolerance?: number;
@@ -315,7 +314,7 @@ const depositAndRepay = createAsyncThunk<
 >(
   'lines/depositAndRepay',
 
-  async ({ lineAddress, tokenAddress, amount, network }, { extra, getState, dispatch }) => {
+  async ({ lineAddress, amount, network }, { extra, getState, dispatch }) => {
     const { wallet, lines, tokens } = getState();
     const { services } = extra;
 
@@ -341,22 +340,20 @@ const depositAndRepay = createAsyncThunk<
     // TODO: fix BigNumber type difference issues
     // const amountInWei = amount.multipliedBy(ONE_UNIT);
     // const { creditLineService, transactionService } = services;
-    const tx = await creditLineService.depositAndRepay(
-      {
-        lineAddress: lineAddress,
-        amount: amount,
-        network: network,
-      },
-      interestRateCreditService
-    );
+    console.log('line address', lineAddress, 'amount', amount, 'network', network);
+    const tx = await creditLineService.depositAndRepay({
+      lineAddress: lineAddress,
+      amount: amount,
+      network: network,
+    });
     console.log(tx);
     // const notifyEnabled = app.servicesEnabled.notify;
     // await transactionService.handleTransaction({ tx, network: network.current, useExternalService: notifyEnabled });
-    dispatch(getLinePage({ id: lineAddress }));
+    //dispatch(getLinePage({ id: lineAddress }));
     // dispatch(getUserLinesSummary());
-    dispatch(getUserLinePositions({ lineAddresses: [lineAddress] }));
+    //dispatch(getUserLinePositions({ lineAddresses: [lineAddress] }));
     // dispatch(getUserLinesMetadata({ linesAddresses: [lineAddress] }));
-    dispatch(TokensActions.getUserTokens({ addresses: [tokenAddress, lineAddress] }));
+    //dispatch(TokensActions.getUserTokens({ addresses: [tokenAddress, lineAddress] }));
   },
   {
     // serializeError: parseError,

@@ -232,14 +232,14 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
             label: t('components.transaction.approve'),
             onAction: approveCreditPosition,
             status: true,
-            disabled: !transactionApproved,
+            disabled: transactionApproved,
             contrast: false,
           },
           {
             label: t('components.transaction.deposit'),
             onAction: addCreditPosition,
             status: true,
-            disabled: transactionApproved,
+            disabled: !transactionApproved,
             contrast: true,
           },
         ];

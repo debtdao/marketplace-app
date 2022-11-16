@@ -269,17 +269,19 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 
     /* ------------------------------ depositAndRepay ------------------------------ */
     .addCase(depositAndRepay.pending, (state, { meta }) => {
-      const lineAddress = meta.arg.lineAddress;
-      state.statusMap.user.linesActionsStatusMap[lineAddress].deposit = { loading: true };
+      //const lineAddress = meta.arg.lineAddress;
+      console.log('state', state);
+      //state.statusMap.user.linesActionsStatusMap[lineAddress].deposit = { loading: true };
     })
     .addCase(depositAndRepay.fulfilled, (state, { meta }) => {
-      const lineAddress = meta.arg.lineAddress;
-      state.statusMap.user.linesActionsStatusMap[lineAddress].deposit = {};
+      //const lineAddress = meta.arg.lineAddress;
+      console.log('state', state);
+      //state.statusMap.user.linesActionsStatusMap[lineAddress].deposit = {};
     })
     .addCase(depositAndRepay.rejected, (state, { error, meta }) => {
-      const lineAddress = meta.arg.lineAddress;
-      console.log('error', error.message);
-      state.statusMap.user.linesActionsStatusMap[lineAddress].deposit = { error: error.message };
+      //const lineAddress = meta.arg.lineAddress;
+      console.log('error', error);
+      //state.statusMap.user.linesActionsStatusMap[lineAddress].deposit = { error: error.message };
     })
 
     /* ------------------------------ withdrawLine ----------------------------- */

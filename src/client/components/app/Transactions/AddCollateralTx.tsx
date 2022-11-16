@@ -70,6 +70,13 @@ const StyledTxActionButton = styled(Button)<{ color?: string; contrast?: boolean
   color: ${({ theme }) => theme.colors.txModalColors.onPrimary};
 `;
 
+const StyledTxContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+`;
+
 export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
@@ -136,14 +143,14 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
         <BadLineErrorContainer>
           <BadLineErrorBody>{t('components.transaction.add-collateral.no-assets-enabled.body')}</BadLineErrorBody>
           {userMetadata.role !== ARBITER_POSITION_ROLE ? (
-            <>
+            <StyledTxContainer>
               <StyledTxActionButton color="primary" onClick={onClose}>
                 {t('components.transaction.add-collateral.no-assets-enabled.find-cta')}
               </StyledTxActionButton>
               <StyledTxActionButton color="primary" onClick={onClose}>
                 {t('components.transaction.add-collateral.no-assets-enabled.login-cta')}
               </StyledTxActionButton>
-            </>
+            </StyledTxContainer>
           ) : (
             <StyledTxActionButton color="primary" onClick={onClose}>
               {t('components.transaction.add-collateral.no-assets-enabled.enable-cta')}

@@ -208,6 +208,11 @@
         "header": "Withdraw",
         "select-line": "1. Selected line to withdraw",
         "select-amount": "2. Select amount to withdraw"
+      },
+      "enable-spigot": {
+        "revenue-contract": "1. Revenue Contract",
+        "owner-split": "2. Owner Split",
+        "cta": "Enable Spigot"
       }
     }
   },

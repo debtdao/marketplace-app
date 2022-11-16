@@ -2,10 +2,10 @@ import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
 
-import { formatAmount, normalizeAmount } from '@utils';
+import { formatAmount, normalizeAmount, toWei } from '@utils';
 import { useAppTranslation, useAppDispatch, useAppSelector, useSelectedSellToken } from '@hooks';
 import { TokensActions, TokensSelectors, VaultsSelectors, LinesSelectors, LinesActions, WalletSelectors } from '@store';
-import { getConstants } from '@src/config/constants';
+import { getConstants, testTokens } from '@src/config/constants';
 import { PositionItem } from '@src/core/types';
 
 import { TxContainer } from './components/TxContainer';
@@ -39,6 +39,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
   const selectedPosition = useAppSelector(LinesSelectors.selectPositionData);
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionLoading, setLoading] = useState(false);
+  const [transactionApproved, setTransactionApproved] = useState(true);
   const [targetAmount, setTargetAmount] = useState('1');
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
   const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
@@ -111,6 +112,31 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
     }
   };
 
+  const approveRepay = () => {
+    setLoading(true);
+    if (!selectedCredit?.id) {
+      setLoading(false);
+      return;
+    }
+    let approvalOBj = {
+      spenderAddress: selectedCredit.id,
+      tokenAddress: selectedSellTokenAddress,
+      amount: toWei(targetAmount, 18),
+      network: walletNetwork,
+    };
+    //@ts-ignore
+    dispatch(LinesActions.approveDeposit(approvalOBj)).then((res) => {
+      if (res.meta.requestStatus === 'rejected') {
+        setTransactionApproved(transactionApproved);
+        setLoading(false);
+      }
+      if (res.meta.requestStatus === 'fulfilled') {
+        setTransactionApproved(!transactionApproved);
+        setLoading(false);
+      }
+    });
+  };
+
   const depositAndRepay = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
@@ -119,10 +145,11 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
       return;
     }
 
+    console.log('deposit and repay');
+
     dispatch(
       LinesActions.depositAndRepay({
         lineAddress: selectedCredit.id,
-        tokenAddress: selectedSellTokenAddress,
         amount: ethers.utils.parseEther(targetAmount),
         network: walletNetwork,
       })
@@ -150,7 +177,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
       LinesActions.depositAndClose({
         lineAddress: selectedCredit.id,
         //@ts-ignore
-        id: selectedPosition[0]['id'],
+        id: selectedPosition['id'],
         network: walletNetwork,
       })
     ).then((res) => {
@@ -194,6 +221,13 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
 
   const txActions = [
     {
+      label: t('components.transaction.approve'),
+      onAction: approveRepay,
+      status: true,
+      disabled: !transactionApproved,
+      contrast: false,
+    },
+    {
       label:
         repayType.value === 'Wallet'
           ? t('components.transaction.deposit-and-repay-header')
@@ -211,7 +245,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
           ? depositAndClose
           : () => {},
       status: true,
-      disabled: false,
+      disabled: transactionApproved,
       contrast: false,
     },
   ];
@@ -302,7 +336,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
         maxAmount={targetBalance}
         selectedToken={selectedSellToken}
         onSelectedTokenChange={onSelectedSellTokenChange}
-        tokenOptions={sourceAssetOptions}
+        tokenOptions={walletNetwork === 'goerli' ? testTokens : sourceAssetOptions}
         // inputError={!!sourceStatus.error}
         readOnly={acceptingOffer}
         // displayGuidance={displaySourceGuidance}

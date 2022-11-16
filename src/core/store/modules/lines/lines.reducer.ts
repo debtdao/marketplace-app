@@ -278,6 +278,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
     .addCase(depositAndRepay.rejected, (state, { error, meta }) => {
       const lineAddress = meta.arg.lineAddress;
+      console.log('error', error.message);
       state.statusMap.user.linesActionsStatusMap[lineAddress].deposit = { error: error.message };
     })
 

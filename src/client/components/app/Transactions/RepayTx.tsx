@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import { formatAmount, normalizeAmount } from '@utils';
 import { useAppTranslation, useAppDispatch, useAppSelector, useSelectedSellToken } from '@hooks';
 import { TokensActions, TokensSelectors, VaultsSelectors, LinesSelectors, LinesActions, WalletSelectors } from '@store';
-import { getConstants } from '@src/config/constants';
+import { getConstants, testTokens } from '@src/config/constants';
 import { PositionItem } from '@src/core/types';
 
 import { TxContainer } from './components/TxContainer';
@@ -119,6 +119,8 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
       return;
     }
 
+    console.log('deposit and repay');
+
     dispatch(
       LinesActions.depositAndRepay({
         lineAddress: selectedCredit.id,
@@ -150,7 +152,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
       LinesActions.depositAndClose({
         lineAddress: selectedCredit.id,
         //@ts-ignore
-        id: selectedPosition[0]['id'],
+        id: selectedPosition['id'],
         network: walletNetwork,
       })
     ).then((res) => {
@@ -302,7 +304,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
         maxAmount={targetBalance}
         selectedToken={selectedSellToken}
         onSelectedTokenChange={onSelectedSellTokenChange}
-        tokenOptions={sourceAssetOptions}
+        tokenOptions={walletNetwork === 'goerli' ? testTokens : sourceAssetOptions}
         // inputError={!!sourceStatus.error}
         readOnly={acceptingOffer}
         // displayGuidance={displaySourceGuidance}

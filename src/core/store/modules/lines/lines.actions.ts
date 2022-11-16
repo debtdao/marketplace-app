@@ -322,11 +322,7 @@ const depositAndRepay = createAsyncThunk<
     const userAddress = wallet.selectedAddress;
     if (!userAddress) throw new Error('WALLET NOT CONNECTED');
 
-    const userLineData = lines.user.linePositions[lineAddress];
-    const tokenData = tokens.tokensMap[tokenAddress];
-    const userTokenData = tokens.user.userTokensMap[tokenAddress];
-    const decimals = toBN(tokenData.decimals);
-    const ONE_UNIT = toBN('10').pow(decimals);
+    console.log('deposit in repay in state');
 
     const { creditLineService, interestRateCreditService } = services;
     // const { error: depositError } = validateLineDeposit({

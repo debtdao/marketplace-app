@@ -1,10 +1,8 @@
 import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { ethers, BigNumber } from 'ethers';
 import _ from 'lodash';
 import { useLocation, useHistory } from 'react-router-dom';
 
-import { formatAmount, normalizeAmount, toBN } from '@utils';
 import {
   useAppTranslation,
   useAppDispatch,

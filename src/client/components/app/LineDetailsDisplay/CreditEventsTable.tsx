@@ -99,6 +99,7 @@ export const CreditEventsTable = (props: CreditEventsTableProps) => {
         handler: (e: Event) => WithdrawHandler(e),
         disabled: false,
       });
+      console.log('withdraw');
     }
     //@ts-ignore
     if (userRoleMetadata.role === ARBITER_POSITION_ROLE) {
@@ -117,6 +118,8 @@ export const CreditEventsTable = (props: CreditEventsTableProps) => {
     dispatch(LinesActions.setSelectedLinePosition({ position: e.target.value }));
     dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
   };
+
+  console.log('user wallet and lender', userWallet);
 
   // THIS NEEDS REVISITNG
   const liquidateHandler = (e: Event) => {
@@ -236,11 +239,11 @@ export const CreditEventsTable = (props: CreditEventsTableProps) => {
                   actions={
                     event['status'] === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE
                       ? [ApproveMutualConsent]
-                      : event['lender'] === userWallet
+                      : event['lender'] === userWallet && event['status'] === 'OPEN'
                       ? actions
                       : userRoleMetadata.role === BORROWER_POSITION_ROLE
                       ? actions
-                      : []
+                      : actions
                   }
                 />
               ),

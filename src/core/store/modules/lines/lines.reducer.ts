@@ -284,16 +284,19 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 
     /* ------------------------------ withdrawLine ----------------------------- */
     .addCase(withdrawLine.pending, (state, { meta }) => {
-      const lineAddress = meta.arg.lineAddress;
-      state.statusMap.user.linesActionsStatusMap[lineAddress].withdraw = { loading: true };
+      //const lineAddress = meta.arg.lineAddress;
+      //state.statusMap.user.linesActionsStatusMap[lineAddress].withdraw = { loading: true };
+      state.statusMap.getAllowances = { loading: true };
     })
     .addCase(withdrawLine.fulfilled, (state, { meta }) => {
-      const lineAddress = meta.arg.lineAddress;
-      state.statusMap.user.linesActionsStatusMap[lineAddress].withdraw = {};
+      //const lineAddress = meta.arg.lineAddress;
+      //state.statusMap.user.linesActionsStatusMap[lineAddress].withdraw = {};
+      state.statusMap.getAllowances = { loading: true };
     })
     .addCase(withdrawLine.rejected, (state, { error, meta }) => {
-      const lineAddress = meta.arg.lineAddress;
-      state.statusMap.user.linesActionsStatusMap[lineAddress].withdraw = { error: error.message };
+      //const lineAddress = meta.arg.lineAddress;
+      //state.statusMap.user.linesActionsStatusMap[lineAddress].withdraw = { error: error.message };
+      state.statusMap.getAllowances = { loading: true };
     });
 });
 

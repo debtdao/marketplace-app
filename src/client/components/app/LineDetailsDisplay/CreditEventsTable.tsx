@@ -239,11 +239,11 @@ export const CreditEventsTable = (props: CreditEventsTableProps) => {
                   actions={
                     event['status'] === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE
                       ? [ApproveMutualConsent]
-                      : event['lender'] === userWallet && event['status'] === 'OPEN'
+                      : userRoleMetadata.role === LENDER_POSITION_ROLE
                       ? actions
                       : userRoleMetadata.role === BORROWER_POSITION_ROLE
                       ? actions
-                      : actions
+                      : []
                   }
                 />
               ),

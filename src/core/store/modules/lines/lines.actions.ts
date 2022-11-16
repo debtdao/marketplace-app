@@ -488,11 +488,12 @@ const withdrawLine = createAsyncThunk<
     lineAddress: string;
     amount: BigNumber;
     network: Network;
+    id: string;
   },
   ThunkAPI
 >(
   'lines/withdrawLine',
-  async ({ lineAddress, amount, network }, { extra, getState, dispatch }) => {
+  async ({ lineAddress, amount, network, id }, { extra, getState, dispatch }) => {
     const { wallet, lines } = getState();
     const { services, config } = extra;
 
@@ -505,13 +506,12 @@ const withdrawLine = createAsyncThunk<
     //});
     //if (networkError) throw networkError;
 
-    const lineData = lines.linesMap[lineAddress];
-    const userLineData = lines.user.linePositions[lineAddress];
+    //const userLineData = lines.user.linePositions[lineAddress];
     // selector for UserPositionMetadata to get available liquidity
-    const available = utils.parseUnits(userLineData.deposit, 'wei').sub(userLineData.principal);
+    //const available = utils.parseUnits(userLineData.deposit, 'wei').sub(userLineData.principal);
     // if requesting more than available or max available
-    const withdrawAll = amount.eq(config.MAX_UINT256) || amount.gte(available);
-    const amountOfShares = withdrawAll ? available : amount;
+    //const withdrawAll = amount.eq(config.MAX_UINT256) || amount.gte(available);
+    //const amountOfShares = withdrawAll ? available : amount;
 
     // const { error: withdrawError } = validateLineWithdraw({
     //   amount: toBN(normalizeAmount(amountOfShares, parseInt(tokenData.decimals))),
@@ -523,19 +523,20 @@ const withdrawLine = createAsyncThunk<
     // if (error) throw new Error(error);
     // TODO: fix BigNumber type difference issues
     const { creditLineService } = services;
+    console.log(lineAddress, 'lineaddress', amount, 'amount', network, 'network');
     const tx = await creditLineService.withdraw({
-      id: lineAddress,
-      amount: amountOfShares,
+      id: id,
+      amount: amount,
       lineAddress: lineAddress,
       network: network,
-      dryRun: true,
+      dryRun: false,
     });
     console.log(tx);
     // const notifyEnabled = app.servicesEnabled.notify;
     // await transactionService.handleTransaction({ tx, network: network.current, useExternalService: notifyEnabled });
-    dispatch(getLinePage({ id: lineAddress }));
+    //dispatch(getLinePage({ id: lineAddress }));
     // dispatch(getUserLinesSummary());
-    dispatch(getUserLinePositions({ lineAddresses: [lineAddress] }));
+    //dispatch(getUserLinePositions({ lineAddresses: [lineAddress] }));
     // dispatch(getUserLinesMetadata({ linesAddresses: [lineAddress] }));
     //dispatch(TokensActions.getUserTokens({ addresses: [targetTokenAddress, lineAddress] }));
   },

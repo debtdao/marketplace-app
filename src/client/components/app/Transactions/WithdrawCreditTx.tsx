@@ -36,6 +36,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
   const [transactionLoading, setLoading] = useState(false);
   const [targetAmount, setTargetAmount] = useState('1');
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
+  const selectedPosition = useAppSelector(LinesSelectors.selectPositionData);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
 
@@ -46,7 +47,6 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
     });
 
   // Event Handlers
-
   const onAmountChange = (amount: string): void => {
     setTargetAmount(amount);
     _updatePosition();
@@ -68,13 +68,14 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
   const withdrawCredit = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    if (!selectedCredit?.id || !targetAmount || walletNetwork === undefined) {
+    if (!selectedCredit?.id || !targetAmount || walletNetwork === undefined || selectedPosition === undefined) {
       setLoading(false);
       return;
     }
 
     dispatch(
       LinesActions.withdrawLine({
+        id: selectedPosition['id'],
         lineAddress: selectedCredit.id,
         amount: ethers.utils.parseEther(targetAmount),
         network: walletNetwork,

@@ -136,7 +136,7 @@ export interface UserPositionMetadata {
   available: string; // borrowable/withdrawable/liquidatable
 }
 
-// TODO consolidate PositonInt and PositionSummary types
+// TODO consolidate PositonInt andCreditPosition types
 export interface UserPositionSummary extends CreditPosition, UserPositionMetadata {}
 
 // Collateral Module Types

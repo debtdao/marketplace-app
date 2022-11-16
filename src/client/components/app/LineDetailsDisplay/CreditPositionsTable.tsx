@@ -65,7 +65,6 @@ export const CreditPositionsTable = (props: CreditPositionsTableProps) => {
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const userRoleMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
-  const selectedPosition = useAppSelector(LinesSelectors.selectPositionData);
   const [actions, setActions] = useState([]);
   const { positions } = props;
   const dispatch = useAppDispatch();

@@ -218,7 +218,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     //   state.statusMap.user.getUserLinePositions = { loading: true };
     // })
     // .addCase(getUserLinePositions.fulfilled, (state, { payload: { userLinesPositions } }) => {
-    //   // TODO fix data missmatch between types PositionSummary and BasicCreditLine
+    //   // TODO fix data missmatch between typesCreditPosition and BasicCreditLine
     //   // state.user.linePositions = userLinesPositions.reduce((map, line) => ({ ...map, [line]: state.linesMap[line]}), {});
     //   state.statusMap.user.getUserLinePositions = {};
     // })

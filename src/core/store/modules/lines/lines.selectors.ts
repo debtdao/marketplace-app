@@ -62,7 +62,7 @@ const selectLiveLines = createSelector([selectLines], (lines): AggregatedCreditL
 });
 
 // Not needed yet. TODO: Select all past-term lines
-// const selectDeprecatedLines = createSelector([selectLines], (lines): PositionSummary[] => {
+// const selectDeprecatedLines = createSelector([selectLines], (lines):CreditPosition[] => {
 //   const deprecatedLines = lines
 //     .filter((line) => line.hideIfNoDeposits)
 //     .map(({ token, ...rest }) => ({ token, ...rest }));
@@ -186,6 +186,14 @@ const selectSelectedLinePage = createSelector(
   }
 );
 
+const selectPositions = createSelector([selectSelectedLine], (line) => {
+  if (line === undefined) {
+    return;
+  }
+  let positions = line?.positions;
+  return positions;
+});
+
 const selectPositionData = createSelector(
   [selectSelectedLine, selectSelectedPosition],
   (line, selectSelectedPosition) => {
@@ -195,6 +203,7 @@ const selectPositionData = createSelector(
       line?.positions,
       (position: CreditPosition) => position.id === selectSelectedPosition
     );
+    console.log(selectedPositionData, 'e');
     return selectedPositionData;
   }
 );
@@ -271,7 +280,7 @@ const selectUserPositionMetadata = createSelector(
 // interface CreateLineProps {
 //   lineData: AggregatedCreditLine;
 //   // tokenAllowancesMap: AllowancesMap;
-//   positions: { [key: string]: PositionSummary };
+//   positions: { [key: string]:CreditPosition };
 //   // userLinesMetadataMap: UserPositionMetadata;
 //   lineAllowancesMap: AllowancesMap;
 // }
@@ -303,6 +312,7 @@ export const LinesSelectors = {
   selectSelectedLineAddress,
   selectLinesActionsStatusMap,
   selectLinesStatusMap,
+  selectPositions,
   selectLinesGeneralStatus,
   selectSelectedLine,
   selectSelectedLinePage,

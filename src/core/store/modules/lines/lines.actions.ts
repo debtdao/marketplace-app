@@ -13,7 +13,7 @@ import {
   GetLineArgs,
   GetLinesArgs,
   GetLinePageArgs,
-  UserPositionSummary,
+  CreditPosition,
   AddCreditProps,
   UseCreditLinesParams,
   BorrowCreditProps,
@@ -140,7 +140,7 @@ const getLinePage = createAsyncThunk<{ linePageData: CreditLinePage | undefined 
 );
 
 const getUserLinePositions = createAsyncThunk<
-  { userLinesPositions: UserPositionSummary[] },
+  { userLinesPositions: CreditPosition[] },
   { lineAddresses?: string[] },
   ThunkAPI
 >('lines/getUserLinePositions', async ({ lineAddresses }, { extra, getState }) => {
@@ -360,6 +360,7 @@ const claimAndRepay = createAsyncThunk<
     lineAddress: Address;
     claimToken: Address;
     calldata: BytesLike;
+    network: Network;
   },
   ThunkAPI
 >(
@@ -705,6 +706,7 @@ export const LinesActions = {
   approveDeposit,
   addCredit,
   depositAndRepay,
+  depositAndClose,
   borrowCredit,
   deploySecuredLine,
   // approveZapOut,

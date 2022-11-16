@@ -15,7 +15,7 @@ import {
   RevenueSummary,
   TokenView,
 } from '@src/core/types';
-import { DetailCard, ActionButtons, TokenIcon } from '@components/app';
+import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
 import { Button, Text, Tooltip } from '@components/common';
 import { LinesSelectors, ModalsActions, WalletSelectors } from '@src/core/store';
 import { humanize } from '@src/utils';
@@ -55,6 +55,8 @@ const DataSubMetricsContainer = styled.div``;
 const DataSubMetric = styled.p``;
 
 const AssetsListCard = styled(DetailCard)`
+  max-width: ${({ theme }) => theme.globalMaxWidth};
+  padding: ${({ theme }) => theme.card.padding};
   @media ${device.tablet} {
     .col-name {
       width: 18rem;
@@ -237,7 +239,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
       </ThreeColumnLayout>
 
       {(!isEmpty(deposits) || !isEmpty(revenue)) && (
-        <>
+        <ViewContainer>
           <AssetsListCard
             header={t('lineDetails:metadata.escrow.assets-list.title')}
             data-testid="line-assets-list"
@@ -308,7 +310,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
             initialSortBy="value"
             wrap
           />
-        </>
+        </ViewContainer>
       )}
     </>
   );

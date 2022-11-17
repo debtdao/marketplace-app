@@ -27,6 +27,7 @@ import { TxActions } from './components/TxActions';
 import { TxStatus } from './components/TxStatus';
 import { TxAddressInput } from './components/TxAddressInput';
 import { TxNumberInput } from './components/TxNumberInput';
+import { TxByteInput } from './components/TxByteInput';
 
 const StyledTransaction = styled(TxContainer)`
   min-height: 60vh;
@@ -100,6 +101,14 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       dispatch(CollateralActions.setSelectedEscrow({ escrowAddress: selectedLine.spigot.id }));
     }
   });
+
+  const handleClaimChange = (byteCode: string) => {
+    setClaimFunc(byteCode);
+  };
+
+  const handleTransferFuncChange = (byteCode: string) => {
+    setTransferFunc(byteCode);
+  };
 
   const notArbiter = selectedLine?.status === ACTIVE_STATUS; // TODO
   if (!notArbiter) {
@@ -194,11 +203,21 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   return (
     <StyledTransaction onClose={onClose} header={header}>
       <TxAddressInput headerText={t('components.transaction.enable-spigot.revenue-contract')} address="" />
-      <TxNumberInput
-        headerText={t('components.transaction.enable-spigot.owner-split')}
-        amount={settingOwnerSplit.toString()}
-        onInputChange={setOwnerSplit}
-        maxAmount={'100'}
+      <TxByteInput
+        headerText={t('components.transaction.enable-spigot.function-revenue')}
+        inputText={' '}
+        inputError={false}
+        byteCode={settingClaimFunc}
+        onByteCodeChange={handleClaimChange}
+        readOnly={false}
+      />
+      <TxByteInput
+        headerText={t('components.transaction.enable-spigot.function-transfer')}
+        inputText={' '}
+        inputError={false}
+        byteCode={settingTransferFunc}
+        onByteCodeChange={handleTransferFuncChange}
+        readOnly={false}
       />
 
       <TxActions>

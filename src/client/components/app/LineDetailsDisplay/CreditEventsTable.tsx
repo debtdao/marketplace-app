@@ -205,6 +205,20 @@ export const CreditEventsTable = (props: CreditEventsTableProps) => {
                 className: 'col-assets',
               },
               {
+                key: 'principle',
+                header: t('components.positions-card.principle'),
+                sortable: true,
+                width: '10rem',
+                className: 'col-assets',
+              },
+              {
+                key: 'interest',
+                header: t('components.positions-card.interest'),
+                sortable: true,
+                width: '10rem',
+                className: 'col-assets',
+              },
+              {
                 key: 'drate',
                 header: t('components.positions-card.drate'),
                 sortable: true,
@@ -232,6 +246,8 @@ export const CreditEventsTable = (props: CreditEventsTableProps) => {
               frate: `${event['frate']} %`,
               status: event['status'],
               lender: formatAddress(event['lender']),
+              principle: humanize('amount', event['principle'], 18, 2),
+              interest: humanize('amount', event['interestAccrued'], 18, 2),
               token: event['tokenSymbol'],
               actions: (
                 <ActionButtons

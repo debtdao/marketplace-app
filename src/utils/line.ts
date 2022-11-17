@@ -356,7 +356,7 @@ export const formatLinePageData = (
       lender: position.lender.id,
       interestAccrued: position.interestAccrued,
       interestRepaid: position.interestRepaid,
-      principal: position.principal,
+      principle: position.principal,
       id: position.id,
     };
 

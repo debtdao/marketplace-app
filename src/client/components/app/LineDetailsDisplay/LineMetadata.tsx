@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { device } from '@themes/default';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
-import { prettyNumbers } from '@src/utils';
+import { normalize, prettyNumbers } from '@src/utils';
 import {
   ARBITER_POSITION_ROLE,
   BORROWER_POSITION_ROLE,
@@ -83,6 +83,8 @@ interface LineMetadataProps {
   principal: string;
   deposit: string;
   totalInterestPaid: string;
+  totalOutstandingDebt: string;
+  totalCreditProvided: string;
   startTime: number;
   endTime: number;
   revenue?: { [token: string]: RevenueSummary };
@@ -125,8 +127,9 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const dispatch = useAppDispatch();
 
-  const { principal, deposit, totalInterestPaid, revenue, deposits } = props;
+  const { totalInterestPaid, totalOutstandingDebt, totalCreditProvided, revenue, deposits } = props;
   const modules = [revenue && 'revenue', deposits && 'escrow'].filter((x) => !!x);
+  console.log('interest', totalInterestPaid);
   const totalRevenue = isEmpty(revenue)
     ? ''
     : Object.values(revenue!)
@@ -232,11 +235,17 @@ export const LineMetadata = (props: LineMetadataProps) => {
   return (
     <>
       <ThreeColumnLayout>
-        <MetricDataDisplay title={t('lineDetails:metadata.principal')} data={`$ ${prettyNumbers(principal)}`} />
-        <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${prettyNumbers(deposit)}`} />
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.deposit')}
+          data={`$ ${normalize('amount', totalCreditProvided, 18)}`}
+        />
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.principal')}
+          data={`$ ${normalize('amount', totalOutstandingDebt, 18)}`}
+        />
         <MetricDataDisplay
           title={t('lineDetails:metadata.totalInterestPaid')}
-          data={`$ ${prettyNumbers(totalInterestPaid)}`}
+          data={`$ ${normalize('amount', totalInterestPaid, 18)}`}
         />
       </ThreeColumnLayout>
       <SectionHeader>

@@ -39,12 +39,26 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   const [allDataLoaded, setAllDataLoaded] = useState(false);
   const [lineData, setLineData] = useState<AggregatedCreditLine | CreditLinePage>(line!);
   const [positions, setPositions] = useState<[]>();
+  const [totalInterestPaid, setTotalInterestPaid] = useState('0');
+  const [totalOutstandingDebt, setTotalDebt] = useState('0');
+  const [totalCreditProvided, setTotalCredit] = useState('0');
 
   useEffect(() => {
     if (page && page.positions) {
       setAllDataLoaded(true);
       setLineData(page);
       setPositions(page.positions);
+      let interestPaid: number = 0;
+      let totalCredit: number = 0;
+      let totalDebt: number = 0;
+      page.positions.map((position, i) => {
+        interestPaid = +interestPaid + +position['interestAccrued'];
+        totalCredit = +totalCredit + +position['deposit'];
+        totalDebt = +totalDebt + +position['principle'] + +position['interestAccrued'];
+      });
+      setTotalInterestPaid(`${interestPaid}`);
+      setTotalCredit(`${totalCredit}`);
+      setTotalDebt(`${totalDebt}`);
     }
     // LineDetails page handles getLinePage query
   }, [page?.positions]);
@@ -72,7 +86,9 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
           deposits={escrow?.deposits}
           deposit={deposit}
           principal={principal}
-          totalInterestPaid={'0'}
+          totalInterestPaid={totalInterestPaid}
+          totalOutstandingDebt={totalOutstandingDebt}
+          totalCreditProvided={totalCreditProvided}
           startTime={start}
           endTime={end}
         />

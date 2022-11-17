@@ -354,9 +354,9 @@ export const formatLinePageData = (
       tokenDecimals: position.token.decimals,
       tokenSymbol: position.token.symbol,
       lender: position.lender.id,
+      principle: position.principal,
       interestAccrued: position.interestAccrued,
       interestRepaid: position.interestRepaid,
-      principal: position.principal,
       id: position.id,
     };
 

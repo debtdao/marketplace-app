@@ -17,6 +17,8 @@
       "total-deposits": "Supplied",
       "token": "Token",
       "status": "Status",
+      "principle": "Principle",
+      "interest": "Interest",
       "lender": "Lender"
     },
     "list-card": {

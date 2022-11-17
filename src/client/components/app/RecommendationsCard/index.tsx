@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { normalizeAmount, numberWithCommas, prettyNumbers, formatAddress, getDate } from '@utils';
+import { prettyNumbers, formatAddress, getDate } from '@utils';
 import { Card, CardHeader, CardContent, Text, Icon, ChevronRightIcon } from '@components/common';
 import { TokenIcon } from '@components/app';
 import { useAppTranslation } from '@hooks';

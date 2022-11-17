@@ -60,8 +60,6 @@ const {
   getUserLinePositions,
   clearLinesData,
   clearUserData,
-  getExpectedTransactionOutcome,
-  clearTransactionData,
   // getUserLinesMetadata,
   clearSelectedLineAndStatus,
   clearLineStatus,
@@ -98,7 +96,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 
     .addCase(clearSelectedLineAndStatus, (state) => {
       if (!state.selectedLineAddress) return;
-      const currentAddress = state.selectedLineAddress;
+      //const currentAddress = state.selectedLineAddress;
       // state.statusMap.linesActionsStatusMap[currentAddress] = initialLineActionsStatusMap;
       state.selectedLineAddress = undefined;
     })

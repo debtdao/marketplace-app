@@ -1,14 +1,7 @@
 import { createReducer } from '@reduxjs/toolkit';
-import _, { difference, groupBy, keyBy, union } from 'lodash';
+import _ from 'lodash';
 
-import {
-  initialStatus,
-  Position,
-  CollateralState,
-  CollateralActionsStatusMap,
-  PositionSummary,
-  AggregatedCreditLine,
-} from '@types';
+import { CollateralState, CollateralActionsStatusMap } from '@types';
 
 import { CollateralActions } from './collateral.actions';
 

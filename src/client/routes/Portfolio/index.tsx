@@ -1,30 +1,18 @@
 import styled from 'styled-components';
 
-import { useAppDispatch, useAppSelector, useAppTranslation, useIsMounting } from '@hooks';
+import { useAppSelector, useAppTranslation, useIsMounting } from '@hooks';
 import {
   TokensSelectors,
   VaultsSelectors,
   WalletSelectors,
   NetworkSelectors,
-  ModalsActions,
-  TokensActions,
   AppSelectors,
   ModalSelectors,
 } from '@store';
-import {
-  SummaryCard,
-  ViewContainer,
-  NoWalletCard,
-  Amount,
-  DetailCard,
-  TokenIcon,
-  ActionButtons,
-} from '@components/app';
-import { SpinnerLoading, Text } from '@components/common';
-import { toBN, halfWidthCss, humanize, normalizeAmount } from '@utils';
+import { SummaryCard, ViewContainer, NoWalletCard, Amount } from '@components/app';
+import { SpinnerLoading } from '@components/common';
+import { toBN, halfWidthCss } from '@utils';
 import { getConfig } from '@config';
-import { getConstants } from '@config/constants';
-import { device } from '@themes/default';
 
 const StyledViewContainer = styled(ViewContainer)`
   display: grid;
@@ -62,35 +50,9 @@ const StyledSpinnerLoading = styled(SpinnerLoading)`
   margin: 10rem 0;
 `;
 
-const TokensCard = styled(DetailCard)`
-  grid-column: 1 / 3;
-
-  flex: 1;
-  @media (max-width: 800px) {
-    .col-price {
-      display: none;
-    }
-  }
-  @media (max-width: 700px) {
-    .col-name {
-      width: 18rem;
-    }
-  }
-  @media ${device.mobile} {
-    .col-name {
-      width: 17rem;
-    }
-    .col-balance {
-      display: none;
-    }
-  }
-` as typeof DetailCard;
-
 export const Portfolio = () => {
   const { t } = useAppTranslation(['common', 'home']);
   const { NETWORK_SETTINGS } = getConfig();
-  const { DUST_AMOUNT_USD } = getConstants();
-  const dispatch = useAppDispatch();
   const isMounting = useIsMounting();
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
 
@@ -102,10 +64,7 @@ export const Portfolio = () => {
 
   const userTokens = useAppSelector(TokensSelectors.selectUserTokens);
   const activeModal = useAppSelector(ModalSelectors.selectActiveModal);
-  const vaultsUnderlyingTokens = useAppSelector(VaultsSelectors.selectUnderlyingTokensAddresses);
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
-  const servicesEnabled = useAppSelector(AppSelectors.selectServicesEnabled);
-  const zapperEnabled = servicesEnabled.zapper && currentNetwork === 'mainnet';
   const tokensListStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
   const generalLoading = (appStatus.loading || tokensListStatus.loading || isMounting) && !activeModal;
   const userTokensLoading = generalLoading && !userTokens.length;
@@ -136,36 +95,6 @@ export const Portfolio = () => {
       }
     );
   }
-
-  const actionHandler = (action: string, tokenAddress: string) => {
-    switch (action) {
-      case 'invest':
-        dispatch(TokensActions.setSelectedTokenAddress({ tokenAddress }));
-        dispatch(
-          ModalsActions.openModal({
-            modalName: 'depositTx',
-            modalProps: { allowTokenSelect: false, allowVaultSelect: zapperEnabled },
-          })
-        );
-        break;
-      default:
-        break;
-    }
-  };
-
-  const investButton = (tokenAddress: string, isZapable: boolean) => {
-    return [
-      {
-        name: t('components.transaction.deposit'),
-        handler: () => actionHandler('invest', tokenAddress),
-        disabled: !walletIsConnected || !(isZapable || vaultsUnderlyingTokens.includes(tokenAddress)),
-      },
-    ];
-  };
-
-  const filterDustTokens = (item: { balanceUsdc: string }) => {
-    return parseInt(item.balanceUsdc) > parseInt(DUST_AMOUNT_USD);
-  };
 
   return (
     <StyledViewContainer>

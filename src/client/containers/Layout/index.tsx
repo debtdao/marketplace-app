@@ -110,7 +110,7 @@ export const Layout: FC = ({ children }) => {
   // TODO Add lab details route when its added the view
 
   // TODO This is only assetAddress on the vault page
-  const assetAddress: string | undefined = location.pathname.split('/')[2];
+  //const assetAddress: string | undefined = location.pathname.split('/')[2];
 
   // Used to check zapper api
   // const { ZAPPER_AUTH_TOKEN } = getConfig();

@@ -109,7 +109,6 @@ export const Navbar = ({
   onWalletClick,
   disableWalletSelect,
   selectedNetwork,
-  networkOptions,
   onNetworkChange,
   disableNetworkChange,
   hideDisabledControls,
@@ -129,12 +128,6 @@ export const Navbar = ({
     label: walletNetwork,
     Icon: getNetworkIcon(walletNetwork!),
   };
-
-  const dropdownNetworkOptions = networkOptions.map((network, i) => ({
-    value: network,
-    label: NETWORK_SETTINGS[network].name,
-    Icon: getNetworkIcon(network),
-  }));
 
   const secondTitleEnabled = !!subTitle?.length;
 

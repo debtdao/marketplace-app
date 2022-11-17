@@ -1,25 +1,16 @@
 import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { ethers, BigNumber } from 'ethers';
 import _ from 'lodash';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
-import { formatAmount, normalizeAmount, toBN } from '@utils';
 import {
   useAppTranslation,
   useAppDispatch,
   // used to dummy token for dev
   useAppSelector,
-  useSelectedSellToken,
 } from '@hooks';
-import {
-  ACTIVE_STATUS,
-  ARBITER_POSITION_ROLE,
-  BORROWER_POSITION_ROLE,
-  EnableCollateralAssetProps,
-  UserPositionMetadata,
-} from '@src/core/types';
-import { getConstants, TOKEN_ADDRESSES } from '@src/config/constants';
+import { ACTIVE_STATUS, ARBITER_POSITION_ROLE, EnableCollateralAssetProps } from '@src/core/types';
+import { TOKEN_ADDRESSES } from '@src/config/constants';
 import {
   TokensActions,
   TokensSelectors,
@@ -29,12 +20,10 @@ import {
   selectDepositTokenOptionsByAsset,
   CollateralSelectors,
 } from '@store';
-import { Button, Icon, Link } from '@components/common';
+import { Button } from '@components/common';
 
 import { TxContainer } from './components/TxContainer';
 import { TxTokenInput } from './components/TxTokenInput';
-import { TxCreditLineInput } from './components/TxCreditLineInput';
-import { TxRateInput } from './components/TxRateInput';
 import { TxActionButton } from './components/TxActions';
 import { TxActions } from './components/TxActions';
 import { TxStatus } from './components/TxStatus';
@@ -74,7 +63,6 @@ const StyledTxActionButton = styled(Button)<{ color?: string; contrast?: boolean
 export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
-  const history = useHistory();
 
   // user data
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
@@ -84,7 +72,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedEscrow = useAppSelector(CollateralSelectors.selectSelectedEscrow);
   // need to get call statusMap from state for tx error messages
-  const collateralStatusMap = useAppSelector(CollateralSelectors.selectStatusMap);
+  //const collateralStatusMap = useAppSelector(CollateralSelectors.selectStatusMap);
 
   //state for params
   const { header, onClose } = props;
@@ -99,7 +87,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
   const selectedAsset = _.find(collateralOptions, (t) => t.address === selectedAssetAddress);
   // TODO get token prices from yearn API and display
 
-  const enabledCollateralAddressess = _.values(selectedLine?.escrow?.deposits)?.map((d) => d.token.address);
+  //const enabledCollateralAddressess = _.values(selectedLine?.escrow?.deposits)?.map((d) => d.token.address);
 
   useEffect(() => {
     // if escrow not set yet then correct state

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import { useAppTranslation } from '@hooks';
-import { Text, Icon, ZapIcon, WalletIcon, LogoIcon } from '@components/common';
+import { Text, Icon, ZapIcon, LogoIcon } from '@components/common';
 import { PositionSearchList } from '@src/client/components/common/PositionSearchList';
 import { PositionItem } from '@src/core/types';
 import { normalizeAmount } from '@src/utils';
@@ -25,11 +25,6 @@ const CreditLineData = styled.div`
   padding: ${({ theme }) => theme.layoutPadding};
   font-size: 1.7rem;
   flex: 1;
-`;
-
-const StyledIcon = styled(Icon)`
-  width: 6.4rem;
-  padding: 1rem;
 `;
 
 const CreditLineName = styled.div`
@@ -131,11 +126,6 @@ const StyledTxCreditLineInput = styled(TransitionGroup)`
   }
 `;
 
-const amountToNumber = (amount: string) => {
-  const parsedAmount = amount.replace(/[%,$ ]/g, '');
-  return parseInt(parsedAmount);
-};
-
 export interface TxPositionInputProps {
   headerText?: string;
   inputText?: string;
@@ -167,7 +157,7 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
   const { t } = useAppTranslation('common');
 
   let listItems: PositionItem[] = [];
-  let zappableItems: PositionItem[] = [];
+  //let zappableItems: PositionItem[] = [];
 
   let selectedItem: PositionItem = {
     id: selectedPosition!.id,

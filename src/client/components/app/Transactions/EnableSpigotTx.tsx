@@ -1,25 +1,17 @@
 import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import _ from 'lodash';
-import { useLocation, useHistory } from 'react-router-dom';
+//import { useHistory } from 'react-router-dom';
 
 import {
   useAppTranslation,
   useAppDispatch,
   // used to dummy token for dev
   useAppSelector,
-  useSelectedSellToken,
 } from '@hooks';
+import { ACTIVE_STATUS, AddSpigotProps } from '@src/core/types';
+import { TOKEN_ADDRESSES } from '@src/config/constants';
 import {
-  ACTIVE_STATUS,
-  AddSpigotProps,
-  ARBITER_POSITION_ROLE,
-  BORROWER_POSITION_ROLE,
-  UserPositionMetadata,
-} from '@src/core/types';
-import { getConstants, TOKEN_ADDRESSES } from '@src/config/constants';
-import {
-  TokensActions,
   TokensSelectors,
   WalletSelectors,
   LinesSelectors,
@@ -27,12 +19,9 @@ import {
   selectDepositTokenOptionsByAsset,
   CollateralSelectors,
 } from '@store';
-import { Button, Icon, Link } from '@components/common';
+//import { Button, Icon, Link } from '@components/common';
 
 import { TxContainer } from './components/TxContainer';
-import { TxTokenInput } from './components/TxTokenInput';
-import { TxCreditLineInput } from './components/TxCreditLineInput';
-import { TxRateInput } from './components/TxRateInput';
 import { TxActionButton } from './components/TxActions';
 import { TxActions } from './components/TxActions';
 import { TxStatus } from './components/TxStatus';
@@ -48,42 +37,42 @@ interface EnableSpigotTxProps {
   onClose: () => void;
 }
 
-const BadLineErrorContainer = styled.div``;
+//const BadLineErrorContainer = styled.div``;
 
-const BadLineErrorBody = styled.h3`
-  ${({ theme }) => `
-    margin: ${theme.spacing.lg} 0;
-    font-size: ${theme.fonts.sizes.md};;
-  `}
-`;
+//const BadLineErrorBody = styled.h3`
+//  ${({ theme }) => `
+//    margin: ${theme.spacing.lg} 0;
+//    font-size: ${theme.fonts.sizes.md};;
+//  `}
+//`;
 
-const BadLineErrorImageContainer = styled.div``;
+//const BadLineErrorImageContainer = styled.div``;
 
-const BadLineErrorImage = styled.img``;
+//const BadLineErrorImage = styled.img``;
 
-const StyledTxActionButton = styled(Button)<{ color?: string; contrast?: boolean }>`
-  height: 4rem;
-  flex: 1;
-  font-size: 1.6rem;
-  font-weight: 700;
-  gap: 0.5rem;
-  background-color: ${({ theme }) => theme.colors.txModalColors.primary};
-  color: ${({ theme }) => theme.colors.txModalColors.onPrimary};
-`;
+//const StyledTxActionButton = styled(Button)<{ color?: string; contrast?: boolean }>`
+//  height: 4rem;
+//  flex: 1;
+//  font-size: 1.6rem;
+//  font-weight: 700;
+//  gap: 0.5rem;
+//  background-color: ${({ theme }) => theme.colors.txModalColors.primary};
+//  color: ${({ theme }) => theme.colors.txModalColors.onPrimary};
+//`;
 
 export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
-  const history = useHistory();
+  //const history = useHistory();
 
   // user data
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const walletAddresssk = useAppSelector(WalletSelectors.selectSelectedAddress);
-  const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
+  //const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   // need to get call statusMap from state for tx error messages
-  const collateralStatusMap = useAppSelector(CollateralSelectors.selectStatusMap);
+  //const collateralStatusMap = useAppSelector(CollateralSelectors.selectStatusMap);
   const selectedSpigotAddress = useAppSelector(CollateralSelectors.selectSelectedSpigot);
   const selectedRevenueContractAddress = useAppSelector(CollateralSelectors.selectSelectedRevenueContract);
 
@@ -102,7 +91,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const selectedAssetAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress) || TOKEN_ADDRESSES.DAI;
   // TODO pull colalteralOptions from subgraph instread of default yearn tokens
   const collateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
-  const selectedAsset = _.find(collateralOptions, (t) => t.address === selectedAssetAddress);
+  //const selectedAsset = _.find(collateralOptions, (t) => t.address === selectedAssetAddress);
   // TODO get token prices from yearn API and display
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { BigNumber, utils } from 'ethers';
+import { BigNumber } from 'ethers';
 import { BytesLike } from '@ethersproject/bytes/src.ts';
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 
@@ -22,7 +22,6 @@ import {
   DeploySecuredLineWithConfigProps,
 } from '@types';
 import {
-  toBN,
   formatGetLinesData,
   formatLinePageData,
   // validateLineDeposit,
@@ -277,7 +276,7 @@ const borrowCredit = createAsyncThunk<void, BorrowCreditProps, ThunkAPI>(
 
 const addCredit = createAsyncThunk<void, AddCreditProps, ThunkAPI>(
   'lines/addCredit',
-  async ({ lineAddress, drate, frate, amount, token, lender, network }, { extra, getState, dispatch }) => {
+  async ({ lineAddress, drate, frate, amount, token, lender, network }, { extra, getState }) => {
     const { wallet } = getState();
     const { services } = extra;
     const userAddress = wallet.selectedAddress;
@@ -314,8 +313,8 @@ const depositAndRepay = createAsyncThunk<
 >(
   'lines/depositAndRepay',
 
-  async ({ lineAddress, amount, network }, { extra, getState, dispatch }) => {
-    const { wallet, lines, tokens } = getState();
+  async ({ lineAddress, amount, network }, { extra, getState }) => {
+    const { wallet } = getState();
     const { services } = extra;
 
     const userAddress = wallet.selectedAddress;
@@ -323,7 +322,7 @@ const depositAndRepay = createAsyncThunk<
 
     console.log('deposit in repay in state');
 
-    const { creditLineService, interestRateCreditService } = services;
+    const { creditLineService } = services;
     // const { error: depositError } = validateLineDeposit({
     //   sellTokenAmount: amount,
     //   depositLimit: lineData?.metadata.depositLimit ?? '0',
@@ -431,7 +430,7 @@ const liquidate = createAsyncThunk<
   ThunkAPI
 >(
   'lines/liquidate',
-  async ({ lineAddress, tokenAddress, amount }, { extra, getState, dispatch }) => {
+  async ({ lineAddress, tokenAddress, amount }, { extra, getState }) => {
     const { wallet, network } = getState();
     const { services } = extra;
 
@@ -490,9 +489,9 @@ const withdrawLine = createAsyncThunk<
   ThunkAPI
 >(
   'lines/withdrawLine',
-  async ({ lineAddress, amount, network, id }, { extra, getState, dispatch }) => {
-    const { wallet, lines } = getState();
-    const { services, config } = extra;
+  async ({ lineAddress, amount, network, id }, { extra, getState }) => {
+    const { wallet } = getState();
+    const { services } = extra;
 
     const userAddress = wallet.selectedAddress;
     if (!userAddress) throw new Error('WALLET NOT CONNECTED');

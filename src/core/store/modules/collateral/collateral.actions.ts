@@ -1,11 +1,7 @@
-import { BigNumber, utils } from 'ethers';
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { Address } from '@yfi/sdk';
 
 import { ThunkAPI } from '@frameworks/redux';
 import { EnableCollateralAssetProps, AddCollateralProps, AddSpigotProps } from '@src/core/types';
-
-import { TokensActions } from '../tokens/tokens.actions';
 
 const setSelectedEscrow = createAction<{ escrowAddress?: string }>('lines/setSelectedEscrow');
 const setSelectedSpigot = createAction<{ spigotAddress?: string }>('lines/setSelectedSpigot');

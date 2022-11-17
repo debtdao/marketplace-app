@@ -17,6 +17,8 @@
       "total-deposits": "Supplied",
       "token": "Token",
       "status": "Status",
+      "principle": "Principle",
+      "interest": "Interest",
       "lender": "Lender"
     },
     "list-card": {
@@ -211,7 +213,8 @@
       },
       "enable-spigot": {
         "revenue-contract": "1. Revenue Contract",
-        "owner-split": "2. Owner Split",
+        "function-revenue": "2. Select function to claim revenue",
+        "function-transfer": "3. Select function to transfer ownership of revenue contract",
         "cta": "Enable Spigot"
       }
     }

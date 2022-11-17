@@ -124,10 +124,10 @@ const StyledTxCreditLineInput = styled(TransitionGroup)`
   }
 `;
 
-const amountToNumber = (amount: string) => {
-  const parsedAmount = amount.replace(/[%,$ ]/g, '');
-  return parseInt(parsedAmount);
-};
+//const amountToNumber = (amount: string) => {
+//  const parsedAmount = amount.replace(/[%,$ ]/g, '');
+//  return parseInt(parsedAmount);
+//};
 
 export interface TxDropdownProps {
   headerText?: string;
@@ -159,7 +159,7 @@ export const TxDropdown: FC<TxDropdownProps> = ({
   const { t } = useAppTranslation('common');
 
   let listItems: SearchListItem[] = [];
-  let zappableItems: SearchListItem[] = [];
+  //let zappableItems: SearchListItem[] = [];
   let selectedItem: SearchListItem = {
     id: selectedType?.id || '',
     // icon: selectedCredit?.icon,

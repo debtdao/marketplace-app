@@ -44,7 +44,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
   const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
-  const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
+  //const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
   const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
   const initialToken: string = selectedSellTokenAddress || DAI;
   const positions = useAppSelector(LinesSelectors.selectPositions);
@@ -250,10 +250,10 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
     },
   ];
 
-  const onSelectedCreditLineChange = (addr: string): void => {
-    setSelectedCredit(addr);
-    _updatePosition();
-  };
+  //const onSelectedCreditLineChange = (addr: string): void => {
+  //  setSelectedCredit(addr);
+  //  _updatePosition();
+  //};
 
   const onSelectedTypeChange = (newRepayType: { id: string; label: string; value: string }): void => {
     setRepayType(newRepayType);

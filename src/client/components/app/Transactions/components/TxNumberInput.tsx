@@ -2,7 +2,6 @@ import { FC } from 'react';
 import styled from 'styled-components';
 import { TransitionGroup } from 'react-transition-group';
 
-import { useAppTranslation } from '@hooks';
 import { Text } from '@components/common';
 
 const RatesContainer = styled.div``;

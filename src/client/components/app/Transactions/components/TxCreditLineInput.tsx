@@ -155,7 +155,7 @@ export const TxCreditLineInput: FC<TxCreditLineInputProps> = ({
   const { t } = useAppTranslation('common');
 
   let listItems: SearchListItem[] = [];
-  let zappableItems: SearchListItem[] = [];
+  //let zappableItems: SearchListItem[] = [];
   let selectedItem: SearchListItem = {
     id: selectedCredit?.id || '',
     // icon: selectedCredit?.icon,
@@ -175,7 +175,7 @@ export const TxCreditLineInput: FC<TxCreditLineInputProps> = ({
         };
       })
       .sort((a, b) => amountToNumber(b.value || '0') - amountToNumber(a.value || '0'));
-    zappableItems = listItems.slice(0, 4);
+    //zappableItems = listItems.slice(0, 4);
     listItems.sort((a, b) => (a.id === selectedItem.id ? -1 : 1));
   }
 

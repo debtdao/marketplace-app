@@ -1,10 +1,9 @@
 import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { ethers } from 'ethers';
 import _ from 'lodash';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
-import { formatAmount, normalizeAmount, toBN } from '@utils';
+import { formatAmount, normalizeAmount } from '@utils';
 import {
   useAppTranslation,
   useAppDispatch,
@@ -12,28 +11,13 @@ import {
   useAppSelector,
   useSelectedSellToken,
 } from '@hooks';
-import {
-  ACTIVE_STATUS,
-  Address,
-  ARBITER_POSITION_ROLE,
-  BORROWER_POSITION_ROLE,
-  UserPositionMetadata,
-} from '@src/core/types';
+import { ACTIVE_STATUS, ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE } from '@src/core/types';
 import { getConstants } from '@src/config/constants';
-import {
-  TokensActions,
-  TokensSelectors,
-  WalletSelectors,
-  LinesSelectors,
-  LinesActions,
-  CollateralSelectors,
-} from '@store';
-import { Button, Icon, Link } from '@components/common';
+import { TokensActions, WalletSelectors, LinesSelectors, CollateralSelectors } from '@store';
+import { Button } from '@components/common';
 
 import { TxContainer } from './components/TxContainer';
 import { TxTokenInput } from './components/TxTokenInput';
-import { TxCreditLineInput } from './components/TxCreditLineInput';
-import { TxRateInput } from './components/TxRateInput';
 import { TxActionButton } from './components/TxActions';
 import { TxActions } from './components/TxActions';
 import { TxStatus } from './components/TxStatus';

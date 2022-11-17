@@ -53,7 +53,6 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
   const [inputTTLWarning, setTTLWarning] = useState('');
   const [loading, setLoading] = useState(false);
   const [timeToLive, setTimeToLive] = useState('0');
-  const [deployedLineLink, setLink] = useState('');
 
   // Deploy Line with config state
   const [advancedMode, setAdvancedMode] = useState(false);

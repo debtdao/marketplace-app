@@ -5,11 +5,10 @@ import styled from 'styled-components';
 import { device } from '@themes/default';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
-import { normalizeAmount, numberWithCommas, prettyNumbers } from '@src/utils';
+import { prettyNumbers } from '@src/utils';
 import {
   ARBITER_POSITION_ROLE,
   BORROWER_POSITION_ROLE,
-  Collateral,
   EscrowDeposit,
   EscrowDepositList,
   LENDER_POSITION_ROLE,
@@ -17,7 +16,7 @@ import {
   TokenView,
 } from '@src/core/types';
 import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
-import { Button, Text, Tooltip } from '@components/common';
+import { Button, Text } from '@components/common';
 import { LinesSelectors, ModalsActions, WalletSelectors } from '@src/core/store';
 import { humanize } from '@src/utils';
 
@@ -102,7 +101,7 @@ interface MetricDisplay extends Metric {
   submetrics?: Metric[];
 }
 
-const MetricDisplay = ({ title, data, displaySubmetrics = false, submetrics }: MetricDisplay) => {
+const MetricDataDisplay = ({ title, data, displaySubmetrics = false, submetrics }: MetricDisplay) => {
   return (
     <MetricContainer>
       <MetricName>{title}</MetricName>
@@ -149,30 +148,30 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const renderEscrowMetadata = () => {
     if (!deposits) return null;
     if (!totalCollateral) return;
-    <MetricDisplay
+    <MetricDataDisplay
       title={t('lineDetails:metadata.escrow.no-collateral')}
       data={`$ ${prettyNumbers(totalCollateral)}`}
     />;
     return (
-      <MetricDisplay title={t('lineDetails:metadata.escrow.total')} data={`$ ${prettyNumbers(totalCollateral)}`} />
+      <MetricDataDisplay title={t('lineDetails:metadata.escrow.total')} data={`$ ${prettyNumbers(totalCollateral)}`} />
     );
   };
   const renderSpigotMetadata = () => {
     if (!revenue) return null;
     if (!totalRevenue)
       return (
-        <MetricDisplay title={t('lineDetails:metadata.revenue.no-revenue')} data={`$ ${prettyNumbers(totalRevenue)}`} />
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.revenue.no-revenue')}
+          data={`$ ${prettyNumbers(totalRevenue)}`}
+        />
       );
     return (
-      <MetricDisplay title={t('lineDetails:metadata.revenue.per-month')} data={`$ ${prettyNumbers(totalRevenue)}`} />
+      <MetricDataDisplay
+        title={t('lineDetails:metadata.revenue.per-month')}
+        data={`$ ${prettyNumbers(totalRevenue)}`}
+      />
     );
   };
-
-  const formatAssetsTableRow = (deposit: EscrowDeposit) => ({
-    key: deposit.token.toString(),
-    header: deposit.token.toString(),
-    align: 'flex-start',
-  });
 
   const depositHandler = (token: TokenView) => {
     dispatch(ModalsActions.openModal({ modalName: 'addCollateral' }));
@@ -198,6 +197,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
         return 'add-collateral';
     }
   };
+
   const formattedCollataralData = allCollateral.map((c) => ({
     ...c,
     key: c.type + c.token.toString(),
@@ -232,9 +232,9 @@ export const LineMetadata = (props: LineMetadataProps) => {
   return (
     <>
       <ThreeColumnLayout>
-        <MetricDisplay title={t('lineDetails:metadata.principal')} data={`$ ${prettyNumbers(principal)}`} />
-        <MetricDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${prettyNumbers(deposit)}`} />
-        <MetricDisplay
+        <MetricDataDisplay title={t('lineDetails:metadata.principal')} data={`$ ${prettyNumbers(principal)}`} />
+        <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${prettyNumbers(deposit)}`} />
+        <MetricDataDisplay
           title={t('lineDetails:metadata.totalInterestPaid')}
           data={`$ ${prettyNumbers(totalInterestPaid)}`}
         />

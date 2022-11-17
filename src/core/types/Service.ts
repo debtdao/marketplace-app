@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { Bytes, BytesLike } from '@ethersproject/bytes/src.ts';
+import { BytesLike } from '@ethersproject/bytes/src.ts';
 import { PopulatedTransaction } from '@ethersproject/contracts/src.ts';
 
 import {
@@ -17,7 +17,6 @@ import {
   TransactionReceipt,
   VaultsUserSummary,
   VaultUserMetadata,
-  UserPositionMetadata,
   GasFees,
   Overrides,
   Network,

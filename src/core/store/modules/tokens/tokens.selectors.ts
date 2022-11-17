@@ -4,8 +4,6 @@ import { memoize } from 'lodash';
 import { AllowancesMap, Balance, RootState, Status, Token, TokenView } from '@types';
 import { toBN } from '@utils';
 
-import { AppSelectors } from '../app/app.selectors';
-
 /* ---------------------------------- State --------------------------------- */
 const selectTokensState = (state: RootState) => state.tokens;
 const selectTokensMap = (state: RootState) => state.tokens.tokensMap;

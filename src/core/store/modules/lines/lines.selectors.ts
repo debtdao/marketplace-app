@@ -16,7 +16,7 @@ import {
   LENDER_POSITION_ROLE,
   ARBITER_POSITION_ROLE, // prev. GeneralVaultView, Super indepth data, CreditLinePage is most similar atm
 } from '@types';
-import { toBN, formatCreditEvents, formatCollateralEvents, unnullify } from '@utils';
+import { toBN, unnullify } from '@utils';
 import { getConstants } from '@src/config/constants';
 
 import { initialLineActionsStatusMap } from './lines.reducer';
@@ -35,10 +35,10 @@ const selectUserLinesPositionsMap = (state: RootState) =>
 const selectLinesMap = (state: RootState) => state.lines.linesMap;
 const selectLinePagesMap = (state: RootState) => state.lines.pagesMap;
 const selectLineCategories = (state: RootState) => state.lines.categories;
-const selectLinesAddresses = (state: RootState) => Object.keys(state.lines.linesMap);
+//const selectLinesAddresses = (state: RootState) => Object.keys(state.lines.linesMap);
 const selectUserTokensMap = (state: RootState) => state.tokens.user.userTokensMap;
-const selectUserTokensAllowancesMap = (state: RootState) => state.tokens.user.userTokensAllowancesMap;
-const selectLinesAllowancesMap = (state: RootState) => state.lines.user.lineAllowances;
+//const selectUserTokensAllowancesMap = (state: RootState) => state.tokens.user.userTokensAllowancesMap;
+//const selectLinesAllowancesMap = (state: RootState) => state.lines.user.lineAllowances;
 const selectTokensMap = (state: RootState) => state.tokens.tokensMap;
 const selectSelectedLineAddress = (state: RootState) => state.lines.selectedLineAddress;
 const selectSelectedPosition = (state: RootState) => state.lines.selectedPosition;
@@ -115,30 +115,30 @@ const selectSummaryData = createSelector([selectUserLinesSummary], (userLinesSum
   };
 });
 
-const selectRecommendations = createSelector([selectLiveLines, selectLinesMap], (activeLines, linesMap) => {
-  const stableCoinSymbols = ['DAI', 'sUSD'];
-  const targetTokenSymbols = ['ETH'];
-  const stableLines: CreditLinePage[] = [];
-  const tokenLines: CreditLinePage[] = [];
-  // stableCoinsSymbols.forEach((symbol) => {
-  //   const line = lines.find((line) => line.token.symbol === symbol);
-  //   if (!line) return;
-  //   stableLines.push(line);
-  // });
+//const selectRecommendations = createSelector([selectLiveLines, selectLinesMap], (activeLines, linesMap) => {
+//const stableCoinSymbols = ['DAI', 'sUSD'];
+//const targetTokenSymbols = ['ETH'];
+//const stableLines: CreditLinePage[] = [];
+//const tokenLines: CreditLinePage[] = [];
+// stableCoinsSymbols.forEach((symbol) => {
+//   const line = lines.find((line) => line.token.symbol === symbol);
+//   if (!line) return;
+//   stableLines.push(line);
+// });
 
-  // targetTokenSymbols.forEach((symbol) => {
-  //   const line = lines.find((line) => line.token.symbol === symbol);
-  //   if (!line) return;
-  //   tokenLines.push(line);
-  // });
+// targetTokenSymbols.forEach((symbol) => {
+//   const line = lines.find((line) => line.token.symbol === symbol);
+//   if (!line) return;
+//   tokenLines.push(line);
+// });
 
-  // return [stableLine, derivativeLines[1], derivativeLines[0]].filter((item) => !!item);
-  // const sortedLines = [...lines].sort((a, b) => {
-  //   return toBN(b.apyData).minus(a.apyData).toNumber();
-  // });
+// return [stableLine, derivativeLines[1], derivativeLines[0]].filter((item) => !!item);
+// const sortedLines = [...lines].sort((a, b) => {
+//   return toBN(b.apyData).minus(a.apyData).toNumber();
+// });
 
-  // return object with fields for categories
-});
+// return object with fields for categories
+//});
 
 const selectLine = createSelector([selectLinesMap], (linesMap) =>
   memoize((lineAddress: string) => linesMap[lineAddress])
@@ -172,15 +172,15 @@ const selectLinesStatus = createSelector(
   }
 );
 
-const selectLinePageStatus = createSelector(
-  [selectGetLinePageStatus, selectGetUserLinesPositionsStatus],
-  (getLinesStatus, getUserLinesPositionsStatus): Status => {
-    return {
-      loading: getLinesStatus.loading || getUserLinesPositionsStatus.loading,
-      error: getLinesStatus.error || getUserLinesPositionsStatus.error,
-    };
-  }
-);
+//const selectLinePageStatus = createSelector(
+//  [selectGetLinePageStatus, selectGetUserLinesPositionsStatus],
+//  (getLinesStatus, getUserLinesPositionsStatus): Status => {
+//    return {
+//      loading: getLinesStatus.loading || getUserLinesPositionsStatus.loading,
+//      error: getLinesStatus.error || getUserLinesPositionsStatus.error,
+//    };
+//  }
+//);
 
 const selectSelectedLinePage = createSelector(
   [selectLinePagesMap, selectSelectedLineAddress],
@@ -323,7 +323,7 @@ export const LinesSelectors = {
   selectSelectedLineActionsStatusMap,
   // selectDepositedLines,
   selectSummaryData,
-  selectRecommendations,
+  //selectRecommendations,
   selectLinesStatus,
   selectGetLinePageStatus,
   selectPositionData,

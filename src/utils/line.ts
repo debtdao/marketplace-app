@@ -10,33 +10,23 @@ import {
   ESCROW_MODULE_NAME,
   SPIGOT_MODULE_NAME,
   LineStatusTypes,
-  UNINITIALIZED_STATUS,
-  ACTIVE_STATUS,
-  LIQUIDATABLE_STATUS,
-  REPAID_STATUS,
-  INSOLVENT_STATUS,
-  NO_STATUS,
   GetLinePageResponse,
   GetLinesResponse,
   BaseCreditFragResponse,
   BaseEscrowDepositFragResponse,
   SpigotRevenueSummaryFragResponse,
-  Address,
   GetLinePageAuxDataResponse,
   LinePageCreditFragResponse,
   LineEventFragResponse,
-  SpigotEventFragResponse,
-  EscrowDeposit,
   EscrowDepositList,
   TokenFragRepsonse,
   COLLATERAL_TYPE_REVENUE,
-  Collateral,
   COLLATERAL_TYPE_ASSET,
 } from '@types';
 
-import { format, humanize, normalizeAmount } from './format';
+import { humanize, normalizeAmount } from './format';
 
-const { parseUnits, parseEther } = utils;
+const { parseUnits } = utils;
 
 /**
  * @function

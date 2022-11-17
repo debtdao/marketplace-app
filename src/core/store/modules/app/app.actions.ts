@@ -1,9 +1,8 @@
 import { createAsyncThunk, createAction } from '@reduxjs/toolkit';
-import { isEqual } from 'lodash';
 
 import { ThunkAPI } from '@frameworks/redux';
 import { isGnosisApp, isLedgerLive, isCoinbaseApp, get } from '@utils';
-import { Network, Route, Address, ExternalServiceId } from '@types';
+import { ExternalServiceId } from '@types';
 
 import { WalletActions } from '../wallet/wallet.actions';
 import { TokensActions } from '../tokens/tokens.actions';

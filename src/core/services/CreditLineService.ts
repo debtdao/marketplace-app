@@ -1,4 +1,4 @@
-import { ContractFunction, ethers, PopulatedTransaction, utils } from 'ethers';
+import { ContractFunction, ethers, PopulatedTransaction } from 'ethers';
 import { BytesLike } from '@ethersproject/bytes/src.ts';
 import { keccak256 } from 'ethers/lib/utils';
 
@@ -27,16 +27,13 @@ import {
   GetLinesResponse,
   GetLinePageAuxDataProps,
   GetLinePageAuxDataResponse,
-  InterestRateCreditService,
   GetLinePageResponse,
   Network,
-  UserPositionMetadata,
 } from '@types';
 import { getConfig } from '@config';
 import { LineOfCreditABI } from '@services/contracts';
 import { getContract } from '@frameworks/ethers';
 import { getLinePage, getLinePageAuxData, getLines } from '@frameworks/gql';
-import { unnullify } from '@src/utils';
 
 const { GRAPH_API_URL } = getConfig();
 

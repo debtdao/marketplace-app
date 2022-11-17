@@ -7,7 +7,7 @@ import { TransactionResponse } from '../types';
 
 import { LineFactoryABI } from './contracts';
 
-const { Arbiter_GOERLI, Oracle_GOERLI, SwapTarget_GOERLI, LineFactory_GOERLI, KibaSero_oracle } = getConfig();
+const { Arbiter_GOERLI, SwapTarget_GOERLI, LineFactory_GOERLI, KibaSero_oracle } = getConfig();
 
 export class LineFactoryServiceImpl {
   private graphUrl: string;

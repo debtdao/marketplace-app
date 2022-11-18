@@ -14,6 +14,7 @@ import {
   STATUS,
   ExecuteTransactionProps,
   Credit,
+  GetUserLinesProps,
   GetLineProps,
   GetLinesProps,
   GetLinePageProps,
@@ -403,8 +404,16 @@ export class CreditLineServiceImpl implements CreditLineService {
     return response;
   }
 
-  public async getUserLinePositions(): Promise<any | undefined> {
-    return;
+  public async getUserLinePositions(prop: GetUserLinesProps): Promise<any | undefined> {
+    const response = getLines(prop)
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((err) => {
+        console.log('CreditLineService error fetching user lines', err);
+        return undefined;
+      });
+    return response;
   }
 
   public async getExpectedTransactionOutcome(): Promise<any | undefined> {

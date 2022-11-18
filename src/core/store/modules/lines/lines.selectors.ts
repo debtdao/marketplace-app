@@ -16,7 +16,7 @@ import {
   LENDER_POSITION_ROLE,
   ARBITER_POSITION_ROLE, // prev. GeneralVaultView, Super indepth data, CreditLinePage is most similar atm
 } from '@types';
-import { toBN, unnullify } from '@utils';
+import { formatAggregatedCreditLineData, toBN, unnullify } from '@utils';
 import { getConstants } from '@src/config/constants';
 
 import { initialLineActionsStatusMap } from './lines.reducer';
@@ -25,6 +25,7 @@ const { ZERO_ADDRESS } = getConstants();
 
 /* ---------------------------------- State --------------------------------- */
 const selectUserWallet = (state: RootState) => state.wallet.selectedAddress;
+console.log('selectUserWallet', selectUserWallet);
 const selectLinesState = (state: RootState) => state.lines;
 const selectUserLinesPositionsMap = (state: RootState) =>
   _.filter(
@@ -315,6 +316,7 @@ export const LinesSelectors = {
   selectSelectedLineAddress,
   selectLinesActionsStatusMap,
   selectLinesStatusMap,
+  selectUserLinesSummary,
   selectPositions,
   selectLinesGeneralStatus,
   selectSelectedLine,

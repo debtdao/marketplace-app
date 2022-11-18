@@ -61,6 +61,10 @@ const StyledTxContainer = styled.div`
   flex-direction: row;
 `;
 
+const StyledSeperator = styled.div`
+  width: 20px;
+`;
+
 export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
@@ -121,6 +125,12 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
     // dispatch(CreditLineActions.getCreditLinesDynamicData({ addresses: [initialToken] })); // pulled from DepositTX, not sure why data not already filled
   }, [selectedSellToken, walletNetwork]);
 
+  const NavigateToDiscord = () => {
+    console.log('discord');
+    window.open('https://discord.gg/F83xx67fyQ', '_blank');
+    onClose();
+  };
+
   if (collateralOptions.length === 0) {
     return (
       <StyledTransaction onClose={onClose} header={t('components.transaction.add-collateral.no-assets-enabled.title')}>
@@ -128,9 +138,10 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
           <BadLineErrorBody>{t('components.transaction.add-collateral.no-assets-enabled.body')}</BadLineErrorBody>
           {userMetadata.role !== ARBITER_POSITION_ROLE ? (
             <StyledTxContainer>
-              <StyledTxActionButton color="primary" onClick={onClose}>
+              <StyledTxActionButton color="primary" onClick={NavigateToDiscord}>
                 {t('components.transaction.add-collateral.no-assets-enabled.find-cta')}
               </StyledTxActionButton>
+              <StyledSeperator />
               <StyledTxActionButton color="primary" onClick={onClose}>
                 {t('components.transaction.add-collateral.no-assets-enabled.login-cta')}
               </StyledTxActionButton>

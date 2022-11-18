@@ -17,7 +17,7 @@
       "total-deposits": "Supplied",
       "token": "Token",
       "status": "Status",
-      "principle": "Principle",
+      "principal": "Borrowed",
       "interest": "Interest",
       "lender": "Lender"
     },
@@ -153,8 +153,8 @@
         "header": "Setup deal terms",
         "header-accepting": "Agree To Deal Terms",
         "select-credit": "1. Borrower:",
-        "select-lender": "2. Lender:",
-        "select-token": "3. The token being lent",
+        "select-token": "2. The token being lent",
+        "select-lender": "3. Lender:",
         "select-rates": "4. Set Interest Rates",
         "lender-address": "Ethereum Address",
         "back-to-market": "Head back to the Market",
@@ -171,9 +171,9 @@
         "back-to-market": "Head back to the Market",
         "no-assets-enabled": {
           "title": "No tokens have been enabled as collateral on your line!",
-          "body": "The arbiter is the only oen that can enable assets to be depostied as collateral. Find and contact yours in the Debt DAO discord.",
-          "find-cta": "Go to discord",
-          "login-cta": "Login as arbiter",
+          "body": "The arbiter is the only one that can enable assets to be deposited as collateral. Find and contact your Arbiter in the Debt DAO discord.",
+          "find-cta": "Go to Discord",
+          "login-cta": "Login as Arbiter",
           "enable-cta": "Enable token"
         }
       },

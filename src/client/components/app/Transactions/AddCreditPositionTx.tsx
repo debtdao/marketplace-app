@@ -164,6 +164,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       }
       if (res.meta.requestStatus === 'fulfilled') {
         setTransactionApproved(!transactionApproved);
+        window.location.reload();
         setLoading(false);
       }
     });

@@ -89,7 +89,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
         setLoading(false);
       }
       if (res.meta.requestStatus === 'fulfilled') {
-        console.log('res', res);
+        window.location.reload();
         setTransactionCompleted(1);
         setLoading(false);
       }

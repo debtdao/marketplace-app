@@ -214,6 +214,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
       }
       if (res.meta.requestStatus === 'fulfilled') {
         setTransactionCompleted(1);
+        window.location.reload();
         setLoading(false);
       }
     });

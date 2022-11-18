@@ -1,7 +1,6 @@
 import styled from 'styled-components';
-import { useEffect } from 'react';
 
-import { useAppSelector, useAppTranslation, useIsMounting, useAppDispatch } from '@hooks';
+import { useAppSelector, useAppTranslation, useIsMounting } from '@hooks';
 import {
   TokensSelectors,
   VaultsSelectors,
@@ -9,8 +8,6 @@ import {
   NetworkSelectors,
   AppSelectors,
   ModalSelectors,
-  LinesActions,
-  LinesSelectors,
 } from '@store';
 import { SummaryCard, ViewContainer, NoWalletCard, Amount } from '@components/app';
 import { SpinnerLoading } from '@components/common';
@@ -57,7 +54,6 @@ export const Portfolio = () => {
   const { t } = useAppTranslation(['common', 'home']);
   const { NETWORK_SETTINGS } = getConfig();
   const isMounting = useIsMounting();
-  const dispatch = useAppDispatch();
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
 
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
@@ -71,18 +67,6 @@ export const Portfolio = () => {
   const tokensListStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
   const generalLoading = (appStatus.loading || tokensListStatus.loading || isMounting) && !activeModal;
   const userTokensLoading = generalLoading && !userTokens.length;
-
-  const defaultLineCategories = {
-    'market:featured.newest': {
-      first: 15,
-      orderBy: 'start', // NOTE: theoretically gets lines that start in the future, will have to refine query
-      orderDirection: 'desc',
-    },
-  };
-
-  const fetchMarketData = () => dispatch(LinesActions.getUserLines(defaultLineCategories));
-  const lineCategoriesForDisplay = useAppSelector(LinesSelectors.selectLinesForCategories);
-  const getLinesStatus = useAppSelector(LinesSelectors.selectLinesStatusMap).getLines;
 
   const netWorth = toBN(vaultsSummary.totalDeposits)
     .plus(walletSummary.totalBalance)

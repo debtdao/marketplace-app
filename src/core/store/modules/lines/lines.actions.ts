@@ -139,8 +139,8 @@ const getLinePage = createAsyncThunk<{ linePageData: CreditLinePage | undefined 
   }
 );
 
-const getUserLines = createAsyncThunk<
-  { linesData: { [category: string]: AggregatedCreditLine[] } },
+const getUserLinePositions = createAsyncThunk<
+  { userLinesPositions: PositionSummary[] },
   { lineAddresses?: string[] },
   ThunkAPI
 >('lines/getUserLinePositions', async ({ lineAddresses }, { extra, getState }) => {
@@ -151,6 +151,7 @@ const getUserLines = createAsyncThunk<
     throw new Error('WALLET NOT CONNECTED');
   }
   const userLinesPositions = await services.creditLineService.getUserLinePositions({
+    network: network.current,
     userAddress,
   });
   return { userLinesPositions };
@@ -707,7 +708,7 @@ export const LinesActions = {
   getLine,
   getLines,
   getLinePage,
-  getUserLines,
+  getUserLinePositions,
   approveDeposit,
   addCredit,
   depositAndRepay,

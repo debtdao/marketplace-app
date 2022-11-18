@@ -87,6 +87,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
       }
       if (res.meta.requestStatus === 'fulfilled') {
         setTransactionCompleted(1);
+        window.location.reload();
         setLoading(false);
       }
     });

@@ -287,9 +287,17 @@ export interface GetLinesProps extends GetLinesArgs {
   network: Network;
 }
 
+export interface GetUserLinesProps extends GetLinesArgs {
+  walletAddress: Address;
+}
+
 export interface GetLinePageProps extends GetLinePageArgs {
   id: string;
   network: Network;
+}
+
+export interface GetUserLineProps {
+  id: string;
 }
 
 export interface GetLinePageAuxDataProps extends GetLinePageArgs {

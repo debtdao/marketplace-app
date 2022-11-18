@@ -44,7 +44,7 @@ const TableHeader = styled.h3`
   `}
 `;
 
-interface CreditEventsTableProps {
+interface PositionsProps {
   events: [];
 }
 
@@ -54,14 +54,18 @@ const BannerCtaButton = styled(Button)`
   margin-top: 1em;
 `;
 
-export const CreditEventsTable = (props: CreditEventsTableProps) => {
+export const PositionsTable = (props: PositionsProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const userRoleMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
+  const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
+  const selectedPage = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const [actions, setActions] = useState([]);
   const { events } = props;
   const dispatch = useAppDispatch();
+
+  //Initial set up for positions table
 
   useEffect(() => {
     if (!selectedLine) {
@@ -79,7 +83,6 @@ export const CreditEventsTable = (props: CreditEventsTableProps) => {
 
   useEffect(() => {
     let Transactions = [];
-
     // TODO integrate UserPositoinMetadata in here
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
       Transactions.push({
@@ -109,17 +112,28 @@ export const CreditEventsTable = (props: CreditEventsTableProps) => {
         disabled: false,
       });
     }
+    if (userWallet === undefined) {
+      Transactions = [];
+    }
     //@ts-ignore
     setActions(Transactions);
-  }, [selectedLine]);
+  }, [selectedLine, userWallet]);
+
+  useEffect(() => {
+    if (lineAddress === undefined) {
+      return;
+    }
+    console.log('query the page', selectedPage);
+    dispatch(LinesActions.getLinePage({ id: lineAddress }));
+  }, [selectedPage]);
+
+  //Action Handlers for positions table
 
   const depositHandler = (e: Event) => {
     //@ts-ignore
     dispatch(LinesActions.setSelectedLinePosition({ position: e.target.value }));
     dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
   };
-
-  console.log('user wallet and lender', userWallet);
 
   // THIS NEEDS REVISITNG
   const liquidateHandler = (e: Event) => {
@@ -152,7 +166,6 @@ export const CreditEventsTable = (props: CreditEventsTableProps) => {
     dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
   };
 
-  console.log('credit events table', events);
   return (
     <>
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
@@ -205,8 +218,8 @@ export const CreditEventsTable = (props: CreditEventsTableProps) => {
                 className: 'col-assets',
               },
               {
-                key: 'principle',
-                header: t('components.positions-card.principle'),
+                key: 'principal',
+                header: t('components.positions-card.principal'),
                 sortable: true,
                 width: '10rem',
                 className: 'col-assets',
@@ -245,7 +258,7 @@ export const CreditEventsTable = (props: CreditEventsTableProps) => {
               drate: `${event['drate']} %`,
               frate: `${event['frate']} %`,
               status: event['status'],
-              principle: humanize('amount', event['principle'], 18, 2),
+              principal: humanize('amount', event['principal'], 18, 2),
               interest: humanize('amount', event['interestAccrued'], 18, 2),
               lender: formatAddress(event['lender']),
               token: event['tokenSymbol'],
@@ -255,9 +268,9 @@ export const CreditEventsTable = (props: CreditEventsTableProps) => {
                   actions={
                     event['status'] === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE
                       ? [ApproveMutualConsent]
-                      : userRoleMetadata.role === LENDER_POSITION_ROLE
+                      : userRoleMetadata.role === LENDER_POSITION_ROLE && event['status'] === 'OPEN'
                       ? actions
-                      : userRoleMetadata.role === BORROWER_POSITION_ROLE
+                      : userRoleMetadata.role === BORROWER_POSITION_ROLE && event['status'] === 'OPEN'
                       ? actions
                       : []
                   }

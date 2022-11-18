@@ -61,7 +61,6 @@ export const Portfolio = () => {
   const vaultsSummary = useAppSelector(VaultsSelectors.selectSummaryData);
   // const labsSummary = useAppSelector(LabsSelectors.selectSummaryData);
   const walletSummary = useAppSelector(TokensSelectors.selectSummaryData);
-
   const userTokens = useAppSelector(TokensSelectors.selectUserTokens);
   const activeModal = useAppSelector(ModalSelectors.selectActiveModal);
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);

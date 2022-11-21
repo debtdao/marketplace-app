@@ -132,9 +132,9 @@ export const formatAddress = (address: string) => {
 
 export const getENSname = (address: string) => {
   //TO DO: need to set up a provider here.
-  const provider = EthersWeb3ProviderImpl.getInstanceOf('ethereum');
-  const addressEnsName = await provider.lookupAddress(address);
-  return addressEnsName;
+  //const provider = EthersWeb3ProviderImpl.getInstanceOf('ethereum');
+  //const addressEnsName = await provider.lookupAddress(address);
+  //return addressEnsName;
 };
 
 export const getDate = (timestamp: number) => {

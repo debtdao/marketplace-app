@@ -130,6 +130,13 @@ export const formatAddress = (address: string) => {
   return address.substring(0, 6) + '...' + address.substring(address.length - 4, address.length);
 };
 
+export const getENSname = (address: string) => {
+  //TO DO: need to set up a provider here.
+  const provider = EthersWeb3ProviderImpl.getInstanceOf('ethereum');
+  const addressEnsName = await provider.lookupAddress(address);
+  return addressEnsName;
+};
+
 export const getDate = (timestamp: number) => {
   const months = {
     Jan: '01',

@@ -3,7 +3,7 @@ import { API } from 'bnc-onboard/dist/src/interfaces';
 import { getAddress } from '@ethersproject/address';
 
 import { getConfig } from '@config';
-import { getNetworkId, getNetworkRpc } from '@utils';
+import { getNetworkRpc } from '@utils';
 import { Wallet, Subscriptions, Network, Theme } from '@types';
 
 import ledgerIframeWallet from './IframeWallet';
@@ -45,18 +45,18 @@ export class BlocknativeWalletImpl implements Wallet {
   }
 
   public create(network: Network, subscriptions: Subscriptions, theme?: Theme): boolean {
-    const networkId = getNetworkId(network);
+    const networkId = 5;
     const { BLOCKNATIVE_KEY, FORTMATIC_KEY, PORTIS_KEY } = getConfig();
 
     const rpcUrl = getNetworkRpc(network);
-    const appName = 'Yearn Finance';
+    const appName = 'Debt DAO';
 
     const wallets = [
       { walletName: 'metamask' },
       {
         walletName: 'walletConnect',
         rpc: {
-          [networkId]: rpcUrl,
+          [networkId]: 'https://eth-goerli.public.blastapi.io',
         },
       },
       {
@@ -105,7 +105,7 @@ export class BlocknativeWalletImpl implements Wallet {
     const walletCheck = [{ checkName: 'derivationPath' }, { checkName: 'connect' }, { checkName: 'accounts' }];
 
     this.onboard = Onboard({
-      networkId,
+      networkId: 5,
       dappId: BLOCKNATIVE_KEY,
       darkMode: theme !== 'light',
       subscriptions,
@@ -133,50 +133,6 @@ export class BlocknativeWalletImpl implements Wallet {
     if (this.onboard) {
       this.onboard.config({ darkMode });
     }
-  }
-
-  public async changeNetwork(network: Network): Promise<boolean> {
-    const { NETWORK_SETTINGS } = getConfig();
-    const networkSettings = NETWORK_SETTINGS[network];
-    const networkId = networkSettings.networkId;
-
-    if (this.onboard) {
-      this.onboard.config({ networkId });
-    }
-
-    if (this.onboard && this.isMetaMask()) {
-      try {
-        await this.getState()?.wallet.provider.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: `0x${networkId.toString(16)}` }],
-        });
-        return true;
-      } catch (error: any) {
-        if (error.code === 4902) {
-          try {
-            await this.getState()?.wallet.provider.request({
-              method: 'wallet_addEthereumChain',
-              params: [
-                {
-                  chainId: `0x${networkId.toString(16)}`,
-                  chainName: networkSettings.name,
-                  nativeCurrency: networkSettings.nativeCurrency,
-                  rpcUrls: [networkSettings.rpcUrl],
-                  blockExplorerUrls: [networkSettings.blockExplorerUrl],
-                },
-              ],
-            });
-            return true;
-          } catch (addError) {
-            console.error(addError);
-          }
-        }
-        console.error(error);
-        return false;
-      }
-    }
-
-    return true;
   }
 
   public async addToken(

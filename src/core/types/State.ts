@@ -4,13 +4,13 @@ import { ExternalServiceId } from './General';
 import { PartnerId } from './Partner';
 import { Theme } from './Settings';
 import { Status } from './Status';
+import { CreditLinePage, UserLineMetadataStatusMap, AggregatedCreditLine, PositionSummary } from './CreditLine';
 import {
   Position,
   Token,
   Vault,
   Integer,
   Balance,
-  Lab,
   VaultsUserSummary,
   VaultUserMetadata,
   TransactionOutcome,
@@ -26,10 +26,12 @@ export interface RootState {
   vaults: VaultsState;
   wallet: WalletState;
   tokens: TokensState;
-  labs: LabsState;
   settings: SettingsState;
-  user: UserState;
+  // user: UserState;
   partner: PartnerState;
+  // debt dao
+  lines: CreditLineState;
+  collateral: CollateralState;
 }
 
 export interface AppState {
@@ -93,6 +95,27 @@ export interface AllowancesMap {
 
 export interface VaultTransaction {
   expectedOutcome: TransactionOutcome | undefined;
+}
+
+export interface CreditLineState {
+  selectedLineAddress: string | undefined;
+  selectedPosition: string | undefined;
+  linesMap: { [lineAddress: string]: AggregatedCreditLine };
+  // probs can just consolidate line/linePage since we need a lot of derived data in linePage for basic functionality
+  pagesMap: { [lineAddress: string]: CreditLinePage };
+  categories: { [category: string]: string[] };
+  user: {
+    linePositions: { [positionId: string]: PositionSummary };
+    lineAllowances: { [line: string]: { [token: string]: Integer } };
+  };
+  statusMap: {
+    getLines: Status;
+    getLine: Status;
+    getLinePage: Status;
+    getAllowances: Status;
+    deploySecuredLine: Status;
+    user: UserLineMetadataStatusMap;
+  };
 }
 
 export interface VaultsState {
@@ -159,22 +182,30 @@ export interface TokensState {
   };
 }
 
-export interface MarketActionsStatusMap {
-  approve: Status;
-  borrow: Status;
-  supply: Status;
-  repay: Status;
-  withdraw: Status;
-  enterMarket: Status;
-  exitMarket: Status;
-  get: Status;
+export interface CollateralState {
+  selectedEscrow?: Address;
+  selectedSpigot?: Address;
+  selectedRevenueContract?: Address;
+  selectedCollateralAsset?: Address;
+  // collateralTradeData?: ZeroExApiResponse;
+  user: {
+    escrowAllowances: { [line: string]: { [token: string]: string } };
+  };
+  statusMap: CollateralActionsStatusMap;
 }
 
-export type MarketActionsTypes = keyof MarketActionsStatusMap;
+interface TokenCollateralMap {
+  [contract: string]: { [token: string]: Status };
+}
+export interface CollateralActionsStatusMap {
+  getLineCollateralData: Status;
+  approve: TokenCollateralMap;
+  addCollateral: TokenCollateralMap;
+  enableCollateral: TokenCollateralMap;
 
-export interface UserMarketActionsStatusMap {
-  getPosition: Status;
-  getMetadata: Status;
+  addSpigot: Status;
+  releaseSpigot: Status;
+  updateOwnerSplit: Status;
 }
 
 export interface SettingsState {
@@ -185,53 +216,6 @@ export interface SettingsState {
   devMode: {
     enabled: boolean;
     walletAddressOverride: Address;
-  };
-}
-
-export interface LabsPositionsMap {
-  DEPOSIT: Position;
-  YIELD: Position;
-  STAKE: Position;
-}
-
-export type LabsPositionsTypes = keyof LabsPositionsMap;
-
-export interface LabActionsStatusMap {
-  get: Status;
-  approveDeposit: Status;
-  deposit: Status;
-  approveWithdraw: Status;
-  withdraw: Status;
-  claimReward: Status;
-  approveReinvest: Status;
-  reinvest: Status;
-  approveInvest: Status;
-  invest: Status;
-  approveStake: Status;
-  stake: Status;
-}
-
-export interface UserLabActionsStatusMap {
-  get: Status;
-  getPositions: Status;
-}
-
-export interface LabsState {
-  labsAddresses: string[];
-  labsMap: { [address: string]: Lab };
-  selectedLabAddress: Address | undefined;
-  user: {
-    userLabsPositionsMap: { [address: string]: LabsPositionsMap };
-    labsAllowancesMap: { [labAddress: string]: AllowancesMap };
-  };
-  statusMap: {
-    initiateLabs: Status;
-    getLabs: Status;
-    labsActionsStatusMap: { [labAddress: string]: LabActionsStatusMap };
-    user: {
-      getUserLabsPositions: Status;
-      userLabsActionsStatusMap: { [labAddress: string]: UserLabActionsStatusMap };
-    };
   };
 }
 

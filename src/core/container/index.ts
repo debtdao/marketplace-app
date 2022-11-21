@@ -4,13 +4,15 @@ import { BlocknativeWalletImpl } from '@frameworks/blocknative';
 import { EthersWeb3ProviderImpl } from '@frameworks/ethers';
 import { YearnSdkImpl } from '@frameworks/yearnSdk';
 import {
+  CreditLineServiceImpl,
   TokenServiceImpl,
   UserServiceImpl,
   VaultServiceImpl,
-  LabServiceImpl,
   GasServiceImpl,
   TransactionServiceImpl,
-  SubscriptionServiceImpl,
+  InterestRateCreditServiceImpl,
+  LineFactoryServiceImpl,
+  CollateralServiceImpl,
 } from '@services';
 import { getConfig } from '@config';
 import { DIContainer, ContextContainer, ServiceContainer, ConfigContainer } from '@types';
@@ -38,13 +40,15 @@ export class Container implements DIContainer {
 
   private registerServices() {
     this.container.register({
+      creditLineService: awilix.asClass(CreditLineServiceImpl),
+      collateralService: awilix.asClass(CollateralServiceImpl),
       tokenService: awilix.asClass(TokenServiceImpl),
       userService: awilix.asClass(UserServiceImpl),
       vaultService: awilix.asClass(VaultServiceImpl),
-      labService: awilix.asClass(LabServiceImpl),
       gasService: awilix.asClass(GasServiceImpl),
       transactionService: awilix.asClass(TransactionServiceImpl),
-      subscriptionService: awilix.asClass(SubscriptionServiceImpl),
+      interestRateCreditService: awilix.asClass(InterestRateCreditServiceImpl),
+      lineFactoryService: awilix.asClass(LineFactoryServiceImpl),
     });
   }
 
@@ -64,13 +68,15 @@ export class Container implements DIContainer {
 
   get services(): ServiceContainer {
     return {
+      creditLineService: this.container.cradle.creditLineService,
       tokenService: this.container.cradle.tokenService,
       userService: this.container.cradle.userService,
       vaultService: this.container.cradle.vaultService,
-      labService: this.container.cradle.labService,
       gasService: this.container.cradle.gasService,
       transactionService: this.container.cradle.transactionService,
-      subscriptionService: this.container.cradle.subscriptionService,
+      interestRateCreditService: this.container.cradle.interestRateCreditService,
+      lineFactoryService: this.container.cradle.lineFactoryService,
+      collateralService: this.container.cradle.collateralService,
     };
   }
 

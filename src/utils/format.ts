@@ -6,6 +6,7 @@ BigNumber.set({ EXPONENTIAL_AT: 50 });
 
 export const USDC_DECIMALS = 6;
 export const COLLATERAL_FACTOR_DECIMALS = 18;
+export const USD_PRICE_DECIMALS = 8;
 export const GWEI = 9;
 
 const FORMAT = {
@@ -102,6 +103,10 @@ export const formatApy = (apyData: Fraction, apyType?: string): FormattedAmount 
   return formatPercent(apyData, 2);
 };
 
+export const numberWithCommas = (x: string) => {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
 /* -------------------------------------------------------------------------- */
 /*                                  Humanize                                  */
 /* -------------------------------------------------------------------------- */
@@ -115,4 +120,34 @@ export const humanize = (
   if (!tokenDecimals && dataType === 'amount') return '0';
   const units = normalize(dataType, amount, tokenDecimals);
   return format(dataType, units, formatDecimals);
+};
+
+export const prettyNumbers = (x: string) => {
+  return numberWithCommas(parseInt(normalizeAmount(x, 18)).toFixed(2));
+};
+
+export const formatAddress = (address: string) => {
+  return address.substring(0, 6) + '...' + address.substring(address.length - 4, address.length);
+};
+
+export const getDate = (timestamp: number) => {
+  const months = {
+    Jan: '01',
+    Feb: '02',
+    Mar: '03',
+    Apr: '04',
+    May: '05',
+    Jun: '06',
+    Jul: '07',
+    Aug: '08',
+    Sep: '09',
+    Oct: '10',
+    Nov: '11',
+    Dec: '12',
+  };
+  const date = new Date(timestamp * 1000).toString();
+  const dateArr = date.split(' ');
+  //@ts-ignore
+  const finalDate = `${dateArr[2]}/${months[dateArr[1]]}/${dateArr[3]}, ${dateArr[4]}`;
+  return finalDate;
 };

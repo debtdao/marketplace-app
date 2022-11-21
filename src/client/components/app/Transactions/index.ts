@@ -4,11 +4,12 @@ export * from './components/TxContainer';
 export * from './components/TxError';
 export * from './components/TxStatus';
 export * from './components/TxTokenInput';
-
-export * from './Backscratcher';
-export * from './Labs';
-
-export * from './DepositTx';
+export * from './BorrowCreditTx';
+export * from './AddCreditPositionTx';
+export * from './EnableCollateralAssetTx';
+export * from './EnableSpigotTx';
+export * from './AddCollateralTx';
+export * from './RepayTx';
 export * from './MigrateTx';
 export * from './TestTx';
-export * from './WithdrawTx';
+export * from './WithdrawCreditTx';

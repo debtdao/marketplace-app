@@ -6,7 +6,6 @@ import {
   SignPermitProps,
   DepositProps,
   WithdrawProps,
-  MigrateProps,
   Position,
   Vault,
   VaultDynamic,
@@ -30,10 +29,8 @@ import {
   TokenAllowance,
 } from '@types';
 
-import v2VaultAbi from './contracts/v2Vault.json';
 import eip2612Abi from './contracts/eip2612.json';
-import trustedVaultMigratorAbi from './contracts/trustedVaultMigrator.json';
-import triCryptoVaultMigratorAbi from './contracts/triCryptoVaultMigrator.json';
+import v2VaultAbi from './contracts/v2Vault.json';
 
 export class VaultServiceImpl implements VaultService {
   private yearnSdk: YearnSdk;
@@ -238,30 +235,6 @@ export class VaultServiceImpl implements VaultService {
       slippage: slippageTolerance,
       signature,
     });
-  }
-
-  public async migrate(props: MigrateProps): Promise<TransactionResponse> {
-    const { network, vaultFromAddress, vaultToAddress, migrationContractAddress } = props;
-    const { triCryptoVaultMigrator } = this.config.CONTRACT_ADDRESSES;
-
-    switch (migrationContractAddress) {
-      case triCryptoVaultMigrator:
-        return await this.transactionService.execute({
-          network,
-          methodName: 'migrate_to_new_vault',
-          contractAddress: migrationContractAddress,
-          abi: triCryptoVaultMigratorAbi,
-        });
-
-      default:
-        return await this.transactionService.execute({
-          network,
-          methodName: 'migrateAll',
-          args: [vaultFromAddress, vaultToAddress],
-          contractAddress: migrationContractAddress,
-          abi: trustedVaultMigratorAbi,
-        });
-    }
   }
 
   public async approveDeposit(props: ApproveDepositProps): Promise<TransactionResponse> {

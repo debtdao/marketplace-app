@@ -35,7 +35,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
   const { acceptingOffer, header, onClose, onPositionChange } = props;
-  const [repayType, setRepayType] = useState({ id: '1', label: 'wallet', value: 'wallet' });
+  const [repayType, setRepayType] = useState({ id: '1', label: 'Repay from:', value: 'Wallet' });
   const selectedPosition = useAppSelector(LinesSelectors.selectPositionData);
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionLoading, setLoading] = useState(false);
@@ -341,7 +341,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
         typeOptions={repaymentOptions}
         // creditOptions={sourceCreditOptions}
         // inputError={!!sourceStatus.error}
-        readOnly={false}
+        readOnly={true}
       />
       <TxTokenInput
         key={'token-input'}

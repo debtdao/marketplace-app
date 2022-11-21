@@ -145,6 +145,8 @@ export interface PositionInt {
   principal: string;
   status: string;
   tokenAddress: string;
+  tokenSymbol: string;
+  tokenDecimals: string;
 }
 
 export interface PositionItem {

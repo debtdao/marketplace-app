@@ -57,6 +57,7 @@ const {
   // initiateSaveLines,
   setSelectedLineAddress,
   setSelectedLinePosition,
+  setUpdatedPositionData,
   getUserLinePositions,
   clearLinesData,
   clearUserData,
@@ -79,6 +80,21 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.selectedPosition = position;
     })
 
+    .addCase(setUpdatedPositionData, (state, { payload: { position, lineAddress, positionObject } }) => {
+      if (positionObject !== undefined) {
+        //@ts-ignore
+        state.pagesMap[lineAddress].positions = [{ ...positionObject }];
+      }
+      console.log(
+        'position object',
+        //@ts-ignore
+        state.pagesMap[lineAddress].positions,
+        'position',
+        position,
+        'new object',
+        positionObject
+      );
+    })
     /* -------------------------------------------------------------------------- */
     /*                                 Clear State                                */
     /* -------------------------------------------------------------------------- */

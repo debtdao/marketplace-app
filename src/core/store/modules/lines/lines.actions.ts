@@ -17,6 +17,7 @@ import {
   AddCreditProps,
   UseCreditLinesParams,
   BorrowCreditProps,
+  PositionInt,
   Network,
   DeploySecuredLineProps,
   DeploySecuredLineWithConfigProps,
@@ -39,6 +40,9 @@ import { TokensActions } from '../tokens/tokens.actions';
 
 const setSelectedLineAddress = createAction<{ lineAddress?: string }>('lines/setSelectedLineAddress');
 const setSelectedLinePosition = createAction<{ position?: string }>('lines/setSelectedLinePosition');
+const setUpdatedPositionData = createAction<{ positionObject: PositionInt; lineAddress: string; position: string }>(
+  'lines/setUpdatedPositionData'
+);
 
 /* -------------------------------------------------------------------------- */
 /*                                 Clear State                                */
@@ -704,6 +708,7 @@ const getWithdrawAllowance = createAsyncThunk<
 export const LinesActions = {
   setSelectedLineAddress,
   setSelectedLinePosition,
+  setUpdatedPositionData,
   // initiateSaveLines,
   getLine,
   getLines,

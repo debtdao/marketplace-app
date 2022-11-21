@@ -96,15 +96,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
         //@ts-ignore
         state.pagesMap[lineAddress].positions = newPositions;
       }
-      console.log(
-        'position object',
-        //@ts-ignore
-        state.pagesMap[lineAddress].positions,
-        'position',
-        position,
-        'new object',
-        positionObject
-      );
     })
     /* -------------------------------------------------------------------------- */
     /*                                 Clear State                                */

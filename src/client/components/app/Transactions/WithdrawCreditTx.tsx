@@ -9,6 +9,7 @@ import {
   useAppSelector,
 } from '@hooks';
 import { LinesSelectors, LinesActions, WalletSelectors } from '@store';
+import { withdrawUpdate } from '@src/utils';
 
 import { TxContainer } from './components/TxContainer';
 import { TxCreditLineInput } from './components/TxCreditLineInput';
@@ -39,6 +40,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
   const selectedPosition = useAppSelector(LinesSelectors.selectPositionData);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
+  const positions = useAppSelector(LinesSelectors.selectPositions);
 
   const _updatePosition = () =>
     onPositionChange({
@@ -68,7 +70,13 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
   const withdrawCredit = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    if (!selectedCredit?.id || !targetAmount || walletNetwork === undefined || selectedPosition === undefined) {
+    if (
+      !selectedCredit?.id ||
+      !targetAmount ||
+      walletNetwork === undefined ||
+      selectedPosition === undefined ||
+      positions === undefined
+    ) {
       setLoading(false);
       return;
     }
@@ -87,7 +95,15 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
       }
       if (res.meta.requestStatus === 'fulfilled') {
         setTransactionCompleted(1);
-        window.location.reload();
+        let updatedPosition = withdrawUpdate(selectedPosition, targetAmount);
+        dispatch(
+          LinesActions.setUpdatedPositionData({
+            position: selectedPosition['id'],
+            lineAddress: selectedCredit.id,
+            positionObject: updatedPosition,
+            positions: positions,
+          })
+        );
         setLoading(false);
       }
     });

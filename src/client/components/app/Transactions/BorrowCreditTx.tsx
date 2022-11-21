@@ -37,7 +37,6 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
   const selectedPosition = useAppSelector(LinesSelectors.selectPositionData);
   const [targetAmount, setTargetAmount] = useState('1');
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
-  const selectedPage = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const positions = useAppSelector(LinesSelectors.selectPositions);
 
   console.log('positions', positions);

@@ -62,7 +62,7 @@ export const depositAndRepayUpdate = (position: PositionInt, amount: string) => 
       interestRepaid: `${+position['interestRepaid'] + +position['interestAccrued']}`,
       lender: position['lender'],
       deposit: position['deposit'],
-      principal: prinicipalToRepay,
+      principal: `${+position['principal'] - +prinicipalToRepay}`,
       status: position['status'],
       tokenAddress: position['tokenAddress'],
       tokenSymbol: position['tokenSymbol'],
@@ -87,6 +87,6 @@ export const depositAndRepayUpdate = (position: PositionInt, amount: string) => 
       tokenDecimals: position['tokenDecimals'],
     };
   }
-
+  console.log('repay remaining', prinicipalToRepay);
   return UpdatedPositon;
 };

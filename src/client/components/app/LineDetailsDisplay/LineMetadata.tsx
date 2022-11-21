@@ -15,7 +15,7 @@ import {
   RevenueSummary,
   TokenView,
 } from '@src/core/types';
-import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
+import { DetailCard, ActionButtons, TokenIcon, ViewContainer, SliderCard } from '@components/app';
 import { Button, Text } from '@components/common';
 import { LinesSelectors, ModalsActions, WalletSelectors } from '@src/core/store';
 import { humanize } from '@src/utils';
@@ -33,6 +33,12 @@ const MetricContainer = styled.div`
   ${({ theme }) => `
     margin-bottom: ${theme.spacing.xl};
   `}
+`;
+
+const BannerCtaButton = styled(Button)`
+  width: 80%;
+  max-width: 20rem;
+  margin-top: 1em;
 `;
 
 const MetricName = styled.h3`
@@ -250,79 +256,95 @@ export const LineMetadata = (props: LineMetadataProps) => {
         {renderSpigotMetadata()}
         {renderEscrowMetadata()}
       </ThreeColumnLayout>
-      {(!isEmpty(deposits) || !isEmpty(revenue)) && (
-        <ViewContainer>
-          <AssetsListCard
-            header={t('lineDetails:metadata.escrow.assets-list.title')}
-            data-testid="line-assets-list"
-            metadata={[
-              {
-                key: 'type',
-                header: t('lineDetails:metadata.escrow.assets-list.type'),
-                transform: ({ type }) => (
-                  <>
-                    <Text>{type?.toUpperCase()}</Text>
-                  </>
-                ),
-                width: '10rem',
-                sortable: true,
-                className: 'col-type',
-              },
-              {
-                key: 'token',
-                header: t('lineDetails:metadata.escrow.assets-list.symbol'),
-                transform: ({ token: { symbol, icon } }) => (
-                  <>
-                    {icon && <TokenIcon icon={icon} symbol={symbol} />}
-                    <Text>{symbol}</Text>
-                  </>
-                ),
-                width: '15rem',
-                sortable: true,
-                className: 'col-symbol',
-              },
-              {
-                key: 'amount',
-                header: t('lineDetails:metadata.escrow.assets-list.amount'),
-                transform: ({ token: { balance } }) => <Text ellipsis> {balance} </Text>,
-                sortable: true,
-                width: '20rem',
-                className: 'col-amount',
-              },
-              {
-                key: 'value',
-                header: t('lineDetails:metadata.escrow.assets-list.value'),
-                format: ({ value }) => humanize('usd', value, 2 /* 4 decimals but as percentage */, 0),
-                sortable: true,
-                width: '20rem',
-                className: 'col-value',
-              },
-              {
-                key: 'actions',
-                transform: ({ token }) => (
-                  <ActionButtons
-                    actions={[
-                      {
-                        name: t('components.transaction.deposit'),
-                        handler: () => depositHandler(token),
-                        disabled: !walletIsConnected,
-                      },
-                    ]}
-                  />
-                ),
-                align: 'flex-end',
-                width: 'auto',
-                grow: '1',
-              },
-            ]}
-            data={formattedCollataralData}
-            SearchBar={getCollateralTableActions()}
-            searching={false}
-            onAction={undefined}
-            initialSortBy="value"
-            wrap
-          />
-        </ViewContainer>
+
+      {isEmpty(deposits) ? (
+        <SliderCard
+          header={t('lineDetails:metadata.collateral-table.no-table')}
+          Component={
+            <Text>
+              <p>{t('lineDetails:metadata.collateral-table.no-table')}</p>
+
+              <BannerCtaButton styling="primary" onClick={depositHandler}>
+                {t('lineDetails:metadata.collateral-table.add-collateral')}
+              </BannerCtaButton>
+            </Text>
+          }
+        />
+      ) : (
+        (!isEmpty(deposits) || !isEmpty(revenue)) && (
+          <ViewContainer>
+            <AssetsListCard
+              header={t('lineDetails:metadata.escrow.assets-list.title')}
+              data-testid="line-assets-list"
+              metadata={[
+                {
+                  key: 'type',
+                  header: t('lineDetails:metadata.escrow.assets-list.type'),
+                  transform: ({ type }) => (
+                    <>
+                      <Text>{type?.toUpperCase()}</Text>
+                    </>
+                  ),
+                  width: '10rem',
+                  sortable: true,
+                  className: 'col-type',
+                },
+                {
+                  key: 'token',
+                  header: t('lineDetails:metadata.escrow.assets-list.symbol'),
+                  transform: ({ token: { symbol, icon } }) => (
+                    <>
+                      {icon && <TokenIcon icon={icon} symbol={symbol} />}
+                      <Text>{symbol}</Text>
+                    </>
+                  ),
+                  width: '15rem',
+                  sortable: true,
+                  className: 'col-symbol',
+                },
+                {
+                  key: 'amount',
+                  header: t('lineDetails:metadata.escrow.assets-list.amount'),
+                  transform: ({ token: { balance } }) => <Text ellipsis> {balance} </Text>,
+                  sortable: true,
+                  width: '20rem',
+                  className: 'col-amount',
+                },
+                {
+                  key: 'value',
+                  header: t('lineDetails:metadata.escrow.assets-list.value'),
+                  format: ({ value }) => humanize('usd', value, 2 /* 4 decimals but as percentage */, 0),
+                  sortable: true,
+                  width: '20rem',
+                  className: 'col-value',
+                },
+                {
+                  key: 'actions',
+                  transform: ({ token }) => (
+                    <ActionButtons
+                      actions={[
+                        {
+                          name: t('components.transaction.deposit'),
+                          handler: () => depositHandler(token),
+                          disabled: !walletIsConnected,
+                        },
+                      ]}
+                    />
+                  ),
+                  align: 'flex-end',
+                  width: 'auto',
+                  grow: '1',
+                },
+              ]}
+              data={formattedCollataralData}
+              SearchBar={getCollateralTableActions()}
+              searching={false}
+              onAction={undefined}
+              initialSortBy="value"
+              wrap
+            />
+          </ViewContainer>
+        )
       )}
     </>
   );

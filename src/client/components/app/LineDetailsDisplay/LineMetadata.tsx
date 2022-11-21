@@ -267,6 +267,9 @@ export const LineMetadata = (props: LineMetadataProps) => {
               <BannerCtaButton styling="primary" onClick={depositHandler}>
                 {t('lineDetails:metadata.collateral-table.add-collateral')}
               </BannerCtaButton>
+              <BannerCtaButton styling="primary" onClick={enableAssetHandler}>
+                {t('lineDetails:metadata.collateral-table.enable-asset')}
+              </BannerCtaButton>
             </Text>
           }
         />

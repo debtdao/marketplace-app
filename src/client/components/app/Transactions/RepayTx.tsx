@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
 
-import { formatAmount, normalizeAmount, toWei } from '@utils';
+import { formatAmount, normalizeAmount, toWei, depositAndRepayUpdate } from '@utils';
 import { useAppTranslation, useAppDispatch, useAppSelector, useSelectedSellToken } from '@hooks';
 import { TokensActions, TokensSelectors, VaultsSelectors, LinesSelectors, LinesActions, WalletSelectors } from '@store';
 import { getConstants, testTokens } from '@src/config/constants';
@@ -140,7 +140,14 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
   const depositAndRepay = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    if (!selectedCredit?.id || !targetAmount || !selectedSellTokenAddress || walletNetwork === undefined) {
+    if (
+      !selectedCredit?.id ||
+      !targetAmount ||
+      !selectedSellTokenAddress ||
+      walletNetwork === undefined ||
+      positions === undefined ||
+      selectedPosition === undefined
+    ) {
       setLoading(false);
       return;
     }
@@ -160,6 +167,15 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
       }
       if (res.meta.requestStatus === 'fulfilled') {
         setTransactionCompleted(1);
+        let updatedPosition = depositAndRepayUpdate(selectedPosition, targetAmount);
+        dispatch(
+          LinesActions.setUpdatedPositionData({
+            position: selectedPosition['id'],
+            lineAddress: selectedCredit.id,
+            positionObject: updatedPosition,
+            positions: positions,
+          })
+        );
         setLoading(false);
       }
     });

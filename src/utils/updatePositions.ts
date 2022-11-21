@@ -45,3 +45,48 @@ export const withdrawUpdate = (position: PositionInt, amount: string) => {
 
   return UpdatedPositon;
 };
+
+export const depositAndRepayUpdate = (position: PositionInt, amount: string) => {
+  const repayAmount = toWei(amount, +position['tokenDecimals']);
+  let prinicipalToRepay = '';
+  let remainingInterest = '';
+  let UpdatedPositon: any = {};
+
+  if (+repayAmount > +position['interestAccrued']) {
+    prinicipalToRepay = `${+repayAmount - +position['interestAccrued']}`;
+    UpdatedPositon = {
+      drate: position['drate'],
+      frate: position['frate'],
+      id: position['id'],
+      interestAccrued: '0',
+      interestRepaid: `${+position['interestRepaid'] + +position['interestAccrued']}`,
+      lender: position['lender'],
+      deposit: position['deposit'],
+      principal: prinicipalToRepay,
+      status: position['status'],
+      tokenAddress: position['tokenAddress'],
+      tokenSymbol: position['tokenSymbol'],
+      tokenDecimals: position['tokenDecimals'],
+    };
+  }
+
+  if (+repayAmount <= +position['interestAccrued']) {
+    remainingInterest = `${+position['interestAccrued'] - +repayAmount}`;
+    UpdatedPositon = {
+      drate: position['drate'],
+      frate: position['frate'],
+      id: position['id'],
+      interestAccrued: remainingInterest,
+      interestRepaid: `${+position['interestRepaid'] + +repayAmount}`,
+      lender: position['lender'],
+      deposit: position['deposit'],
+      principal: position['principal'],
+      status: position['status'],
+      tokenAddress: position['tokenAddress'],
+      tokenSymbol: position['tokenSymbol'],
+      tokenDecimals: position['tokenDecimals'],
+    };
+  }
+
+  return UpdatedPositon;
+};

@@ -29,7 +29,7 @@
     },
     "collateral-table": {
       "enable-spigot": "Add Spigot",
-      "enable-asset": "Enable Asset",
+      "enable-asset": "Enable",
       "add-collateral": "Deposit",
       "no-table": "No Collateral added"
     }

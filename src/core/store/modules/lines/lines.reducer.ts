@@ -5,6 +5,7 @@ import {
   CreditLineState,
   UserLineMetadataStatusMap,
   LineActionsStatusMap,
+  PositionInt,
   AggregatedCreditLine,
 } from '@types';
 
@@ -80,10 +81,20 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.selectedPosition = position;
     })
 
-    .addCase(setUpdatedPositionData, (state, { payload: { position, lineAddress, positionObject } }) => {
+    .addCase(setUpdatedPositionData, (state, { payload: { position, lineAddress, positionObject, positions } }) => {
       if (positionObject !== undefined) {
+        let newPositions: PositionInt[] = [];
+        positions.map((positionObj: PositionInt) => {
+          let PositionId: string = positionObj.id;
+          if (PositionId === position) {
+            return;
+          } else {
+            newPositions.push(positionObj);
+          }
+        });
+        newPositions.push({ ...positionObject });
         //@ts-ignore
-        state.pagesMap[lineAddress].positions = [{ ...positionObject }];
+        state.pagesMap[lineAddress].positions = newPositions;
       }
       console.log(
         'position object',

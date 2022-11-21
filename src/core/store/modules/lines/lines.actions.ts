@@ -40,9 +40,12 @@ import { TokensActions } from '../tokens/tokens.actions';
 
 const setSelectedLineAddress = createAction<{ lineAddress?: string }>('lines/setSelectedLineAddress');
 const setSelectedLinePosition = createAction<{ position?: string }>('lines/setSelectedLinePosition');
-const setUpdatedPositionData = createAction<{ positionObject: PositionInt; lineAddress: string; position: string }>(
-  'lines/setUpdatedPositionData'
-);
+const setUpdatedPositionData = createAction<{
+  positionObject: PositionInt;
+  lineAddress: string;
+  position: string;
+  positions: PositionInt[];
+}>('lines/setUpdatedPositionData');
 
 /* -------------------------------------------------------------------------- */
 /*                                 Clear State                                */

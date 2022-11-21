@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 
 import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
 import { LinesSelectors, LinesActions, WalletSelectors } from '@store';
-import { normalizeAmount, toWei } from '@src/utils';
+import { normalizeAmount, borrowUpdate } from '@src/utils';
 import { PositionItem } from '@src/core/types';
 
 import { TxContainer } from './components/TxContainer';
@@ -40,7 +40,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
   const selectedPage = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const positions = useAppSelector(LinesSelectors.selectPositions);
 
-  console.log('selected Position', selectedPosition, selectedPage);
+  console.log('positions', positions);
 
   const _updatePosition = () =>
     onPositionChange({
@@ -70,7 +70,13 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
   const borrowCredit = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    if (!selectedCredit?.id || !targetAmount || walletNetwork === undefined || selectedPosition === undefined) {
+    if (
+      !selectedCredit?.id ||
+      !targetAmount ||
+      walletNetwork === undefined ||
+      selectedPosition === undefined ||
+      positions === undefined
+    ) {
       setLoading(false);
       return;
     }
@@ -89,24 +95,13 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
         setLoading(false);
       }
       if (res.meta.requestStatus === 'fulfilled') {
+        let updatedPosition = borrowUpdate(selectedPosition, targetAmount);
         dispatch(
           LinesActions.setUpdatedPositionData({
             position: selectedPosition['id'],
             lineAddress: selectedCredit.id,
-            positionObject: {
-              drate: selectedPosition['drate'],
-              frate: selectedPosition['frate'],
-              id: selectedPosition['id'],
-              interestAccrued: selectedPosition['interestAccrued'],
-              interestRepaid: selectedPosition['interestRepaid'],
-              lender: selectedPosition['lender'],
-              deposit: selectedPosition['deposit'],
-              principal: `900`,
-              status: selectedPosition['status'],
-              tokenAddress: selectedPosition['tokenAddress'],
-              tokenSymbol: selectedPosition['tokenSymbol'],
-              tokenDecimals: selectedPosition['tokenDecimals'],
-            },
+            positionObject: updatedPosition,
+            positions: positions,
           })
         );
         setTransactionCompleted(1);

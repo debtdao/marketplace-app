@@ -1,6 +1,6 @@
 import { memoize } from 'lodash';
 
-import { Constants, NetworkSettings } from '@types';
+import { Constants, NetworkSettings, TokenView } from '@types';
 import { getEnv } from '@config/env';
 // import { encode } from '@src/utils';
 
@@ -20,10 +20,10 @@ export const TOKEN_ADDRESSES = {
   WBTC: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
 };
 
-export const testTokens = [
+export const testTokens: TokenView[] = [
   {
     address: '0x3730954eC1b5c59246C1fA6a20dD6dE6Ef23aEa6',
-    allowancesMap: 'Object {  }',
+    allowancesMap: {},
     balance: '0',
     balanceUsdc: '0',
     categories: ['Seerocoin'],
@@ -34,11 +34,11 @@ export const testTokens = [
     priceUsdc: '0',
     symbol: 'SER',
     website: 'https://debtdao.finance/',
-    yield: '0',
+    // yield: '0',
   },
   {
     address: '0x3D4AA21e8915F3b5409BDb20f76457FCdAF8f757',
-    allowancesMap: 'Object {  }',
+    allowancesMap: {},
     balance: '0',
     balanceUsdc: '0',
     categories: ['kiibacoin'],
@@ -49,11 +49,11 @@ export const testTokens = [
     priceUsdc: '0',
     symbol: 'KIB',
     website: 'https://debtdao.finance/',
-    yield: '0',
+    // yield: '0',
   },
   {
     address: '0xe62e4B079D40CF643D3b4963e4B675eC101928df',
-    allowancesMap: 'Object {  }',
+    allowancesMap: {},
     balance: '0',
     balanceUsdc: '0',
     categories: ['Moocoin'],
@@ -64,7 +64,7 @@ export const testTokens = [
     priceUsdc: '0',
     symbol: 'MOO',
     website: 'https://debtdao.finance/',
-    yield: '0',
+    // yield: '0',
   },
 ];
 

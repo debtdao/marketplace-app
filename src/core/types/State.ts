@@ -165,6 +165,7 @@ export interface UserTokenActionsMap {
 
 export interface TokensState {
   tokensAddresses: string[];
+  activeNetworkTokenAddresses: string[];
   tokensMap: { [address: string]: Token };
   selectedTokenAddress: Address | undefined;
   user: {

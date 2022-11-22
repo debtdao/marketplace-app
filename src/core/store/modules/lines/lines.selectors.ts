@@ -56,8 +56,8 @@ const selectLinesActionsStatusMap = (state: RootState) => state.lines.statusMap.
 const selectGetLinesStatus = (state: RootState) => state.lines.statusMap.getLines;
 const selectGetLinePageStatus = (state: RootState) => state.lines.statusMap.getLinePage;
 const selectGetUserLinesPositionsStatus = (state: RootState) => state.lines.statusMap.user.getUserLinePositions;
-
-const selectGetBorrowerPositions = (state: RootState) => state.lines.statusMap.user.getBorrowerPositions;
+const selectGetBorrowerPositionsStatus = (state: RootState) => state.lines.statusMap.getBorrowerPositions;
+const selectGetBorrowerPositions = (state: RootState) => state.lines.user.borrowerPositions;
 
 /* ----------------------------- Main Selectors ----------------------------- */
 const selectLines = createSelector([selectLinesMap], (linesMap) => {
@@ -202,7 +202,8 @@ const selectPositions = createSelector([selectSelectedLine], (line) => {
 });
 // createSelector([<inputSelector>, <inputSelector>], <outputSelector>)
 
-const selectBorrowerPositions = createSelector([selectGetBorrowerPositions], (borrowerPositions): PositionSummary => {
+const selectBorrowerPositions = createSelector([selectGetBorrowerPositions], (borrowerPositions): PositionSummary[] => {
+  console.log('line.selector.ts: ', borrowerPositions);
   // @ts-ignore // FIXME: fix type
   return borrowerPositions;
 });

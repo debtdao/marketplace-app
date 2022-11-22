@@ -159,7 +159,7 @@ const getUserLinePositions = createAsyncThunk<
 });
 
 const getBorrowerPositions = createAsyncThunk<
-  { borrowerPositions: GetBorrowerPositionsResponse | undefined },
+  { borrowerPositions: PositionSummary[] | undefined },
   { borrower: string },
   ThunkAPI
 >('lines/getBorrowerPositions', async ({ borrower }, { extra, getState }) => {

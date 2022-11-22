@@ -390,18 +390,18 @@ export class CreditLineServiceImpl implements CreditLineService {
     return response;
   }
 
-  public async getBorrowerPositions(
-    prop: GetBorrowerPositionsProps
-  ): Promise<GetBorrowerPositionsResponse | undefined> {
-    console.log('CreditLineService.ts: borrower prop: ', prop);
-    const response = getBorrowerPositions(prop)
-      .then((data) => data)
-      .catch((err) => {
-        console.log('CreditLineService: error fetching borrower positions', err);
-        return undefined;
-      });
-    return response;
-  }
+  // public async getBorrowerPositions(
+  //   prop: GetBorrowerPositionsProps
+  // ): Promise<GetBorrowerPositionsResponse | undefined> {
+  //   console.log('CreditLineService.ts: borrower prop: ', prop);
+  //   const response = getBorrowerPositions(prop)
+  //     .then((data) => data)
+  //     .catch((err) => {
+  //       console.log('CreditLineService: error fetching borrower positions', err);
+  //       return undefined;
+  //     });
+  //   return response;
+  // }
 
   // TODO
   public async getLinePage(prop: GetLinePageProps): Promise<GetLinePageResponse | undefined> {
@@ -433,11 +433,12 @@ export class CreditLineServiceImpl implements CreditLineService {
     return response;
   }
 
-  // TODO: replay `any` type
-  public async GetBorrowerPositions(prop: GetBorrowerPositionsProps): Promise<any | undefined> {
-    const response = this.GetBorrowerPositions(prop)
+  // FIXME: replay `any` type
+  public async getBorrowerPositions(prop: GetBorrowerPositionsProps): Promise<any | undefined> {
+    const response = getBorrowerPositions(prop)
       .then((data) => {
         console.log(data);
+        return data;
       })
       .catch((err) => {
         console.log('CreditLineService error fetching borrower positions', err);

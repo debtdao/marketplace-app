@@ -158,7 +158,7 @@ export interface CreditLineService {
   getLinePage: (props: GetLinePageProps) => Promise<GetLinePageResponse | undefined>;
   getLinePageAuxData: (props: GetLinePageProps) => Promise<GetLinePageAuxDataResponse | undefined>;
   getUserLinePositions: (...args: any) => Promise<any | undefined>;
-  getBorrowerPositions: (props: GetBorrowerPositionsProps) => Promise<GetBorrowerPositionsResponse | undefined>;
+  getBorrowerPositions: (props: GetBorrowerPositionsProps) => Promise<any[] | undefined>; // FIXME: needs type
   getExpectedTransactionOutcome: (...args: any) => Promise<any | undefined>;
   depositAndRepay: (
     props: DepositAndRepayProps

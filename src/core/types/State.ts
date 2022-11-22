@@ -107,12 +107,14 @@ export interface CreditLineState {
   user: {
     linePositions: { [positionId: string]: PositionSummary };
     lineAllowances: { [line: string]: { [token: string]: Integer } };
+    borrowerPositions: { [positionId: string]: PositionSummary };
   };
   statusMap: {
     getLines: Status;
     getLine: Status;
     getLinePage: Status;
     getAllowances: Status;
+    getBorrowerPositions: Status;
     deploySecuredLine: Status;
     user: UserLineMetadataStatusMap;
   };

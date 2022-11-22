@@ -19,6 +19,7 @@ export const initialLineActionsStatusMap: LineActionsStatusMap = {
 
 export const initialUserMetadataStatusMap: UserLineMetadataStatusMap = {
   getUserLinePositions: initialStatus,
+  getBorrowerPositions: initialStatus,
   linesActionsStatusMap: {},
 };
 
@@ -31,12 +32,14 @@ export const linesInitialState: CreditLineState = {
   user: {
     linePositions: {},
     lineAllowances: {},
+    borrowerPositions: {},
   },
   statusMap: {
     getLines: initialStatus,
     getLine: initialStatus,
     getLinePage: initialStatus,
     getAllowances: initialStatus,
+    getBorrowerPositions: initialStatus,
     deploySecuredLine: initialStatus,
     user: initialUserMetadataStatusMap,
   },
@@ -58,6 +61,7 @@ const {
   setSelectedLineAddress,
   setSelectedLinePosition,
   getUserLinePositions,
+  getBorrowerPositions,
   clearLinesData,
   clearUserData,
   // getUserLinesMetadata,
@@ -209,6 +213,20 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
         state.statusMap.user.getUserLinePositions = {};
       });
       state.statusMap.user.getUserLinePositions = { error: error.message };
+    })
+    /* ------------------------- getBorrowerPositions ------------------------- */
+    .addCase(getBorrowerPositions.pending, (state, { meta }) => {
+      // const borrower = meta.arg.borrower;
+      state.statusMap.user.getBorrowerPositions = { loading: true };
+    })
+    .addCase(getBorrowerPositions.fulfilled, (state, { meta, payload: { borrowerPositions } }) => {
+      if (!borrowerPositions) return;
+      const borrowerPositionsMap = [borrowerPositions].reduce((obj, a) => ({ ...obj, [a.id]: a }), {});
+      state.user.borrowerPositions = { ...state.user.borrowerPositions, ...borrowerPositionsMap };
+      state.statusMap.user.getBorrowerPositions = {};
+    })
+    .addCase(getBorrowerPositions.rejected, (state, { meta, error }) => {
+      state.statusMap.user.getBorrowerPositions = { error: error.message };
     })
 
     // /* -------------------------- getUserLinePositions -------------------------- */

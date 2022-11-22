@@ -104,6 +104,6 @@ export const getUserLinePositions: QueryCreator<GetUserLinePositionsArgs, Positi
 ) => getUserLinePositionsQuery(arg);
 
 const getBorrowerPositionsQuery = createQuery(GET_BORROWER_POSITIONS_QUERY, 'lineOfCredits');
-export const getUserBorrowingPositions: QueryCreator<GetBorrowerPositionsArgs, GetBorrowerPositionsResponse> = (
+export const getBorrowerPositions: QueryCreator<GetBorrowerPositionsArgs, GetBorrowerPositionsResponse> = (
   arg: GetBorrowerPositionsArgs
 ) => getBorrowerPositionsQuery(arg);

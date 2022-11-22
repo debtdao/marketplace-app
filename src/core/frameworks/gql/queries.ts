@@ -307,7 +307,6 @@ export const GET_SPIGOT_QUERY = gql`
 // fetches all of a users positions that they borrow from
 export const GET_BORROWER_POSITIONS_QUERY = gql`
   ${BASE_LINE_FRAGMENT}
-  ${GET_LINE_PAGE_QUERY}
 
   query getBorrowerPositions($borrower: String!) {
     lineOfCredits(where: { borrower_contains: $borrower }) {

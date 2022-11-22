@@ -69,6 +69,10 @@ export interface GetUserLinePositionsArgs {
   id: Address;
 }
 
+/**
+ * @typedef {object} GetBorrowerPositionsArgs
+ * @property {Address} GetBorrowerPositionsArgs.borrower - address to fetch borrower positions for
+ */
 export interface GetBorrowerPositionsArgs {
   borrower: Address;
 }

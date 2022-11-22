@@ -20,6 +20,7 @@ import {
   Network,
   DeploySecuredLineProps,
   DeploySecuredLineWithConfigProps,
+  GetBorrowerPositionsResponse,
 } from '@types';
 import {
   formatGetLinesData,
@@ -155,6 +156,22 @@ const getUserLinePositions = createAsyncThunk<
     userAddress,
   });
   return { userLinesPositions };
+});
+
+const getBorrowerPositions = createAsyncThunk<
+  { borrowerPositions: GetBorrowerPositionsResponse | undefined },
+  { borrower: string },
+  ThunkAPI
+>('lines/getBorrowerPositions', async ({ borrower }, { extra, getState }) => {
+  const { wallet } = getState();
+  const { services } = extra;
+  const userAddress = wallet.selectedAddress;
+  if (!userAddress) {
+    throw new Error('WALLET NOT CONNECTED');
+  }
+  // @ts-ignore // FIXME: type of borrower
+  const borrowerPositions = await services.creditLineService.getBorrowerPositions(borrower);
+  return { borrowerPositions };
 });
 
 export interface GetExpectedTransactionOutcomeProps {
@@ -709,6 +726,7 @@ export const LinesActions = {
   getLines,
   getLinePage,
   getUserLinePositions,
+  getBorrowerPositions,
   approveDeposit,
   addCredit,
   depositAndRepay,

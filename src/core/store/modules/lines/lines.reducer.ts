@@ -93,7 +93,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
           }
         });
         newPositions.push({ ...positionObject });
-        //@ts-ignore
+
         state.pagesMap[lineAddress].positions = newPositions;
       }
     })

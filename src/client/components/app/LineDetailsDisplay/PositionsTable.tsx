@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { device } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer, SliderCard } from '@components/app';
 import { Input, SearchIcon, Text, Button } from '@components/common';
-import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE } from '@src/core/types';
+import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, PositionInt } from '@src/core/types';
 import { humanize, formatAddress } from '@src/utils';
 
 const PositionsCard = styled(DetailCard)`
@@ -45,7 +45,7 @@ const TableHeader = styled.h3`
 `;
 
 interface PositionsProps {
-  events: [];
+  events: PositionInt[];
 }
 
 const BannerCtaButton = styled(Button)`

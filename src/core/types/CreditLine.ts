@@ -41,7 +41,7 @@ export interface BaseCreditLine {
   status: LineStatusTypes;
   borrower: Address;
   arbiter: Address;
-  positions?: [];
+  positions?: PositionInt[];
   escrow?: { id: Address };
   spigot?: { id: Address };
 }
@@ -53,7 +53,7 @@ export interface AggregatedCreditLine extends BaseCreditLine {
   // id, symbol, APY (4 decimals)
   highestApy: [string, string, string];
 
-  positions?: [];
+  positions?: PositionInt[];
 
   escrow?: AggregatedEscrow;
   spigot?: AggregatedSpigot;
@@ -64,7 +64,7 @@ export interface CreditLinePage extends AggregatedCreditLine {
   interest: string; // | Promise<string>;
   totalInterestRepaid: string; // | Promise<string>;
 
-  positions?: [];
+  positions?: PositionInt[];
 
   collateralEvents: CollateralEvent[];
   creditEvents: CreditEvent[];

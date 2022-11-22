@@ -18,7 +18,7 @@ export const depositAndRepayUpdate = (position: PositionInt, amount: string) => 
   const repayAmount = toWei(amount, Number(position['tokenDecimals']));
   const interestPaid =
     Number(repayAmount) > Number(position['interestAccrued']) ? position['interestAccrued'] : repayAmount;
-  const prinicipalToRepay = Number(position['principal']) - Number(repayAmount) + interestPaid;
+  const prinicipalToRepay = Number(position['principal']) - Number(repayAmount) + Number(interestPaid);
   const remainingInterest = Number(position['interestAccrued']) - Number(interestPaid);
   return {
     ...position,

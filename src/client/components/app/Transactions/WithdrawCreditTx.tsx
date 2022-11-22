@@ -70,13 +70,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
   const withdrawCredit = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    if (
-      !selectedCredit?.id ||
-      !targetAmount ||
-      walletNetwork === undefined ||
-      selectedPosition === undefined ||
-      positions === undefined
-    ) {
+    if (!selectedCredit?.id || !targetAmount || !walletNetwork || !selectedPosition || !positions) {
       setLoading(false);
       return;
     }
@@ -100,6 +94,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
           LinesActions.setUpdatedPositionData({
             position: selectedPosition['id'],
             lineAddress: selectedCredit.id,
+            //@ts-ignore
             positionObject: updatedPosition,
             positions: positions,
           })

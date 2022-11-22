@@ -144,9 +144,9 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
       !selectedCredit?.id ||
       !targetAmount ||
       !selectedSellTokenAddress ||
-      walletNetwork === undefined ||
-      positions === undefined ||
-      selectedPosition === undefined
+      !walletNetwork ||
+      !positions ||
+      !selectedPosition
     ) {
       setLoading(false);
       return;
@@ -184,7 +184,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
   const depositAndClose = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    if (!selectedCredit?.id || selectedPosition === undefined || walletNetwork === undefined) {
+    if (!selectedCredit?.id || !selectedPosition || !walletNetwork) {
       setLoading(false);
       return;
     }
@@ -211,7 +211,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
   const claimAndRepay = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    if (!selectedCredit?.id || !targetAmount || !selectedSellTokenAddress || walletNetwork === undefined) {
+    if (!selectedCredit?.id || !targetAmount || !selectedSellTokenAddress || !walletNetwork) {
       setLoading(false);
       return;
     }

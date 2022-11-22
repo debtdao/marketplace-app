@@ -1,21 +1,21 @@
-import { PositionInt } from '@src/core/types';
+import { PositionSummary } from '@src/core/types';
 
 import { toWei } from './format';
 
-export const borrowUpdate = (position: PositionInt, amount: string) => {
-  const borrowedAmount = toWei(amount, Number(+position['tokenDecimals']));
+export const borrowUpdate = (position: PositionSummary, amount: string) => {
+  const borrowedAmount = toWei(amount, Number(+position['token'].decimals));
   const updatedPrincipal = Number(position['principal']) + Number(borrowedAmount);
   return { ...position, principal: `${updatedPrincipal}` };
 };
 
-export const withdrawUpdate = (position: PositionInt, amount: string) => {
-  const withdrawnAmount = toWei(amount, Number(position['tokenDecimals']));
+export const withdrawUpdate = (position: PositionSummary, amount: string) => {
+  const withdrawnAmount = toWei(amount, Number(position['token'].decimals));
   const updatedDeposit = Number(position['deposit']) - Number(withdrawnAmount);
   return { ...position, deposit: `${updatedDeposit}` };
 };
 
-export const depositAndRepayUpdate = (position: PositionInt, amount: string) => {
-  const repayAmount = toWei(amount, Number(position['tokenDecimals']));
+export const depositAndRepayUpdate = (position: PositionSummary, amount: string) => {
+  const repayAmount = toWei(amount, Number(position['token'].decimals));
   const interestPaid =
     Number(repayAmount) > Number(position['interestAccrued']) ? position['interestAccrued'] : repayAmount;
   const prinicipalToRepay = Number(position['principal']) - Number(repayAmount) + Number(interestPaid);

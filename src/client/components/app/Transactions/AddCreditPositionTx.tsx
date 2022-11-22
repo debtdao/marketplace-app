@@ -97,7 +97,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
     if (selectedPosition && userMetadata.role === BORROWER_POSITION_ROLE) {
       let deposit = normalizeAmount(selectedPosition.deposit, 18);
       setTargetTokenAmount(deposit);
-      setSelectedTokenAddress(selectedPosition.tokenAddress);
+      setSelectedTokenAddress(selectedPosition.token.address);
       setDrate(selectedPosition.drate);
       setFrate(selectedPosition.frate);
       setLenderAddress(selectedPosition.lender);

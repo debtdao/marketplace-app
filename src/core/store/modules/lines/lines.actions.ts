@@ -17,7 +17,6 @@ import {
   AddCreditProps,
   UseCreditLinesParams,
   BorrowCreditProps,
-  PositionInt,
   Network,
   DeploySecuredLineProps,
   DeploySecuredLineWithConfigProps,
@@ -41,10 +40,10 @@ import { TokensActions } from '../tokens/tokens.actions';
 const setSelectedLineAddress = createAction<{ lineAddress?: string }>('lines/setSelectedLineAddress');
 const setSelectedLinePosition = createAction<{ position?: string }>('lines/setSelectedLinePosition');
 const setPositionData = createAction<{
-  positionObject: PositionInt;
+  positionObject: PositionSummary;
   lineAddress: string;
   position: string;
-  positions: PositionInt[];
+  positions: PositionSummary[];
 }>('lines/setUpdatedPositionData');
 
 /* -------------------------------------------------------------------------- */

@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
 import { LinesSelectors, LinesActions, WalletSelectors } from '@store';
 import { normalizeAmount, borrowUpdate } from '@src/utils';
-import { PositionItem } from '@src/core/types';
+import { PositionItem, PositionSummary } from '@src/core/types';
 
 import { TxContainer } from './components/TxContainer';
 import { TxActionButton } from './components/TxActions';
@@ -55,7 +55,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
     _updatePosition();
   };
 
-  const onSelectedPositionChange = (arg: PositionItem): void => {
+  const onSelectedPositionChange = (arg: PositionSummary): void => {
     dispatch(LinesActions.setSelectedLinePosition({ position: arg.id }));
   };
 
@@ -168,7 +168,6 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
         headerText={t('components.transaction.borrow-credit.select-line')}
         inputText={t('components.transaction.borrow-credit.select-line')}
         onSelectedPositionChange={onSelectedPositionChange}
-        //@ts-ignore
         selectedPosition={selectedPosition}
         positions={positions}
         // creditOptions={sourceCreditOptions}

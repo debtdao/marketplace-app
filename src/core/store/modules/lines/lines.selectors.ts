@@ -10,7 +10,7 @@ import {
   AggregatedCreditLine,
   Address,
   CreditLinePage,
-  PositionInt,
+  PositionSummary,
   UserPositionMetadata,
   BORROWER_POSITION_ROLE,
   LENDER_POSITION_ROLE,
@@ -205,7 +205,7 @@ const selectPositionData = createSelector(
 
     let selectedPositionData = _.find(
       line?.positions,
-      (position: PositionInt) => position.id === selectSelectedPosition
+      (position: PositionSummary) => position.id === selectSelectedPosition
     );
     return selectedPositionData;
   }

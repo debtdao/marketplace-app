@@ -41,7 +41,7 @@ export interface BaseCreditLine {
   status: LineStatusTypes;
   borrower: Address;
   arbiter: Address;
-  positions?: PositionInt[];
+  positions?: PositionSummary[];
   escrow?: { id: Address };
   spigot?: { id: Address };
 }
@@ -53,7 +53,7 @@ export interface AggregatedCreditLine extends BaseCreditLine {
   // id, symbol, APY (4 decimals)
   highestApy: [string, string, string];
 
-  positions?: PositionInt[];
+  positions?: PositionSummary[];
 
   escrow?: AggregatedEscrow;
   spigot?: AggregatedSpigot;
@@ -64,7 +64,7 @@ export interface CreditLinePage extends AggregatedCreditLine {
   interest: string; // | Promise<string>;
   totalInterestRepaid: string; // | Promise<string>;
 
-  positions?: PositionInt[];
+  positions?: PositionSummary[];
 
   collateralEvents: CollateralEvent[];
   creditEvents: CreditEvent[];
@@ -133,22 +133,6 @@ export interface UserPositionMetadata {
   available: string; // borrowable/withdrawable/liquidatable
 }
 
-// TODO consolidate PositonInt and PositionSummary types
-export interface PositionInt {
-  drate: string;
-  frate: string;
-  id: string;
-  interestAccrued: string;
-  interestRepaid: string;
-  lender: string;
-  deposit: string;
-  principal: string;
-  status: string;
-  tokenAddress: string;
-  tokenSymbol: string;
-  tokenDecimals: string;
-}
-
 export interface PositionItem {
   drate: string;
   frate: string;
@@ -164,8 +148,11 @@ export interface PositionSummary {
   lender: Address;
   token: TokenView;
   line: Address;
+  interestAccrued: string;
+  interestRepaid: string;
   deposit: string;
   principal: string;
+  status: string;
   drate: string;
   frate: string;
 }

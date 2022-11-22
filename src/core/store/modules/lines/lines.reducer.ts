@@ -5,8 +5,8 @@ import {
   CreditLineState,
   UserLineMetadataStatusMap,
   LineActionsStatusMap,
-  PositionInt,
   AggregatedCreditLine,
+  PositionSummary,
 } from '@types';
 
 import { LinesActions } from './lines.actions';
@@ -83,8 +83,8 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 
     .addCase(setPositionData, (state, { payload: { position, lineAddress, positionObject, positions } }) => {
       if (positionObject !== undefined) {
-        let newPositions: PositionInt[] = [];
-        positions.map((positionObj: PositionInt) => {
+        let newPositions: PositionSummary[] = [];
+        positions.map((positionObj: PositionSummary) => {
           let PositionId: string = positionObj.id;
           if (PositionId === position) {
             return;

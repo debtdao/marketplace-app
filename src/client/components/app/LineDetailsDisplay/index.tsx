@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { AggregatedCreditLine, CreditLinePage, PositionInt } from '@src/core/types';
+import { AggregatedCreditLine, CreditLinePage, PositionSummary } from '@src/core/types';
 import { useAppTranslation } from '@hooks';
 import { Text } from '@components/common';
 
@@ -38,7 +38,7 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
 
   const [allDataLoaded, setAllDataLoaded] = useState(false);
   const [lineData, setLineData] = useState<AggregatedCreditLine | CreditLinePage>(line!);
-  const [positions, setPositions] = useState<PositionInt[]>();
+  const [positions, setPositions] = useState<PositionSummary[]>();
 
   useEffect(() => {
     if (page && page.positions) {

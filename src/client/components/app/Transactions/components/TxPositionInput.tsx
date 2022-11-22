@@ -5,7 +5,7 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppTranslation } from '@hooks';
 import { Text, Icon, ZapIcon, LogoIcon } from '@components/common';
 import { PositionSearchList } from '@src/client/components/common/PositionSearchList';
-import { PositionItem } from '@src/core/types';
+import { PositionSummary, PositionItem } from '@src/core/types';
 import { normalizeAmount } from '@src/utils';
 
 import { TokenIcon } from '../../TokenIcon';
@@ -130,9 +130,9 @@ export interface TxPositionInputProps {
   headerText?: string;
   inputText?: string;
   inputError?: boolean;
-  selectedPosition?: PositionItem;
-  onSelectedPositionChange?: (arg: PositionItem) => void;
-  positions?: PositionItem[];
+  selectedPosition?: PositionSummary;
+  onSelectedPositionChange?: (arg: PositionSummary) => void;
+  positions?: PositionSummary[];
   readOnly?: boolean;
   loading?: boolean;
   loadingText?: string;
@@ -164,7 +164,7 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
     lender: selectedPosition!.lender,
     // icon: '',
     deposit: selectedPosition!.deposit,
-    tokenSymbol: selectedPosition!.tokenSymbol,
+    tokenSymbol: selectedPosition!.token.symbol,
     frate: selectedPosition!.frate,
     drate: selectedPosition!.drate,
   };
@@ -179,7 +179,7 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
           lender: item!.lender,
           // icon: '',
           deposit: item!.deposit,
-          tokenSymbol: item?.tokenSymbol,
+          tokenSymbol: item?.token.symbol,
           frate: item?.frate,
           drate: item?.drate,
         };
@@ -229,7 +229,7 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
           <CreditLineData>
             <LineTitle ellipsis> Lender: {selectedPosition?.lender} </LineTitle>
             <LineTitle ellipsis>
-              {`${normalizeAmount(selectedPosition?.deposit, 18)} ${selectedPosition?.tokenSymbol}
+              {`${normalizeAmount(selectedPosition?.deposit, 18)} ${selectedPosition?.token.symbol}
               @${selectedPosition?.drate}/${selectedPosition?.frate}%`}
             </LineTitle>
           </CreditLineData>

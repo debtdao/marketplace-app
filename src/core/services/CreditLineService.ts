@@ -393,6 +393,7 @@ export class CreditLineServiceImpl implements CreditLineService {
   public async getBorrowerPositions(
     prop: GetBorrowerPositionsProps
   ): Promise<GetBorrowerPositionsResponse | undefined> {
+    console.log('CreditLineService.ts: borrower prop: ', prop);
     const response = getBorrowerPositions(prop)
       .then((data) => data)
       .catch((err) => {

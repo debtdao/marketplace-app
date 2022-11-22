@@ -106,4 +106,7 @@ export const getUserLinePositions: QueryCreator<GetUserLinePositionsArgs, Positi
 const getBorrowerPositionsQuery = createQuery(GET_BORROWER_POSITIONS_QUERY, 'lineOfCredits');
 export const getBorrowerPositions: QueryCreator<GetBorrowerPositionsArgs, GetBorrowerPositionsResponse> = (
   arg: GetBorrowerPositionsArgs
-) => getBorrowerPositionsQuery(arg);
+) => {
+  console.log('gql/indx.ts getBorrowerPositions: ', arg);
+  return getBorrowerPositionsQuery(arg);
+};

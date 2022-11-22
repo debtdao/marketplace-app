@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { AggregatedCreditLine, CreditLinePage } from '@src/core/types';
-import { useAppTranslation } from '@hooks';
+import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
 import { Text } from '@components/common';
+import { LinesActions, LinesSelectors } from '@src/core/store';
 
 import { LineMetadata } from './LineMetadata';
 import { PositionsTable } from './PositionsTable';
@@ -36,9 +37,14 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   const { t } = useAppTranslation('common');
   const { line, page } = props;
 
+  const dispatch = useAppDispatch();
+  const borrowerPositions = useAppSelector(LinesSelectors.selectBorrowerPositions);
+
   const [allDataLoaded, setAllDataLoaded] = useState(false);
   const [lineData, setLineData] = useState<AggregatedCreditLine | CreditLinePage>(line!);
   const [positions, setPositions] = useState<[]>();
+
+  const { principal, deposit, escrow, spigot, borrower, start, end } = lineData;
 
   useEffect(() => {
     if (page && page.positions) {
@@ -50,9 +56,18 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
     // LineDetails page handles getLinePage query
   }, [page]);
 
-  if (!line && !page) return <Container>{t('lineDetails:line.no-data')}</Container>;
+  useEffect(() => {
+    console.log({ borrower });
+    if (borrower) {
+      dispatch(LinesActions.getBorrowerPositions({ borrower }));
+    }
+  }, [borrower]);
 
-  const { principal, deposit, escrow, spigot, borrower, start, end } = lineData;
+  useEffect(() => {
+    console.log({ borrowerPositions });
+  }, [borrowerPositions]);
+
+  if (!line && !page) return <Container>{t('lineDetails:line.no-data')}</Container>;
 
   const StandardMetadata = (metadataProps: any) => (
     <>

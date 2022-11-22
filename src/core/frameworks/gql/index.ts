@@ -17,7 +17,13 @@ import {
   GetLinesResponse,
 } from '@src/core/types';
 
-import { GET_LINE_QUERY, GET_LINE_PAGE_QUERY, GET_LINE_PAGE_AUX_QUERY, GET_LINES_QUERY } from './queries';
+import {
+  GET_LINE_QUERY,
+  GET_LINE_PAGE_QUERY,
+  GET_LINE_PAGE_AUX_QUERY,
+  GET_LINES_QUERY,
+  GET_BORROWING_POSITIONS_QUERY,
+} from './queries';
 
 const { GRAPH_API_URL } = getEnv();
 const { BLACKLISTED_LINES: blacklist } = getConstants();
@@ -94,3 +100,7 @@ export const getUserLinePositions: QueryCreator<GetUserLinePositionsArgs, Positi
 >(
   arg: GetUserLinePositionsArgs
 ) => getUserLinePositionsQuery(arg);
+
+const getUserBorrowingPositionsQuery = createQuery(GET_BORROWING_POSITIONS_QUERY);
+export const getUserBorrowingPositions: QueryCreator<> = (arg: GetUserBorrowingPositionsArgs) =>
+  getgetUserBorrowingPositionsQuery(arg);

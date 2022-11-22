@@ -1,4 +1,4 @@
-import { ContractFunction, ethers, PopulatedTransaction } from 'ethers';
+import { ContractFunction, ethers, PopulatedTransaction, ContractInterface } from 'ethers';
 import { BytesLike } from '@ethersproject/bytes/src.ts';
 import { keccak256 } from 'ethers/lib/utils';
 
@@ -79,6 +79,8 @@ export class CreditLineServiceImpl implements CreditLineService {
       return (<TransactionResponse>await this.executeContractMethod(props.lineAddress, 'close', [props.id], 'goerli'))
         .hash;
     } catch (e) {
+      const errObj = JSON.parse(JSON.stringify(e));
+      console.log(errObj.transaction.data);
       console.log(`An error occured while closing credit, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
     }
@@ -86,6 +88,8 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   public async withdraw(props: WithdrawLineProps): Promise<TransactionResponse | PopulatedTransaction> {
     try {
+      const check = await this.isLender(props.lineAddress, props.id);
+      console.log(check);
       if (!(await this.isLender(props.lineAddress, props.id))) {
         throw new Error('Cannot withdraw. Signer is not lender');
       }
@@ -94,6 +98,8 @@ export class CreditLineServiceImpl implements CreditLineService {
         await this.executeContractMethod(props.lineAddress, 'withdraw', [props.id, props.amount], props.network)
       )).hash;
     } catch (e) {
+      const errObj = JSON.parse(JSON.stringify(e));
+      console.log(errObj.transaction.data);
       console.log(`An error occured while withdrawing credit, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
     }
@@ -122,6 +128,8 @@ export class CreditLineServiceImpl implements CreditLineService {
         await this.executeContractMethod(props.lineAddress, 'setRates', [props.id, props.drate, props.frate], 'goerli')
       )).hash;
     } catch (e) {
+      const errObj = JSON.parse(JSON.stringify(e));
+      console.log(errObj.transaction.data);
       console.log(`An error occured while setting rate, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
     }
@@ -155,6 +163,8 @@ export class CreditLineServiceImpl implements CreditLineService {
         await this.executeContractMethod(props.lineAddress, 'increaseCredit', [props.id, props.amount], 'goerli')
       )).hash;
     } catch (e) {
+      const errObj = JSON.parse(JSON.stringify(e));
+      console.log(errObj.transaction.data);
       console.log(`An error occured while increasing credit, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
     }
@@ -188,6 +198,8 @@ export class CreditLineServiceImpl implements CreditLineService {
         await this.executeContractMethod(props.lineAddress, 'depositAndRepay', [props.amount], props.network)
       )).hash;
     } catch (e) {
+      const errObj = JSON.parse(JSON.stringify(e));
+      console.log(errObj.transaction.data);
       console.log(`An error occured while depositAndRepay credit, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
     }
@@ -206,6 +218,8 @@ export class CreditLineServiceImpl implements CreditLineService {
         await this.executeContractMethod(props.lineAddress, 'depositAndClose', [], props.network)
       )).hash;
     } catch (e) {
+      const errObj = JSON.parse(JSON.stringify(e));
+      console.log(errObj.transaction.data);
       console.log(`An error occured while depositAndClose credit, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
     }
@@ -246,6 +260,8 @@ export class CreditLineServiceImpl implements CreditLineService {
         )
       );
     } catch (e) {
+      const errObj = JSON.parse(JSON.stringify(e));
+      console.log(errObj.transaction.data);
       console.log(`An error occured while adding credit, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
     }
@@ -264,7 +280,12 @@ export class CreditLineServiceImpl implements CreditLineService {
         await this.executeContractMethod(line, 'borrow', [data.id, data.amount], props.network, false)
       );
     } catch (e) {
-      console.log(`An error occured while borrowing credit, error = [${JSON.stringify(e)}]`);
+      const lineInterface = await this._getContract(props.line);
+      const errObj = JSON.parse(JSON.stringify(e));
+      console.log(lineInterface.interface);
+      console.log(lineInterface.interface.parseError(errObj));
+      console.log(errObj.transaction.data);
+      //console.log(`An error occured while borrowing credit, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
     }
   }
@@ -297,6 +318,8 @@ export class CreditLineServiceImpl implements CreditLineService {
       await tx.wait();
       return tx;
     } catch (e) {
+      const errObj = JSON.parse(JSON.stringify(e));
+      console.log(errObj.transaction.data);
       console.log(
         `An error occured while ${methodName} with params [${params}] on CreditLine [${props?.contractAddress}], error = ${e} `
       );

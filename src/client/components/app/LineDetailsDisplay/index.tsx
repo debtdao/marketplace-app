@@ -6,7 +6,7 @@ import { useAppTranslation } from '@hooks';
 import { Text } from '@components/common';
 
 import { LineMetadata } from './LineMetadata';
-import { CreditEventsTable } from './CreditEventsTable';
+import { PositionsTable } from './PositionsTable';
 
 interface LineDetailsProps {
   line?: AggregatedCreditLine;
@@ -46,12 +46,14 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
       setLineData(page);
       setPositions(page.positions);
     }
+    console.log('updating in line details', page);
     // LineDetails page handles getLinePage query
-  }, [page?.positions]);
+  }, [page]);
 
   if (!line && !page) return <Container>{t('lineDetails:line.no-data')}</Container>;
 
   const { principal, deposit, escrow, spigot, borrower, start, end } = lineData;
+
   const StandardMetadata = (metadataProps: any) => (
     <>
       <Header>
@@ -76,7 +78,7 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
           startTime={start}
           endTime={end}
         />
-        <CreditEventsTable events={positions} />
+        <PositionsTable events={positions} />
       </Container>
     );
   } else {

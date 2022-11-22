@@ -37,6 +37,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
   const selectedPosition = useAppSelector(LinesSelectors.selectPositionData);
   const [targetAmount, setTargetAmount] = useState('1');
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
+  const selectedPage = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const positions = useAppSelector(LinesSelectors.selectPositions);
 
   console.log('selected Position', selectedPosition);
@@ -88,6 +89,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
         setLoading(false);
       }
       if (res.meta.requestStatus === 'fulfilled') {
+        window.location.reload();
         setTransactionCompleted(1);
         setLoading(false);
       }

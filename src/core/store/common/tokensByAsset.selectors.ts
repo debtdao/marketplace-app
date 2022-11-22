@@ -1,12 +1,14 @@
-import { createSelector } from '@reduxjs/toolkit';
+import { createSelector, current } from '@reduxjs/toolkit';
 import { memoize } from 'lodash';
 
 import { getConfig } from '@config';
 import { TokenView } from '@types';
+import { testTokens } from '@src/config/constants';
 
 import { VaultsSelectors } from '../modules/vaults/vaults.selectors';
 import { TokensSelectors } from '../modules/tokens/tokens.selectors';
 import { AppSelectors } from '../modules/app/app.selectors';
+import { WalletSelectors } from '../modules/wallet/wallet.selectors';
 import { createToken } from '../modules/tokens/tokens.selectors';
 import { NetworkSelectors } from '../modules/network/network.selectors';
 
@@ -14,24 +16,30 @@ const { selectVaultsMap } = VaultsSelectors;
 const { selectTokensMap, selectTokensUser } = TokensSelectors;
 const { selectServicesEnabled } = AppSelectors;
 const { selectCurrentNetwork } = NetworkSelectors;
+const { selectWalletNetwork } = WalletSelectors;
 
 export const selectDepositTokenOptionsByAsset = createSelector(
-  [selectVaultsMap, selectTokensMap, selectTokensUser, selectServicesEnabled, selectCurrentNetwork],
-  (vaultsMap, tokensMap, tokensUser, servicesEnabled, currentNetwork) =>
+  [selectTokensMap, selectTokensUser, selectServicesEnabled, selectWalletNetwork],
+  (tokensMap, tokensUser, servicesEnabled, currentNetwork) =>
     memoize((assetAddress?: string): TokenView[] => {
-      const { TOKEN_ADDRESSES } = getConfig();
-      const { userTokensMap, userTokensAllowancesMap } = tokensUser;
+      console.log('selectDepositTokenOptionsByAsset', currentNetwork, tokensMap, testTokens);
+      if (currentNetwork === 'goerli') {
+        return testTokens;
+      } else {
+        const { TOKEN_ADDRESSES } = getConfig();
+        const { userTokensMap, userTokensAllowancesMap } = tokensUser;
 
-      const tokens = Object.values(TOKEN_ADDRESSES)
-        .filter((address) => !!tokensMap[address])
-        .map((address) => {
-          const tokenData = tokensMap[address];
-          const userTokenData = userTokensMap[address];
-          const allowancesMap = userTokensAllowancesMap[address] ?? {};
-          return createToken({ tokenData, userTokenData, allowancesMap });
-        });
+        const tokens = Object.values(TOKEN_ADDRESSES)
+          .filter((address) => !!tokensMap[address])
+          .map((address) => {
+            const tokenData = tokensMap[address];
+            const userTokenData = userTokensMap[address];
+            const allowancesMap = userTokensAllowancesMap[address] ?? {};
+            return createToken({ tokenData, userTokenData, allowancesMap });
+          });
 
-      return tokens;
+        return tokens;
+      }
     })
 );
 

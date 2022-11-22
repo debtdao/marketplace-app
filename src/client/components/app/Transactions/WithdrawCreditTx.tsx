@@ -36,6 +36,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionLoading, setLoading] = useState(false);
   const [targetAmount, setTargetAmount] = useState('1');
+  const [errors, setErrors] = useState<string[]>(['']);
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedPosition = useAppSelector(LinesSelectors.selectPositionData);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
@@ -69,8 +70,28 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
 
   const withdrawCredit = () => {
     setLoading(true);
-    // TODO set error in state to display no line selected
-    if (!selectedCredit?.id || !targetAmount || !walletNetwork || !selectedPosition || !positions) {
+    if (!selectedCredit?.id) {
+      setErrors([...errors, 'no selected credit ID']);
+      setLoading(false);
+      return;
+    }
+    if (!targetAmount) {
+      setErrors([...errors, 'no selected target amount']);
+      setLoading(false);
+      return;
+    }
+    if (!selectedPosition) {
+      setErrors([...errors, 'no selected position']);
+      setLoading(false);
+      return;
+    }
+    if (!walletNetwork) {
+      setErrors([...errors, 'wallet not connected']);
+      setLoading(false);
+      return;
+    }
+    if (!positions) {
+      setErrors([...errors, 'no positions available']);
       setLoading(false);
       return;
     }

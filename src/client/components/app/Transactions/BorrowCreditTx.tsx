@@ -88,12 +88,11 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
         setLoading(false);
       }
       if (res.meta.requestStatus === 'fulfilled') {
-        let updatedPosition = borrowUpdate(selectedPosition, targetAmount);
+        const updatedPosition = borrowUpdate(selectedPosition, targetAmount);
         dispatch(
-          LinesActions.setUpdatedPositionData({
+          LinesActions.setPositionData({
             position: selectedPosition['id'],
             lineAddress: selectedCredit.id,
-            //@ts-ignore
             positionObject: updatedPosition,
             positions: positions,
           })

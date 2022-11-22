@@ -89,12 +89,11 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
       }
       if (res.meta.requestStatus === 'fulfilled') {
         setTransactionCompleted(1);
-        let updatedPosition = withdrawUpdate(selectedPosition, targetAmount);
+        const updatedPosition = withdrawUpdate(selectedPosition, targetAmount);
         dispatch(
-          LinesActions.setUpdatedPositionData({
+          LinesActions.setPositionData({
             position: selectedPosition['id'],
             lineAddress: selectedCredit.id,
-            //@ts-ignore
             positionObject: updatedPosition,
             positions: positions,
           })

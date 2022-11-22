@@ -58,7 +58,7 @@ const {
   // initiateSaveLines,
   setSelectedLineAddress,
   setSelectedLinePosition,
-  setUpdatedPositionData,
+  setPositionData,
   getUserLinePositions,
   clearLinesData,
   clearUserData,
@@ -81,7 +81,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.selectedPosition = position;
     })
 
-    .addCase(setUpdatedPositionData, (state, { payload: { position, lineAddress, positionObject, positions } }) => {
+    .addCase(setPositionData, (state, { payload: { position, lineAddress, positionObject, positions } }) => {
       if (positionObject !== undefined) {
         let newPositions: PositionInt[] = [];
         positions.map((positionObj: PositionInt) => {

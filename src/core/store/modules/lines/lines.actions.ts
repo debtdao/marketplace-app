@@ -40,7 +40,7 @@ import { TokensActions } from '../tokens/tokens.actions';
 
 const setSelectedLineAddress = createAction<{ lineAddress?: string }>('lines/setSelectedLineAddress');
 const setSelectedLinePosition = createAction<{ position?: string }>('lines/setSelectedLinePosition');
-const setUpdatedPositionData = createAction<{
+const setPositionData = createAction<{
   positionObject: PositionInt;
   lineAddress: string;
   position: string;
@@ -711,7 +711,7 @@ const getWithdrawAllowance = createAsyncThunk<
 export const LinesActions = {
   setSelectedLineAddress,
   setSelectedLinePosition,
-  setUpdatedPositionData,
+  setPositionData,
   // initiateSaveLines,
   getLine,
   getLines,

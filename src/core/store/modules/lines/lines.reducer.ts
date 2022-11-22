@@ -83,15 +83,9 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 
     .addCase(setPositionData, (state, { payload: { position, lineAddress, positionObject, positions } }) => {
       if (positionObject !== undefined) {
-        let newPositions: PositionSummary[] = [];
-        positions.map((positionObj: PositionSummary) => {
-          let PositionId: string = positionObj.id;
-          if (PositionId === position) {
-            return;
-          } else {
-            newPositions.push(positionObj);
-          }
-        });
+        const newPositions: PositionSummary[] = positions.filter(
+          (positionObj: PositionSummary) => position !== positionObj.id
+        );
         newPositions.push({ ...positionObject });
 
         state.pagesMap[lineAddress].positions = newPositions;

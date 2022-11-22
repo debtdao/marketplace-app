@@ -9,10 +9,12 @@ import {
   GetLinePageArgs,
   GetLinesArgs,
   GetUserLinePositionsArgs,
+  GetBorrowerPositionsArgs,
   QueryResponse,
   QueryCreator,
   GetLinePageResponse,
   GetLinePageAuxDataResponse,
+  GetBorrowerPositionsResponse,
   PositionSummary,
   GetLinesResponse,
 } from '@src/core/types';
@@ -22,7 +24,7 @@ import {
   GET_LINE_PAGE_QUERY,
   GET_LINE_PAGE_AUX_QUERY,
   GET_LINES_QUERY,
-  GET_BORROWING_POSITIONS_QUERY,
+  GET_BORROWER_POSITIONS_QUERY,
 } from './queries';
 
 const { GRAPH_API_URL } = getEnv();
@@ -101,6 +103,7 @@ export const getUserLinePositions: QueryCreator<GetUserLinePositionsArgs, Positi
   arg: GetUserLinePositionsArgs
 ) => getUserLinePositionsQuery(arg);
 
-const getUserBorrowingPositionsQuery = createQuery(GET_BORROWING_POSITIONS_QUERY);
-export const getUserBorrowingPositions: QueryCreator<> = (arg: GetUserBorrowingPositionsArgs) =>
-  getgetUserBorrowingPositionsQuery(arg);
+const getBorrowerPositionsQuery = createQuery(GET_BORROWER_POSITIONS_QUERY, 'lineOfCredits');
+export const getUserBorrowingPositions: QueryCreator<GetBorrowerPositionsArgs, GetBorrowerPositionsResponse> = (
+  arg: GetBorrowerPositionsArgs
+) => getBorrowerPositionsQuery(arg);

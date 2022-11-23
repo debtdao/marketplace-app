@@ -10,13 +10,13 @@ import {
   AggregatedCreditLine,
   Address,
   CreditLinePage,
-  PositionInt,
+  CreditPosition,
   UserPositionMetadata,
   BORROWER_POSITION_ROLE,
   LENDER_POSITION_ROLE,
   ARBITER_POSITION_ROLE, // prev. GeneralVaultView, Super indepth data, CreditLinePage is most similar atm
 } from '@types';
-import { formatAggregatedCreditLineData, toBN, unnullify } from '@utils';
+import { toBN, unnullify } from '@utils';
 import { getConstants } from '@src/config/constants';
 
 import { initialLineActionsStatusMap } from './lines.reducer';
@@ -205,9 +205,8 @@ const selectPositionData = createSelector(
 
     let selectedPositionData = _.find(
       line?.positions,
-      (position: PositionInt) => position.id === selectSelectedPosition
+      (position: CreditPosition) => position.id === selectSelectedPosition
     );
-    console.log(selectedPositionData, 'e');
     return selectedPositionData;
   }
 );

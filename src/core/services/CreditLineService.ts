@@ -13,7 +13,7 @@ import {
   TransactionResponse,
   STATUS,
   ExecuteTransactionProps,
-  Credit,
+  CreditPosition,
   GetUserLinesProps,
   GetLineProps,
   GetLinesProps,
@@ -318,7 +318,7 @@ export class CreditLineServiceImpl implements CreditLineService {
     return await this._getContract(contractAddress).ids(0);
   }
 
-  public async getCredit(contractAddress: string, id: BytesLike): Promise<Credit> {
+  public async getCredit(contractAddress: string, id: BytesLike): Promise<CreditPosition> {
     return await this._getContract(contractAddress).credits(id);
   }
 

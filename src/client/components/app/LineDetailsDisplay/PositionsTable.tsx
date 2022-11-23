@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { device } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer, SliderCard } from '@components/app';
 import { Input, SearchIcon, Text, Button } from '@components/common';
-import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE } from '@src/core/types';
+import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, CreditPosition } from '@src/core/types';
 import { humanize, formatAddress } from '@src/utils';
 
 const PositionsCard = styled(DetailCard)`
@@ -45,7 +45,7 @@ const TableHeader = styled.h3`
 `;
 
 interface PositionsProps {
-  events: [];
+  events: CreditPosition[];
 }
 
 const BannerCtaButton = styled(Button)`
@@ -261,16 +261,16 @@ export const PositionsTable = (props: PositionsProps) => {
               principal: humanize('amount', event['principal'], 18, 2),
               interest: humanize('amount', event['interestAccrued'], 18, 2),
               lender: formatAddress(event['lender']),
-              token: event['tokenSymbol'],
+              token: event['token'].symbol,
               actions: (
                 <ActionButtons
                   value={event['id']}
                   actions={
                     event['status'] === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE
                       ? [ApproveMutualConsent]
-                      : userRoleMetadata.role === LENDER_POSITION_ROLE && event['status'] === 'OPEN'
+                      : userRoleMetadata.role === LENDER_POSITION_ROLE && event['status'] === 'OPENED'
                       ? actions
-                      : userRoleMetadata.role === BORROWER_POSITION_ROLE && event['status'] === 'OPEN'
+                      : userRoleMetadata.role === BORROWER_POSITION_ROLE && event['status'] === 'OPENED'
                       ? actions
                       : []
                   }

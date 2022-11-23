@@ -53,6 +53,7 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   if (!line && !page) return <Container>{t('lineDetails:line.no-data')}</Container>;
 
   const { principal, deposit, escrow, spigot, borrower, start, end } = lineData;
+
   const StandardMetadata = (metadataProps: any) => (
     <>
       <Header>

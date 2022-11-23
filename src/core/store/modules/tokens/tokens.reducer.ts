@@ -12,6 +12,7 @@ export const initialUserTokenActionsMap: UserTokenActionsMap = {
 
 export const tokensInitialState: TokensState = {
   tokensAddresses: [],
+  activeNetworkTokenAddresses: [],
   tokensMap: {},
   selectedTokenAddress: undefined,
   user: {

@@ -10,7 +10,7 @@ import {
   useAppSelector,
 } from '@hooks';
 import { ACTIVE_STATUS, ARBITER_POSITION_ROLE, EnableCollateralAssetProps } from '@src/core/types';
-import { TOKEN_ADDRESSES } from '@src/config/constants';
+import { TOKEN_ADDRESSES, testTokens } from '@src/config/constants';
 import {
   TokensActions,
   TokensSelectors,
@@ -67,7 +67,6 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
   // user data
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
-  const walletAddresssk = useAppSelector(WalletSelectors.selectSelectedAddress);
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedEscrow = useAppSelector(CollateralSelectors.selectSelectedEscrow);
@@ -164,26 +163,27 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
     // TODO set error in state to display no line selected
 
     if (!selectedEscrow || !selectedAssetAddress) {
-      console.log('check this', selectedLine?.id, selectedAssetAddress);
       setLoading(false);
       return; // TODO throw error ot UI component
     }
 
-    console.log('wallet network on enable collat tx', walletNetwork, walletIsConnected, walletAddresssk);
+    console.log('wallet network on enable collat tx', walletNetwork, walletIsConnected);
     if (!walletNetwork) {
       setLoading(false);
       return; // TODO throw error ot UI component
     }
 
     const transactionData: EnableCollateralAssetProps = {
-      escrowAddress: selectedEscrow!,
+      escrowAddress: selectedEscrow,
       token: selectedAssetAddress,
       network: walletNetwork,
-      dryRun: true,
+      dryRun: false,
     };
-    //@ts-ignore
+
+    console.log('enable collataral data', transactionData.escrowAddress, transactionData.token);
     dispatch(CollateralActions.enableCollateral(transactionData)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
+        console.log('enable collateral faild', res);
         setTransactionCompleted(2);
         console.log(transactionCompleted, 'tester');
         setLoading(false);

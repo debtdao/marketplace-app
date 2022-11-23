@@ -162,7 +162,7 @@ export const RecommendationsCard = ({ header, subHeader, items, ...props }: Reco
               <Divider />
               <ItemName>
                 {' '}
-                {t('components.line-card.line')}: {formatAddress(item.id)}
+                {t('components.line-card.line')}: {item.id}
               </ItemName>
               <Divider />
               <ItemName>

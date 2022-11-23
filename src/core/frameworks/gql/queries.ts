@@ -23,6 +23,8 @@ const BASE_LINE_FRAGMENT = gql`
     start
     status
     arbiter
+    oracle
+    dex
     borrower {
       id
     }

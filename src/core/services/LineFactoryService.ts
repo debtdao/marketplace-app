@@ -57,13 +57,7 @@ export class LineFactoryServiceImpl {
     borrower: string,
     dryRun: boolean
   ): Promise<TransactionResponse | PopulatedTransaction> {
-    return await this.executeContractMethod(
-      contractAddress,
-      'deployEscrow',
-      [owner, borrower],
-      'goerli',
-      dryRun
-    );
+    return await this.executeContractMethod(contractAddress, 'deployEscrow', [owner, borrower], 'goerli', dryRun);
   }
 
   public async deploySecuredLine(props: {
@@ -75,9 +69,7 @@ export class LineFactoryServiceImpl {
     const data = {
       borrower,
       ttl,
-  
       factoryAddress: LineFactory_GOERLI,
-      
     };
     console.log(data);
     return <TransactionResponse>(

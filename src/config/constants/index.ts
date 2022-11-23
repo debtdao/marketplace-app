@@ -1,8 +1,9 @@
 import { memoize } from 'lodash';
-import {networks} from "../../../networks.json";
 
 import { Constants, NetworkSettings, TokenView } from '@types';
 import { getEnv } from '@config/env';
+
+import { networks } from './networks.json';
 // import { encode } from '@src/utils';
 
 export const TOKEN_ADDRESSES = {

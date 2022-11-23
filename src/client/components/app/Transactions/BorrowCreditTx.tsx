@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
 import { LinesSelectors, LinesActions, WalletSelectors } from '@store';
 import { normalizeAmount, borrowUpdate } from '@src/utils';
-import { PositionItem, PositionSummary } from '@src/core/types';
+import { PositionSummary } from '@src/core/types';
 
 import { TxContainer } from './components/TxContainer';
 import { TxActionButton } from './components/TxActions';

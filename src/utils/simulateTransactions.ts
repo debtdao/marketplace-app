@@ -27,3 +27,10 @@ export const depositAndRepayUpdate = (position: PositionSummary, amount: string)
     interestPaid: `${Number(position['interestRepaid']) + remainingInterest}`,
   };
 };
+
+export const addCreditUpdate = (position: PositionSummary) => {
+  return {
+    ...position,
+    status: 'OPEN',
+  };
+};

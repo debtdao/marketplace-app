@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 
-import { formatAmount, normalizeAmount, isAddress, toWei } from '@utils';
+import { formatAmount, normalizeAmount, isAddress, toWei, addCreditUpdate } from '@utils';
 import {
   useAppTranslation,
   useAppDispatch,
@@ -90,17 +90,20 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const [frate, setFrate] = useState('0.00');
   const [lenderAddress, setLenderAddress] = useState(walletAddress ? walletAddress : '');
   const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
+  const [transactionType, setTransactionType] = useState('propose');
+  const positions = useAppSelector(LinesSelectors.selectPositions);
 
   //main net logic
 
   useEffect(() => {
     if (selectedPosition && userMetadata.role === BORROWER_POSITION_ROLE) {
-      let deposit = normalizeAmount(selectedPosition.deposit, 18);
+      let deposit = normalizeAmount(selectedPosition.deposit, selectedPosition.token.decimals);
       setTargetTokenAmount(deposit);
       setSelectedTokenAddress(selectedPosition.token.address);
       setDrate(selectedPosition.drate);
       setFrate(selectedPosition.frate);
       setLenderAddress(selectedPosition.lender);
+      setTransactionType('accept');
     }
   }, [selectedPosition]);
 
@@ -180,12 +183,10 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const addCreditPosition = async () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    if (!selectedCredit?.id || !drate || !frate || lenderAddress === '') {
+    if (!selectedCredit?.id || !drate || !frate || lenderAddress === '' || !selectedPosition || !positions) {
       setLoading(false);
       return;
     }
-
-    console.log(toWei(drate, 2), toWei(frate, 2), 'to wei');
 
     let checkSumAddress = await isAddress(lenderAddress);
 
@@ -209,7 +210,20 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         setTransactionCompleted(2);
         setLoading(false);
       }
-      if (res.meta.requestStatus === 'fulfilled') {
+      if (res.meta.requestStatus === 'fulfilled' && transactionType === 'accept') {
+        const updatedPosition = addCreditUpdate(selectedPosition);
+        dispatch(
+          LinesActions.setPositionData({
+            position: selectedPosition['id'],
+            lineAddress: selectedCredit.id,
+            positionObject: updatedPosition,
+            positions: positions,
+          })
+        );
+        setTransactionCompleted(1);
+        setLoading(false);
+      }
+      if (res.meta.requestStatus === 'fulfilled' && transactionType === 'propose') {
         setTransactionCompleted(1);
         setLoading(false);
       }

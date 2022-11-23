@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { isEmpty } from 'lodash';
 import { BigNumber } from 'ethers';
 import styled from 'styled-components';

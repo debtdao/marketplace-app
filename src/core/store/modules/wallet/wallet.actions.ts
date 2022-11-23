@@ -66,10 +66,8 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
           });
         },
         address: () => {
-          if (ALLOW_DEV_MODE && settings.devMode.enabled && isValidAddress(settings.devMode.walletAddressOverride)) {
-            dispatch(addressChange({ address: settings.devMode.walletAddressOverride }));
-            dispatch(getAddressEnsName({ address: settings.devMode.walletAddressOverride }));
-          }
+          dispatch(addressChange({ address: settings.devMode.walletAddressOverride }));
+          dispatch(getAddressEnsName({ address: settings.devMode.walletAddressOverride }));
         },
         network: (networkId) => {
           const supportedNetworkSettings = SUPPORTED_NETWORKS.find(

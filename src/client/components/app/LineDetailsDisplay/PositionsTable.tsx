@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { device } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer, SliderCard } from '@components/app';
 import { Input, SearchIcon, Text, Button } from '@components/common';
-import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, PositionSummary } from '@src/core/types';
+import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, CreditPosition } from '@src/core/types';
 import { humanize, formatAddress } from '@src/utils';
 
 const PositionsCard = styled(DetailCard)`
@@ -45,7 +45,7 @@ const TableHeader = styled.h3`
 `;
 
 interface PositionsProps {
-  events: PositionSummary[];
+  events: CreditPosition[];
 }
 
 const BannerCtaButton = styled(Button)`
@@ -268,9 +268,9 @@ export const PositionsTable = (props: PositionsProps) => {
                   actions={
                     event['status'] === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE
                       ? [ApproveMutualConsent]
-                      : userRoleMetadata.role === LENDER_POSITION_ROLE && event['status'] === 'OPEN'
+                      : userRoleMetadata.role === LENDER_POSITION_ROLE && event['status'] === 'OPENED'
                       ? actions
-                      : userRoleMetadata.role === BORROWER_POSITION_ROLE && event['status'] === 'OPEN'
+                      : userRoleMetadata.role === BORROWER_POSITION_ROLE && event['status'] === 'OPENED'
                       ? actions
                       : []
                   }

@@ -6,7 +6,7 @@ import { formatAmount, normalizeAmount, toWei, depositAndRepayUpdate } from '@ut
 import { useAppTranslation, useAppDispatch, useAppSelector, useSelectedSellToken } from '@hooks';
 import { TokensActions, TokensSelectors, VaultsSelectors, LinesSelectors, LinesActions, WalletSelectors } from '@store';
 import { getConstants, testTokens } from '@src/config/constants';
-import { PositionItem, PositionSummary } from '@src/core/types';
+import { PositionItem, CreditPosition } from '@src/core/types';
 
 import { TxContainer } from './components/TxContainer';
 import { TxTokenInput } from './components/TxTokenInput';
@@ -295,7 +295,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
     _updatePosition();
   };
 
-  const onSelectedPositionChange = (arg: PositionSummary): void => {
+  const onSelectedPositionChange = (arg: CreditPosition): void => {
     dispatch(LinesActions.setSelectedLinePosition({ position: arg.id }));
   };
 

@@ -5,7 +5,7 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppTranslation } from '@hooks';
 import { Text, Icon, ZapIcon, LogoIcon } from '@components/common';
 import { PositionSearchList } from '@src/client/components/common/PositionSearchList';
-import { PositionSummary, PositionItem } from '@src/core/types';
+import { CreditPosition, PositionItem } from '@src/core/types';
 import { normalizeAmount } from '@src/utils';
 
 import { TokenIcon } from '../../TokenIcon';
@@ -130,9 +130,9 @@ export interface TxPositionInputProps {
   headerText?: string;
   inputText?: string;
   inputError?: boolean;
-  selectedPosition?: PositionSummary;
-  onSelectedPositionChange?: (arg: PositionSummary) => void;
-  positions?: PositionSummary[];
+  selectedPosition?: CreditPosition;
+  onSelectedPositionChange?: (arg: CreditPosition) => void;
+  positions?: CreditPosition[];
   readOnly?: boolean;
   loading?: boolean;
   loadingText?: string;

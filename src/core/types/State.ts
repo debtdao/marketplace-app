@@ -97,6 +97,10 @@ export interface VaultTransaction {
   expectedOutcome: TransactionOutcome | undefined;
 }
 
+export type IdToCreditPositionMap = {
+  [positionId: string]: CreditPosition;
+};
+
 export interface CreditLineState {
   selectedLineAddress: string | undefined;
   selectedPosition: string | undefined;
@@ -105,9 +109,9 @@ export interface CreditLineState {
   pagesMap: { [lineAddress: string]: CreditLinePage };
   categories: { [category: string]: string[] };
   user: {
-    linePositions: { [positionId: string]: CreditPosition };
+    linePositions: IdToCreditPositionMap;
     lineAllowances: { [line: string]: { [token: string]: Integer } };
-    borrowerPositions: { [positionId: string]: CreditPosition };
+    borrowerPositions: IdToCreditPositionMap;
   };
   statusMap: {
     getLines: Status;

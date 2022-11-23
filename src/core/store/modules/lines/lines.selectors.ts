@@ -12,6 +12,7 @@ import {
   CreditLinePage,
   UserPositionMetadata,
   CreditPosition,
+  IdToCreditPositionMap,
   BORROWER_POSITION_ROLE,
   LENDER_POSITION_ROLE,
   ARBITER_POSITION_ROLE, // prev. GeneralVaultView, Super indepth data, CreditLinePage is most similar atm
@@ -198,12 +199,14 @@ const selectPositions = createSelector([selectSelectedLine], (line) => {
   let positions = line?.positions;
   return positions;
 });
-// createSelector([<inputSelector>, <inputSelector>], <outputSelector>)
 
-const selectBorrowerPositions = createSelector([selectGetBorrowerPositions], (borrowerPositions): CreditPosition[] => {
-  // @ts-ignore // FIXME: fix type
-  return borrowerPositions;
-});
+// TODO: this should return the equivalent of CreditLineState.user.borrowerPositions
+const selectBorrowerPositions = createSelector(
+  [selectGetBorrowerPositions],
+  (borrowerPositions): IdToCreditPositionMap => {
+    return borrowerPositions;
+  }
+);
 
 const selectPositionData = createSelector(
   [selectSelectedLine, selectSelectedPosition],

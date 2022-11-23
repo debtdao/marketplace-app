@@ -30,11 +30,15 @@ import {
   GetLinePageAuxDataResponse,
   GetLinePageResponse,
   Network,
+  GetBorrowerPositionsProps,
+  CreditLinePage,
+  PositionSummary,
+  GetBorrowerPositionsResponse,
 } from '@types';
 import { getConfig } from '@config';
 import { LineOfCreditABI } from '@services/contracts';
 import { getContract } from '@frameworks/ethers';
-import { getLinePage, getLinePageAuxData, getLines } from '@frameworks/gql';
+import { getLinePage, getLinePageAuxData, getLines, getBorrowerPositions } from '@frameworks/gql';
 
 const { GRAPH_API_URL } = getConfig();
 
@@ -386,6 +390,19 @@ export class CreditLineServiceImpl implements CreditLineService {
     return response;
   }
 
+  // public async getBorrowerPositions(
+  //   prop: GetBorrowerPositionsProps
+  // ): Promise<GetBorrowerPositionsResponse | undefined> {
+  //   console.log('CreditLineService.ts: borrower prop: ', prop);
+  //   const response = getBorrowerPositions(prop)
+  //     .then((data) => data)
+  //     .catch((err) => {
+  //       console.log('CreditLineService: error fetching borrower positions', err);
+  //       return undefined;
+  //     });
+  //   return response;
+  // }
+
   // TODO
   public async getLinePage(prop: GetLinePageProps): Promise<GetLinePageResponse | undefined> {
     return getLinePage(prop)
@@ -411,6 +428,20 @@ export class CreditLineServiceImpl implements CreditLineService {
       })
       .catch((err) => {
         console.log('CreditLineService error fetching user lines', err);
+        return undefined;
+      });
+    return response;
+  }
+
+  // FIXME: replay `any` type
+  public async getBorrowerPositions(prop: GetBorrowerPositionsProps): Promise<any | undefined> {
+    const response = getBorrowerPositions(prop)
+      .then((data) => {
+        console.log(data);
+        return data;
+      })
+      .catch((err) => {
+        console.log('CreditLineService error fetching borrower positions', err);
         return undefined;
       });
     return response;

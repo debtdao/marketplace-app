@@ -9,15 +9,24 @@ import {
   GetLinePageArgs,
   GetLinesArgs,
   GetUserLinePositionsArgs,
+  GetBorrowerPositionsArgs,
   QueryResponse,
   QueryCreator,
   GetLinePageResponse,
   GetLinePageAuxDataResponse,
+  GetBorrowerPositionsResponse,
+  PositionSummary,
   GetLinesResponse,
   CreditPosition,
 } from '@src/core/types';
 
-import { GET_LINE_QUERY, GET_LINE_PAGE_QUERY, GET_LINE_PAGE_AUX_QUERY, GET_LINES_QUERY } from './queries';
+import {
+  GET_LINE_QUERY,
+  GET_LINE_PAGE_QUERY,
+  GET_LINE_PAGE_AUX_QUERY,
+  GET_LINES_QUERY,
+  GET_BORROWER_POSITIONS_QUERY,
+} from './queries';
 
 const { GRAPH_API_URL } = getEnv();
 const { BLACKLISTED_LINES: blacklist } = getConstants();
@@ -94,3 +103,11 @@ export const getUserLinePositions: QueryCreator<GetUserLinePositionsArgs, Credit
 >(
   arg: GetUserLinePositionsArgs
 ) => getUserLinePositionsQuery(arg);
+
+const getBorrowerPositionsQuery = createQuery(GET_BORROWER_POSITIONS_QUERY, 'lineOfCredits');
+export const getBorrowerPositions: QueryCreator<GetBorrowerPositionsArgs, PositionSummary[]> = (
+  arg: GetBorrowerPositionsArgs
+) => {
+  console.log('gql/indx.ts getBorrowerPositions: ', arg);
+  return getBorrowerPositionsQuery(arg);
+};

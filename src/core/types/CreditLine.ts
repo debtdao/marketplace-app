@@ -70,6 +70,22 @@ export interface CreditLinePage extends AggregatedCreditLine {
   creditEvents: CreditEvent[];
 }
 
+export interface BorrowerPositionSummary extends BaseCreditLine {
+  /*
+  id: Address;
+  type?: string;
+  start: number;
+  end: number;
+  status: LineStatusTypes;
+  borrower: Address;
+  arbiter: Address;
+  positions?: [];
+  escrow?: { id: Address };
+  spigot?: { id: Address };
+  */
+  events: [];
+}
+
 // data that isnt included in AggregatedCreditLine that we need to fetch for full CreditLinePage dattype
 // gets merged into existing AggregatedCredit to form LinePageData
 export interface CreditLinePageAuxData {
@@ -291,6 +307,7 @@ export interface LineActionsStatusMap {
 
 export interface UserLineMetadataStatusMap {
   getUserLinePositions: Status;
+  getBorrowerPositions: Status;
   linesActionsStatusMap: { [lineAddress: string]: LineActionsStatusMap };
 }
 

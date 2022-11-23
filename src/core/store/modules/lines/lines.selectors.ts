@@ -12,6 +12,7 @@ import {
   CreditLinePage,
   CreditPosition,
   UserPositionMetadata,
+  PositionSummary,
   BORROWER_POSITION_ROLE,
   LENDER_POSITION_ROLE,
   ARBITER_POSITION_ROLE, // prev. GeneralVaultView, Super indepth data, CreditLinePage is most similar atm
@@ -55,6 +56,8 @@ const selectLinesActionsStatusMap = (state: RootState) => state.lines.statusMap.
 const selectGetLinesStatus = (state: RootState) => state.lines.statusMap.getLines;
 const selectGetLinePageStatus = (state: RootState) => state.lines.statusMap.getLinePage;
 const selectGetUserLinesPositionsStatus = (state: RootState) => state.lines.statusMap.user.getUserLinePositions;
+const selectGetBorrowerPositionsStatus = (state: RootState) => state.lines.statusMap.getBorrowerPositions;
+const selectGetBorrowerPositions = (state: RootState) => state.lines.user.borrowerPositions;
 
 /* ----------------------------- Main Selectors ----------------------------- */
 const selectLines = createSelector([selectLinesMap], (linesMap) => {
@@ -197,6 +200,13 @@ const selectPositions = createSelector([selectSelectedLine], (line) => {
   let positions = line?.positions;
   return positions;
 });
+// createSelector([<inputSelector>, <inputSelector>], <outputSelector>)
+
+const selectBorrowerPositions = createSelector([selectGetBorrowerPositions], (borrowerPositions): PositionSummary[] => {
+  console.log('line.selector.ts: ', borrowerPositions);
+  // @ts-ignore // FIXME: fix type
+  return borrowerPositions;
+});
 
 const selectPositionData = createSelector(
   [selectSelectedLine, selectSelectedPosition],
@@ -317,6 +327,7 @@ export const LinesSelectors = {
   selectLinesStatusMap,
   selectUserLinesSummary,
   selectPositions,
+  selectBorrowerPositions,
   selectLinesGeneralStatus,
   selectSelectedLine,
   selectSelectedLinePage,

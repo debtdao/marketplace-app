@@ -107,4 +107,3 @@ const getBorrowerPositionsQuery = createQuery(GET_BORROWER_POSITIONS_QUERY, 'lin
 export const getBorrowerPositions: QueryCreator<GetBorrowerPositionsArgs, CreditPosition[]> = (
   arg: GetBorrowerPositionsArgs
 ) => getBorrowerPositionsQuery(arg);
-

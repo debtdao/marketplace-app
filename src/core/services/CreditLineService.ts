@@ -389,19 +389,6 @@ export class CreditLineServiceImpl implements CreditLineService {
     return response;
   }
 
-  // public async getBorrowerPositions(
-  //   prop: GetBorrowerPositionsProps
-  // ): Promise<GetBorrowerPositionsResponse | undefined> {
-  //   console.log('CreditLineService.ts: borrower prop: ', prop);
-  //   const response = getBorrowerPositions(prop)
-  //     .then((data) => data)
-  //     .catch((err) => {
-  //       console.log('CreditLineService: error fetching borrower positions', err);
-  //       return undefined;
-  //     });
-  //   return response;
-  // }
-
   // TODO
   public async getLinePage(prop: GetLinePageProps): Promise<GetLinePageResponse | undefined> {
     return getLinePage(prop)
@@ -432,8 +419,7 @@ export class CreditLineServiceImpl implements CreditLineService {
     return response;
   }
 
-  // FIXME: replay `any` type
-  public async getBorrowerPositions(prop: GetBorrowerPositionsProps): Promise<any | undefined> {
+  public async getBorrowerPositions(prop: GetBorrowerPositionsProps): Promise<CreditPosition[] | undefined> {
     const response = getBorrowerPositions(prop)
       .then((data) => {
         console.log(data);

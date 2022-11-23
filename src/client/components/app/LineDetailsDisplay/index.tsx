@@ -56,17 +56,6 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
     // LineDetails page handles getLinePage query
   }, [page]);
 
-  useEffect(() => {
-    console.log({ borrower });
-    if (borrower) {
-      dispatch(LinesActions.getBorrowerPositions({ borrower }));
-    }
-  }, [borrower]);
-
-  useEffect(() => {
-    console.log({ borrowerPositions });
-  }, [borrowerPositions]);
-
   if (!line && !page) return <Container>{t('lineDetails:line.no-data')}</Container>;
 
   const StandardMetadata = (metadataProps: any) => (

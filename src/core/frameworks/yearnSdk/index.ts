@@ -13,19 +13,8 @@ export class YearnSdkImpl implements YearnSdk {
     SUPPORTED_NETWORKS.forEach((network) => {
       const providerType = getProviderType(network);
       const provider = web3Provider.getInstanceOf(providerType);
-      const networkId = getNetworkId(network) as SdkNetwork;
-      const sdkInstance = new Yearn(networkId, {
-        provider,
-        partnerId: isLedger && networkId === 1 ? CONTRACT_ADDRESSES.LEDGER_PARTNER_ID : undefined,
-        ...(GRAPH_API_URL && {
-          subgraph: {
-            // TODO revert to using official subgraph once its working again
-            // mainnetSubgraphEndpoint: `https://gateway.thegraph.com/api/${GRAPH_API_URL}/subgraphs/id/${YEARN_SUBGRAPH_ID}`,
-            mainnetSubgraphEndpoint: `https://api.thegraph.com/subgraphs/name/rareweasel/yearn-vaults-v2-subgraph-mainnet`,
-          },
-        }),
-      });
-      this.register(network, sdkInstance);
+      const networkId = getNetworkId(network);
+      this.register(network);
     });
   }
 
@@ -43,7 +32,8 @@ export class YearnSdkImpl implements YearnSdk {
     return instance;
   }
 
-  public register(network: Network, instance: Yearn<SdkNetwork>): void {
-    this.instances.set(network, instance);
+  public register(network: Network): void {
+    //@ts-ignore
+    this.instances.set(network);
   }
 }

@@ -4,6 +4,7 @@ import { useAppTranslation } from '@hooks';
 import { Button, Text } from '@components/common';
 import { device } from '@themes/default';
 import { formatAddress } from '@utils';
+import { BlocknativeWalletImpl } from '@frameworks/blocknative';
 
 interface WalletAddressProps {
   address?: string;
@@ -25,6 +26,11 @@ export const ConnectWalletButton = ({ address, ensName, disabled, onClick }: Wal
   const { t } = useAppTranslation('common');
   let buttonMessage;
 
+  const connectWallet = () => {
+    let bs = new BlocknativeWalletImpl();
+    bs.connect();
+  };
+
   if (!address) {
     buttonMessage = t('components.connect-button.connect');
   } else {
@@ -33,7 +39,7 @@ export const ConnectWalletButton = ({ address, ensName, disabled, onClick }: Wal
 
   return (
     <StyledButton
-      onClick={() => onClick && onClick()}
+      onClick={connectWallet}
       disabled={disabled}
       data-testid="connect-wallet-button"
       data-connected={!!address}

@@ -5,3 +5,16 @@ sequenceDiagram
 
 ```
 
+
+
+```mermaid
+graph TD
+    dispatch --> LineActions.getBorrowerPositions
+    LineActions.getBorrowerPositions --> creditLineService.getBorrowerPositions
+
+
+
+```
+
+
+

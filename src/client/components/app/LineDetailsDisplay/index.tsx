@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { AggregatedCreditLine, CreditLinePage, CreditPosition } from '@src/core/types';
-import { useAppTranslation } from '@hooks';
+import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
 import { Text } from '@components/common';
 import { LinesActions, LinesSelectors } from '@src/core/store';
 

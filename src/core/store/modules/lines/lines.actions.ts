@@ -165,7 +165,7 @@ const getUserLinePositions = createAsyncThunk<
 });
 
 const getBorrowerPositions = createAsyncThunk<
-  { borrowerPositions: PositionSummary[] | undefined },
+  { borrowerPositions: CreditPosition[] | undefined },
   { borrower: string },
   ThunkAPI
 >('lines/getBorrowerPositions', async ({ borrower }, { extra, getState }) => {
@@ -178,7 +178,6 @@ const getBorrowerPositions = createAsyncThunk<
   }
 
   console.log('lines.actions.ts: borrower', borrower);
-  // @ts-ignore // FIXME: type of borrower
   const borrowerPositions = await services.creditLineService.getBorrowerPositions({ borrower });
   return { borrowerPositions };
 });

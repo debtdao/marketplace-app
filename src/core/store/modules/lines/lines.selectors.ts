@@ -10,9 +10,8 @@ import {
   AggregatedCreditLine,
   Address,
   CreditLinePage,
-  CreditPosition,
   UserPositionMetadata,
-  PositionSummary,
+  CreditPosition,
   BORROWER_POSITION_ROLE,
   LENDER_POSITION_ROLE,
   ARBITER_POSITION_ROLE, // prev. GeneralVaultView, Super indepth data, CreditLinePage is most similar atm
@@ -202,7 +201,7 @@ const selectPositions = createSelector([selectSelectedLine], (line) => {
 });
 // createSelector([<inputSelector>, <inputSelector>], <outputSelector>)
 
-const selectBorrowerPositions = createSelector([selectGetBorrowerPositions], (borrowerPositions): PositionSummary[] => {
+const selectBorrowerPositions = createSelector([selectGetBorrowerPositions], (borrowerPositions): CreditPosition[] => {
   console.log('line.selector.ts: ', borrowerPositions);
   // @ts-ignore // FIXME: fix type
   return borrowerPositions;

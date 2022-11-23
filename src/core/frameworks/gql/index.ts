@@ -15,7 +15,6 @@ import {
   GetLinePageResponse,
   GetLinePageAuxDataResponse,
   GetBorrowerPositionsResponse,
-  PositionSummary,
   GetLinesResponse,
   CreditPosition,
 } from '@src/core/types';
@@ -105,7 +104,7 @@ export const getUserLinePositions: QueryCreator<GetUserLinePositionsArgs, Credit
 ) => getUserLinePositionsQuery(arg);
 
 const getBorrowerPositionsQuery = createQuery(GET_BORROWER_POSITIONS_QUERY, 'lineOfCredits');
-export const getBorrowerPositions: QueryCreator<GetBorrowerPositionsArgs, PositionSummary[]> = (
+export const getBorrowerPositions: QueryCreator<GetBorrowerPositionsArgs, CreditPosition[]> = (
   arg: GetBorrowerPositionsArgs
 ) => {
   console.log('gql/indx.ts getBorrowerPositions: ', arg);

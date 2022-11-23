@@ -32,7 +32,6 @@ import {
   Network,
   GetBorrowerPositionsProps,
   CreditLinePage,
-  PositionSummary,
   GetBorrowerPositionsResponse,
 } from '@types';
 import { getConfig } from '@config';

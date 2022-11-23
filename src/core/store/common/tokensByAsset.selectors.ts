@@ -6,10 +6,9 @@ import { TokenView } from '@types';
 import { testTokens } from '@src/config/constants';
 
 import { VaultsSelectors } from '../modules/vaults/vaults.selectors';
-import { TokensSelectors } from '../modules/tokens/tokens.selectors';
 import { AppSelectors } from '../modules/app/app.selectors';
 import { WalletSelectors } from '../modules/wallet/wallet.selectors';
-import { createToken } from '../modules/tokens/tokens.selectors';
+import { TokensSelectors, createToken } from '../modules/tokens/tokens.selectors';
 import { NetworkSelectors } from '../modules/network/network.selectors';
 
 const { selectVaultsMap } = VaultsSelectors;

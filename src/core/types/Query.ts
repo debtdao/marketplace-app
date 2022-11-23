@@ -216,3 +216,7 @@ export interface GetLinePageResponse extends BaseLineFragResponse {
     };
   };
 }
+
+export interface SupportedTokenFragRepsonse {
+  supportedTokens: [{ token: TokenFragRepsonse }];
+}

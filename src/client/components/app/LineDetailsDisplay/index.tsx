@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { AggregatedCreditLine, CreditLinePage, CreditPosition } from '@src/core/types';
 import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
 import { Text } from '@components/common';
-import { LinesActions, LinesSelectors } from '@src/core/store';
 
 import { LineMetadata } from './LineMetadata';
 import { PositionsTable } from './PositionsTable';
@@ -36,9 +35,6 @@ const BorrowerName = styled(Text)`
 export const LineDetailsDisplay = (props: LineDetailsProps) => {
   const { t } = useAppTranslation('common');
   const { line, page } = props;
-
-  const dispatch = useAppDispatch();
-  const borrowerPositions = useAppSelector(LinesSelectors.selectBorrowerPositions);
 
   const [allDataLoaded, setAllDataLoaded] = useState(false);
   const [lineData, setLineData] = useState<AggregatedCreditLine | CreditLinePage>(line!);

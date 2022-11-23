@@ -89,6 +89,8 @@ const PARTNERS = {
 
 const BLACKLISTED_LINES = ['0x0000000000000000000000000000000000000000'];
 
+const { ALCHEMY_API_KEY } = getEnv();
+
 const NETWORK_SETTINGS: NetworkSettings = {
   goerli: {
     id: 'goerli',
@@ -110,7 +112,7 @@ const NETWORK_SETTINGS: NetworkSettings = {
     id: 'mainnet',
     name: 'Ethereum',
     networkId: 1,
-    rpcUrl: 'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+    rpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     nativeCurrency: {
       name: 'Ethereum',
       symbol: 'ETH',
@@ -155,6 +157,7 @@ export const getConstants = memoize((): Constants => {
     WEB3_PROVIDER_HTTPS: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     WEB3_PROVIDER_WSS: `wss://eth-mainnet.ws.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     ARBITRUM_PROVIDER_HTTPS: 'https://arb1.arbitrum.io/rpc',
+    GOERLI_PROVIDER_HTTPS: 'https://goerli.etherscan.io/',
     BLACKLISTED_LINES: BLACKLISTED_LINES,
     CONTRACT_ADDRESSES: {
       zapIn: '0x8E52522E6a77578904ddd7f528A22521DC4154F5',

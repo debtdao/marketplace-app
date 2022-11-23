@@ -3,7 +3,7 @@ import { API } from 'bnc-onboard/dist/src/interfaces';
 import { getAddress } from '@ethersproject/address';
 
 import { getConfig } from '@config';
-import { getNetworkRpc } from '@utils';
+import { getNetworkRpc, getNetworkId } from '@utils';
 import { Wallet, Subscriptions, Network, Theme } from '@types';
 
 import ledgerIframeWallet from './IframeWallet';
@@ -45,20 +45,15 @@ export class BlocknativeWalletImpl implements Wallet {
   }
 
   public create(network: Network, subscriptions: Subscriptions, theme?: Theme): boolean {
-    const networkId = 5;
     const { BLOCKNATIVE_KEY, FORTMATIC_KEY, PORTIS_KEY } = getConfig();
-
-    const rpcUrl = getNetworkRpc(network);
+    const networkName = 'goerli';
+    const rpcUrl = getNetworkRpc('goerli');
     const appName = 'Debt DAO';
+
+    let networkId = getNetworkId('goerli');
 
     const wallets = [
       { walletName: 'metamask' },
-      {
-        walletName: 'walletConnect',
-        rpc: {
-          [networkId]: 'https://eth-goerli.public.blastapi.io',
-        },
-      },
       {
         walletName: 'trezor',
         appUrl: 'https://reactdemo.blocknative.com',
@@ -105,7 +100,7 @@ export class BlocknativeWalletImpl implements Wallet {
     const walletCheck = [{ checkName: 'derivationPath' }, { checkName: 'connect' }, { checkName: 'accounts' }];
 
     this.onboard = Onboard({
-      networkId: 5,
+      networkId,
       dappId: BLOCKNATIVE_KEY,
       darkMode: theme !== 'light',
       subscriptions,

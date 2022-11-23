@@ -41,7 +41,7 @@ export interface BaseCreditLine {
   status: LineStatusTypes;
   borrower: Address;
   arbiter: Address;
-  positions?: [];
+  positions?: CreditPosition[];
   escrow?: { id: Address };
   spigot?: { id: Address };
 }
@@ -53,7 +53,7 @@ export interface AggregatedCreditLine extends BaseCreditLine {
   // id, symbol, APY (4 decimals)
   highestApy: [string, string, string];
 
-  positions?: [];
+  positions?: CreditPosition[];
 
   escrow?: AggregatedEscrow;
   spigot?: AggregatedSpigot;
@@ -64,7 +64,7 @@ export interface CreditLinePage extends AggregatedCreditLine {
   interest: string; // | Promise<string>;
   totalInterestRepaid: string; // | Promise<string>;
 
-  positions?: [];
+  positions?: CreditPosition[];
 
   collateralEvents: CollateralEvent[];
   creditEvents: CreditEvent[];
@@ -99,19 +99,22 @@ export interface CreditLinePageAuxData {
   creditEvents: CreditEvent[];
 }
 
-export interface Credit {
+export interface CreditPosition {
+  id: string;
   status: PositionStatusTypes;
   deposit: string;
   principal: string;
   interestAccrued: string;
   interestRepaid: string;
   decimals: string;
-  arbiter: Address;
+  borrower: Address;
   token: TokenView;
   lender: Address;
+  drate: string;
+  frate: string;
 }
 
-export interface LinePageCreditPosition extends Credit {
+export interface LinePageCreditPosition extends CreditPosition {
   id: string;
   status: PositionStatusTypes;
   lender: Address;
@@ -149,20 +152,6 @@ export interface UserPositionMetadata {
   available: string; // borrowable/withdrawable/liquidatable
 }
 
-// TODO consolidate PositonInt and PositionSummary types
-export interface PositionInt {
-  drate: string;
-  frate: string;
-  id: string;
-  interestAccrued: string;
-  interestRepaid: string;
-  lender: string;
-  deposit: string;
-  principal: string;
-  status: string;
-  tokenAddress: string;
-}
-
 export interface PositionItem {
   drate: string;
   frate: string;
@@ -172,19 +161,7 @@ export interface PositionItem {
   id: string;
 }
 
-export interface PositionSummary {
-  id: string;
-  borrower: Address;
-  lender: Address;
-  token: TokenView;
-  line: Address;
-  deposit: string;
-  principal: string;
-  drate: string;
-  frate: string;
-}
-
-export interface UserPositionSummary extends PositionSummary, UserPositionMetadata {}
+export interface UserPositionSummary extends CreditPosition, UserPositionMetadata {}
 
 // Collateral Module Types
 export interface Collateral {

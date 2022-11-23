@@ -4,7 +4,7 @@ import { ExternalServiceId } from './General';
 import { PartnerId } from './Partner';
 import { Theme } from './Settings';
 import { Status } from './Status';
-import { CreditLinePage, UserLineMetadataStatusMap, AggregatedCreditLine, PositionSummary } from './CreditLine';
+import { CreditLinePage, UserLineMetadataStatusMap, AggregatedCreditLine, CreditPosition } from './CreditLine';
 import {
   Position,
   Token,
@@ -105,7 +105,7 @@ export interface CreditLineState {
   pagesMap: { [lineAddress: string]: CreditLinePage };
   categories: { [category: string]: string[] };
   user: {
-    linePositions: { [positionId: string]: PositionSummary };
+    linePositions: { [positionId: string]: CreditPosition };
     lineAllowances: { [line: string]: { [token: string]: Integer } };
     borrowerPositions: { [positionId: string]: PositionSummary };
   };

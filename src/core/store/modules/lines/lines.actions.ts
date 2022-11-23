@@ -13,7 +13,7 @@ import {
   GetLineArgs,
   GetLinesArgs,
   GetLinePageArgs,
-  PositionSummary,
+  CreditPosition,
   AddCreditProps,
   UseCreditLinesParams,
   BorrowCreditProps,
@@ -40,6 +40,12 @@ import { TokensActions } from '../tokens/tokens.actions';
 
 const setSelectedLineAddress = createAction<{ lineAddress?: string }>('lines/setSelectedLineAddress');
 const setSelectedLinePosition = createAction<{ position?: string }>('lines/setSelectedLinePosition');
+const setPositionData = createAction<{
+  positionObject: CreditPosition;
+  lineAddress: string;
+  position: string;
+  positions: CreditPosition[];
+}>('lines/setUpdatedPositionData');
 
 /* -------------------------------------------------------------------------- */
 /*                                 Clear State                                */
@@ -141,7 +147,7 @@ const getLinePage = createAsyncThunk<{ linePageData: CreditLinePage | undefined 
 );
 
 const getUserLinePositions = createAsyncThunk<
-  { userLinesPositions: PositionSummary[] },
+  { userLinesPositions: CreditPosition[] },
   { lineAddresses?: string[] },
   ThunkAPI
 >('lines/getUserLinePositions', async ({ lineAddresses }, { extra, getState }) => {
@@ -724,6 +730,7 @@ const getWithdrawAllowance = createAsyncThunk<
 export const LinesActions = {
   setSelectedLineAddress,
   setSelectedLinePosition,
+  setPositionData,
   // initiateSaveLines,
   getLine,
   getLines,

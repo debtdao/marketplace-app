@@ -4,8 +4,8 @@ import { ethers } from 'ethers';
 
 import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
 import { LinesSelectors, LinesActions, WalletSelectors } from '@store';
-import { normalizeAmount } from '@src/utils';
-import { PositionItem } from '@src/core/types';
+import { normalizeAmount, borrowUpdate } from '@src/utils';
+import { CreditPosition } from '@src/core/types';
 
 import { TxContainer } from './components/TxContainer';
 import { TxActionButton } from './components/TxActions';
@@ -35,12 +35,12 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
   const [transactionLoading, setLoading] = useState(false);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const selectedPosition = useAppSelector(LinesSelectors.selectPositionData);
+  const [errors, setErrors] = useState<string[]>(['']);
   const [targetAmount, setTargetAmount] = useState('1');
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
-  const selectedPage = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const positions = useAppSelector(LinesSelectors.selectPositions);
 
-  console.log('selected Position', selectedPosition);
+  console.log('positions', positions);
 
   const _updatePosition = () =>
     onPositionChange({
@@ -55,7 +55,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
     _updatePosition();
   };
 
-  const onSelectedPositionChange = (arg: PositionItem): void => {
+  const onSelectedPositionChange = (arg: CreditPosition): void => {
     dispatch(LinesActions.setSelectedLinePosition({ position: arg.id }));
   };
 
@@ -70,7 +70,28 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
   const borrowCredit = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    if (!selectedCredit?.id || !targetAmount || walletNetwork === undefined || selectedPosition === undefined) {
+    if (!selectedCredit?.id) {
+      setErrors([...errors, 'no selected credit ID']);
+      setLoading(false);
+      return;
+    }
+    if (!targetAmount) {
+      setErrors([...errors, 'no selected target amount']);
+      setLoading(false);
+      return;
+    }
+    if (!selectedPosition) {
+      setErrors([...errors, 'no selected position']);
+      setLoading(false);
+      return;
+    }
+    if (!walletNetwork) {
+      setErrors([...errors, 'wallet not connected']);
+      setLoading(false);
+      return;
+    }
+    if (!positions) {
+      setErrors([...errors, 'no positions available']);
       setLoading(false);
       return;
     }
@@ -89,7 +110,15 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
         setLoading(false);
       }
       if (res.meta.requestStatus === 'fulfilled') {
-        window.location.reload();
+        const updatedPosition = borrowUpdate(selectedPosition, targetAmount);
+        dispatch(
+          LinesActions.setPositionData({
+            position: selectedPosition['id'],
+            lineAddress: selectedCredit.id,
+            positionObject: updatedPosition,
+            positions: positions,
+          })
+        );
         setTransactionCompleted(1);
         setLoading(false);
       }
@@ -139,7 +168,6 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
         headerText={t('components.transaction.borrow-credit.select-line')}
         inputText={t('components.transaction.borrow-credit.select-line')}
         onSelectedPositionChange={onSelectedPositionChange}
-        //@ts-ignore
         selectedPosition={selectedPosition}
         positions={positions}
         // creditOptions={sourceCreditOptions}

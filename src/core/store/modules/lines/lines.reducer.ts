@@ -6,6 +6,7 @@ import {
   UserLineMetadataStatusMap,
   LineActionsStatusMap,
   AggregatedCreditLine,
+  CreditPosition,
 } from '@types';
 
 import { LinesActions } from './lines.actions';
@@ -60,6 +61,7 @@ const {
   // initiateSaveLines,
   setSelectedLineAddress,
   setSelectedLinePosition,
+  setPositionData,
   getUserLinePositions,
   getBorrowerPositions,
   clearLinesData,
@@ -83,6 +85,16 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.selectedPosition = position;
     })
 
+    .addCase(setPositionData, (state, { payload: { position, lineAddress, positionObject, positions } }) => {
+      if (positionObject !== undefined) {
+        const newPositions: CreditPosition[] = positions.filter(
+          (positionObj: CreditPosition) => position !== positionObj.id
+        );
+        newPositions.push({ ...positionObject });
+
+        state.pagesMap[lineAddress].positions = newPositions;
+      }
+    })
     /* -------------------------------------------------------------------------- */
     /*                                 Clear State                                */
     /* -------------------------------------------------------------------------- */

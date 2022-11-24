@@ -59,7 +59,8 @@ const initApp = createAsyncThunk<void, void, ThunkAPI>('app/initApp', async (_ar
     await dispatch(WalletActions.walletSelect({ walletName, network: 'mainnet' }));
   } else if (wallet.name && wallet.name !== 'Iframe') {
     const { NETWORK } = getEnv();
-    await dispatch(WalletActions.walletSelect({ walletName: wallet.name, network: NETWORK }));
+    //quick test if goerli init works
+    await dispatch(WalletActions.walletSelect({ walletName: wallet.name, network: 'goerli' }));
   }
   dispatch(checkExternalServicesStatus());
   // TODO use when sdk ready

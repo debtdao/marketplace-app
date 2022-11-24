@@ -2,13 +2,14 @@ import styled from 'styled-components';
 import { isEmpty } from 'lodash';
 import { useEffect, useState } from 'react';
 
-import { ModalsActions, LinesActions, LinesSelectors, WalletSelectors } from '@store';
+import { ModalsActions, LinesActions, LinesSelectors, WalletSelectors, WalletActions } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { device } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer, SliderCard } from '@components/app';
 import { Input, SearchIcon, Text, Button } from '@components/common';
 import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, CreditPosition } from '@src/core/types';
 import { humanize, formatAddress } from '@src/utils';
+import { getEnv } from '@config/env';
 
 const PositionsCard = styled(DetailCard)`
   max-width: ${({ theme }) => theme.globalMaxWidth};
@@ -48,6 +49,12 @@ interface PositionsProps {
   events: CreditPosition[];
 }
 
+interface Transaction {
+  name: string;
+  handler: (e: Event) => void;
+  disabled: boolean;
+}
+
 const BannerCtaButton = styled(Button)`
   width: 80%;
   max-width: 20rem;
@@ -61,9 +68,11 @@ export const PositionsTable = (props: PositionsProps) => {
   const userRoleMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
   const selectedPage = useAppSelector(LinesSelectors.selectSelectedLinePage);
-  const [actions, setActions] = useState([]);
+  const [actions, setActions] = useState<Transaction[]>([]);
   const { events } = props;
   const dispatch = useAppDispatch();
+  const { NETWORK } = getEnv();
+  const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
   //Initial set up for positions table
 
@@ -82,7 +91,7 @@ export const PositionsTable = (props: PositionsProps) => {
   };
 
   useEffect(() => {
-    let Transactions = [];
+    let Transactions: Transaction[] = [];
     // TODO integrate UserPositoinMetadata in here
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
       Transactions.push({
@@ -104,7 +113,6 @@ export const PositionsTable = (props: PositionsProps) => {
       });
       console.log('withdraw');
     }
-    //@ts-ignore
     if (userRoleMetadata.role === ARBITER_POSITION_ROLE) {
       Transactions.push({
         name: t('components.transaction.liquidate'),
@@ -112,15 +120,14 @@ export const PositionsTable = (props: PositionsProps) => {
         disabled: false,
       });
     }
-    if (userWallet === undefined) {
+    if (!userWallet) {
       Transactions = [];
     }
-    //@ts-ignore
     setActions(Transactions);
   }, [selectedLine, userWallet]);
 
   useEffect(() => {
-    if (lineAddress === undefined) {
+    if (!lineAddress) {
       return;
     }
     console.log('query the page', selectedPage);
@@ -130,9 +137,13 @@ export const PositionsTable = (props: PositionsProps) => {
   //Action Handlers for positions table
 
   const depositHandler = (e: Event) => {
-    //@ts-ignore
-    dispatch(LinesActions.setSelectedLinePosition({ position: e.target.value }));
-    dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
+    if (!userWallet) {
+      connectWallet();
+    } else {
+      //@ts-ignore
+      dispatch(LinesActions.setSelectedLinePosition({ position: e.target.value }));
+      dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
+    }
   };
 
   // THIS NEEDS REVISITNG
@@ -166,6 +177,10 @@ export const PositionsTable = (props: PositionsProps) => {
     dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
   };
 
+  let ctaButtonText = userWallet
+    ? `${t('lineDetails:positions-events.propose-position')}`
+    : `${t('components.connect-button.connect')}`;
+
   return (
     <>
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
@@ -177,7 +192,7 @@ export const PositionsTable = (props: PositionsProps) => {
               <p>{t('lineDetails:positions-events.no-data')}</p>
 
               <BannerCtaButton styling="primary" onClick={depositHandler}>
-                {t('lineDetails:positions-events.propose-position')}
+                {ctaButtonText}
               </BannerCtaButton>
             </Text>
           }
@@ -285,7 +300,7 @@ export const PositionsTable = (props: PositionsProps) => {
                   placeholder={t('components.search-input.search')}
                   Icon={SearchIcon}
                 />
-                <Button onClick={depositHandler}>New Position</Button>
+                <Button onClick={depositHandler}>{ctaButtonText}</Button>
               </>
             }
             searching={false}

@@ -57,8 +57,8 @@ const initApp = createAsyncThunk<void, void, ThunkAPI>('app/initApp', async (_ar
     const walletName = 'Coinbase Wallet';
     await dispatch(WalletActions.walletSelect({ walletName, network: 'mainnet' }));
   } else if (wallet.name && wallet.name !== 'Iframe') {
-    //Test if possible to do a dynamic network connection
-    await dispatch(WalletActions.walletSelect({ walletName: wallet.name, network: network.current }));
+    //Passing down data from network state unreliable
+    await dispatch(WalletActions.walletSelect({ walletName: wallet.name, network: 'mainnet' }));
   }
   dispatch(checkExternalServicesStatus());
   // TODO use when sdk ready

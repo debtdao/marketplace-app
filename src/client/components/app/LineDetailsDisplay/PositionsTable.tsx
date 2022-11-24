@@ -48,6 +48,12 @@ interface PositionsProps {
   events: CreditPosition[];
 }
 
+interface Transaction {
+  name: string;
+  handler: (e: Event) => void;
+  disabled: boolean;
+}
+
 const BannerCtaButton = styled(Button)`
   width: 80%;
   max-width: 20rem;
@@ -61,7 +67,7 @@ export const PositionsTable = (props: PositionsProps) => {
   const userRoleMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
   const selectedPage = useAppSelector(LinesSelectors.selectSelectedLinePage);
-  const [actions, setActions] = useState([]);
+  const [actions, setActions] = useState<Transaction[]>([]);
   const { events } = props;
   const dispatch = useAppDispatch();
 
@@ -82,7 +88,7 @@ export const PositionsTable = (props: PositionsProps) => {
   };
 
   useEffect(() => {
-    let Transactions = [];
+    let Transactions: Transaction[] = [];
     // TODO integrate UserPositoinMetadata in here
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
       Transactions.push({
@@ -104,7 +110,6 @@ export const PositionsTable = (props: PositionsProps) => {
       });
       console.log('withdraw');
     }
-    //@ts-ignore
     if (userRoleMetadata.role === ARBITER_POSITION_ROLE) {
       Transactions.push({
         name: t('components.transaction.liquidate'),
@@ -112,15 +117,14 @@ export const PositionsTable = (props: PositionsProps) => {
         disabled: false,
       });
     }
-    if (userWallet === undefined) {
+    if (!userWallet) {
       Transactions = [];
     }
-    //@ts-ignore
     setActions(Transactions);
   }, [selectedLine, userWallet]);
 
   useEffect(() => {
-    if (lineAddress === undefined) {
+    if (!lineAddress) {
       return;
     }
     console.log('query the page', selectedPage);

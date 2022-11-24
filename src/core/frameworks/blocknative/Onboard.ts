@@ -46,7 +46,7 @@ export class BlocknativeWalletImpl implements Wallet {
 
   public create(network: Network, subscriptions: Subscriptions, theme?: Theme): boolean {
     //To-Do test if switching network ID works.
-    const networkId = 5;
+    const networkId = 1;
     const { BLOCKNATIVE_KEY, FORTMATIC_KEY, PORTIS_KEY } = getConfig();
 
     const rpcUrl = getNetworkRpc(network);
@@ -55,10 +55,6 @@ export class BlocknativeWalletImpl implements Wallet {
     const wallets = [
       {
         walletName: 'metamask',
-        //rpc: {
-        //  [networkId]: 'https://eth-goerli.public.blastapi.io',
-        //},
-        //Testing to see if root is network in app.actions, or if issue is lack of RPC object
       },
       {
         walletName: 'walletConnect',
@@ -112,7 +108,7 @@ export class BlocknativeWalletImpl implements Wallet {
     const walletCheck = [{ checkName: 'derivationPath' }, { checkName: 'connect' }, { checkName: 'accounts' }];
 
     this.onboard = Onboard({
-      networkId: 5,
+      networkId: 1,
       dappId: BLOCKNATIVE_KEY,
       darkMode: theme !== 'light',
       subscriptions,

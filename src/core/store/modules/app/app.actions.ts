@@ -57,8 +57,9 @@ const initApp = createAsyncThunk<void, void, ThunkAPI>('app/initApp', async (_ar
     const walletName = 'Coinbase Wallet';
     await dispatch(WalletActions.walletSelect({ walletName, network: 'mainnet' }));
   } else if (wallet.name && wallet.name !== 'Iframe') {
-    //Issue here, if we use the network from state connection won't happen.
-    await dispatch(WalletActions.walletSelect({ walletName: wallet.name, network: 'goerli' }));
+    //network passed in from the state's network object does not allow for a proper connection
+    //TO-DO: Test if possible to use ETH MAINNET as initial connection, if not return to Goerli
+    await dispatch(WalletActions.walletSelect({ walletName: wallet.name, network: 'mainnet' }));
   }
   dispatch(checkExternalServicesStatus());
   // TODO use when sdk ready

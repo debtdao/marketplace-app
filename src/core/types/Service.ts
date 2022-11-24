@@ -29,6 +29,7 @@ import {
   GetLinesResponse,
   GetLinePageResponse,
   GetLinePageAuxDataResponse,
+  SupportedOracleTokenFragResponse,
 } from '@types';
 
 // *************** USER ***************
@@ -305,6 +306,8 @@ export interface GetLinePageAuxDataProps extends GetLinePageArgs {
   network: Network;
 }
 
+export interface GetSupportedOracleTokensProps {}
+
 // Colalteral Service Function Props
 export interface EnableCollateralAssetProps {
   // userPositionMetadata: UserPositionMetadata;
@@ -446,6 +449,9 @@ export interface CollateralService {
 // *************** TOKEN ***************
 export interface TokenService {
   getSupportedTokens: (props: GetSupportedTokensProps) => Promise<Token[]>;
+  getSupportedOracleTokens: (
+    props: GetSupportedOracleTokensProps
+  ) => Promise<SupportedOracleTokenFragResponse[] | undefined>;
   getTokensDynamicData: (props: GetTokensDynamicDataProps) => Promise<TokenDynamicData[]>;
   getUserTokensData: (props: GetUserTokensDataProps) => Promise<Balance[]>;
   getTokenAllowance: (props: GetTokenAllowanceProps) => Promise<Integer>;

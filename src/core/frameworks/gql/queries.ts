@@ -304,7 +304,7 @@ export const GET_SPIGOT_QUERY = gql`
   }
 `;
 
-export const GET_SUPPORTED_TOKENS_QUERY = gql`
+export const GET_SUPPORTED_ORACLE_TOKENS_QUERY = gql`
   query {
     supportedTokens {
       ${TOKEN_FRAGMENT}

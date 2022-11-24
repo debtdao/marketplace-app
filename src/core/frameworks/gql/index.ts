@@ -15,9 +15,16 @@ import {
   GetLinePageAuxDataResponse,
   PositionSummary,
   GetLinesResponse,
+  SupportedOracleTokenFragResponse,
 } from '@src/core/types';
 
-import { GET_LINE_QUERY, GET_LINE_PAGE_QUERY, GET_LINE_PAGE_AUX_QUERY, GET_LINES_QUERY } from './queries';
+import {
+  GET_LINE_QUERY,
+  GET_LINE_PAGE_QUERY,
+  GET_LINE_PAGE_AUX_QUERY,
+  GET_LINES_QUERY,
+  GET_SUPPORTED_ORACLE_TOKENS_QUERY,
+} from './queries';
 
 const { GRAPH_API_URL } = getEnv();
 const { BLACKLISTED_LINES: blacklist } = getConstants();
@@ -94,3 +101,8 @@ export const getUserLinePositions: QueryCreator<GetUserLinePositionsArgs, Positi
 >(
   arg: GetUserLinePositionsArgs
 ) => getUserLinePositionsQuery(arg);
+
+const getSupportedTokensQuery = createQuery(GET_SUPPORTED_ORACLE_TOKENS_QUERY, 'supportedOracletokens');
+export const getSupportedOracleTokens: QueryCreator<undefined, SupportedOracleTokenFragResponse[]> = <
+  SupportedTokenFragResponse
+>(): QueryResponse<SupportedTokenFragResponse[]> => getSupportedTokensQuery({});

@@ -217,6 +217,6 @@ export interface GetLinePageResponse extends BaseLineFragResponse {
   };
 }
 
-export interface SupportedTokenFragRepsonse {
+export interface SupportedOracleTokenFragResponse {
   supportedTokens: [{ token: TokenFragRepsonse }];
 }

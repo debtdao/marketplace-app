@@ -12,16 +12,38 @@ import { TokensSelectors, createToken } from '../modules/tokens/tokens.selectors
 import { NetworkSelectors } from '../modules/network/network.selectors';
 
 const { selectVaultsMap } = VaultsSelectors;
-const { selectTokensMap, selectTokensUser } = TokensSelectors;
+const { selectTokenAddresses, selectSupportedTokens, selectSupportedTokensMap, selectTokensMap, selectTokensUser } =
+  TokensSelectors;
 const { selectServicesEnabled } = AppSelectors;
 const { selectCurrentNetwork } = NetworkSelectors;
 const { selectWalletNetwork } = WalletSelectors;
 
 export const selectDepositTokenOptionsByAsset = createSelector(
-  [selectTokensMap, selectTokensUser, selectServicesEnabled, selectWalletNetwork],
-  (tokensMap, tokensUser, servicesEnabled, currentNetwork) =>
+  [
+    selectSupportedTokens,
+    selectSupportedTokensMap,
+    selectTokenAddresses,
+    selectTokensMap,
+    selectTokensUser,
+    selectServicesEnabled,
+    selectWalletNetwork,
+  ],
+  (supportedTokens, supportedTokensMap, tokenAddresses, tokensMap, tokensUser, servicesEnabled, currentNetwork) =>
     memoize((assetAddress?: string): TokenView[] => {
       console.log('selectDepositTokenOptionsByAsset', currentNetwork, tokensMap, testTokens);
+      console.log('supportedTokens: ', supportedTokens);
+      console.log('supported tokens map: ', supportedTokensMap);
+      console.log('token addresses: ', tokenAddresses);
+      console.log('TokensUser: ', tokensUser);
+      console.log('TokensMap: ', tokensMap);
+      const { userTokensMap, userTokensAllowancesMap } = tokensUser;
+      const address = '0x3730954eC1b5c59246C1fA6a20dD6dE6Ef23aEa6'; // SEEROcoin
+      const tokenData = tokensMap[address];
+      const userTokenData = userTokensMap[address];
+      const allowancesMap = userTokensAllowancesMap[address] ?? {};
+      console.log('tokenData:', tokenData);
+      console.log('userTokenData:', userTokenData);
+      console.log('allowancesMap:', userTokenData);
       if (currentNetwork === 'goerli') {
         return testTokens;
       } else {

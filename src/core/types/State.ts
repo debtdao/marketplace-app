@@ -165,9 +165,10 @@ export interface UserTokenActionsMap {
 
 export interface TokensState {
   tokensAddresses: string[];
-  supportedTokens: Address[];
+  supportedTokens: string[];
   activeNetworkTokenAddresses: string[];
   tokensMap: { [address: string]: Token };
+  supportedTokensMap: { [address: string]: Token };
   selectedTokenAddress: Address | undefined;
   user: {
     userTokensAddresses: string[];
@@ -176,6 +177,7 @@ export interface TokensState {
   };
   statusMap: {
     getTokens: Status;
+    getSupportedTokens: Status;
     user: {
       getUserTokens: Status;
       getUserTokensAllowances: Status;

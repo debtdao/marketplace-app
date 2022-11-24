@@ -95,7 +95,7 @@ export const Market = () => {
     }
   };
 
-  let ctaButtonText = userWallet ? `${t('market:banner.cta-lender')}` : `${t('components.connect-button.connect')}`;
+  let ctaButtonText = userWallet ? `${t('market:banner.cta-borrower')}` : `${t('components.connect-button.connect')}`;
 
   return (
     <ViewContainer>
@@ -122,10 +122,10 @@ export const Market = () => {
               <p>{t('market:banner.body')}</p>
             </Text>
             <BannerCtaButton styling="primary" onClick={onBorrowerCtaClick}>
-              {t('market:banner.cta-borrower')}
+              {ctaButtonText}
             </BannerCtaButton>
             <BannerCtaButton styling="secondary" outline onClick={onLenderCtaClick}>
-              {ctaButtonText}
+              {t('market:banner.cta-lender')}
             </BannerCtaButton>
           </div>
         }

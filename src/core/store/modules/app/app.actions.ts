@@ -57,7 +57,8 @@ const initApp = createAsyncThunk<void, void, ThunkAPI>('app/initApp', async (_ar
     const walletName = 'Coinbase Wallet';
     await dispatch(WalletActions.walletSelect({ walletName, network: 'mainnet' }));
   } else if (wallet.name && wallet.name !== 'Iframe') {
-    await dispatch(WalletActions.walletSelect({ walletName: wallet.name, network: network.current }));
+    await dispatch(WalletActions.walletSelect({ walletName: wallet.name, network: 'goerli' }));
+    console.log('I am dispatching wallet select on app init');
   }
   dispatch(checkExternalServicesStatus());
   // TODO use when sdk ready

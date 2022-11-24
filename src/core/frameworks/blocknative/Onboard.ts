@@ -52,7 +52,12 @@ export class BlocknativeWalletImpl implements Wallet {
     const appName = 'Debt DAO';
 
     const wallets = [
-      { walletName: 'metamask' },
+      {
+        walletName: 'metamask',
+        rpc: {
+          [networkId]: 'https://eth-goerli.public.blastapi.io',
+        },
+      },
       {
         walletName: 'walletConnect',
         rpc: {
@@ -124,6 +129,7 @@ export class BlocknativeWalletImpl implements Wallet {
       const valid = await this.onboard?.walletCheck();
       return valid ?? false;
     } catch (error) {
+      console.log('error', error);
       return false;
     }
   }

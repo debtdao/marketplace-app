@@ -83,6 +83,7 @@ const appReducer = createReducer(appInitialState, (builder) => {
       };
     })
     .addCase(initApp.fulfilled, (state) => {
+      console.log('fulfilled app init', state);
       state.isInitialized = true;
       state.statusMap.initApp = initialStatus;
     })

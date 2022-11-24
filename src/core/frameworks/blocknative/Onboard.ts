@@ -45,7 +45,6 @@ export class BlocknativeWalletImpl implements Wallet {
   }
 
   public create(network: Network, subscriptions: Subscriptions, theme?: Theme): boolean {
-    //To do, make network ID Dynamic
     const networkId = getNetworkId(network);
     const { BLOCKNATIVE_KEY, FORTMATIC_KEY, PORTIS_KEY } = getConfig();
 

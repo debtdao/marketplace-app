@@ -19,6 +19,7 @@ import { DetailCard, ActionButtons, TokenIcon, ViewContainer, SliderCard } from 
 import { Button, Text } from '@components/common';
 import { LinesSelectors, ModalsActions, WalletSelectors, WalletActions } from '@src/core/store';
 import { humanize } from '@src/utils';
+import { getEnv } from '@config/env';
 
 const SectionHeader = styled.h3`
   ${({ theme }) => `
@@ -130,8 +131,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const dispatch = useAppDispatch();
-
-  const connectWallet = () => dispatch(WalletActions.walletSelect({ network: 'mainnet' }));
+  const { NETWORK } = getEnv();
+  const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
   const { principal, deposit, totalInterestPaid, revenue, deposits } = props;
   const modules = [revenue && 'revenue', deposits && 'escrow'].filter((x) => !!x);

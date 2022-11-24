@@ -10,6 +10,7 @@ import { RecommendationsCard, SliderCard, ViewContainer } from '@components/app'
 import { SpinnerLoading, Text, Button } from '@components/common';
 import { AggregatedCreditLine, UseCreditLinesParams } from '@src/core/types';
 import { GoblinTown } from '@assets/images';
+import { getEnv } from '@config/env';
 
 const StyledRecommendationsCard = styled(RecommendationsCard)``;
 
@@ -30,7 +31,7 @@ interface VaultsQueryParams {
 
 export const Market = () => {
   const { t } = useAppTranslation(['common', 'vaults', 'market']);
-
+  const { NETWORK } = getEnv();
   const history = useHistory();
   const queryParams = useQueryParams<VaultsQueryParams>();
   const dispatch = useAppDispatch();
@@ -38,7 +39,7 @@ export const Market = () => {
   const [search, setSearch] = useState('');
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
 
-  const connectWallet = () => dispatch(WalletActions.walletSelect({ network: 'mainnet' }));
+  const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
   // TODO not neeed here
   const addCreditStatus = useAppSelector(LinesSelectors.selectLinesActionsStatusMap);

@@ -9,6 +9,7 @@ import { DetailCard, ActionButtons, ViewContainer, SliderCard } from '@component
 import { Input, SearchIcon, Text, Button } from '@components/common';
 import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, CreditPosition } from '@src/core/types';
 import { humanize, formatAddress } from '@src/utils';
+import { getEnv } from '@config/env';
 
 const PositionsCard = styled(DetailCard)`
   max-width: ${({ theme }) => theme.globalMaxWidth};
@@ -70,8 +71,8 @@ export const PositionsTable = (props: PositionsProps) => {
   const [actions, setActions] = useState<Transaction[]>([]);
   const { events } = props;
   const dispatch = useAppDispatch();
-
-  const connectWallet = () => dispatch(WalletActions.walletSelect({ network: 'mainnet' }));
+  const { NETWORK } = getEnv();
+  const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
   //Initial set up for positions table
 

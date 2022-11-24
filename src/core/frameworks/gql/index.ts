@@ -13,8 +13,8 @@ import {
   QueryCreator,
   GetLinePageResponse,
   GetLinePageAuxDataResponse,
-  PositionSummary,
   GetLinesResponse,
+  CreditPosition,
 } from '@src/core/types';
 
 import { GET_LINE_QUERY, GET_LINE_PAGE_QUERY, GET_LINE_PAGE_AUX_QUERY, GET_LINES_QUERY } from './queries';
@@ -89,7 +89,7 @@ export const getLines: QueryCreator<GetLinesArgs, GetLinesResponse[]> = <GetLine
 ): QueryResponse<GetLinesResponse[]> => getLinesQuery({ ...arg, blacklist });
 
 const getUserLinePositionsQuery = createQuery(GET_LINES_QUERY);
-export const getUserLinePositions: QueryCreator<GetUserLinePositionsArgs, PositionSummary[]> = <
+export const getUserLinePositions: QueryCreator<GetUserLinePositionsArgs, CreditPosition[]> = <
   GetUserLinePositionsArgs
 >(
   arg: GetUserLinePositionsArgs

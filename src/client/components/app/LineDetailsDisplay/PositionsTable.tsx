@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { isEmpty } from 'lodash';
 import { useEffect, useState } from 'react';
 
-import { ModalsActions, LinesActions, LinesSelectors, WalletSelectors } from '@store';
+import { ModalsActions, LinesActions, LinesSelectors, WalletSelectors, WalletActions } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { device } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer, SliderCard } from '@components/app';
@@ -71,6 +71,8 @@ export const PositionsTable = (props: PositionsProps) => {
   const { events } = props;
   const dispatch = useAppDispatch();
 
+  const connectWallet = () => dispatch(WalletActions.walletSelect({ network: 'mainnet' }));
+
   //Initial set up for positions table
 
   useEffect(() => {
@@ -134,9 +136,13 @@ export const PositionsTable = (props: PositionsProps) => {
   //Action Handlers for positions table
 
   const depositHandler = (e: Event) => {
-    //@ts-ignore
-    dispatch(LinesActions.setSelectedLinePosition({ position: e.target.value }));
-    dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
+    if (!userWallet) {
+      connectWallet();
+    } else {
+      //@ts-ignore
+      dispatch(LinesActions.setSelectedLinePosition({ position: e.target.value }));
+      dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
+    }
   };
 
   // THIS NEEDS REVISITNG
@@ -170,6 +176,10 @@ export const PositionsTable = (props: PositionsProps) => {
     dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
   };
 
+  let ctaButtonText = userWallet
+    ? `${t('lineDetails:positions-events.propose-position')}`
+    : `${t('components.connect-button.connect')}`;
+
   return (
     <>
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
@@ -181,7 +191,7 @@ export const PositionsTable = (props: PositionsProps) => {
               <p>{t('lineDetails:positions-events.no-data')}</p>
 
               <BannerCtaButton styling="primary" onClick={depositHandler}>
-                {t('lineDetails:positions-events.propose-position')}
+                {ctaButtonText}
               </BannerCtaButton>
             </Text>
           }

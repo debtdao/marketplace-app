@@ -17,7 +17,7 @@ import {
 } from '@src/core/types';
 import { DetailCard, ActionButtons, TokenIcon, ViewContainer, SliderCard } from '@components/app';
 import { Button, Text } from '@components/common';
-import { LinesSelectors, ModalsActions, WalletSelectors } from '@src/core/store';
+import { LinesSelectors, ModalsActions, WalletSelectors, WalletActions } from '@src/core/store';
 import { humanize } from '@src/utils';
 
 const SectionHeader = styled.h3`

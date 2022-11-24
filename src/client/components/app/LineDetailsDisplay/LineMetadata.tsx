@@ -36,7 +36,7 @@ const MetricContainer = styled.div`
 `;
 
 const BannerCtaButton = styled(Button)`
-  width: 80%;
+  width: 100%;
   max-width: 20rem;
   margin-top: 1em;
 `;
@@ -182,6 +182,9 @@ export const LineMetadata = (props: LineMetadataProps) => {
   };
 
   const depositHandler = (token: TokenView) => {
+    if (!walletIsConnected) {
+      connectWallet();
+    }
     dispatch(ModalsActions.openModal({ modalName: 'addCollateral' }));
   };
 
@@ -230,6 +233,10 @@ export const LineMetadata = (props: LineMetadataProps) => {
     ? `${t('lineDetails:metadata.collateral-table.enable-spigot')}`
     : `${t('components.connect-button.connect')}`;
 
+  const depositCollateralText = walletIsConnected
+    ? `${t('lineDetails:metadata.collateral-table.add-collateral')}`
+    : `${t('components.connect-button.connect')}`;
+
   const getCollateralTableActions = () => {
     console.log('get collateral table actions', userPositionMetadata.role);
     switch (userPositionMetadata.role) {
@@ -244,8 +251,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
       case BORROWER_POSITION_ROLE:
         return (
           <>
-            <Button onClick={depositHandler}>{t('lineDetails:metadata.collateral-table.add-collateral')} </Button>
-            <Button onClick={addSpigotHandler}>{t('lineDetails:metadata.collateral-table.enable-spigot')} </Button>
+            <Button onClick={depositHandler}>{depositCollateralText} </Button>
+            <Button onClick={addSpigotHandler}>{enableSpigotText} </Button>
           </>
         );
       default:
@@ -283,10 +290,10 @@ export const LineMetadata = (props: LineMetadataProps) => {
               <p>{t('lineDetails:metadata.collateral-table.no-table')}</p>
 
               <BannerCtaButton styling="primary" onClick={depositHandler}>
-                {t('lineDetails:metadata.collateral-table.add-collateral')}
+                {depositCollateralText}
               </BannerCtaButton>
               <BannerCtaButton styling="primary" onClick={enableAssetHandler}>
-                {t('lineDetails:metadata.collateral-table.enable-asset')}
+                {enableCollateralText}
               </BannerCtaButton>
             </Text>
           }

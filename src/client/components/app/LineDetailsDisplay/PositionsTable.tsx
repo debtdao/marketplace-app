@@ -299,7 +299,7 @@ export const PositionsTable = (props: PositionsProps) => {
                   placeholder={t('components.search-input.search')}
                   Icon={SearchIcon}
                 />
-                <Button onClick={depositHandler}>New Position</Button>
+                <Button onClick={depositHandler}>{ctaButtonText}</Button>
               </>
             }
             searching={false}

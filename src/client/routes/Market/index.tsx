@@ -67,8 +67,6 @@ export const Market = () => {
   const lineCategoriesForDisplay = useAppSelector(LinesSelectors.selectLinesForCategories);
   const getLinesStatus = useAppSelector(LinesSelectors.selectLinesStatusMap).getLines;
 
-  console.log('ready', lineCategoriesForDisplay, getLinesStatus);
-
   useEffect(() => {
     setSearch(queryParams.search ?? '');
 

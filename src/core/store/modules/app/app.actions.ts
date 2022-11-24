@@ -3,6 +3,7 @@ import { createAsyncThunk, createAction } from '@reduxjs/toolkit';
 import { ThunkAPI } from '@frameworks/redux';
 import { isGnosisApp, isLedgerLive, isCoinbaseApp, get } from '@utils';
 import { ExternalServiceId } from '@types';
+import { getEnv } from '@config/env';
 
 import { WalletActions } from '../wallet/wallet.actions';
 import { TokensActions } from '../tokens/tokens.actions';
@@ -57,8 +58,8 @@ const initApp = createAsyncThunk<void, void, ThunkAPI>('app/initApp', async (_ar
     const walletName = 'Coinbase Wallet';
     await dispatch(WalletActions.walletSelect({ walletName, network: 'mainnet' }));
   } else if (wallet.name && wallet.name !== 'Iframe') {
-    //Passing down data from network state unreliable
-    await dispatch(WalletActions.walletSelect({ walletName: wallet.name, network: 'mainnet' }));
+    const { NETWORK } = getEnv();
+    await dispatch(WalletActions.walletSelect({ walletName: wallet.name, network: NETWORK }));
   }
   dispatch(checkExternalServicesStatus());
   // TODO use when sdk ready

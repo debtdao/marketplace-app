@@ -131,6 +131,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const dispatch = useAppDispatch();
 
+  const connectWallet = () => dispatch(WalletActions.walletSelect({ network: 'mainnet' }));
+
   const { principal, deposit, totalInterestPaid, revenue, deposits } = props;
   const modules = [revenue && 'revenue', deposits && 'escrow'].filter((x) => !!x);
   const totalRevenue = isEmpty(revenue)
@@ -184,11 +186,19 @@ export const LineMetadata = (props: LineMetadataProps) => {
   };
 
   const addSpigotHandler = (token: TokenView) => {
-    dispatch(ModalsActions.openModal({ modalName: 'enableSpigot' }));
+    if (!walletIsConnected) {
+      connectWallet();
+    } else {
+      dispatch(ModalsActions.openModal({ modalName: 'enableSpigot' }));
+    }
   };
 
   const enableAssetHandler = (token: TokenView) => {
-    dispatch(ModalsActions.openModal({ modalName: 'enableCollateral' }));
+    if (!walletIsConnected) {
+      connectWallet();
+    } else {
+      dispatch(ModalsActions.openModal({ modalName: 'enableCollateral' }));
+    }
   };
 
   const allCollateral = [...Object.values(deposits ?? {}), ...Object.values(revenue ?? {})];
@@ -212,6 +222,14 @@ export const LineMetadata = (props: LineMetadataProps) => {
     actions: getCollateralRowActionForRole(userPositionMetadata.role),
   }));
 
+  const enableCollateralText = walletIsConnected
+    ? `${t('lineDetails:metadata.collateral-table.enable-asset')}`
+    : `${t('components.connect-button.connect')}`;
+
+  const enableSpigotText = walletIsConnected
+    ? `${t('lineDetails:metadata.collateral-table.enable-spigot')}`
+    : `${t('components.connect-button.connect')}`;
+
   const getCollateralTableActions = () => {
     console.log('get collateral table actions', userPositionMetadata.role);
     switch (userPositionMetadata.role) {
@@ -219,8 +237,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
       case LENDER_POSITION_ROLE: // for testing
         return (
           <>
-            <Button onClick={addSpigotHandler}>{t('lineDetails:metadata.collateral-table.enable-spigot')} </Button>
-            <Button onClick={enableAssetHandler}>{t('lineDetails:metadata.collateral-table.enable-asset')} </Button>
+            <Button onClick={addSpigotHandler}>{enableSpigotText}</Button>
+            <Button onClick={enableAssetHandler}>{enableCollateralText}</Button>
           </>
         );
       case BORROWER_POSITION_ROLE:

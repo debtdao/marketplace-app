@@ -46,7 +46,7 @@ const MetricName = styled.h3`
     font-size: ${theme.fonts.sizes.lg};
     font-weight: 600;
     margin-bottom: ${theme.spacing.md};
-    color: ${theme.colors.primary};
+    color: ${theme.colors.titles};
   `}
 `;
 

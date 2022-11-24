@@ -22,7 +22,7 @@ import {
   Network,
   TokenAllowance,
   AggregatedCreditLine,
-  Credit,
+  CreditPosition,
   GetLineArgs,
   GetLinesArgs,
   GetLinePageArgs,
@@ -174,7 +174,7 @@ export interface CreditLineService {
 
   // helpers
   getFirstID: (contractAddress: string) => Promise<BytesLike>;
-  getCredit: (contractAddress: string, id: BytesLike) => Promise<Credit>;
+  getCredit: (contractAddress: string, id: BytesLike) => Promise<CreditPosition>;
   getLenderByCreditID: (contractAddress: string, id: BytesLike) => Promise<Address>;
   getInterestRateContract: (contractAddress: string) => Promise<Address>;
   borrower: (contractAddress: string) => Promise<Address>;

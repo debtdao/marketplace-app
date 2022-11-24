@@ -2,11 +2,11 @@ import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
 
-import { formatAmount, normalizeAmount, toWei } from '@utils';
+import { formatAmount, normalizeAmount, toWei, depositAndRepayUpdate } from '@utils';
 import { useAppTranslation, useAppDispatch, useAppSelector, useSelectedSellToken } from '@hooks';
 import { TokensActions, TokensSelectors, VaultsSelectors, LinesSelectors, LinesActions, WalletSelectors } from '@store';
 import { getConstants, testTokens } from '@src/config/constants';
-import { PositionItem } from '@src/core/types';
+import { PositionItem, CreditPosition } from '@src/core/types';
 
 import { TxContainer } from './components/TxContainer';
 import { TxTokenInput } from './components/TxTokenInput';
@@ -35,10 +35,11 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
   const { acceptingOffer, header, onClose, onPositionChange } = props;
-  const [repayType, setRepayType] = useState({ id: '1', label: 'wallet', value: 'wallet' });
+  const [repayType, setRepayType] = useState({ id: '1', label: 'Repay from:', value: 'Wallet' });
   const selectedPosition = useAppSelector(LinesSelectors.selectPositionData);
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionLoading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<string[]>(['']);
   const [transactionApproved, setTransactionApproved] = useState(true);
   const [targetAmount, setTargetAmount] = useState('1');
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
@@ -140,12 +141,36 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
   const depositAndRepay = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    if (!selectedCredit?.id || !targetAmount || !selectedSellTokenAddress || walletNetwork === undefined) {
+    if (!selectedCredit?.id) {
+      setErrors([...errors, 'no selected credit ID']);
       setLoading(false);
       return;
     }
-
-    console.log('deposit and repay');
+    if (!selectedSellTokenAddress) {
+      setErrors([...errors, 'no selected token']);
+      setLoading(false);
+      return;
+    }
+    if (!targetAmount) {
+      setErrors([...errors, 'no selected target amount']);
+      setLoading(false);
+      return;
+    }
+    if (!selectedPosition) {
+      setErrors([...errors, 'no selected position']);
+      setLoading(false);
+      return;
+    }
+    if (!walletNetwork) {
+      setErrors([...errors, 'wallet not connected']);
+      setLoading(false);
+      return;
+    }
+    if (!positions) {
+      setErrors([...errors, 'no positions available']);
+      setLoading(false);
+      return;
+    }
 
     dispatch(
       LinesActions.depositAndRepay({
@@ -160,6 +185,15 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
       }
       if (res.meta.requestStatus === 'fulfilled') {
         setTransactionCompleted(1);
+        const updatedPosition = depositAndRepayUpdate(selectedPosition, targetAmount);
+        dispatch(
+          LinesActions.setPositionData({
+            position: selectedPosition['id'],
+            lineAddress: selectedCredit.id,
+            positionObject: updatedPosition,
+            positions: positions,
+          })
+        );
         setLoading(false);
       }
     });
@@ -168,7 +202,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
   const depositAndClose = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    if (!selectedCredit?.id || selectedPosition === undefined || walletNetwork === undefined) {
+    if (!selectedCredit?.id || !selectedPosition || !walletNetwork) {
       setLoading(false);
       return;
     }
@@ -195,7 +229,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
   const claimAndRepay = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    if (!selectedCredit?.id || !targetAmount || !selectedSellTokenAddress || walletNetwork === undefined) {
+    if (!selectedCredit?.id || !targetAmount || !selectedSellTokenAddress || !walletNetwork) {
       setLoading(false);
       return;
     }
@@ -261,7 +295,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
     _updatePosition();
   };
 
-  const onSelectedPositionChange = (arg: PositionItem): void => {
+  const onSelectedPositionChange = (arg: CreditPosition): void => {
     dispatch(LinesActions.setSelectedLinePosition({ position: arg.id }));
   };
 
@@ -308,7 +342,6 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
         headerText={t('components.transaction.borrow-credit.select-line')}
         inputText={t('components.transaction.borrow-credit.select-line')}
         onSelectedPositionChange={onSelectedPositionChange}
-        //@ts-ignore
         selectedPosition={selectedPosition}
         positions={positions}
         // creditOptions={sourceCreditOptions}
@@ -325,7 +358,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
         typeOptions={repaymentOptions}
         // creditOptions={sourceCreditOptions}
         // inputError={!!sourceStatus.error}
-        readOnly={false}
+        readOnly={true}
       />
       <TxTokenInput
         key={'token-input'}

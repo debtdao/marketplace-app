@@ -5,11 +5,12 @@ import { useHistory } from 'react-router-dom';
 import { utils } from 'ethers';
 
 import { useAppSelector, useAppDispatch, useAppTranslation, useQueryParams } from '@hooks';
-import { ModalsActions, LinesActions, LinesSelectors } from '@store';
+import { ModalsActions, LinesActions, LinesSelectors, WalletActions, WalletSelectors } from '@store';
 import { RecommendationsCard, SliderCard, ViewContainer } from '@components/app';
 import { SpinnerLoading, Text, Button } from '@components/common';
 import { AggregatedCreditLine, UseCreditLinesParams } from '@src/core/types';
 import { GoblinTown } from '@assets/images';
+import { getEnv } from '@config/env';
 
 const StyledRecommendationsCard = styled(RecommendationsCard)``;
 
@@ -30,12 +31,15 @@ interface VaultsQueryParams {
 
 export const Market = () => {
   const { t } = useAppTranslation(['common', 'vaults', 'market']);
-
+  const { NETWORK } = getEnv();
   const history = useHistory();
   const queryParams = useQueryParams<VaultsQueryParams>();
   const dispatch = useAppDispatch();
   // const { isTablet, isMobile, width: DWidth } = useWindowDimensions();
   const [search, setSearch] = useState('');
+  const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
+
+  const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
   // TODO not neeed here
   const addCreditStatus = useAppSelector(LinesSelectors.selectLinesActionsStatusMap);
@@ -64,8 +68,6 @@ export const Market = () => {
   const lineCategoriesForDisplay = useAppSelector(LinesSelectors.selectLinesForCategories);
   const getLinesStatus = useAppSelector(LinesSelectors.selectLinesStatusMap).getLines;
 
-  console.log('ready', lineCategoriesForDisplay, getLinesStatus);
-
   useEffect(() => {
     setSearch(queryParams.search ?? '');
 
@@ -85,8 +87,14 @@ export const Market = () => {
   };
 
   const onBorrowerCtaClick = () => {
-    dispatch(ModalsActions.openModal({ modalName: 'createLine' }));
+    if (!userWallet) {
+      connectWallet();
+    } else {
+      dispatch(ModalsActions.openModal({ modalName: 'createLine' }));
+    }
   };
+
+  let ctaButtonText = userWallet ? `${t('market:banner.cta-borrower')}` : `${t('components.connect-button.connect')}`;
 
   return (
     <ViewContainer>
@@ -113,7 +121,7 @@ export const Market = () => {
               <p>{t('market:banner.body')}</p>
             </Text>
             <BannerCtaButton styling="primary" onClick={onBorrowerCtaClick}>
-              {t('market:banner.cta-borrower')}
+              {ctaButtonText}
             </BannerCtaButton>
             <BannerCtaButton styling="secondary" outline onClick={onLenderCtaClick}>
               {t('market:banner.cta-lender')}

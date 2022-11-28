@@ -69,6 +69,14 @@ export interface GetUserLinePositionsArgs {
   id: Address;
 }
 
+/**
+ * @typedef {object} GetBorrowerPositionsArgs
+ * @property {Address} GetBorrowerPositionsArgs.borrower - address to fetch borrower positions for
+ */
+export interface GetBorrowerPositionsArgs {
+  borrower: Address;
+}
+
 // React hook args wrapping these queries
 export interface UseCreditLinesParams {
   [key: string]: GetLinesArgs;
@@ -206,6 +214,33 @@ export interface GetLinePageResponse extends BaseLineFragResponse {
     };
     events?: SpigotEventFragResponse[];
   };
+  escrow?: BaseEscrowFragResponse & {
+    events: {
+      __typename: string;
+      timestamp: number;
+      // only on add/remove collateral
+      amount?: string;
+      value?: string;
+    };
+  };
+}
+
+export interface GetBorrowerPositionsResponse extends BaseLineFragResponse {
+  positions?: LinePageCreditFragResponse[];
+
+  events?: LineEventFragResponse[];
+
+  spigot?: {
+    id: Address;
+    summaries: SpigotRevenueSummaryFragResponse[];
+    spigots: {
+      contract: Address;
+      active: boolean;
+      startTime: number;
+    };
+    events?: SpigotEventFragResponse[];
+  };
+
   escrow?: BaseEscrowFragResponse & {
     events: {
       __typename: string;

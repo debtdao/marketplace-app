@@ -291,6 +291,7 @@ export interface LineActionsStatusMap {
 
 export interface UserLineMetadataStatusMap {
   getUserLinePositions: Status;
+  getBorrowerPositions: Status;
   linesActionsStatusMap: { [lineAddress: string]: LineActionsStatusMap };
 }
 

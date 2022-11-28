@@ -177,6 +177,11 @@ export const PositionsTable = (props: PositionsProps) => {
     dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
   };
 
+  const isWithdrawable = (deposit: string, borrowed: string, lender: string) => {
+    console.log(borrowed, deposit, lender, userWallet);
+    return Number(borrowed) < Number(deposit) && lender.toLocaleLowerCase() === userWallet?.toLocaleLowerCase();
+  };
+
   let ctaButtonText = userWallet
     ? `${t('lineDetails:positions-events.propose-position')}`
     : `${t('components.connect-button.connect')}`;
@@ -273,8 +278,8 @@ export const PositionsTable = (props: PositionsProps) => {
               drate: `${event['drate']} %`,
               frate: `${event['frate']} %`,
               status: event['status'],
-              principal: humanize('amount', event['principal'], 18, 2),
-              interest: humanize('amount', event['interestAccrued'], 18, 2),
+              principal: humanize('amount', event['principal'], event['token'].decimals, 2),
+              interest: humanize('amount', event['interestAccrued'], event['token'].decimals, 2),
               lender: formatAddress(event['lender']),
               token: event['token'].symbol,
               actions: (
@@ -283,9 +288,10 @@ export const PositionsTable = (props: PositionsProps) => {
                   actions={
                     event['status'] === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE
                       ? [ApproveMutualConsent]
-                      : userRoleMetadata.role === LENDER_POSITION_ROLE && event['status'] === 'OPENED'
+                      : userRoleMetadata.role === LENDER_POSITION_ROLE &&
+                        isWithdrawable(event['deposit'], event['principal'], event['lender'])
                       ? actions
-                      : userRoleMetadata.role === BORROWER_POSITION_ROLE && event['status'] === 'OPENED'
+                      : userRoleMetadata.role === BORROWER_POSITION_ROLE
                       ? actions
                       : []
                   }

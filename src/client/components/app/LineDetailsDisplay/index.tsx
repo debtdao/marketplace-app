@@ -40,6 +40,8 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   const [lineData, setLineData] = useState<AggregatedCreditLine | CreditLinePage>(line!);
   const [positions, setPositions] = useState<CreditPosition[]>();
 
+  const { principal, deposit, escrow, spigot, borrower, start, end } = lineData;
+
   useEffect(() => {
     if (page && page.positions) {
       setAllDataLoaded(true);
@@ -51,8 +53,6 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   }, [page]);
 
   if (!line && !page) return <Container>{t('lineDetails:line.no-data')}</Container>;
-
-  const { principal, deposit, escrow, spigot, borrower, start, end } = lineData;
 
   const StandardMetadata = (metadataProps: any) => (
     <>

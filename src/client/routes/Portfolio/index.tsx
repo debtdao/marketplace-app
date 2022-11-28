@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { useState } from 'react';
 
 import { useAppSelector, useAppTranslation, useIsMounting } from '@hooks';
 import {
@@ -10,7 +11,7 @@ import {
   ModalSelectors,
 } from '@store';
 import { SummaryCard, ViewContainer, NoWalletCard, Amount } from '@components/app';
-import { SpinnerLoading } from '@components/common';
+import { SpinnerLoading, CardContent, Card } from '@components/common';
 import { toBN, halfWidthCss } from '@utils';
 import { getConfig } from '@config';
 
@@ -38,16 +39,80 @@ const StyledNoWalletCard = styled(NoWalletCard)`
   ${halfWidthCss}
 `;
 
-const StyledSummaryCard = styled(SummaryCard)`
-  width: 100%;
-  grid-column: 1 / 3;
-  ${halfWidthCss};
-`;
-
 const StyledSpinnerLoading = styled(SpinnerLoading)`
   grid-column: 1 / 3;
   flex: 1;
   margin: 10rem 0;
+`;
+
+const SettingsCardContent = styled(CardContent)`
+  flex-direction: column;
+  align-items: flex-start;
+`;
+
+const SettingsCard = styled(Card)`
+  display: grid;
+  padding: ${({ theme }) => theme.card.padding} 0;
+  width: 100%;
+`;
+
+const SettingsSection = styled.div`
+  display: grid;
+  grid-template-columns: 18rem 1fr;
+  padding: 0 ${({ theme }) => theme.card.padding};
+  grid-gap: ${({ theme }) => theme.layoutPadding};
+`;
+
+const SectionContent = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  grid-gap: ${({ theme }) => theme.layoutPadding};
+  align-items: center;
+
+  ${SettingsSection}:not(:first-child) & {
+    padding-top: ${({ theme }) => theme.card.padding};
+  }
+`;
+
+const SectionTitle = styled.div<{ centerText?: boolean }>`
+  display: flex;
+  align-items: ${({ centerText }) => (centerText ? 'center' : 'flex-start')};
+  fill: currentColor;
+
+  ${SettingsSection}:not(:first-child) & {
+    padding-top: ${({ theme }) => theme.card.padding};
+  }
+`;
+
+const SectionHeading = styled.h3`
+  color: ${({ theme }) => theme.colors.titles};
+  display: inline-block;
+  font-size: 1.6rem;
+  font-weight: 500;
+  margin: 0;
+  padding: 0;
+`;
+
+const SlippageOption = styled.div<{ active?: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 8rem;
+  height: 8rem;
+  border: 2px solid transparent;
+  color: ${({ theme }) => theme.colors.titles};
+  background-color: ${({ theme }) => theme.colors.background};
+  border-radius: ${({ theme }) => theme.globalRadius};
+  font-weight: 700;
+  cursor: pointer;
+
+  ${({ active, theme }) =>
+    active &&
+    `
+    background-color: ${theme.colors.backgroundVariant};
+    color: ${theme.colors.titlesVariant};
+    border-color: ${theme.colors.primary};
+  `}
 `;
 
 export const Portfolio = () => {
@@ -67,6 +132,9 @@ export const Portfolio = () => {
   const tokensListStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
   const generalLoading = (appStatus.loading || tokensListStatus.loading || isMounting) && !activeModal;
   const userTokensLoading = generalLoading && !userTokens.length;
+  const [currentRole, setRole] = useState<string>('Borrower');
+
+  const availableRoles = ['Borrower', 'Lender', 'Arbiter'];
 
   const netWorth = toBN(vaultsSummary.totalDeposits)
     .plus(walletSummary.totalBalance)
@@ -102,22 +170,18 @@ export const Portfolio = () => {
       {walletIsConnected && (
         <>
           <Row>
-            <StyledSummaryCard
-              header={t('navigation.vaults')}
-              items={[
-                {
-                  header: t('dashboard.holdings'),
-                  Component: <Amount value={vaultsSummary.totalDeposits} input="usdc" />,
-                },
-                {
-                  header: t('dashboard.apy'),
-                  Component: <Amount value={vaultsSummary.apy} input="percent" />,
-                },
-              ]}
-              redirectTo="vaults"
-              cardSize="small"
-            />
-
+            <SettingsSection>
+              <SectionTitle>
+                <SectionHeading>{t('settings:slippage-tolerance')}</SectionHeading>
+              </SectionTitle>
+              <SectionContent>
+                {availableRoles.map((role) => (
+                  <SlippageOption onClick={() => setRole(role)} active={role === currentRole} key={`s-${role}`}>
+                    {role}
+                  </SlippageOption>
+                ))}
+              </SectionContent>
+            </SettingsSection>
             {/*  {currentNetworkSettings.labsEnabled && (
               <StyledSummaryCard
                 header={t('navigation.labs')}

@@ -11,7 +11,7 @@ import { Health } from './Health';
 
 const routesMap = [
   {
-    path: '/portfolio',
+    path: '/portfolio/:userAddress',
     component: Portfolio,
   },
   {

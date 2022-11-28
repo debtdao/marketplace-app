@@ -97,9 +97,9 @@ export interface VaultTransaction {
   expectedOutcome: TransactionOutcome | undefined;
 }
 
-export type IdToCreditPositionMap = {
+export interface IdToCreditPositionMap {
   [positionId: string]: CreditPosition;
-};
+}
 
 export interface CreditLineState {
   selectedLineAddress: string | undefined;

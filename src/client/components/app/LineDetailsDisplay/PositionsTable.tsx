@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { isEmpty } from 'lodash';
 import { useEffect, useState } from 'react';
+import { ethers } from 'ethers';
 
 import { ModalsActions, LinesActions, LinesSelectors, WalletSelectors, WalletActions } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
@@ -178,8 +179,9 @@ export const PositionsTable = (props: PositionsProps) => {
   };
 
   const isWithdrawable = (deposit: string, borrowed: string, lender: string) => {
-    console.log(borrowed, deposit, lender, userWallet);
-    return Number(borrowed) < Number(deposit) && lender.toLocaleLowerCase() === userWallet?.toLocaleLowerCase();
+    return (
+      Number(borrowed) < Number(deposit) && ethers.utils.getAddress(lender) === ethers.utils.getAddress(userWallet!)
+    );
   };
 
   let ctaButtonText = userWallet
@@ -288,8 +290,7 @@ export const PositionsTable = (props: PositionsProps) => {
                   actions={
                     event['status'] === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE
                       ? [ApproveMutualConsent]
-                      : userRoleMetadata.role === LENDER_POSITION_ROLE &&
-                        isWithdrawable(event['deposit'], event['principal'], event['lender'])
+                      : isWithdrawable(event['deposit'], event['principal'], event['lender'])
                       ? actions
                       : userRoleMetadata.role === BORROWER_POSITION_ROLE
                       ? actions

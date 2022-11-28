@@ -312,7 +312,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
       setErrors([...errors, 'no selected position']);
       return;
     }
-    let maxRepay: string = selectedPosition['principal'];
+    let maxRepay: string = `${Number(selectedPosition['principal']) + Number(selectedPosition['interestAccrued'])}`;
     maxRepay = normalize('amount', `${maxRepay}`, selectedPosition['token'].decimals);
     return maxRepay;
   };

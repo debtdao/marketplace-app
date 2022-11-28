@@ -12,8 +12,8 @@ import {
   LinesSelectors,
   AlertsActions,
 } from '@store';
-import { SummaryCard, ViewContainer, NoWalletCard } from '@components/app';
-import { SpinnerLoading } from '@components/common';
+import { SummaryCard, ViewContainer, NoWalletCard, SliderCard } from '@components/app';
+import { SpinnerLoading, Text } from '@components/common';
 import { halfWidthCss, isValidAddress } from '@utils';
 
 const StyledViewContainer = styled(ViewContainer)`
@@ -57,6 +57,11 @@ const RoleOption = styled.div<{ active?: boolean }>`
     color: ${theme.colors.titlesVariant};
     border-color: ${theme.colors.primary};
   `}
+`;
+
+const StyledSliderCard = styled(SliderCard)`
+  padding: 3rem;
+  margin: 0;
 `;
 
 export const Portfolio = () => {
@@ -141,6 +146,17 @@ export const Portfolio = () => {
       {!walletIsConnected && <StyledNoWalletCard />}
 
       {userTokensLoading && <StyledSpinnerLoading />}
+
+      {borrowerPositions && (
+        <StyledSliderCard
+          header={t('components.no-borrower-positions.header')}
+          Component={
+            <Text>
+              <p>{t('components.no-borrower-positions.content')}</p>
+            </Text>
+          }
+        />
+      )}
 
       {/* {!userTokensLoading && (
         <TokensCard

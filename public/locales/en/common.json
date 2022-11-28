@@ -10,6 +10,10 @@
       "searching-text": "Please search for another asset",
       "text": "No assets to display"
     },
+    "no-borrower-positions": {
+      "header": "No User Positions Available",
+      "content": "No User Content"
+    },
     "positions-card": {
       "positions": "Positions",
       "drate": "dRate",

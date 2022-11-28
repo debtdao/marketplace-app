@@ -127,7 +127,7 @@ export const Portfolio = () => {
       history.push('/market');
       return;
     } else {
-      dispatch(LinesActions.getBorrowerPositions({ borrower: borrowerAddress }));
+      dispatch(LinesActions.getBorrowerPositions({ borrower: '0x1A6784925814a13334190Fd249ae0333B90b6443' }));
       console.log('success', borrowerPositions);
     }
   }, [currentRole]);

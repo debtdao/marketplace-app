@@ -176,6 +176,7 @@ const getBorrowerPositions = createAsyncThunk<
     throw new Error('WALLET NOT CONNECTED');
   }
   const borrowerPositions = await services.creditLineService.getBorrowerPositions({ borrower });
+  console.log('actions', borrowerPositions);
   return { borrowerPositions };
 });
 

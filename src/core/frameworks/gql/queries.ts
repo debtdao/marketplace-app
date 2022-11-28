@@ -303,3 +303,45 @@ export const GET_SPIGOT_QUERY = gql`
     }
   }
 `;
+
+// fetches all of a users positions that they borrow from
+export const GET_BORROWER_POSITIONS_QUERY = gql`
+  ${BASE_LINE_FRAGMENT}
+  ${LINE_PAGE_CREDIT_FRAGMENT}
+  ${LINE_EVENT_FRAGMENT}
+  ${BASE_SPIGOT_FRAGMENT}
+  ${SPIGOT_SUMMARY_FRAGMENT}
+  ${SPIGOT_EVENT_FRAGMENT}
+  ${ESCROW_FRAGMENT}
+
+  query getBorrowerPositions($borrower: String!) {
+    lineOfCredits(where: { borrower_contains: $borrower }) {
+      ...BaseLineFrag
+
+      positions(first: 20) {
+        ...LinePageCreditFrag
+      }
+
+      events(first: 20) {
+        ...LineEventFrag
+      }
+
+      spigot {
+        id
+        spigots {
+          ...BaseSpigotFrag
+        }
+
+        summaries {
+          ...SpigotSummaryFrag
+        }
+        events(first: 20) {
+          ...SpigotEventFrag
+        }
+      }
+      escrow {
+        ...EscrowFrag
+      }
+    }
+  }
+`;

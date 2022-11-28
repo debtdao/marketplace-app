@@ -1,19 +1,20 @@
 import styled from 'styled-components';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 
-import { useAppSelector, useAppTranslation, useIsMounting } from '@hooks';
+import { useAppSelector, useAppTranslation, useIsMounting, useAppDispatch } from '@hooks';
 import {
   TokensSelectors,
-  VaultsSelectors,
   WalletSelectors,
-  NetworkSelectors,
   AppSelectors,
   ModalSelectors,
+  LinesActions,
+  LinesSelectors,
+  AlertsActions,
 } from '@store';
-import { SummaryCard, ViewContainer, NoWalletCard, Amount } from '@components/app';
-import { SpinnerLoading, CardContent, Card } from '@components/common';
-import { toBN, halfWidthCss } from '@utils';
-import { getConfig } from '@config';
+import { SummaryCard, ViewContainer, NoWalletCard } from '@components/app';
+import { SpinnerLoading } from '@components/common';
+import { halfWidthCss, isValidAddress } from '@utils';
 
 const StyledViewContainer = styled(ViewContainer)`
   display: grid;
@@ -22,15 +23,6 @@ const StyledViewContainer = styled(ViewContainer)`
 `;
 
 const HeaderCard = styled(SummaryCard)`
-  grid-column: 1 / 3;
-`;
-
-const Row = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  grid-gap: ${({ theme }) => theme.layoutPadding};
-  flex-wrap: wrap;
   grid-column: 1 / 3;
 `;
 
@@ -45,59 +37,11 @@ const StyledSpinnerLoading = styled(SpinnerLoading)`
   margin: 10rem 0;
 `;
 
-const SettingsCardContent = styled(CardContent)`
-  flex-direction: column;
-  align-items: flex-start;
-`;
-
-const SettingsCard = styled(Card)`
-  display: grid;
-  padding: ${({ theme }) => theme.card.padding} 0;
-  width: 100%;
-`;
-
-const SettingsSection = styled.div`
-  display: grid;
-  grid-template-columns: 18rem 1fr;
-  padding: 0 ${({ theme }) => theme.card.padding};
-  grid-gap: ${({ theme }) => theme.layoutPadding};
-`;
-
-const SectionContent = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  grid-gap: ${({ theme }) => theme.layoutPadding};
-  align-items: center;
-
-  ${SettingsSection}:not(:first-child) & {
-    padding-top: ${({ theme }) => theme.card.padding};
-  }
-`;
-
-const SectionTitle = styled.div<{ centerText?: boolean }>`
-  display: flex;
-  align-items: ${({ centerText }) => (centerText ? 'center' : 'flex-start')};
-  fill: currentColor;
-
-  ${SettingsSection}:not(:first-child) & {
-    padding-top: ${({ theme }) => theme.card.padding};
-  }
-`;
-
-const SectionHeading = styled.h3`
-  color: ${({ theme }) => theme.colors.titles};
-  display: inline-block;
-  font-size: 1.6rem;
-  font-weight: 500;
-  margin: 0;
-  padding: 0;
-`;
-
-const SlippageOption = styled.div<{ active?: boolean }>`
+const RoleOption = styled.div<{ active?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 8rem;
+  width: 20rem;
   height: 8rem;
   border: 2px solid transparent;
   color: ${({ theme }) => theme.colors.titles};
@@ -117,91 +61,82 @@ const SlippageOption = styled.div<{ active?: boolean }>`
 
 export const Portfolio = () => {
   const { t } = useAppTranslation(['common', 'home']);
-  const { NETWORK_SETTINGS } = getConfig();
   const isMounting = useIsMounting();
+  const location = useLocation();
+  const dispatch = useAppDispatch();
+  const history = useHistory();
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
 
-  const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
-  const currentNetworkSettings = NETWORK_SETTINGS[currentNetwork];
-  const vaultsSummary = useAppSelector(VaultsSelectors.selectSummaryData);
   // const labsSummary = useAppSelector(LabsSelectors.selectSummaryData);
-  const walletSummary = useAppSelector(TokensSelectors.selectSummaryData);
   const userTokens = useAppSelector(TokensSelectors.selectUserTokens);
   const activeModal = useAppSelector(ModalSelectors.selectActiveModal);
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
   const tokensListStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
   const generalLoading = (appStatus.loading || tokensListStatus.loading || isMounting) && !activeModal;
+  const borrowerPositions = useAppSelector(LinesSelectors.selectBorrowerPositions);
   const userTokensLoading = generalLoading && !userTokens.length;
   const [currentRole, setRole] = useState<string>('Borrower');
 
   const availableRoles = ['Borrower', 'Lender', 'Arbiter'];
 
-  const netWorth = toBN(vaultsSummary.totalDeposits)
-    .plus(walletSummary.totalBalance)
-    // .plus(labsSummary.totalDeposits)
-    .toString();
-
   const summaryCardItems = [
-    { header: t('dashboard.total-net-worth'), Component: <Amount value={netWorth} input="usdc" /> },
+    {
+      header: t(''),
+      Component: (
+        <RoleOption
+          onClick={() => setRole(availableRoles[0])}
+          active={availableRoles[0] === currentRole}
+          key={`s-${availableRoles[0]}`}
+        >
+          {t(`settings:${availableRoles[0]}`)}
+        </RoleOption>
+      ),
+    },
+    {
+      header: t(''),
+      Component: (
+        <RoleOption
+          onClick={() => setRole(availableRoles[1])}
+          active={availableRoles[1] === currentRole}
+          key={`s-${availableRoles[1]}`}
+        >
+          {t(`settings:${availableRoles[1]}`)}
+        </RoleOption>
+      ),
+    },
+    {
+      header: t(''),
+      Component: (
+        <RoleOption
+          onClick={() => setRole(availableRoles[2])}
+          active={availableRoles[2] === currentRole}
+          key={`s-${availableRoles[2]}`}
+        >
+          {t(`settings:${availableRoles[2]}`)}
+        </RoleOption>
+      ),
+    },
   ];
-  if (walletIsConnected) {
-    summaryCardItems.push({
-      header: t('dashboard.available-deposit'),
-      Component: <Amount value={walletSummary.totalBalance} input="usdc" />,
-    });
-  }
-  if (currentNetworkSettings.earningsEnabled) {
-    summaryCardItems.push(
-      {
-        header: t('dashboard.vaults-earnings'),
-        Component: <Amount value={vaultsSummary.totalEarnings} input="usdc" />,
-      },
-      {
-        header: t('dashboard.vaults-est-yearly-yield'),
-        Component: <Amount value={vaultsSummary.estYearlyYeild} input="usdc" />,
-      }
-    );
-  }
+
+  useEffect(() => {
+    const borrowerAddress: string | undefined = location.pathname.split('/')[2];
+
+    console.log('line address', borrowerAddress);
+    if (!borrowerAddress || !isValidAddress(borrowerAddress)) {
+      dispatch(AlertsActions.openAlert({ message: 'INVALID_ADDRESS', type: 'error' }));
+      history.push('/market');
+      return;
+    } else {
+      dispatch(LinesActions.getBorrowerPositions({ borrower: borrowerAddress }));
+      console.log('success', borrowerPositions);
+    }
+  }, [currentRole]);
+
+  console.log('borrower positions', borrowerPositions);
 
   return (
     <StyledViewContainer>
       <HeaderCard items={summaryCardItems} cardSize="small" />
-
-      {walletIsConnected && (
-        <>
-          <Row>
-            <SettingsSection>
-              <SectionTitle>
-                <SectionHeading>{t('settings:slippage-tolerance')}</SectionHeading>
-              </SectionTitle>
-              <SectionContent>
-                {availableRoles.map((role) => (
-                  <SlippageOption onClick={() => setRole(role)} active={role === currentRole} key={`s-${role}`}>
-                    {role}
-                  </SlippageOption>
-                ))}
-              </SectionContent>
-            </SettingsSection>
-            {/*  {currentNetworkSettings.labsEnabled && (
-              <StyledSummaryCard
-                header={t('navigation.labs')}
-                items={[
-                  {
-                    header: t('dashboard.holdings'),
-                    Component: <Amount value={labsSummary.totalDeposits} input="usdc" />,
-                  },
-                  {
-                    header: t('dashboard.apy'),
-                    Component: <Amount value={labsSummary.estYearlyYield} input="percent" />,
-                  },
-                ]}
-                redirectTo="labs"
-                cardSize="small"
-              />
-            )} */}
-          </Row>
-        </>
-      )}
 
       {!walletIsConnected && <StyledNoWalletCard />}
 

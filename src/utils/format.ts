@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import { ethers } from 'ethers';
 
 import { Wei, Unit, Amount, FormattedAmount, Fraction, DataType } from '@types';
 
@@ -130,11 +131,20 @@ export const formatAddress = (address: string) => {
   return address.substring(0, 6) + '...' + address.substring(address.length - 4, address.length);
 };
 
-export const getENSname = (address: string) => {
-  //TO DO: need to set up a provider here.
-  //const provider = EthersWeb3ProviderImpl.getInstanceOf('ethereum');
-  //const addressEnsName = await provider.lookupAddress(address);
-  //return addressEnsName;
+export const getENSname = async (address: string) => {
+  //TO DO:
+  //1. Need to resolve promise
+  //2. Need to check if address or ens
+  //3. Need to handle errors
+  const provider = ethers.getDefaultProvider();
+  let ens = await provider.lookupAddress(address);
+  console.log('ens', ens);
+
+  if (ens !== null) {
+    return ens;
+  } else {
+    return address;
+  }
 };
 
 export const getDate = (timestamp: number) => {

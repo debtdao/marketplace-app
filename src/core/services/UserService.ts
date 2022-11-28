@@ -19,7 +19,11 @@ export class UserServiceImpl implements UserService {
     const { address } = props;
     const provider = this.web3Provider.getInstanceOf('ethereum');
     const addressEnsName = await provider.lookupAddress(address);
-    return addressEnsName;
+    if (addressEnsName) {
+      return addressEnsName;
+    } else {
+      return address;
+    }
   }
 
   /* -------------------------------------------------------------------------- */

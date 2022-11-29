@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { AggregatedCreditLine, CreditLinePage, CreditPosition } from '@src/core/types';
-import { useAppTranslation } from '@hooks';
+import { useAppTranslation, useAppSelector, useAppDispatch } from '@hooks';
 import { Text } from '@components/common';
+import { LinesActions, LinesSelectors, WalletSelectors } from '@store';
 
 import { LineMetadata } from './LineMetadata';
 import { PositionsTable } from './PositionsTable';
@@ -34,6 +35,11 @@ const BorrowerName = styled(Text)`
 
 export const LineDetailsDisplay = (props: LineDetailsProps) => {
   const { t } = useAppTranslation('common');
+  const borrowerPositions = useAppSelector(LinesSelectors.selectBorrowerPositions);
+  const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
+
+  const dispatch = useAppDispatch();
+
   const { line, page } = props;
 
   const [allDataLoaded, setAllDataLoaded] = useState(false);
@@ -51,6 +57,17 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
     console.log('updating in line details', page);
     // LineDetails page handles getLinePage query
   }, [page]);
+
+  useEffect(() => {
+    if (borrowerPositions) console.log({ borrowerPositions });
+  }, [borrowerPositions]);
+
+  useEffect(() => {
+    if (userWallet) {
+      console.log('fetching borrower positions for: ', userWallet);
+      dispatch(LinesActions.getBorrowerPositions({ borrower: '0x1a6784925814a13334190fd249ae0333b90b6443' }));
+    }
+  }, [userWallet]);
 
   if (!line && !page) return <Container>{t('lineDetails:line.no-data')}</Container>;
 

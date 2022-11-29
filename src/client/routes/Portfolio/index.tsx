@@ -15,7 +15,7 @@ import {
 import { SummaryCard, ViewContainer, NoWalletCard, SliderCard } from '@components/app';
 import { SpinnerLoading, Text } from '@components/common';
 import { halfWidthCss, isValidAddress } from '@utils';
-import { AggregatedCreditLine } from '@src/core/types';
+import { AggregatedCreditLine, CreditPosition } from '@src/core/types';
 
 const StyledViewContainer = styled(ViewContainer)`
   display: grid;
@@ -163,8 +163,30 @@ export const Portfolio = () => {
     //  escrow?: AggregatedEscrow;
     //  spigot?: AggregatedSpigot;
     //}
-
-    const aggregatedCredit = '';
+    let aggregate: AggregatedCreditLine = {
+      principal: '0',
+      deposit: '0',
+      highestApy: ['0', '0', '0'],
+      positions: [],
+      //@ts-ignore
+      escrow: {},
+      //@ts-ignore
+      spigot: {},
+    };
+    if (data) {
+      data.map((data: any, i) => {
+        console.log(data.positions);
+        data.positions.map((position: CreditPosition, i: number) => {
+          let totalPrincipal = Number(aggregate.principal) + Number(position.principal);
+          let totalDeposit = Number(aggregate.deposit) + Number(position.deposit);
+          //@ts-ignore
+          aggregate.positions.push(position);
+          aggregate.principal = `${totalPrincipal}`;
+          aggregate.deposit = `${totalDeposit}`;
+        });
+      });
+      console.log(aggregate);
+    }
   }, [data]);
 
   return (

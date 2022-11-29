@@ -52,7 +52,6 @@ export interface AggregatedCreditLine extends BaseCreditLine {
   deposit: string; // | Promise<string>;
   // id, symbol, APY (4 decimals)
   highestApy: [string, string, string];
-
   positions?: CreditPosition[];
   escrow?: AggregatedEscrow;
   spigot?: AggregatedSpigot;

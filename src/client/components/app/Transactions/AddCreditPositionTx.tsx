@@ -182,8 +182,9 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
 
   const addCreditPosition = async () => {
     setLoading(true);
+    console.log('made it here');
     // TODO set error in state to display no line selected
-    if (!selectedCredit?.id || !drate || !frate || lenderAddress === '' || !selectedPosition || !positions) {
+    if (!selectedCredit?.id || !drate || !frate || lenderAddress === '' || !positions) {
       setLoading(false);
       return;
     }
@@ -211,6 +212,9 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         setLoading(false);
       }
       if (res.meta.requestStatus === 'fulfilled' && transactionType === 'accept') {
+        if (!selectedPosition) {
+          return;
+        }
         const updatedPosition = addCreditUpdate(selectedPosition);
         dispatch(
           LinesActions.setPositionData({

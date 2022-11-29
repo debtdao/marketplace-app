@@ -9,13 +9,15 @@ import {
   GetLinePageArgs,
   GetLinesArgs,
   GetUserLinePositionsArgs,
+  GetBorrowerPositionsArgs,
   QueryResponse,
   QueryCreator,
   GetLinePageResponse,
   GetLinePageAuxDataResponse,
-  PositionSummary,
+  GetBorrowerPositionsResponse,
   GetLinesResponse,
   SupportedOracleTokenResponse,
+  CreditPosition,
 } from '@src/core/types';
 
 import {
@@ -24,6 +26,7 @@ import {
   GET_LINE_PAGE_AUX_QUERY,
   GET_LINES_QUERY,
   GET_SUPPORTED_ORACLE_TOKENS_QUERY,
+  GET_BORROWER_POSITIONS_QUERY,
 } from './queries';
 
 const { GRAPH_API_URL } = getEnv();
@@ -94,7 +97,7 @@ export const getLines: QueryCreator<GetLinesArgs, GetLinesResponse[]> = <GetLine
 ): QueryResponse<GetLinesResponse[]> => getLinesQuery({ ...arg, blacklist });
 
 const getUserLinePositionsQuery = createQuery(GET_LINES_QUERY);
-export const getUserLinePositions: QueryCreator<GetUserLinePositionsArgs, PositionSummary[]> = <
+export const getUserLinePositions: QueryCreator<GetUserLinePositionsArgs, CreditPosition[]> = <
   GetUserLinePositionsArgs
 >(
   arg: GetUserLinePositionsArgs
@@ -105,3 +108,8 @@ export const getSupportedOracleTokens: QueryCreator<
   undefined,
   SupportedOracleTokenResponse | undefined
 > = (): QueryResponse<SupportedOracleTokenResponse | undefined> => getSupportedOracleTokensQuery();
+
+const getBorrowerPositionsQuery = createQuery(GET_BORROWER_POSITIONS_QUERY, 'lineOfCredits');
+export const getBorrowerPositions: QueryCreator<GetBorrowerPositionsArgs, CreditPosition[]> = (
+  arg: GetBorrowerPositionsArgs
+) => getBorrowerPositionsQuery(arg);

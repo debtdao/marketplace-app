@@ -13,7 +13,7 @@ import {
   TransactionResponse,
   STATUS,
   ExecuteTransactionProps,
-  Credit,
+  CreditPosition,
   GetUserLinesProps,
   GetLineProps,
   GetLinesProps,
@@ -30,11 +30,14 @@ import {
   GetLinePageAuxDataResponse,
   GetLinePageResponse,
   Network,
+  GetBorrowerPositionsProps,
+  CreditLinePage,
+  GetBorrowerPositionsResponse,
 } from '@types';
 import { getConfig } from '@config';
 import { LineOfCreditABI } from '@services/contracts';
 import { getContract } from '@frameworks/ethers';
-import { getLinePage, getLinePageAuxData, getLines } from '@frameworks/gql';
+import { getLinePage, getLinePageAuxData, getLines, getBorrowerPositions } from '@frameworks/gql';
 
 const { GRAPH_API_URL } = getConfig();
 
@@ -318,7 +321,7 @@ export class CreditLineServiceImpl implements CreditLineService {
     return await this._getContract(contractAddress).ids(0);
   }
 
-  public async getCredit(contractAddress: string, id: BytesLike): Promise<Credit> {
+  public async getCredit(contractAddress: string, id: BytesLike): Promise<CreditPosition> {
     return await this._getContract(contractAddress).credits(id);
   }
 
@@ -411,6 +414,16 @@ export class CreditLineServiceImpl implements CreditLineService {
       })
       .catch((err) => {
         console.log('CreditLineService error fetching user lines', err);
+        return undefined;
+      });
+    return response;
+  }
+
+  public async getBorrowerPositions(prop: GetBorrowerPositionsProps): Promise<CreditPosition[] | undefined> {
+    const response = getBorrowerPositions(prop)
+      .then((data) => data)
+      .catch((err) => {
+        console.log('CreditLineService error fetching borrower positions', err);
         return undefined;
       });
     return response;

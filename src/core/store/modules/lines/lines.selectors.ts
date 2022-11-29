@@ -10,13 +10,14 @@ import {
   AggregatedCreditLine,
   Address,
   CreditLinePage,
-  PositionInt,
   UserPositionMetadata,
+  CreditPosition,
+  IdToCreditPositionMap,
   BORROWER_POSITION_ROLE,
   LENDER_POSITION_ROLE,
   ARBITER_POSITION_ROLE, // prev. GeneralVaultView, Super indepth data, CreditLinePage is most similar atm
 } from '@types';
-import { formatAggregatedCreditLineData, toBN, unnullify } from '@utils';
+import { toBN, unnullify } from '@utils';
 import { getConstants } from '@src/config/constants';
 
 import { initialLineActionsStatusMap } from './lines.reducer';
@@ -55,6 +56,7 @@ const selectLinesActionsStatusMap = (state: RootState) => state.lines.statusMap.
 const selectGetLinesStatus = (state: RootState) => state.lines.statusMap.getLines;
 const selectGetLinePageStatus = (state: RootState) => state.lines.statusMap.getLinePage;
 const selectGetUserLinesPositionsStatus = (state: RootState) => state.lines.statusMap.user.getUserLinePositions;
+const selectGetBorrowerPositions = (state: RootState) => state.lines.user.borrowerPositions;
 
 /* ----------------------------- Main Selectors ----------------------------- */
 const selectLines = createSelector([selectLinesMap], (linesMap) => {
@@ -198,6 +200,14 @@ const selectPositions = createSelector([selectSelectedLine], (line) => {
   return positions;
 });
 
+// TODO: this should return the equivalent of CreditLineState.user.borrowerPositions
+const selectBorrowerPositions = createSelector(
+  [selectGetBorrowerPositions],
+  (borrowerPositions): IdToCreditPositionMap => {
+    return borrowerPositions;
+  }
+);
+
 const selectPositionData = createSelector(
   [selectSelectedLine, selectSelectedPosition],
   (line, selectSelectedPosition) => {
@@ -205,9 +215,8 @@ const selectPositionData = createSelector(
 
     let selectedPositionData = _.find(
       line?.positions,
-      (position: PositionInt) => position.id === selectSelectedPosition
+      (position: CreditPosition) => position.id === selectSelectedPosition
     );
-    console.log(selectedPositionData, 'e');
     return selectedPositionData;
   }
 );
@@ -318,6 +327,7 @@ export const LinesSelectors = {
   selectLinesStatusMap,
   selectUserLinesSummary,
   selectPositions,
+  selectBorrowerPositions,
   selectLinesGeneralStatus,
   selectSelectedLine,
   selectSelectedLinePage,

@@ -13,13 +13,14 @@ import {
   GetLineArgs,
   GetLinesArgs,
   GetLinePageArgs,
-  PositionSummary,
+  CreditPosition,
   AddCreditProps,
   UseCreditLinesParams,
   BorrowCreditProps,
   Network,
   DeploySecuredLineProps,
   DeploySecuredLineWithConfigProps,
+  GetBorrowerPositionsResponse,
 } from '@types';
 import {
   formatGetLinesData,
@@ -39,6 +40,12 @@ import { TokensActions } from '../tokens/tokens.actions';
 
 const setSelectedLineAddress = createAction<{ lineAddress?: string }>('lines/setSelectedLineAddress');
 const setSelectedLinePosition = createAction<{ position?: string }>('lines/setSelectedLinePosition');
+const setPositionData = createAction<{
+  positionObject: CreditPosition;
+  lineAddress: string;
+  position: string;
+  positions: CreditPosition[];
+}>('lines/setUpdatedPositionData');
 
 /* -------------------------------------------------------------------------- */
 /*                                 Clear State                                */
@@ -140,7 +147,7 @@ const getLinePage = createAsyncThunk<{ linePageData: CreditLinePage | undefined 
 );
 
 const getUserLinePositions = createAsyncThunk<
-  { userLinesPositions: PositionSummary[] },
+  { userLinesPositions: CreditPosition[] },
   { lineAddresses?: string[] },
   ThunkAPI
 >('lines/getUserLinePositions', async ({ lineAddresses }, { extra, getState }) => {
@@ -155,6 +162,21 @@ const getUserLinePositions = createAsyncThunk<
     userAddress,
   });
   return { userLinesPositions };
+});
+
+const getBorrowerPositions = createAsyncThunk<
+  { borrowerPositions: CreditPosition[] | undefined },
+  { borrower: string },
+  ThunkAPI
+>('lines/getBorrowerPositions', async ({ borrower }, { extra, getState }) => {
+  const { wallet } = getState();
+  const { services } = extra;
+  const userAddress = wallet.selectedAddress;
+  if (!userAddress) {
+    throw new Error('WALLET NOT CONNECTED');
+  }
+  const borrowerPositions = await services.creditLineService.getBorrowerPositions({ borrower });
+  return { borrowerPositions };
 });
 
 export interface GetExpectedTransactionOutcomeProps {
@@ -704,11 +726,13 @@ const getWithdrawAllowance = createAsyncThunk<
 export const LinesActions = {
   setSelectedLineAddress,
   setSelectedLinePosition,
+  setPositionData,
   // initiateSaveLines,
   getLine,
   getLines,
   getLinePage,
   getUserLinePositions,
+  getBorrowerPositions,
   approveDeposit,
   addCredit,
   depositAndRepay,

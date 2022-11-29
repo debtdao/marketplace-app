@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { AggregatedCreditLine, CreditLinePage } from '@src/core/types';
+import { AggregatedCreditLine, CreditLinePage, CreditPosition } from '@src/core/types';
 import { useAppTranslation } from '@hooks';
 import { Text } from '@components/common';
 
@@ -38,7 +38,9 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
 
   const [allDataLoaded, setAllDataLoaded] = useState(false);
   const [lineData, setLineData] = useState<AggregatedCreditLine | CreditLinePage>(line!);
-  const [positions, setPositions] = useState<[]>();
+  const [positions, setPositions] = useState<CreditPosition[]>();
+
+  const { principal, deposit, escrow, spigot, borrower, start, end } = lineData;
 
   useEffect(() => {
     if (page && page.positions) {
@@ -51,8 +53,6 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   }, [page]);
 
   if (!line && !page) return <Container>{t('lineDetails:line.no-data')}</Container>;
-
-  const { principal, deposit, escrow, spigot, borrower, start, end } = lineData;
 
   const StandardMetadata = (metadataProps: any) => (
     <>

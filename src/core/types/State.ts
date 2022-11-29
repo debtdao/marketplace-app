@@ -6,7 +6,7 @@ import { ExternalServiceId } from './General';
 import { PartnerId } from './Partner';
 import { Theme } from './Settings';
 import { Status } from './Status';
-import { CreditLinePage, UserLineMetadataStatusMap, AggregatedCreditLine, PositionSummary } from './CreditLine';
+import { CreditLinePage, UserLineMetadataStatusMap, AggregatedCreditLine, CreditPosition } from './CreditLine';
 import {
   Position,
   Token,
@@ -99,6 +99,10 @@ export interface VaultTransaction {
   expectedOutcome: TransactionOutcome | undefined;
 }
 
+export interface IdToCreditPositionMap {
+  [positionId: string]: CreditPosition;
+}
+
 export interface CreditLineState {
   selectedLineAddress: string | undefined;
   selectedPosition: string | undefined;
@@ -107,14 +111,16 @@ export interface CreditLineState {
   pagesMap: { [lineAddress: string]: CreditLinePage };
   categories: { [category: string]: string[] };
   user: {
-    linePositions: { [positionId: string]: PositionSummary };
+    linePositions: IdToCreditPositionMap;
     lineAllowances: { [line: string]: { [token: string]: Integer } };
+    borrowerPositions: IdToCreditPositionMap;
   };
   statusMap: {
     getLines: Status;
     getLine: Status;
     getLinePage: Status;
     getAllowances: Status;
+    getBorrowerPositions: Status;
     deploySecuredLine: Status;
     user: UserLineMetadataStatusMap;
   };

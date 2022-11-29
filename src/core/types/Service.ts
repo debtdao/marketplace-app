@@ -22,14 +22,17 @@ import {
   Network,
   TokenAllowance,
   AggregatedCreditLine,
-  Credit,
+  CreditPosition,
   GetLineArgs,
   GetLinesArgs,
   GetLinePageArgs,
+  GetBorrowerPositionsArgs,
   GetLinesResponse,
   GetLinePageResponse,
+  CreditLinePage,
   GetLinePageAuxDataResponse,
   SupportedOracleTokenResponse,
+  GetBorrowerPositionsResponse,
 } from '@types';
 
 // *************** USER ***************
@@ -156,6 +159,7 @@ export interface CreditLineService {
   getLinePage: (props: GetLinePageProps) => Promise<GetLinePageResponse | undefined>;
   getLinePageAuxData: (props: GetLinePageProps) => Promise<GetLinePageAuxDataResponse | undefined>;
   getUserLinePositions: (...args: any) => Promise<any | undefined>;
+  getBorrowerPositions: (props: GetBorrowerPositionsProps) => Promise<CreditPosition[] | undefined>; // FIXME: needs type
   getExpectedTransactionOutcome: (...args: any) => Promise<any | undefined>;
   depositAndRepay: (
     props: DepositAndRepayProps
@@ -175,7 +179,7 @@ export interface CreditLineService {
 
   // helpers
   getFirstID: (contractAddress: string) => Promise<BytesLike>;
-  getCredit: (contractAddress: string, id: BytesLike) => Promise<Credit>;
+  getCredit: (contractAddress: string, id: BytesLike) => Promise<CreditPosition>;
   getLenderByCreditID: (contractAddress: string, id: BytesLike) => Promise<Address>;
   getInterestRateContract: (contractAddress: string) => Promise<Address>;
   borrower: (contractAddress: string) => Promise<Address>;
@@ -183,6 +187,7 @@ export interface CreditLineService {
   isBorrowing: (contractAddress: string) => Promise<boolean>;
   isBorrower: (contractAddress: string) => Promise<boolean>;
   isLender: (contractAddress: string, id: BytesLike) => Promise<boolean>;
+
   isMutualConsent: (
     contractAddress: string,
     trxData: string | undefined,
@@ -304,6 +309,10 @@ export interface GetUserLineProps {
 export interface GetLinePageAuxDataProps extends GetLinePageArgs {
   id: string;
   network: Network;
+}
+
+export interface GetBorrowerPositionsProps {
+  borrower: string;
 }
 
 // Colalteral Service Function Props

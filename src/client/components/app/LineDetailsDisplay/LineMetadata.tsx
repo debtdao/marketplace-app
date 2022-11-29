@@ -17,8 +17,9 @@ import {
 } from '@src/core/types';
 import { DetailCard, ActionButtons, TokenIcon, ViewContainer, SliderCard } from '@components/app';
 import { Button, Text } from '@components/common';
-import { LinesSelectors, ModalsActions, WalletSelectors } from '@src/core/store';
+import { LinesSelectors, ModalsActions, WalletSelectors, WalletActions } from '@src/core/store';
 import { humanize } from '@src/utils';
+import { getEnv } from '@config/env';
 
 const SectionHeader = styled.h3`
   ${({ theme }) => `
@@ -36,7 +37,7 @@ const MetricContainer = styled.div`
 `;
 
 const BannerCtaButton = styled(Button)`
-  width: 80%;
+  width: 100%;
   max-width: 20rem;
   margin-top: 1em;
 `;
@@ -46,7 +47,7 @@ const MetricName = styled.h3`
     font-size: ${theme.fonts.sizes.lg};
     font-weight: 600;
     margin-bottom: ${theme.spacing.md};
-    color: ${theme.colors.primary};
+    color: ${theme.colors.titles};
   `}
 `;
 
@@ -130,6 +131,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const dispatch = useAppDispatch();
+  const { NETWORK } = getEnv();
+  const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
   const { principal, deposit, totalInterestPaid, revenue, deposits } = props;
   const modules = [revenue && 'revenue', deposits && 'escrow'].filter((x) => !!x);
@@ -180,15 +183,26 @@ export const LineMetadata = (props: LineMetadataProps) => {
   };
 
   const depositHandler = (token: TokenView) => {
+    if (!walletIsConnected) {
+      connectWallet();
+    }
     dispatch(ModalsActions.openModal({ modalName: 'addCollateral' }));
   };
 
   const addSpigotHandler = (token: TokenView) => {
-    dispatch(ModalsActions.openModal({ modalName: 'enableSpigot' }));
+    if (!walletIsConnected) {
+      connectWallet();
+    } else {
+      dispatch(ModalsActions.openModal({ modalName: 'enableSpigot' }));
+    }
   };
 
   const enableAssetHandler = (token: TokenView) => {
-    dispatch(ModalsActions.openModal({ modalName: 'enableCollateral' }));
+    if (!walletIsConnected) {
+      connectWallet();
+    } else {
+      dispatch(ModalsActions.openModal({ modalName: 'enableCollateral' }));
+    }
   };
 
   const allCollateral = [...Object.values(deposits ?? {}), ...Object.values(revenue ?? {})];
@@ -212,6 +226,18 @@ export const LineMetadata = (props: LineMetadataProps) => {
     actions: getCollateralRowActionForRole(userPositionMetadata.role),
   }));
 
+  const enableCollateralText = walletIsConnected
+    ? `${t('lineDetails:metadata.collateral-table.enable-asset')}`
+    : `${t('components.connect-button.connect')}`;
+
+  const enableSpigotText = walletIsConnected
+    ? `${t('lineDetails:metadata.collateral-table.enable-spigot')}`
+    : `${t('components.connect-button.connect')}`;
+
+  const depositCollateralText = walletIsConnected
+    ? `${t('lineDetails:metadata.collateral-table.add-collateral')}`
+    : `${t('components.connect-button.connect')}`;
+
   const getCollateralTableActions = () => {
     console.log('get collateral table actions', userPositionMetadata.role);
     switch (userPositionMetadata.role) {
@@ -219,15 +245,15 @@ export const LineMetadata = (props: LineMetadataProps) => {
       case LENDER_POSITION_ROLE: // for testing
         return (
           <>
-            <Button onClick={addSpigotHandler}>{t('lineDetails:metadata.collateral-table.enable-spigot')} </Button>
-            <Button onClick={enableAssetHandler}>{t('lineDetails:metadata.collateral-table.enable-asset')} </Button>
+            <Button onClick={addSpigotHandler}>{enableSpigotText}</Button>
+            <Button onClick={enableAssetHandler}>{enableCollateralText}</Button>
           </>
         );
       case BORROWER_POSITION_ROLE:
         return (
           <>
-            <Button onClick={depositHandler}>{t('lineDetails:metadata.collateral-table.add-collateral')} </Button>
-            <Button onClick={addSpigotHandler}>{t('lineDetails:metadata.collateral-table.enable-spigot')} </Button>
+            <Button onClick={depositHandler}>{depositCollateralText} </Button>
+            <Button onClick={addSpigotHandler}>{enableSpigotText} </Button>
           </>
         );
       default:
@@ -265,10 +291,10 @@ export const LineMetadata = (props: LineMetadataProps) => {
               <p>{t('lineDetails:metadata.collateral-table.no-table')}</p>
 
               <BannerCtaButton styling="primary" onClick={depositHandler}>
-                {t('lineDetails:metadata.collateral-table.add-collateral')}
+                {depositCollateralText}
               </BannerCtaButton>
               <BannerCtaButton styling="primary" onClick={enableAssetHandler}>
-                {t('lineDetails:metadata.collateral-table.enable-asset')}
+                {enableCollateralText}
               </BannerCtaButton>
             </Text>
           }

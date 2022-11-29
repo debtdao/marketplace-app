@@ -1,7 +1,13 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { union } from 'lodash';
 
-import { TokensState, UserTokenActionsMap, initialStatus } from '@types';
+import {
+  TokensState,
+  UserTokenActionsMap,
+  initialStatus,
+  TokenFragRepsonse,
+  SupportedOracleTokenResponse,
+} from '@types';
 
 import { TokensActions } from './tokens.actions';
 
@@ -68,6 +74,7 @@ const tokensReducer = createReducer(tokensInitialState, (builder) => {
     .addCase(clearTokensData, (state) => {
       state.tokensMap = {};
       state.tokensAddresses = [];
+      state.supportedTokens = [];
     })
     .addCase(clearUserTokenState, (state) => {
       state.user.userTokensAddresses = [];
@@ -90,6 +97,7 @@ const tokensReducer = createReducer(tokensInitialState, (builder) => {
         tokenAddresses.push(token.address);
       });
       state.tokensAddresses = union(state.tokensAddresses, tokenAddresses);
+      // state.supportedTokens = union(state.supportedTokens, tokenAddresses);
       state.statusMap.getTokens = {};
     })
     .addCase(getTokens.rejected, (state, { error }) => {
@@ -106,17 +114,19 @@ const tokensReducer = createReducer(tokensInitialState, (builder) => {
       //   const tokenAddress = tokensData[0].supportedTokens[0].token.id;
       //   supportedTokens.push(tokenAddress);
       // }
-      const supportedTokens: string[] = [];
-      tokensData.forEach((token) => {
-        state.supportedTokensMap[token.address] = token;
-        supportedTokens.push(token.address);
+      const tokenAddresses: string[] = [];
+      // console.log('TokenService Reducer: ', tokensData);
+      // const tokenAddresses = tokensData[0].supportedTokens[0].token.id;
+      tokensData.supportedTokens.forEach((supportedToken: { token: TokenFragRepsonse }) => {
+        state.supportedTokensMap[supportedToken.token.id] = supportedToken.token;
+        tokenAddresses.push(supportedToken.token.id);
       });
       // console.log('is anything here?');
       // state.supportedTokensMap[token.address] = token; // Change this
       // supportedTokens.push(token.address);
       // state.supportedTokensMap[tokenAddress] = token.supportedTokens[0].token;
 
-      state.supportedTokens = union(state.supportedTokens, supportedTokens);
+      state.supportedTokens = union(state.supportedTokens, tokenAddresses);
       state.statusMap.getSupportedTokens = { error: 'no error!' };
     })
     .addCase(getSupportedOracleTokens.rejected, (state, { error }) => {

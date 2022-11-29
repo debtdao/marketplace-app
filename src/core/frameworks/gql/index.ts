@@ -15,7 +15,7 @@ import {
   GetLinePageAuxDataResponse,
   PositionSummary,
   GetLinesResponse,
-  SupportedOracleTokenFragResponse,
+  SupportedOracleTokenResponse,
 } from '@src/core/types';
 
 import {
@@ -36,7 +36,7 @@ const createClient = (): typeof ApolloClient => {
     uri: GRAPH_API_URL,
     cache: new InMemoryCache(),
   });
-
+  console.log('TokenService client: ', GRAPH_API_URL);
   return client;
 };
 
@@ -61,12 +61,11 @@ export const createQuery =
         .then((result: QueryResult) => {
           const { data, error } = result;
           const requestedData = path ? at(data, [path])[0] : data;
-
           if (error) return reject(error);
           else return resolve(requestedData);
         })
         .catch((error: any) => {
-          console.log('gql request error', error);
+          console.log('TokenService gql request error', error);
           reject(error);
         });
     });
@@ -102,7 +101,8 @@ export const getUserLinePositions: QueryCreator<GetUserLinePositionsArgs, Positi
   arg: GetUserLinePositionsArgs
 ) => getUserLinePositionsQuery(arg);
 
-const getSupportedTokensQuery = createQuery(GET_SUPPORTED_ORACLE_TOKENS_QUERY, 'supportedOracletokens');
-export const getSupportedOracleTokens: QueryCreator<undefined, SupportedOracleTokenFragResponse[]> = <
-  SupportedTokenFragResponse
->(): QueryResponse<SupportedTokenFragResponse[]> => getSupportedTokensQuery({});
+const getSupportedOracleTokensQuery = createQuery(GET_SUPPORTED_ORACLE_TOKENS_QUERY);
+export const getSupportedOracleTokens: QueryCreator<
+  undefined,
+  SupportedOracleTokenResponse | undefined
+> = (): QueryResponse<SupportedOracleTokenResponse | undefined> => getSupportedOracleTokensQuery();

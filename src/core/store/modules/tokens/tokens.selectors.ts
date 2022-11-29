@@ -8,7 +8,7 @@ import { toBN } from '@utils';
 const selectTokensState = (state: RootState) => state.tokens;
 const selectTokenAddresses = (state: RootState) => state.tokens.tokensAddresses;
 const selectSupportedTokens = (state: RootState) => state.tokens.supportedTokens;
-const selectSupportedTokensMap = (state: RootState) => state.tokens.statusMap.getSupportedTokens;
+const selectSupportedTokensMap = (state: RootState) => state.tokens.supportedTokensMap;
 const selectTokensMap = (state: RootState) => state.tokens.tokensMap;
 const selectSelectedTokenAddress = (state: RootState) => state.tokens.selectedTokenAddress;
 const selectTokensUser = (state: RootState) => state.tokens.user;

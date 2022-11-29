@@ -1,3 +1,5 @@
+import { TokenFragRepsonse, SupportedOracleTokenResponse } from '@types';
+
 import { Alert } from './Alerts';
 import { Address, Network } from './Blockchain';
 import { ExternalServiceId } from './General';
@@ -168,7 +170,7 @@ export interface TokensState {
   supportedTokens: string[];
   activeNetworkTokenAddresses: string[];
   tokensMap: { [address: string]: Token };
-  supportedTokensMap: { [address: string]: Token };
+  supportedTokensMap: { [address: string]: TokenFragRepsonse };
   selectedTokenAddress: Address | undefined;
   user: {
     userTokensAddresses: string[];

@@ -6,7 +6,7 @@ import {
   Web3Provider,
   Balance,
   Token,
-  SupportedOracleTokenFragResponse,
+  SupportedOracleTokenResponse,
   Integer,
   Config,
   TransactionResponse,
@@ -15,7 +15,6 @@ import {
   GetTokensDynamicDataProps,
   GetUserTokensDataProps,
   GetTokenAllowanceProps,
-  GetSupportedOracleTokensProps,
 } from '@types';
 import { getContract } from '@frameworks/ethers';
 import { get, getUniqueAndCombine, toBN, USDC_DECIMALS } from '@utils';
@@ -53,8 +52,9 @@ export class TokenServiceImpl implements TokenService {
   public async getSupportedTokens({ network }: GetSupportedTokensProps): Promise<Token[]> {
     const { WETH } = this.config.CONTRACT_ADDRESSES;
     const yearn = this.yearnSdk.getInstanceOf(network);
-
+    console.log('TokenService Network: ', network);
     const supportedTokens = await yearn.tokens.supported();
+    console.log('Yearn Supported Tokens Network: ', supportedTokens);
 
     // TODO: remove fixedSupportedTokens when WETH symbol is fixed on sdk
     const fixedSupportedTokens = supportedTokens.map((token) => ({
@@ -65,10 +65,13 @@ export class TokenServiceImpl implements TokenService {
   }
 
   // prop: GetSupportedOracleTokensProps
-  public async getSupportedOracleTokens(): Promise<SupportedOracleTokenFragResponse[] | undefined> {
+  public async getSupportedOracleTokens(): Promise<SupportedOracleTokenResponse | undefined> {
     // todo get all token prices from yearn add update store with values
     const response = getSupportedOracleTokens(undefined)
-      .then((data) => data)
+      .then((data) => {
+        console.log('TokenService Response: ', data);
+        return data;
+      })
       .catch((err) => {
         console.log('TokenService: error fetching supported oracle tokens from subgraph', err);
         return undefined;

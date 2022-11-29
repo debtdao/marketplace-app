@@ -10,6 +10,7 @@ import { AppSelectors } from '../modules/app/app.selectors';
 import { WalletSelectors } from '../modules/wallet/wallet.selectors';
 import { TokensSelectors, createToken } from '../modules/tokens/tokens.selectors';
 import { NetworkSelectors } from '../modules/network/network.selectors';
+// import { Token } from 'graphql';
 
 const { selectVaultsMap } = VaultsSelectors;
 const { selectTokenAddresses, selectSupportedTokens, selectSupportedTokensMap, selectTokensMap, selectTokensUser } =
@@ -31,26 +32,28 @@ export const selectDepositTokenOptionsByAsset = createSelector(
   (supportedTokens, supportedTokensMap, tokenAddresses, tokensMap, tokensUser, servicesEnabled, currentNetwork) =>
     memoize((assetAddress?: string): TokenView[] => {
       console.log('selectDepositTokenOptionsByAsset', currentNetwork, tokensMap, testTokens);
-      console.log('supportedTokens: ', supportedTokens);
-      console.log('supported tokens map: ', supportedTokensMap);
-      console.log('token addresses: ', tokenAddresses);
-      console.log('TokensUser: ', tokensUser);
-      console.log('TokensMap: ', tokensMap);
       const { userTokensMap, userTokensAllowancesMap } = tokensUser;
-      const address = '0x3730954eC1b5c59246C1fA6a20dD6dE6Ef23aEa6'; // SEEROcoin
-      const tokenData = tokensMap[address];
-      const userTokenData = userTokensMap[address];
-      const allowancesMap = userTokensAllowancesMap[address] ?? {};
-      console.log('tokenData:', tokenData);
-      console.log('userTokenData:', userTokenData);
-      console.log('allowancesMap:', userTokenData);
       if (currentNetwork === 'goerli') {
-        return testTokens;
+        // TO-DO: fill in token values appropriately
+        const tokens: TokenView[] = supportedTokens.map((address: string) => {
+          return {
+            address: address,
+            ...supportedTokensMap[address],
+            icon: '',
+            balance: '0',
+            balanceUsdc: '0',
+            priceUsdc: '0',
+            categories: [],
+            description: '',
+            website: '',
+            allowanceMap: {},
+          };
+        });
+        const allTestTokens = tokens.concat(testTokens);
+        return allTestTokens;
       } else {
         const { TOKEN_ADDRESSES } = getConfig();
-        const { userTokensMap, userTokensAllowancesMap } = tokensUser;
-
-        const tokens = Object.values(TOKEN_ADDRESSES)
+        const mainnetTestTokens = Object.values(TOKEN_ADDRESSES)
           .filter((address) => !!tokensMap[address])
           .map((address) => {
             const tokenData = tokensMap[address];
@@ -58,8 +61,22 @@ export const selectDepositTokenOptionsByAsset = createSelector(
             const allowancesMap = userTokensAllowancesMap[address] ?? {};
             return createToken({ tokenData, userTokenData, allowancesMap });
           });
-
-        return tokens;
+        const subgraphTokens: TokenView[] = supportedTokens.map((address: string) => {
+          return {
+            address: address,
+            ...supportedTokensMap[address],
+            icon: '',
+            balance: '0',
+            balanceUsdc: '0',
+            priceUsdc: '0',
+            categories: [],
+            description: '',
+            website: '',
+            allowanceMap: {},
+          };
+        });
+        const allMainnetTokens = mainnetTestTokens.concat(subgraphTokens);
+        return allMainnetTokens;
       }
     })
 );

@@ -54,7 +54,6 @@ export interface AggregatedCreditLine extends BaseCreditLine {
   highestApy: [string, string, string];
 
   positions?: CreditPosition[];
-
   escrow?: AggregatedEscrow;
   spigot?: AggregatedSpigot;
 }

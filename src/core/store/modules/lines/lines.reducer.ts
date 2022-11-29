@@ -231,7 +231,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.user.getBorrowerPositions = { loading: true };
     })
     .addCase(getBorrowerPositions.fulfilled, (state, { meta, payload: { borrowerPositions } }) => {
-      console.log('positions', borrowerPositions);
+      console.log('positions in reducer', borrowerPositions);
       if (!borrowerPositions) return;
       const borrowerPositionsMap = borrowerPositions.reduce((obj, a) => ({ ...obj, [a.id]: a }), {});
       state.user.borrowerPositions = { ...state.user.borrowerPositions, ...borrowerPositionsMap };

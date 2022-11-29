@@ -15,6 +15,7 @@ import {
 import { SummaryCard, ViewContainer, NoWalletCard, SliderCard } from '@components/app';
 import { SpinnerLoading, Text } from '@components/common';
 import { halfWidthCss, isValidAddress } from '@utils';
+import { AggregatedCreditLine } from '@src/core/types';
 
 const StyledViewContainer = styled(ViewContainer)`
   display: grid;
@@ -78,9 +79,13 @@ export const Portfolio = () => {
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
   const tokensListStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
   const generalLoading = (appStatus.loading || tokensListStatus.loading || isMounting) && !activeModal;
+
   const borrowerPositions = useAppSelector(LinesSelectors.selectBorrowerPositions);
+
   const userTokensLoading = generalLoading && !userTokens.length;
   const [currentRole, setRole] = useState<string>('Borrower');
+  const [data, setdata] = useState([]);
+  const [aggregatedCreditLine, setAggregatedCreditLine] = useState<AggregatedCreditLine>();
 
   const availableRoles = ['Borrower', 'Lender', 'Arbiter'];
 
@@ -126,18 +131,41 @@ export const Portfolio = () => {
   useEffect(() => {
     const borrowerAddress: string | undefined = location.pathname.split('/')[2];
 
-    console.log('line address', borrowerAddress);
     if (!borrowerAddress || !isValidAddress(borrowerAddress)) {
       dispatch(AlertsActions.openAlert({ message: 'INVALID_ADDRESS', type: 'error' }));
       history.push('/market');
       return;
-    } else {
-      dispatch(LinesActions.getBorrowerPositions({ borrower: '0x1A6784925814a13334190Fd249ae0333B90b6443' }));
-      console.log('success', borrowerPositions);
+    } else if (borrowerAddress.length === 42) {
+      dispatch(LinesActions.getBorrowerPositions({ borrower: borrowerAddress.toLocaleLowerCase() }));
     }
-  }, [currentRole]);
+  }, [currentRole, walletIsConnected]);
 
-  console.log('borrower positions', borrowerPositions);
+  useEffect(() => {
+    if (borrowerPositions) {
+      let borrowerData: any = [];
+      const keys = Object.keys(borrowerPositions);
+      keys.map((key) => {
+        let data = borrowerPositions[key];
+        borrowerData.push(data);
+      });
+      setdata(borrowerData);
+    }
+  }, [borrowerPositions]);
+
+  useEffect(() => {
+    //export interface AggregatedCreditLine extends BaseCreditLine {
+    // real-time aggregate usd value across all credits
+    //  principal: string; // | Promise<string>;
+    //  deposit: string; // | Promise<string>;
+    //  // id, symbol, APY (4 decimals)
+    //  highestApy: [string, string, string];
+    //  positions?: CreditPosition[];
+    //  escrow?: AggregatedEscrow;
+    //  spigot?: AggregatedSpigot;
+    //}
+
+    const aggregatedCredit = '';
+  }, [data]);
 
   return (
     <StyledViewContainer>

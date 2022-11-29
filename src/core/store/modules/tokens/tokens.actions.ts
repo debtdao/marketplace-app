@@ -28,11 +28,8 @@ const getTokens = createAsyncThunk<{ tokensData: Token[] }, string | undefined, 
   'tokens/getTokens',
   async (_arg, { getState, extra }) => {
     const { network } = getState();
-    console.log('TokenService getTokens network: ', network.current);
     const { tokenService } = extra.services;
     const tokensData: Token[] = await tokenService.getSupportedTokens({ network: network.current });
-    // const tokensData: Token[] = await tokenService.getSupportedTokens({ network: 'goerli' });
-    // console.log('TokenService Get Tokens: ', tokensData);
     return { tokensData };
   }
 );
@@ -41,11 +38,8 @@ const getSupportedOracleTokens = createAsyncThunk<{ tokensData: any }, string | 
   'tokens/getSupportedTokens',
   async (_arg, { getState, extra }) => {
     // const { network } = getState();
-
     const { tokenService } = extra.services;
     const tokensData: SupportedOracleTokenResponse | undefined = await tokenService.getSupportedOracleTokens();
-    // console.log('GET SUPPORTED TOKENS: ', tokensData);
-    // const tokensData: SupportedOracleTokenFragResponse[] = [];
 
     return { tokensData };
   }

@@ -1,4 +1,4 @@
-import { TokenFragRepsonse, SupportedOracleTokenResponse } from '@types';
+import { TokenFragRepsonse } from '@types';
 
 import { Alert } from './Alerts';
 import { Address, Network } from './Blockchain';

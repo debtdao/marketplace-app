@@ -52,7 +52,6 @@ export class TokenServiceImpl implements TokenService {
   public async getSupportedTokens({ network }: GetSupportedTokensProps): Promise<Token[]> {
     const { WETH } = this.config.CONTRACT_ADDRESSES;
     const yearn = this.yearnSdk.getInstanceOf(network);
-    console.log('TokenService Network: ', network);
     const supportedTokens = await yearn.tokens.supported();
     console.log('Yearn Supported Tokens Network: ', supportedTokens);
 
@@ -64,12 +63,9 @@ export class TokenServiceImpl implements TokenService {
     return getUniqueAndCombine(fixedSupportedTokens, [], 'address');
   }
 
-  // prop: GetSupportedOracleTokensProps
   public async getSupportedOracleTokens(): Promise<SupportedOracleTokenResponse | undefined> {
-    // todo get all token prices from yearn add update store with values
     const response = getSupportedOracleTokens(undefined)
       .then((data) => {
-        console.log('TokenService Response: ', data);
         return data;
       })
       .catch((err) => {

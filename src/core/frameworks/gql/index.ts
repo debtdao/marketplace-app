@@ -36,7 +36,6 @@ const createClient = (): typeof ApolloClient => {
     uri: GRAPH_API_URL,
     cache: new InMemoryCache(),
   });
-  console.log('TokenService client: ', GRAPH_API_URL);
   return client;
 };
 

@@ -91,7 +91,7 @@ export const Portfolio = () => {
   const [data, setdata] = useState([]);
   const [aggregatedCreditLinePage, setAggregatedCreditLine] = useState<CreditLinePage>();
 
-  const availableRoles = ['Borrower', 'Lender', 'Arbiter'];
+  const availableRoles = ['Borrower', 'Lender'];
 
   const summaryCardItems = [
     {
@@ -115,18 +115,6 @@ export const Portfolio = () => {
           key={`s-${availableRoles[1]}`}
         >
           {t(`settings:${availableRoles[1]}`)}
-        </RoleOption>
-      ),
-    },
-    {
-      header: t(''),
-      Component: (
-        <RoleOption
-          onClick={() => setRole(availableRoles[2])}
-          active={availableRoles[2] === currentRole}
-          key={`s-${availableRoles[2]}`}
-        >
-          {t(`settings:${availableRoles[2]}`)}
         </RoleOption>
       ),
     },

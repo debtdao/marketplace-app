@@ -188,8 +188,8 @@
       },
       "deploy-line": {
         "header": "Deploy Credit Line",
-        "select-borrower": "1. Select a borrower for the line",
-        "select-ttl": "2. Select a deadline for the line",
+        "select-borrower": "1. Insert a borrower for the line",
+        "select-ttl": "2. Insert a deadline for the line",
         "time-to-live": "Time this line will remain active for (in days):",
         "cratio": "3. Select a Collateralization Ratio",
         "cratio-input": "Your Cratio",

@@ -8,7 +8,7 @@ import { device } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer, SliderCard } from '@components/app';
 import { Input, SearchIcon, Text, Button } from '@components/common';
 import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, CreditPosition } from '@src/core/types';
-import { humanize } from '@src/utils';
+import { humanize, formatAddress } from '@src/utils';
 import { getEnv } from '@config/env';
 
 const PositionsCard = styled(DetailCard)`
@@ -276,7 +276,7 @@ export const PositionsTable = (props: PositionsProps) => {
               status: event['status'] === 'OPEN' ? 'OPENED' : event['status'],
               principal: humanize('amount', event['principal'], event['token'].decimals, 2),
               interest: humanize('amount', event['interestAccrued'], event['token'].decimals, 2),
-              lender: event['lender'].id,
+              lender: formatAddress(event['lender'].id),
               token: event['token'].symbol,
               actions: (
                 <ActionButtons

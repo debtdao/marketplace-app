@@ -115,14 +115,14 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
 
   const approveRepay = () => {
     setLoading(true);
-    if (!selectedCredit?.id) {
+    if (!selectedCredit?.id || !selectedPosition) {
       setLoading(false);
       return;
     }
     let approvalOBj = {
       spenderAddress: selectedCredit.id,
       tokenAddress: selectedSellTokenAddress,
-      amount: toWei(targetAmount, 18),
+      amount: toWei(targetAmount, selectedPosition['token'].decimals),
       network: walletNetwork,
     };
     //@ts-ignore

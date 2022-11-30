@@ -1,5 +1,5 @@
 import { createSelector, current } from '@reduxjs/toolkit';
-import { memoize, sortBy, sortedUniq, uniqWith, isEqual } from 'lodash';
+import { memoize, sortBy, unionBy } from 'lodash';
 
 import { getConfig } from '@config';
 import { TokenView } from '@types';
@@ -70,14 +70,9 @@ export const selectDepositTokenOptionsByAsset = createSelector(
             const allowancesMap = userTokensAllowancesMap[address] ?? {};
             return createToken({ tokenData, userTokenData, allowancesMap });
           });
-        subgraphTokens = sortBy(subgraphTokens, [
-          function (o) {
-            return o.symbol;
-          },
-        ]);
-        let mainnetTokens = mainTokens.concat(subgraphTokens);
-        mainnetTokens = uniqWith(mainnetTokens, isEqual);
-        return mainnetTokens;
+        return unionBy(mainTokens, subgraphTokens, function (o) {
+          return o.symbol;
+        });
       }
     })
 );

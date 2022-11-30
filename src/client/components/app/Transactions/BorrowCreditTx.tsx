@@ -192,9 +192,9 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
       <TxRateInput
         key={'frate'}
         headerText={t('components.transaction.borrow-credit.your-rates')}
-        frate={selectedPosition['frate']}
-        drate={selectedPosition['drate']}
-        amount={selectedPosition['frate']}
+        frate={selectedPosition['fRate']}
+        drate={selectedPosition['dRate']}
+        amount={selectedPosition['fRate']}
         maxAmount={'100'}
         // setRateChange={onFrateChange}
         setRateChange={() => {}}

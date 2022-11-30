@@ -340,15 +340,16 @@ export const formatLinePageData = (
 
   positions?.map((position, i) => {
     console.log('positions info origin', positions);
-    console.log('position', position);
-
+    console.log('position', position.status);
+    //@ts-ignore
+    const status = position.status === 'OPEN' ? 'OPENED' : position.status;
     let Frate = normalizeAmount(position.fRate, 2);
     let Drate = normalizeAmount(position.dRate, 2);
-
+    console.log('in line.ts', position.status);
     let positionObject = {
-      status: position.status,
-      drate: Drate,
-      frate: Frate,
+      status,
+      dRate: Drate,
+      fRate: Frate,
       deposit: position.deposit,
       token: position.token,
       lender: position.lender,

@@ -165,8 +165,8 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
     // icon: '',
     deposit: selectedPosition!.deposit,
     tokenSymbol: selectedPosition!.token.symbol,
-    frate: selectedPosition!.frate,
-    drate: selectedPosition!.drate,
+    frate: selectedPosition!.fRate,
+    drate: selectedPosition!.dRate,
   };
 
   if (positions && positions.length > 1) {
@@ -180,8 +180,8 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
           // icon: '',
           deposit: item!.deposit,
           tokenSymbol: item?.token.symbol,
-          frate: item?.frate,
-          drate: item?.drate,
+          frate: item?.fRate,
+          drate: item?.dRate,
         };
       });
   }
@@ -230,7 +230,7 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
             <LineTitle ellipsis> Lender: {selectedPosition?.lender} </LineTitle>
             <LineTitle ellipsis>
               {`${normalizeAmount(selectedPosition?.deposit, 18)} ${selectedPosition?.token.symbol}
-              @${selectedPosition?.drate}/${selectedPosition?.frate}%`}
+              @${selectedPosition?.dRate}/${selectedPosition?.fRate}%`}
             </LineTitle>
           </CreditLineData>
         </CreditLineInfo>

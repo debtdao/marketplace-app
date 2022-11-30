@@ -79,7 +79,7 @@ export const Portfolio = () => {
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
   const tokensListStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
   const generalLoading = (appStatus.loading || tokensListStatus.loading || isMounting) && !activeModal;
-
+  const borrowerAddress: string | undefined = location.pathname.split('/')[2];
   const borrowerPositions = useAppSelector(LinesSelectors.selectBorrowerPositions);
 
   const userTokensLoading = generalLoading && !userTokens.length;
@@ -129,8 +129,6 @@ export const Portfolio = () => {
   ];
 
   useEffect(() => {
-    const borrowerAddress: string | undefined = location.pathname.split('/')[2];
-
     if (!borrowerAddress || !isValidAddress(borrowerAddress)) {
       dispatch(AlertsActions.openAlert({ message: 'INVALID_ADDRESS', type: 'error' }));
       history.push('/market');
@@ -154,6 +152,7 @@ export const Portfolio = () => {
 
   useEffect(() => {
     let aggregate: CreditLinePage = {
+      borrower: borrowerAddress,
       principal: '0', //done
       deposit: '0', //done
       highestApy: ['0', '0', '0'], //todo
@@ -223,10 +222,10 @@ export const Portfolio = () => {
         />
       )}
 
-      {aggregatedCreditLinePage ? (
+      {aggregatedCreditLinePage && currentRole === 'Borrower' ? (
         <LineDetailsDisplay page={aggregatedCreditLinePage} line={aggregatedCreditLinePage} />
       ) : (
-        <div>bye</div>
+        ''
       )}
 
       {/* {!userTokensLoading && (

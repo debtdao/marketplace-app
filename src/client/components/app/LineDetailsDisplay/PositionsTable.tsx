@@ -270,11 +270,12 @@ export const PositionsTable = (props: PositionsProps) => {
             data={events.map((event) => ({
               // this needs to be humanized to correct amount depending on the token.
               deposit: humanize('amount', event['deposit'], 18, 2),
-              drate: `${event['drate']} %`,
-              frate: `${event['frate']} %`,
-              status: event['status'],
-              principal: humanize('amount', event['principal'], 18, 2),
-              interest: humanize('amount', event['interestAccrued'], 18, 2),
+              drate: `${event['dRate']} %`,
+              frate: `${event['fRate']} %`,
+              //@ts-ignore
+              status: event['status'] === 'OPEN' ? 'OPENED' : event['status'],
+              principal: humanize('amount', event['principal'], event['token'].decimals, 2),
+              interest: humanize('amount', event['interestAccrued'], event['token'].decimals, 2),
               lender:
                 typeof event['lender'] === 'object'
                   ? //@ts-ignore

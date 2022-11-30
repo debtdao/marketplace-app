@@ -90,8 +90,8 @@ export interface CreditPosition {
   borrower: Address;
   token: TokenView;
   lender: Address;
-  drate: string;
-  frate: string;
+  dRate: string;
+  fRate: string;
 }
 
 export interface LinePageCreditPosition extends CreditPosition {

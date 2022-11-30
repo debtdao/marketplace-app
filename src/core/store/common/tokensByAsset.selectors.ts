@@ -34,23 +34,24 @@ export const selectDepositTokenOptionsByAsset = createSelector(
       console.log('TokenService selectDepositTokenOptionsByAsset', currentNetwork, tokensMap, testTokens);
       const { userTokensMap, userTokensAllowancesMap } = tokensUser;
       if (currentNetwork === 'goerli') {
-        // TODO: fill in token values appropriately
-        const tokens: TokenView[] = supportedTokens.map((address: string) => {
-          return {
-            address: address,
-            ...supportedTokensMap[address],
-            icon: '',
-            balance: '0',
-            balanceUsdc: '0',
-            priceUsdc: '0',
-            categories: [],
-            description: '',
-            website: '',
-            allowanceMap: {},
-          };
-        });
-        const allTestTokens = tokens.concat(testTokens);
-        return allTestTokens;
+        // TODO: fill in token values appropriately with values from subgraph
+        // const tokens: TokenView[] = supportedTokens.map((address: string) => {
+        //   return {
+        //     address: address,
+        //     ...supportedTokensMap[address],
+        //     icon: '',
+        //     balance: '0',
+        //     balanceUsdc: '0',
+        //     priceUsdc: '0',
+        //     categories: [],
+        //     description: '',
+        //     website: '',
+        //     allowanceMap: {},
+        //   };
+        // });
+        // const allTestTokens = testTokens.concat(tokens);
+        // return allTestTokens;
+        return testTokens;
       } else {
         const { TOKEN_ADDRESSES } = getConfig();
         const mainTokens = Object.values(TOKEN_ADDRESSES)

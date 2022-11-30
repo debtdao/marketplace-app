@@ -27,7 +27,7 @@ const clearUserTokenState = createAction<void>('tokens/clearUserTokenState');
 const getTokens = createAsyncThunk<{ tokensData: Token[] }, string | undefined, ThunkAPI>(
   'tokens/getTokens',
   async (_arg, { getState, extra }) => {
-    const { network } = getState();
+    const { network, wallet } = getState();
     const { tokenService } = extra.services;
     const tokensData: Token[] = await tokenService.getSupportedTokens({ network: network.current });
     return { tokensData };
@@ -37,10 +37,8 @@ const getTokens = createAsyncThunk<{ tokensData: Token[] }, string | undefined, 
 const getSupportedOracleTokens = createAsyncThunk<{ tokensData: any }, string | undefined, ThunkAPI>(
   'tokens/getSupportedTokens',
   async (_arg, { getState, extra }) => {
-    // const { network } = getState();
     const { tokenService } = extra.services;
     const tokensData: SupportedOracleTokenResponse | undefined = await tokenService.getSupportedOracleTokens();
-
     return { tokensData };
   }
 );

@@ -20,6 +20,7 @@ import {
   GasFees,
   Overrides,
   Network,
+  Wallet,
   TokenAllowance,
   AggregatedCreditLine,
   CreditPosition,
@@ -466,6 +467,12 @@ export interface TokenService {
 export interface GetSupportedTokensProps {
   network: Network;
 }
+
+// TODO: use wallet state for props in getSupportedOracleTokens()
+// to determine which subgraph to query from based on wallet's network
+// export interface GetSupportedOracleTokensProps {
+//   wallet: Wallet;
+// }
 
 export interface GetTokensDynamicDataProps {
   network: Network;

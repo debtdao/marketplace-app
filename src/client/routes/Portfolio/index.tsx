@@ -65,6 +65,10 @@ const StyledSliderCard = styled(SliderCard)`
   margin: 0;
 `;
 
+const StyledBorrowerContainer = styled.div`
+  grid-column: 1 / 3;
+`;
+
 export const Portfolio = () => {
   const { t } = useAppTranslation(['common', 'home']);
   const isMounting = useIsMounting();
@@ -178,7 +182,9 @@ export const Portfolio = () => {
       )}
 
       {aggregatedCreditLinePage && currentRole === 'Borrower' ? (
-        <LineDetailsDisplay page={aggregatedCreditLinePage} line={aggregatedCreditLinePage} />
+        <StyledBorrowerContainer>
+          <LineDetailsDisplay page={aggregatedCreditLinePage} line={aggregatedCreditLinePage} />
+        </StyledBorrowerContainer>
       ) : (
         ''
       )}

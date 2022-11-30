@@ -34,6 +34,7 @@ import {
 import { getConfig } from '@config';
 import { getContract } from '@frameworks/ethers';
 import { unnullify } from '@src/utils';
+import { getContractABI } from '@src/utils';
 
 import { SpigotedLineABI } from './contracts';
 import { EscrowABI } from './contracts';
@@ -150,6 +151,8 @@ export class CollateralServiceImpl implements CollateralService {
     ) {
       throw new Error('addSpigot: bad owner split');
     }
+
+    getContractABI(props.revenueContract);
 
     const settingsData = ethers.utils.AbiCoder.prototype.encode(
       ['uint8', 'bytes4', 'bytes4'],

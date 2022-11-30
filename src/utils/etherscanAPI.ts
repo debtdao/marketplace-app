@@ -10,9 +10,9 @@ function getContractABI(address: Address){
     const [abi, setABI] = useState([]);
     const queryString = `https://api.etherscan.io/api?module=contract&action=getabi&address=${address}&apikey=${ETHERSCAN_API_KEY}`
     const getABI = async () => {
-        const data =  await get(queryString);
+        const abi =  await get(queryString);
         
-        setABI(abi);
+        setABI(abi.data);
     }
 
     useEffect(() => {
@@ -20,6 +20,5 @@ function getContractABI(address: Address){
       }, []);
 
 }
-
 
 export { getContractABI };

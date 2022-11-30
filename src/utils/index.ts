@@ -10,3 +10,4 @@ export * from './network';
 export * from './http';
 export * from './validations';
 export * from './simulateTransactions';
+export * from './etherscanAPI';

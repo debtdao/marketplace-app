@@ -147,7 +147,7 @@ export function formatGetLinesData(
     const deposits = escrowRes?.deposits.map((d: any) => ({ ...d, token: d.token.id }));
     // formatAggData (positions, deposits, summaries);
 
-    return {
+    const formatted = {
       ...rest,
       ...credit,
       status: status.toLowerCase() as LineStatusTypes,
@@ -162,6 +162,8 @@ export function formatGetLinesData(
         ...escrow,
       },
     };
+    console.log({ formatted });
+    return formatted;
   });
 }
 
@@ -405,7 +407,7 @@ export const formatLinePageData = (
     positions: newFormattedPositions,
     // collateral data
     spigot: formattedSpigot,
-    escrow: isEmpty(escrow?.deposits) ? undefined : { ...escrow!, ...escrowData },
+    escrow: { ...escrow!, ...escrowData },
   };
   console.log('page data', pageData);
   return pageData;

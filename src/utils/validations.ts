@@ -335,3 +335,9 @@ export function isAddress(address: string) {
   }
   return true;
 }
+
+export const isFnSelector = (h: string): boolean => {
+  if (h.length !== 8) return false;
+  var a = parseInt(h, 16);
+  return a.toString(16) === h.toLowerCase();
+};

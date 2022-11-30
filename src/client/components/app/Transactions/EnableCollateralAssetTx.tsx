@@ -89,6 +89,8 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
   //const enabledCollateralAddressess = _.values(selectedLine?.escrow?.deposits)?.map((d) => d.token.address);
 
   useEffect(() => {
+    console.log({ selectedLine });
+    console.log(selectedLine?.escrow);
     // if escrow not set yet then correct state
     if (selectedLine?.escrow && !selectedEscrow) {
       dispatch(CollateralActions.setSelectedEscrow({ escrowAddress: selectedLine.escrow.id }));
@@ -161,7 +163,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
     setLoading(true);
 
     // TODO set error in state to display no line selected
-
+    console.log({ selectedEscrow, selectedAssetAddress });
     if (!selectedEscrow || !selectedAssetAddress) {
       setLoading(false);
       return; // TODO throw error ot UI component
@@ -179,6 +181,8 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
       network: walletNetwork,
       dryRun: false,
     };
+
+    console.log({ transactionData });
 
     console.log('enable collataral data', transactionData.escrowAddress, transactionData.token);
     dispatch(CollateralActions.enableCollateral(transactionData)).then((res) => {

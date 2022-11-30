@@ -11,7 +11,7 @@ const StyledBorrowerInput = styled.input<{ readOnly?: boolean; error?: boolean }
   background: transparent;
   outline: none;
   border: none;
-  color: ${({ theme }) => theme.colors.txModalColors.textContrast};
+  color: ${({ theme, error }) => (error ? theme.colors.txModalColors.error : theme.colors.txModalColors.textContrast)};
   padding: 0;
   font-family: inherit;
   appearance: textfield;
@@ -31,8 +31,6 @@ const StyledBorrowerInput = styled.input<{ readOnly?: boolean; error?: boolean }
       color: ${theme.colors.txModalColors.text};
     }
   `}
-
-  ${({ error, theme }) => error && `color: ${theme.colors.txModalColors.error};`}
 
   ${() => `
     ::-webkit-outer-spin-button,
@@ -124,6 +122,8 @@ export const TxAddressInput: FC<TxAddressProps> = ({
   ...props
 }) => {
   const { t } = useAppTranslation('common');
+
+  console.log({ addressInputError: inputError });
 
   return (
     <StyledTxTokenInput {...props}>

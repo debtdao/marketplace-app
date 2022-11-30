@@ -103,6 +103,7 @@ const getLines = createAsyncThunk<
       .map((k) => categories[k])
       .map((params: GetLinesArgs) => creditLineService.getLines({ network: network.current, ...params }))
   );
+  console.log({ promises });
   //@ts-ignore
   const linesData = categoryKeys.reduce(
     (all, category, i) =>
@@ -141,6 +142,7 @@ const getLinePage = createAsyncThunk<{ linePageData: CreditLinePage | undefined 
       network: network.current,
       id,
     });
+    console.log({ linePageResponse });
     const linePageData = linePageResponse ? formatLinePageData(linePageResponse, tokenPrices) : undefined;
     return { linePageData };
   }

@@ -1,6 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import _ from 'lodash';
+
 //import { useHistory } from 'react-router-dom';
 
 import {
@@ -19,6 +20,7 @@ import {
   selectDepositTokenOptionsByAsset,
   CollateralSelectors,
 } from '@store';
+import { isAddress, isFnSelector } from '@utils';
 //import { Button, Icon, Link } from '@components/common';
 
 import { TxContainer } from './components/TxContainer';
@@ -86,8 +88,9 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
 
   // spigot setting params
   const [settingOwnerSplit, setOwnerSplit] = useState('100');
-  const [settingClaimFunc, setClaimFunc] = useState('');
-  const [settingTransferFunc, setTransferFunc] = useState('');
+  const [revenueContractAddress, setRevenueContractAddress] = useState('');
+  const [claimFuncSelector, setClaimFuncSelector] = useState('');
+  const [transferFuncSelector, setTransferFuncSelector] = useState('');
 
   const selectedAssetAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress) || TOKEN_ADDRESSES.DAI;
   // TODO pull colalteralOptions from subgraph instread of default yearn tokens
@@ -102,12 +105,16 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     }
   });
 
+  const handleAddressChange = (text: string) => {
+    setRevenueContractAddress(text);
+  };
+
   const handleClaimChange = (byteCode: string) => {
-    setClaimFunc(byteCode);
+    setClaimFuncSelector(byteCode);
   };
 
   const handleTransferFuncChange = (byteCode: string) => {
-    setTransferFunc(byteCode);
+    setTransferFuncSelector(byteCode);
   };
 
   const notArbiter = selectedLine?.status === ACTIVE_STATUS; // TODO
@@ -125,11 +132,22 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     }
   };
 
+  const canProceed = (): boolean => {
+    if (!isAddress(revenueContractAddress)) return false;
+    if (!isFnSelector(claimFuncSelector)) return false;
+    if (!isFnSelector(transferFuncSelector)) return false;
+    return true;
+  };
+
   const enableSpigot = () => {
+    if (!canProceed()) {
+      console.log('inputs are not valid');
+      // TODO: should display some sort of error
+    }
     setLoading(true);
 
     // TODO set error in state to display no line selected
-
+    console.log({ selectedLine });
     if (!selectedLine || !selectedSpigotAddress) {
       console.log('no line/spigot to enable on', selectedLine?.id, selectedSpigotAddress);
       setLoading(false);
@@ -155,8 +173,8 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       revenueContract: selectedRevenueContractAddress,
       setting: {
         ownerSplit: settingOwnerSplit,
-        claimFunction: settingClaimFunc,
-        transferOwnerFunction: settingTransferFunc,
+        claimFunction: claimFuncSelector,
+        transferOwnerFunction: transferFuncSelector,
       },
     };
 
@@ -202,20 +220,25 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
 
   return (
     <StyledTransaction onClose={onClose} header={header}>
-      <TxAddressInput headerText={t('components.transaction.enable-spigot.revenue-contract')} address="" />
+      <TxAddressInput
+        headerText={t('components.transaction.enable-spigot.revenue-contract')}
+        address={revenueContractAddress}
+        onAddressChange={handleAddressChange}
+        inputError={!isAddress(revenueContractAddress)}
+      />
       <TxByteInput
         headerText={t('components.transaction.enable-spigot.function-revenue')}
         inputText={' '}
-        inputError={false}
-        byteCode={settingClaimFunc}
+        inputError={!isFnSelector(claimFuncSelector)}
+        byteCode={claimFuncSelector}
         onByteCodeChange={handleClaimChange}
         readOnly={false}
       />
       <TxByteInput
         headerText={t('components.transaction.enable-spigot.function-transfer')}
         inputText={' '}
-        inputError={false}
-        byteCode={settingTransferFunc}
+        inputError={!isFnSelector(transferFuncSelector)}
+        byteCode={transferFuncSelector}
         onByteCodeChange={handleTransferFuncChange}
         readOnly={false}
       />
@@ -225,7 +248,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
           key={t('components.transaction.enable-spigot.cta') as string}
           data-testid={`modal-action-${t('components.transaction.enable-spigot.cta').toLowerCase()}`}
           onClick={enableSpigot}
-          disabled={!transactionApproved}
+          disabled={!canProceed() || !transactionApproved}
           contrast={true}
           isLoading={transactionLoading}
         >

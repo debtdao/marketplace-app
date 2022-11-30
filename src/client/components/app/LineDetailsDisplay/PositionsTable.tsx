@@ -283,9 +283,11 @@ export const PositionsTable = (props: PositionsProps) => {
                   actions={
                     event['status'] === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE
                       ? [ApproveMutualConsent]
-                      : userRoleMetadata.role === LENDER_POSITION_ROLE && event['status'] === 'OPENED'
+                      : //@ts-ignore
+                      userRoleMetadata.role === LENDER_POSITION_ROLE && event['status'] === 'OPEN'
                       ? actions
-                      : userRoleMetadata.role === BORROWER_POSITION_ROLE && event['status'] === 'OPENED'
+                      : //@ts-ignore
+                      userRoleMetadata.role === BORROWER_POSITION_ROLE && event['status'] === 'OPEN'
                       ? actions
                       : []
                   }

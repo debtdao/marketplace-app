@@ -179,6 +179,9 @@ export const PositionsTable = (props: PositionsProps) => {
   };
 
   const isWithdrawable = (deposit: string, borrowed: string, lender: string) => {
+    if (!userWallet) {
+      return;
+    }
     return (
       Number(borrowed) < Number(deposit) && ethers.utils.getAddress(lender) === ethers.utils.getAddress(userWallet!)
     );

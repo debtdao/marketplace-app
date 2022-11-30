@@ -69,33 +69,19 @@ export const createQuery =
   (query: DocumentNode, path?: string, isOracle?: boolean): Function =>
   <A, R>(variables: A): Promise<QueryResponse<R>> =>
     new Promise(async (resolve, reject) => {
-      if (isOracle === undefined) {
-        getClient()
-          .query({ query, variables })
-          .then((result: QueryResult) => {
-            const { data, error } = result;
-            const requestedData = path ? at(data, [path])[0] : data;
-            if (error) return reject(error);
-            else return resolve(requestedData);
-          })
-          .catch((error: any) => {
-            console.log('TokenService gql request error', error);
-            reject(error);
-          });
-      } else {
-        getPriceFeedClient()
-          .query({ query, variables })
-          .then((result: QueryResult) => {
-            const { data, error } = result;
-            const requestedData = path ? at(data, [path])[0] : data;
-            if (error) return reject(error);
-            else return resolve(requestedData);
-          })
-          .catch((error: any) => {
-            console.log('TokenService gql request error', error);
-            reject(error);
-          });
-      }
+      const client = isOracle ? getPriceFeedClient() : getClient();
+      client
+        .query({ query, variables })
+        .then((result: QueryResult) => {
+          const { data, error } = result;
+          const requestedData = path ? at(data, [path])[0] : data;
+          if (error) return reject(error);
+          else return resolve(requestedData);
+        })
+        .catch((error: any) => {
+          console.log('TokenService gql request error', error);
+          reject(error);
+        });
     });
 
 const getLineQuery = createQuery(GET_LINE_QUERY);

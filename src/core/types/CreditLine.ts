@@ -62,8 +62,6 @@ export interface CreditLinePage extends AggregatedCreditLine {
   interest: string; // | Promise<string>;
   totalInterestRepaid: string; // | Promise<string>;
 
-  positions?: CreditPosition[];
-
   collateralEvents: CollateralEvent[];
   creditEvents: CreditEvent[];
 }

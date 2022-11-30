@@ -275,7 +275,11 @@ export const PositionsTable = (props: PositionsProps) => {
               status: event['status'],
               principal: humanize('amount', event['principal'], 18, 2),
               interest: humanize('amount', event['interestAccrued'], 18, 2),
-              lender: formatAddress(event['lender']),
+              lender:
+                typeof event['lender'] === 'object'
+                  ? //@ts-ignore
+                    formatAddress(event['lender'].id)
+                  : formatAddress(event['lender']),
               token: event['token'].symbol,
               actions: (
                 <ActionButtons

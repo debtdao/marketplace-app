@@ -12,10 +12,10 @@ import {
   LinesSelectors,
   AlertsActions,
 } from '@store';
-import { SummaryCard, ViewContainer, NoWalletCard, SliderCard } from '@components/app';
+import { SummaryCard, ViewContainer, NoWalletCard, SliderCard, LineDetailsDisplay } from '@components/app';
 import { SpinnerLoading, Text } from '@components/common';
-import { halfWidthCss, isValidAddress } from '@utils';
-import { AggregatedCreditLine, CreditPosition } from '@src/core/types';
+import { halfWidthCss, isValidAddress, normalize } from '@utils';
+import { AggregatedCreditLine, CreditLinePage, CreditPosition } from '@src/core/types';
 
 const StyledViewContainer = styled(ViewContainer)`
   display: grid;
@@ -85,7 +85,7 @@ export const Portfolio = () => {
   const userTokensLoading = generalLoading && !userTokens.length;
   const [currentRole, setRole] = useState<string>('Borrower');
   const [data, setdata] = useState([]);
-  const [aggregatedCreditLine, setAggregatedCreditLine] = useState<AggregatedCreditLine>();
+  const [aggregatedCreditLinePage, setAggregatedCreditLine] = useState<CreditLinePage>();
 
   const availableRoles = ['Borrower', 'Lender', 'Arbiter'];
 
@@ -153,40 +153,55 @@ export const Portfolio = () => {
   }, [borrowerPositions]);
 
   useEffect(() => {
-    //export interface AggregatedCreditLine extends BaseCreditLine {
-    // real-time aggregate usd value across all credits
-    //  principal: string; // | Promise<string>;
-    //  deposit: string; // | Promise<string>;
-    //  // id, symbol, APY (4 decimals)
-    //  highestApy: [string, string, string];
-    //  positions?: CreditPosition[];
-    //  escrow?: AggregatedEscrow;
-    //  spigot?: AggregatedSpigot;
-    //}
-    let aggregate: AggregatedCreditLine = {
-      principal: '0',
-      deposit: '0',
-      highestApy: ['0', '0', '0'],
-      positions: [],
-      //@ts-ignore
-      escrow: {},
-      //@ts-ignore
-      spigot: {},
+    let aggregate: CreditLinePage = {
+      principal: '0', //done
+      deposit: '0', //done
+      highestApy: ['0', '0', '0'], //todo
+      positions: [], //done
+      escrow: {
+        id: '',
+        cratio: '',
+        minCRatio: '',
+        collateralValue: '',
+        //@ts-ignore
+        deposits: [],
+      }, //todo
+      spigot: {
+        id: '',
+        tokenRevenue: {},
+      }, //todo
+
+      //CreditLinePage data
+      interest: '0', //done
+      totalInterestRepaid: '0', //to review
+      collateralEvents: [], //todo
+      creditEvents: [], //done
     };
     if (data) {
       data.map((data: any, i) => {
-        console.log(data.positions);
         data.positions.map((position: CreditPosition, i: number) => {
-          let totalPrincipal = Number(aggregate.principal) + Number(position.principal);
-          let totalDeposit = Number(aggregate.deposit) + Number(position.deposit);
+          const normalizedPrincipal = normalize('amount', position.principal, position.token.decimals);
+          const normalizedDeposit = normalize('amount', position.deposit, position.token.decimals);
+          const normalizedInterest = normalize('amount', position.interestAccrued, position.token.decimals);
+          const normalizedInterestRepaid = normalize('amount', position.interestRepaid, position.token.decimals);
+          const totalPrincipal = Number(aggregate.principal) + Number(normalizedPrincipal);
+          const totalDeposit = Number(aggregate.deposit) + Number(normalizedDeposit);
+          const totalInterest = Number(aggregate.interest) + Number(normalizedInterest);
+          const totalInterestRepaid = Number(aggregate.totalInterestRepaid) + Number(normalizedInterestRepaid);
           //@ts-ignore
-          aggregate.positions.push(position);
+          aggregate.positions.push(position!);
           aggregate.principal = `${totalPrincipal}`;
           aggregate.deposit = `${totalDeposit}`;
+          aggregate.interest = `${totalInterest}`;
+          aggregate.totalInterestRepaid = `${totalInterestRepaid}`;
+        });
+        data.events.map((event: any, i: number) => {
+          aggregate.creditEvents.push(event);
         });
       });
       console.log(aggregate);
     }
+    setAggregatedCreditLine(aggregate);
   }, [data]);
 
   return (
@@ -197,7 +212,7 @@ export const Portfolio = () => {
 
       {userTokensLoading && <StyledSpinnerLoading />}
 
-      {borrowerPositions && (
+      {!aggregatedCreditLinePage && (
         <StyledSliderCard
           header={t('components.no-borrower-positions.header')}
           Component={
@@ -206,6 +221,12 @@ export const Portfolio = () => {
             </Text>
           }
         />
+      )}
+
+      {aggregatedCreditLinePage ? (
+        <LineDetailsDisplay page={aggregatedCreditLinePage} line={aggregatedCreditLinePage} />
+      ) : (
+        <div>bye</div>
       )}
 
       {/* {!userTokensLoading && (

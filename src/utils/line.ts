@@ -351,7 +351,7 @@ export const formatLinePageData = (
       frate: Frate,
       deposit: position.deposit,
       token: position.token,
-      lender: position.lender.id,
+      lender: position.lender,
       principal: position.principal,
       interestAccrued: position.interestAccrued,
       interestRepaid: position.interestRepaid,

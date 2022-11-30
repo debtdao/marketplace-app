@@ -47,7 +47,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
   const getMaxWithdraw = () => {
     if (!selectedPosition) {
       setErrors([...errors, 'no selected position']);
-      return;
+      return '0';
     }
     let maxWithdraw: string = `${Number(selectedPosition['deposit']) - Number(selectedPosition['principal'])}`;
     maxWithdraw = normalize('amount', maxWithdraw, selectedPosition['token'].decimals);
@@ -64,8 +64,6 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
 
     return amountToWithdraw > maxWithdrawAmount;
   };
-
-  isWithdrawable();
 
   const _updatePosition = () =>
     onPositionChange({

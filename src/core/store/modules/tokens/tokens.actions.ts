@@ -27,7 +27,7 @@ const clearUserTokenState = createAction<void>('tokens/clearUserTokenState');
 const getTokens = createAsyncThunk<{ tokensData: Token[] }, string | undefined, ThunkAPI>(
   'tokens/getTokens',
   async (_arg, { getState, extra }) => {
-    const { network, wallet } = getState();
+    const { network } = getState();
     const { tokenService } = extra.services;
     const tokensData: Token[] = await tokenService.getSupportedTokens({ network: network.current });
     return { tokensData };

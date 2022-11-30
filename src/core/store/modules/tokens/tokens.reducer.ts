@@ -1,5 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { union } from 'lodash';
+import { utils } from 'ethers';
 
 import { TokensState, UserTokenActionsMap, initialStatus, TokenFragRepsonse } from '@types';
 
@@ -87,9 +88,9 @@ const tokensReducer = createReducer(tokensInitialState, (builder) => {
     .addCase(getTokens.fulfilled, (state, { payload: { tokensData } }) => {
       const tokenAddresses: string[] = [];
       tokensData.forEach((token) => {
-        // TODO: Should lowercase be handled here or in subgraph?
-        state.tokensMap[token.address.toLowerCase()] = token;
-        tokenAddresses.push(token.address.toLowerCase());
+        const checkSumAddress = utils.getAddress(token.address);
+        state.tokensMap[checkSumAddress] = token;
+        tokenAddresses.push(checkSumAddress);
       });
       state.tokensAddresses = union(state.tokensAddresses, tokenAddresses);
       state.statusMap.getTokens = {};
@@ -105,8 +106,9 @@ const tokensReducer = createReducer(tokensInitialState, (builder) => {
     .addCase(getSupportedOracleTokens.fulfilled, (state, { payload: { tokensData } }) => {
       const tokenAddresses: string[] = [];
       tokensData.supportedTokens.forEach((supportedToken: { token: TokenFragRepsonse }) => {
-        state.supportedTokensMap[supportedToken.token.id] = supportedToken.token;
-        tokenAddresses.push(supportedToken.token.id);
+        const checkSumAddress = utils.getAddress(supportedToken.token.id);
+        state.supportedTokensMap[checkSumAddress] = supportedToken.token;
+        tokenAddresses.push(checkSumAddress);
       });
       state.supportedTokens = union(state.supportedTokens, tokenAddresses);
       state.statusMap.getSupportedTokens = { error: 'no error!' };

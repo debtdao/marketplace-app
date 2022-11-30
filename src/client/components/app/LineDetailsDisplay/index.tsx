@@ -17,7 +17,7 @@ interface LineDetailsProps {
 const Container = styled.div`
   margin: 0;
   padding: 1em;
-  width: 75em;
+  width: 100%;
 `;
 
 const Header = styled.h1`

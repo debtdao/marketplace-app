@@ -31,7 +31,7 @@ const selectLinesState = (state: RootState) => state.lines;
 const selectUserLinesPositionsMap = (state: RootState) =>
   _.filter(
     state.lines.user.linePositions,
-    (p) => state.wallet.selectedAddress !== p.lender || state.wallet.selectedAddress !== p.borrower
+    (p) => state.wallet.selectedAddress !== p.lender.id || state.wallet.selectedAddress !== p.borrower
   );
 // const selectUserLinesMetadataMap = (state: RootState) => state.lines.user.userLinesMetadataMap;
 const selectLinesMap = (state: RootState) => state.lines.linesMap;

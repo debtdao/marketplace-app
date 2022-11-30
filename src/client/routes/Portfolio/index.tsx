@@ -14,8 +14,8 @@ import {
 } from '@store';
 import { SummaryCard, ViewContainer, NoWalletCard, SliderCard, LineDetailsDisplay } from '@components/app';
 import { SpinnerLoading, Text } from '@components/common';
-import { halfWidthCss, isValidAddress, normalize, formatGetBorrowerQuery } from '@utils';
-import { CreditLinePage, CreditPosition } from '@src/core/types';
+import { halfWidthCss, isValidAddress, formatGetBorrowerQuery } from '@utils';
+import { CreditLinePage } from '@src/core/types';
 
 const StyledViewContainer = styled(ViewContainer)`
   display: grid;

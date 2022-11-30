@@ -161,7 +161,7 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
 
   let selectedItem: PositionItem = {
     id: selectedPosition!.id,
-    lender: selectedPosition!.lender,
+    lender: selectedPosition!.lender.id,
     // icon: '',
     deposit: selectedPosition!.deposit,
     tokenSymbol: selectedPosition!.token.symbol,
@@ -176,7 +176,7 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
       .map((item) => {
         return {
           id: item!.id,
-          lender: item!.lender,
+          lender: item!.lender.id,
           // icon: '',
           deposit: item!.deposit,
           tokenSymbol: item?.token.symbol,
@@ -227,7 +227,7 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
             <CreditLineName>{selectedItem.tokenSymbol}</CreditLineName>
           </CreditLineSelector>
           <CreditLineData>
-            <LineTitle ellipsis> Lender: {selectedPosition?.lender} </LineTitle>
+            <LineTitle ellipsis> Lender: {selectedPosition?.lender.id} </LineTitle>
             <LineTitle ellipsis>
               {`${normalizeAmount(selectedPosition?.deposit, 18)} ${selectedPosition?.token.symbol}
               @${selectedPosition?.dRate}/${selectedPosition?.fRate}%`}

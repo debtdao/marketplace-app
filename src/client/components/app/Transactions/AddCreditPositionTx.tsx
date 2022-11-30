@@ -102,7 +102,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       setSelectedTokenAddress(selectedPosition.token.address);
       setDrate(selectedPosition.dRate);
       setFrate(selectedPosition.fRate);
-      setLenderAddress(selectedPosition.lender);
+      setLenderAddress(selectedPosition.lender.id);
       setTransactionType('accept');
     }
   }, [selectedPosition]);

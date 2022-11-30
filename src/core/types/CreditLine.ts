@@ -89,7 +89,10 @@ export interface CreditPosition {
   decimals: string;
   borrower: Address;
   token: TokenView;
-  lender: Address;
+  lender: {
+    _typename: string;
+    id: Address;
+  };
   dRate: string;
   fRate: string;
 }
@@ -97,7 +100,10 @@ export interface CreditPosition {
 export interface LinePageCreditPosition extends CreditPosition {
   id: string;
   status: PositionStatusTypes;
-  lender: Address;
+  lender: {
+    _typename: string;
+    id: Address;
+  };
   arbiter: string;
   deposit: string;
   principal: string;

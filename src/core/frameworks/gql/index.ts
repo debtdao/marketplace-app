@@ -39,8 +39,6 @@ const createClient = (): typeof ApolloClient => {
     uri: GRAPH_API_URL,
     cache: new InMemoryCache(),
   });
-  console.log('TokenService Oracle: do I get here?');
-  console.log('TokenService GRAPH API: ', GRAPH_API_URL);
   return client;
 };
 
@@ -48,13 +46,10 @@ let priceFeedClient: any;
 export const getPriceFeedClient = (isOracle?: boolean) =>
   priceFeedClient ? priceFeedClient : createPriceFeedClient(isOracle);
 const createPriceFeedClient = (isOracle?: boolean): typeof ApolloClient => {
-  console.log('TokenService CreateClient Oracle: ', isOracle);
   priceFeedClient = new ApolloClient({
     uri: GRAPH_CHAINLINK_FEED_REGISTRY_API_URL,
     cache: new InMemoryCache(),
   });
-  console.log('TokenService Oracle: ', isOracle);
-  console.log('TokenService GRAPH API: ', GRAPH_CHAINLINK_FEED_REGISTRY_API_URL);
   return priceFeedClient;
 };
 
@@ -79,8 +74,6 @@ export const createQuery =
           .query({ query, variables })
           .then((result: QueryResult) => {
             const { data, error } = result;
-            console.log('TokenService Normal Data: ', data);
-            console.log('TokenService Normal Oracle: ', isOracle);
             const requestedData = path ? at(data, [path])[0] : data;
             if (error) return reject(error);
             else return resolve(requestedData);
@@ -94,8 +87,6 @@ export const createQuery =
           .query({ query, variables })
           .then((result: QueryResult) => {
             const { data, error } = result;
-            console.log('TokenService Data: ', data);
-            console.log('TokenService Oracle: ', isOracle);
             const requestedData = path ? at(data, [path])[0] : data;
             if (error) return reject(error);
             else return resolve(requestedData);

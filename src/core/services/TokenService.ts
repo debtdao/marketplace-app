@@ -58,7 +58,7 @@ export class TokenServiceImpl implements TokenService {
     // TODO: remove fixedSupportedTokens when WETH symbol is fixed on sdk
     const fixedSupportedTokens = supportedTokens.map((token) => ({
       ...token,
-      symbol: token.address === WETH ? 'WETH' : token.symbol,
+      symbol: token.address.toLowerCase() === WETH ? 'WETH' : token.symbol,
     }));
     return getUniqueAndCombine(fixedSupportedTokens, [], 'address');
   }

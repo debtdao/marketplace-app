@@ -1,5 +1,5 @@
 import { createSelector, current } from '@reduxjs/toolkit';
-import { memoize } from 'lodash';
+import { memoize, sortBy, sortedUniq, uniqWith, isEqual } from 'lodash';
 
 import { getConfig } from '@config';
 import { TokenView } from '@types';
@@ -31,10 +31,10 @@ export const selectDepositTokenOptionsByAsset = createSelector(
   ],
   (supportedTokens, supportedTokensMap, tokenAddresses, tokensMap, tokensUser, servicesEnabled, currentNetwork) =>
     memoize((assetAddress?: string): TokenView[] => {
-      console.log('selectDepositTokenOptionsByAsset', currentNetwork, tokensMap, testTokens);
+      console.log('TokenService selectDepositTokenOptionsByAsset', currentNetwork, tokensMap, testTokens);
       const { userTokensMap, userTokensAllowancesMap } = tokensUser;
       if (currentNetwork === 'goerli') {
-        // TO-DO: fill in token values appropriately
+        // TODO: fill in token values appropriately
         const tokens: TokenView[] = supportedTokens.map((address: string) => {
           return {
             address: address,
@@ -53,7 +53,7 @@ export const selectDepositTokenOptionsByAsset = createSelector(
         return allTestTokens;
       } else {
         const { TOKEN_ADDRESSES } = getConfig();
-        const mainnetTestTokens = Object.values(TOKEN_ADDRESSES)
+        const mainTokens = Object.values(TOKEN_ADDRESSES)
           .filter((address) => !!tokensMap[address])
           .map((address) => {
             const tokenData = tokensMap[address];
@@ -61,22 +61,22 @@ export const selectDepositTokenOptionsByAsset = createSelector(
             const allowancesMap = userTokensAllowancesMap[address] ?? {};
             return createToken({ tokenData, userTokenData, allowancesMap });
           });
-        const subgraphTokens: TokenView[] = supportedTokens.map((address: string) => {
-          return {
-            address: address,
-            ...supportedTokensMap[address],
-            icon: '',
-            balance: '0',
-            balanceUsdc: '0',
-            priceUsdc: '0',
-            categories: [],
-            description: '',
-            website: '',
-            allowanceMap: {},
-          };
-        });
-        const allMainnetTokens = mainnetTestTokens.concat(subgraphTokens);
-        return allMainnetTokens;
+        let subgraphTokens: TokenView[] = supportedTokens
+          .filter((address) => !!tokensMap[address])
+          .map((address) => {
+            const tokenData = tokensMap[address];
+            const userTokenData = userTokensMap[address];
+            const allowancesMap = userTokensAllowancesMap[address] ?? {};
+            return createToken({ tokenData, userTokenData, allowancesMap });
+          });
+        subgraphTokens = sortBy(subgraphTokens, [
+          function (o) {
+            return o.symbol;
+          },
+        ]);
+        let mainnetTokens = mainTokens.concat(subgraphTokens);
+        mainnetTokens = uniqWith(mainnetTokens, isEqual);
+        return mainnetTokens;
       }
     })
 );

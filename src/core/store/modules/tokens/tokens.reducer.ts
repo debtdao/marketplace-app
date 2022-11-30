@@ -87,8 +87,9 @@ const tokensReducer = createReducer(tokensInitialState, (builder) => {
     .addCase(getTokens.fulfilled, (state, { payload: { tokensData } }) => {
       const tokenAddresses: string[] = [];
       tokensData.forEach((token) => {
-        state.tokensMap[token.address] = token;
-        tokenAddresses.push(token.address);
+        // TODO: Should lowercase be handled here or in subgraph?
+        state.tokensMap[token.address.toLowerCase()] = token;
+        tokenAddresses.push(token.address.toLowerCase());
       });
       state.tokensAddresses = union(state.tokensAddresses, tokenAddresses);
       state.statusMap.getTokens = {};

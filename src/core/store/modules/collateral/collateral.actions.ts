@@ -72,6 +72,8 @@ const addSpigot = createAsyncThunk<{ contract: string; asset: string; success: b
 
     // TODO chekc that they are arbiter on line that owns Escrowbeforethey send tx
 
+    console.log({ props });
+
     const { collateralService } = services;
     const tx = await collateralService.addSpigot(props);
     console.log('addSpigot tx', tx);

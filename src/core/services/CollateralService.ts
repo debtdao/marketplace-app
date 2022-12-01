@@ -130,7 +130,7 @@ export class CollateralServiceImpl implements CollateralService {
   }
 
   public async addSpigot(props: AddSpigotProps): Promise<TransactionResponse | PopulatedTransaction> {
-    if (!(await this.isSpigotOwner(undefined, props.lineAddress))) {
+    if (!(await this.isSpigotOwner(props.spigotAddress, props.lineAddress))) {
       throw new Error('Cannot add spigot. Signer is not owner.');
     }
 

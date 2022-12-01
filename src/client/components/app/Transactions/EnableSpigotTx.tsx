@@ -133,9 +133,8 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   };
 
   const canProceed = (): boolean => {
-    if (!isAddress(revenueContractAddress)) return false;
-    if (!isFnSelector(claimFuncSelector)) return false;
-    if (!isFnSelector(transferFuncSelector)) return false;
+    if (!isAddress(revenueContractAddress) || !isFnSelector(claimFuncSelector) || !isFnSelector(transferFuncSelector))
+      return false;
     return true;
   };
 
@@ -147,15 +146,15 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     setLoading(true);
 
     // TODO set error in state to display no line selected
-    console.log({ selectedLine });
-    if (!selectedLine || !selectedSpigotAddress) {
-      console.log('no line/spigot to enable on', selectedLine?.id, selectedSpigotAddress);
+    console.log({ selectedLine, selectedSpigotAddress });
+    if (!selectedLine) {
+      console.log('no line to enable on');
       setLoading(false);
       return; // TODO throw error ot UI component
     }
 
-    if (!selectedRevenueContractAddress) {
-      console.log('no revenue contract selected to enable', selectedSpigotAddress);
+    if (!selectedLine?.spigot) {
+      console.log('no spigot');
       setLoading(false);
       return; // TODO throw error ot UI component
     }
@@ -169,8 +168,8 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     const transactionData: AddSpigotProps = {
       network: walletNetwork,
       lineAddress: selectedLine.id,
-      spigotAddress: selectedSpigotAddress,
-      revenueContract: selectedRevenueContractAddress,
+      spigotAddress: selectedLine?.spigot?.id as string,
+      revenueContract: revenueContractAddress,
       setting: {
         ownerSplit: settingOwnerSplit,
         claimFunction: claimFuncSelector,

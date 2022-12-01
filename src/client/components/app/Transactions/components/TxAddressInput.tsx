@@ -132,7 +132,8 @@ export const TxAddressInput: FC<TxAddressProps> = ({
       {/* NOTE Using fragments here because: https://github.com/yearn/yearn-finance-v3/pull/565 */}
       <>
         <TokenData>
-          <AmountTitle ellipsis>{inputText || t('components.transaction.token-input.you-have')}</AmountTitle>
+          {/* TODO: this should say "Address" probably */}
+          <AmountTitle ellipsis>{inputText || t('components.transaction.token-input.you-have')}</AmountTitle>{' '}
           <AmountInputContainer>
             <StyledBorrowerInput
               value={address}

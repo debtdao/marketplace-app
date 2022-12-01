@@ -6,6 +6,7 @@ import {
   Web3Provider,
   Balance,
   Token,
+  SupportedOracleTokenResponse,
   Integer,
   Config,
   TransactionResponse,
@@ -18,6 +19,7 @@ import {
 import { getContract } from '@frameworks/ethers';
 import { get, getUniqueAndCombine, toBN, USDC_DECIMALS } from '@utils';
 import { getConstants } from '@config/constants';
+import { getSupportedOracleTokens } from '@frameworks/gql';
 
 import erc20Abi from './contracts/erc20.json';
 
@@ -50,7 +52,6 @@ export class TokenServiceImpl implements TokenService {
   public async getSupportedTokens({ network }: GetSupportedTokensProps): Promise<Token[]> {
     const { WETH } = this.config.CONTRACT_ADDRESSES;
     const yearn = this.yearnSdk.getInstanceOf(network);
-
     const supportedTokens = await yearn.tokens.supported();
 
     // TODO: remove fixedSupportedTokens when WETH symbol is fixed on sdk
@@ -59,6 +60,18 @@ export class TokenServiceImpl implements TokenService {
       symbol: token.address === WETH ? 'WETH' : token.symbol,
     }));
     return getUniqueAndCombine(fixedSupportedTokens, [], 'address');
+  }
+
+  public async getSupportedOracleTokens(): Promise<SupportedOracleTokenResponse | undefined> {
+    const response = getSupportedOracleTokens(undefined)
+      .then((data) => {
+        return data;
+      })
+      .catch((err) => {
+        console.log('TokenService: error fetching supported oracle tokens from subgraph', err);
+        return undefined;
+      });
+    return response;
   }
 
   public async getTokensDynamicData({ network, addresses }: GetTokensDynamicDataProps): Promise<TokenDynamicData[]> {

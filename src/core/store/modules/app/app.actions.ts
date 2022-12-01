@@ -12,6 +12,8 @@ import { AlertsActions } from '../alerts/alerts.actions';
 import { NetworkActions } from '../network/network.actions';
 import { PartnerActions } from '../partner/partner.actions';
 import { SettingsActions } from '../settings/settings.actions';
+import { createEventTracker } from "@frameworks/segment";
+import { AnalyticsEventNames, LogAppAnalyticsActionProps } from '@src/core/types/ProductAnalytics';
 
 /* -------------------------------------------------------------------------- */
 /*                                   Setters                                  */
@@ -120,6 +122,18 @@ const checkExternalServicesStatus = createAsyncThunk<void, void, ThunkAPI>(
 // );
 
 /* -------------------------------------------------------------------------- */
+/*                                Analytics                               */
+/* -------------------------------------------------------------------------- */
+
+const logAppanalytics = createAsyncThunk<void, LogAppAnalyticsActionProps, ThunkAPI>('app/initApp', async (
+  { event, data },
+  { dispatch, getState, extra }
+) => {
+  createEventTracker(event)(data);
+});
+
+
+/* -------------------------------------------------------------------------- */
 /*                                   Exports                                  */
 /* -------------------------------------------------------------------------- */
 
@@ -128,5 +142,6 @@ export const AppActions = {
   clearAppData,
   clearUserAppData,
   initApp,
+  logAppanalytics,
   // initSubscriptions,
 };

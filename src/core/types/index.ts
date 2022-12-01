@@ -7,6 +7,7 @@ export * from './Lab';
 export * from './Modals';
 export * from './Partner';
 export * from './Position';
+export * from './ProductAnalytics';
 export * from './Query';
 export * from './Service';
 export * from './Settings';

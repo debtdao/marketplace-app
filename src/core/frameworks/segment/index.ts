@@ -4,17 +4,22 @@ import { AnalyticsEventNames } from '@src/core/types/ProductAnalytics'
 
  
 const { SEGMENT_API_KEY } = getEnv()
-const analytics = new AnalyticsBrowser();
 
-const init = () => SEGMENT_API_KEY && analytics.load({ writeKey: SEGMENT_API_KEY });
+let analytics: AnalyticsBrowser | undefined;
 
-const id = (id: string) => analytics.identify(id);
+const getAnalytics = () => {
+  if(analytics) return analytics;
+  if(SEGMENT_API_KEY) {
+    return analytics = new AnalyticsBrowser();
+  }
+}
 
-const createEventTracker = (eventName: AnalyticsEventNames) => (eventData?: any): Promise<Context> =>
-  analytics.track(eventName, eventData);
+export const init = () => getAnalytics()?.load({ writeKey: SEGMENT_API_KEY! });
 
-export default {
-  id,
-  init,
-  createEventTracker
-};
+
+// TODO check that getAnalytics()? has loaded before calling
+export const idUser = (id: string) => getAnalytics()?.identify(id);
+export const groupUser =  (groupName: string) => getAnalytics()?.group(`${groupName} Group ID`, { groupName })
+export const createEventTracker = (eventName: AnalyticsEventNames) =>
+  (eventData?: any): Promise<Context> | undefined =>
+    getAnalytics()?.track(eventName, eventData); // should event data be an obj or spread op?

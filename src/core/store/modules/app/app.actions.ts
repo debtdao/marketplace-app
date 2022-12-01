@@ -3,7 +3,9 @@ import { createAsyncThunk, createAction } from '@reduxjs/toolkit';
 import { ThunkAPI } from '@frameworks/redux';
 import { isGnosisApp, isLedgerLive, isCoinbaseApp, get } from '@utils';
 import { ExternalServiceId } from '@types';
+import { idUser, trackAnalyticsEvent } from '@frameworks/segment';
 import { getEnv } from '@config/env';
+import { AnalyticsEventNames, LogAppAnalyticsActionProps } from '@src/core/types/ProductAnalytics';
 
 import { WalletActions } from '../wallet/wallet.actions';
 import { TokensActions } from '../tokens/tokens.actions';
@@ -12,8 +14,6 @@ import { AlertsActions } from '../alerts/alerts.actions';
 import { NetworkActions } from '../network/network.actions';
 import { PartnerActions } from '../partner/partner.actions';
 import { SettingsActions } from '../settings/settings.actions';
-import { createEventTracker } from "@frameworks/segment";
-import { AnalyticsEventNames, LogAppAnalyticsActionProps } from '@src/core/types/ProductAnalytics';
 
 /* -------------------------------------------------------------------------- */
 /*                                   Setters                                  */
@@ -125,13 +125,22 @@ const checkExternalServicesStatus = createAsyncThunk<void, void, ThunkAPI>(
 /*                                Analytics                               */
 /* -------------------------------------------------------------------------- */
 
-const logAppanalytics = createAsyncThunk<void, LogAppAnalyticsActionProps, ThunkAPI>('app/initApp', async (
-  { event, data },
-  { dispatch, getState, extra }
-) => {
-  createEventTracker(event)(data);
-});
+const logAppAnalytics = createAsyncThunk<void, LogAppAnalyticsActionProps, ThunkAPI>(
+  'app/initApp',
+  async ({ event }, { dispatch, getState, extra }) => {
+    const { wallet, ...state } = getState();
+    trackAnalyticsEvent(event)({ wallet });
+  }
+);
 
+const id = createAsyncThunk<void, void, ThunkAPI>('app/initApp', async (_, { dispatch, getState, extra }) => {
+  const {
+    wallet: { selectedAddress },
+  } = getState();
+  if (selectedAddress) {
+    idUser(selectedAddress);
+  }
+});
 
 /* -------------------------------------------------------------------------- */
 /*                                   Exports                                  */
@@ -142,6 +151,8 @@ export const AppActions = {
   clearAppData,
   clearUserAppData,
   initApp,
-  logAppanalytics,
+
+  logAppAnalytics,
+  id,
   // initSubscriptions,
 };

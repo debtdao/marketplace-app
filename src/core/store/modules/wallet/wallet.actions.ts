@@ -94,8 +94,14 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
     }
     const isConnected = await wallet.connect({ name: walletName });
 
-    console.log('select wallet action ', wallet);
-    dispatch(AppActions.logAppanalytics({ event: EVENT_LOGIN, data: { address: '', network, walletName, }}));
+    // @analytics
+    dispatch(AppActions.id());
+    dispatch(
+      AppActions.logAppAnalytics({
+        event: EVENT_LOGIN,
+        data: { network, walletName },
+      })
+    );
 
     return { isConnected };
   }

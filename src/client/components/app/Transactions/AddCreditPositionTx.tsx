@@ -14,7 +14,6 @@ import { ACTIVE_STATUS, BORROWER_POSITION_ROLE } from '@src/core/types';
 import { getConstants } from '@src/config/constants';
 import { TokensActions, TokensSelectors, WalletSelectors, LinesSelectors, LinesActions } from '@store';
 import { Button } from '@components/common';
-import { testTokens } from '@src/config/constants';
 
 import { TxContainer } from './components/TxContainer';
 import { TxTokenInput } from './components/TxTokenInput';
@@ -338,7 +337,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         maxAmount={acceptingOffer ? targetTokenAmount : targetBalance}
         selectedToken={selectedSellToken}
         onSelectedTokenChange={onSelectedSellTokenChange}
-        tokenOptions={walletNetwork === 'goerli' ? testTokens : sourceAssetOptions}
+        tokenOptions={sourceAssetOptions}
         readOnly={acceptingOffer}
       />
 

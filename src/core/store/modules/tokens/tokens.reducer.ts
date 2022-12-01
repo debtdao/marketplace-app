@@ -1,7 +1,8 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { union } from 'lodash';
+import { utils } from 'ethers';
 
-import { TokensState, UserTokenActionsMap, initialStatus } from '@types';
+import { TokensState, UserTokenActionsMap, initialStatus, TokenFragRepsonse } from '@types';
 
 import { TokensActions } from './tokens.actions';
 
@@ -12,8 +13,10 @@ export const initialUserTokenActionsMap: UserTokenActionsMap = {
 
 export const tokensInitialState: TokensState = {
   tokensAddresses: [],
+  supportedTokens: [],
   activeNetworkTokenAddresses: [],
   tokensMap: {},
+  supportedTokensMap: {},
   selectedTokenAddress: undefined,
   user: {
     userTokensAddresses: [],
@@ -22,6 +25,7 @@ export const tokensInitialState: TokensState = {
   },
   statusMap: {
     getTokens: { ...initialStatus },
+    getSupportedTokens: { ...initialStatus },
     user: {
       getUserTokens: { ...initialStatus },
       getUserTokensAllowances: { ...initialStatus },
@@ -32,6 +36,7 @@ export const tokensInitialState: TokensState = {
 
 const {
   getTokens,
+  getSupportedOracleTokens,
   getTokensDynamicData,
   getUserTokens,
   setSelectedTokenAddress,
@@ -64,6 +69,7 @@ const tokensReducer = createReducer(tokensInitialState, (builder) => {
     .addCase(clearTokensData, (state) => {
       state.tokensMap = {};
       state.tokensAddresses = [];
+      state.supportedTokens = [];
     })
     .addCase(clearUserTokenState, (state) => {
       state.user.userTokensAddresses = [];
@@ -82,14 +88,33 @@ const tokensReducer = createReducer(tokensInitialState, (builder) => {
     .addCase(getTokens.fulfilled, (state, { payload: { tokensData } }) => {
       const tokenAddresses: string[] = [];
       tokensData.forEach((token) => {
-        state.tokensMap[token.address] = token;
-        tokenAddresses.push(token.address);
+        const checkSumAddress = utils.getAddress(token.address);
+        state.tokensMap[checkSumAddress] = token;
+        tokenAddresses.push(checkSumAddress);
       });
       state.tokensAddresses = union(state.tokensAddresses, tokenAddresses);
       state.statusMap.getTokens = {};
     })
     .addCase(getTokens.rejected, (state, { error }) => {
       state.statusMap.getTokens = { error: error.message };
+    })
+
+    /* -------------------------------- getSupportedTokens ------------------------------- */
+    .addCase(getSupportedOracleTokens.pending, (state) => {
+      state.statusMap.getSupportedTokens = { loading: true };
+    })
+    .addCase(getSupportedOracleTokens.fulfilled, (state, { payload: { tokensData } }) => {
+      const tokenAddresses: string[] = [];
+      tokensData.supportedTokens.forEach((supportedToken: { token: TokenFragRepsonse }) => {
+        const checkSumAddress = utils.getAddress(supportedToken.token.id);
+        state.supportedTokensMap[checkSumAddress] = supportedToken.token;
+        tokenAddresses.push(checkSumAddress);
+      });
+      state.supportedTokens = union(state.supportedTokens, tokenAddresses);
+      state.statusMap.getSupportedTokens = { error: 'no error!' };
+    })
+    .addCase(getSupportedOracleTokens.rejected, (state, { error }) => {
+      state.statusMap.getSupportedTokens = { error: error.message };
     })
 
     /* ------------------------------ getUserTokens ----------------------------- */

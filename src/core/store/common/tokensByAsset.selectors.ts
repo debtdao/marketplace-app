@@ -1,35 +1,60 @@
 import { createSelector, current } from '@reduxjs/toolkit';
-import { memoize } from 'lodash';
+import { memoize, sortBy, unionBy } from 'lodash';
 
 import { getConfig } from '@config';
 import { TokenView } from '@types';
 import { testTokens } from '@src/config/constants';
 
 import { VaultsSelectors } from '../modules/vaults/vaults.selectors';
-import { TokensSelectors } from '../modules/tokens/tokens.selectors';
 import { AppSelectors } from '../modules/app/app.selectors';
 import { WalletSelectors } from '../modules/wallet/wallet.selectors';
-import { createToken } from '../modules/tokens/tokens.selectors';
+import { TokensSelectors, createToken } from '../modules/tokens/tokens.selectors';
 import { NetworkSelectors } from '../modules/network/network.selectors';
+// import { Token } from 'graphql';
 
 const { selectVaultsMap } = VaultsSelectors;
-const { selectTokensMap, selectTokensUser } = TokensSelectors;
+const { selectTokenAddresses, selectSupportedTokens, selectSupportedTokensMap, selectTokensMap, selectTokensUser } =
+  TokensSelectors;
 const { selectServicesEnabled } = AppSelectors;
 const { selectCurrentNetwork } = NetworkSelectors;
 const { selectWalletNetwork } = WalletSelectors;
 
 export const selectDepositTokenOptionsByAsset = createSelector(
-  [selectTokensMap, selectTokensUser, selectServicesEnabled, selectWalletNetwork],
-  (tokensMap, tokensUser, servicesEnabled, currentNetwork) =>
+  [
+    selectSupportedTokens,
+    selectSupportedTokensMap,
+    selectTokenAddresses,
+    selectTokensMap,
+    selectTokensUser,
+    selectServicesEnabled,
+    selectWalletNetwork,
+  ],
+  (supportedTokens, supportedTokensMap, tokenAddresses, tokensMap, tokensUser, servicesEnabled, currentNetwork) =>
     memoize((assetAddress?: string): TokenView[] => {
-      console.log('selectDepositTokenOptionsByAsset', currentNetwork, tokensMap, testTokens);
+      console.log('TokenService selectDepositTokenOptionsByAsset', currentNetwork, tokensMap, testTokens);
+      const { userTokensMap, userTokensAllowancesMap } = tokensUser;
       if (currentNetwork === 'goerli') {
+        // TODO: fill in token values appropriately with values from subgraph
+        // const tokens: TokenView[] = supportedTokens.map((address: string) => {
+        //   return {
+        //     address: address,
+        //     ...supportedTokensMap[address],
+        //     icon: '',
+        //     balance: '0',
+        //     balanceUsdc: '0',
+        //     priceUsdc: '0',
+        //     categories: [],
+        //     description: '',
+        //     website: '',
+        //     allowanceMap: {},
+        //   };
+        // });
+        // const allTestTokens = testTokens.concat(tokens);
+        // return allTestTokens;
         return testTokens;
       } else {
         const { TOKEN_ADDRESSES } = getConfig();
-        const { userTokensMap, userTokensAllowancesMap } = tokensUser;
-
-        const tokens = Object.values(TOKEN_ADDRESSES)
+        const mainTokens = Object.values(TOKEN_ADDRESSES)
           .filter((address) => !!tokensMap[address])
           .map((address) => {
             const tokenData = tokensMap[address];
@@ -37,8 +62,15 @@ export const selectDepositTokenOptionsByAsset = createSelector(
             const allowancesMap = userTokensAllowancesMap[address] ?? {};
             return createToken({ tokenData, userTokenData, allowancesMap });
           });
-
-        return tokens;
+        let subgraphTokens: TokenView[] = supportedTokens
+          .filter((address) => !!tokensMap[address])
+          .map((address) => {
+            const tokenData = tokensMap[address];
+            const userTokenData = userTokensMap[address];
+            const allowancesMap = userTokensAllowancesMap[address] ?? {};
+            return createToken({ tokenData, userTokenData, allowancesMap });
+          });
+        return unionBy(mainTokens, subgraphTokens, (o) => o.symbol);
       }
     })
 );

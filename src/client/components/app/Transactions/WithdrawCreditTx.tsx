@@ -49,8 +49,8 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
       setErrors([...errors, 'no selected position']);
       return '0';
     }
-    let maxWithdraw: string = `${Number(selectedPosition['deposit']) - Number(selectedPosition['principal'])}`;
-    maxWithdraw = normalize('amount', maxWithdraw, selectedPosition['token'].decimals);
+    let maxWithdraw: string = `${Number(selectedPosition.deposit) - Number(selectedPosition.principal)}`;
+    maxWithdraw = normalize('amount', maxWithdraw, selectedPosition.token.decimals);
     return maxWithdraw;
   };
 
@@ -59,8 +59,8 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
     if (!selectedPosition) {
       return;
     }
-    const maxWithdrawAmount = Number(toWei(getMaxWithdraw()!, selectedPosition['token'].decimals));
-    const amountToWithdraw = Number(toWei(targetAmount, selectedPosition['token'].decimals));
+    const maxWithdrawAmount = Number(toWei(getMaxWithdraw()!, selectedPosition.token.decimals));
+    const amountToWithdraw = Number(toWei(targetAmount, selectedPosition.token.decimals));
 
     return amountToWithdraw > maxWithdrawAmount;
   };
@@ -120,7 +120,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
 
     dispatch(
       LinesActions.withdrawLine({
-        id: selectedPosition['id'],
+        id: selectedPosition.id,
         lineAddress: selectedCredit.id,
         amount: ethers.utils.parseEther(targetAmount),
         network: walletNetwork,
@@ -135,7 +135,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
         const updatedPosition = withdrawUpdate(selectedPosition, targetAmount);
         dispatch(
           LinesActions.setPositionData({
-            position: selectedPosition['id'],
+            position: selectedPosition.id,
             lineAddress: selectedCredit.id,
             positionObject: updatedPosition,
             positions: positions,

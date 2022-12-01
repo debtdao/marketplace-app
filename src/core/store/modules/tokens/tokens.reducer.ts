@@ -105,7 +105,7 @@ const tokensReducer = createReducer(tokensInitialState, (builder) => {
     })
     .addCase(getSupportedOracleTokens.fulfilled, (state, { payload: { tokensData } }) => {
       const tokenAddresses: string[] = [];
-      tokensData.supportedTokens.forEach((supportedToken: { token: TokenFragRepsonse }) => {
+      tokensData?.supportedTokens?.forEach((supportedToken: { token: TokenFragRepsonse }) => {
         const checkSumAddress = utils.getAddress(supportedToken.token.id);
         state.supportedTokensMap[checkSumAddress] = supportedToken.token;
         tokenAddresses.push(checkSumAddress);

@@ -188,7 +188,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
         const updatedPosition = depositAndRepayUpdate(selectedPosition, targetAmount);
         dispatch(
           LinesActions.setPositionData({
-            position: selectedPosition['id'],
+            position: selectedPosition.id,
             lineAddress: selectedCredit.id,
             positionObject: updatedPosition,
             positions: positions,
@@ -312,8 +312,8 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
       setErrors([...errors, 'no selected position']);
       return;
     }
-    let maxRepay: string = `${Number(selectedPosition['principal']) + Number(selectedPosition['interestAccrued'])}`;
-    maxRepay = normalize('amount', `${maxRepay}`, selectedPosition['token'].decimals);
+    let maxRepay: string = `${Number(selectedPosition.principal) + Number(selectedPosition.interestAccrued)}`;
+    maxRepay = normalize('amount', `${maxRepay}`, selectedPosition.token.decimals);
     return maxRepay;
   };
 
@@ -390,9 +390,9 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
       <TxRateInput
         key={'frate'}
         headerText={t('components.transaction.deposit-and-repay.your-rates')}
-        frate={selectedPosition['frate']}
-        drate={selectedPosition['drate']}
-        amount={selectedPosition['frate']}
+        frate={selectedPosition.frate}
+        drate={selectedPosition.drate}
+        amount={selectedPosition.frate}
         maxAmount={'100'}
         // setRateChange={onFrateChange}
         setRateChange={() => {}}

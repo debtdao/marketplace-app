@@ -130,7 +130,6 @@ export const PositionsTable = (props: PositionsProps) => {
     if (!lineAddress) {
       return;
     }
-    console.log('query the page', selectedPage);
     dispatch(LinesActions.getLinePage({ id: lineAddress }));
   }, [selectedPage]);
 
@@ -177,12 +176,13 @@ export const PositionsTable = (props: PositionsProps) => {
     dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
   };
 
-  const isWithdrawable = (deposit: string, borrowed: string, lender: string) => {
+  const isWithdrawable = (deposit: string, borrowed: string, lender: string, interestRepaid: string) => {
     if (!userWallet) {
       return;
     }
     return (
-      Number(borrowed) < Number(deposit) && ethers.utils.getAddress(lender) === ethers.utils.getAddress(userWallet!)
+      Number(borrowed) < Number(deposit) + Number(interestRepaid) &&
+      ethers.utils.getAddress(lender) === ethers.utils.getAddress(userWallet!)
     );
   };
 
@@ -278,21 +278,21 @@ export const PositionsTable = (props: PositionsProps) => {
             ]}
             data={events.map((event) => ({
               // this needs to be humanized to correct amount depending on the token.
-              deposit: humanize('amount', event['deposit'], 18, 2),
-              drate: `${event['drate']} %`,
-              frate: `${event['frate']} %`,
-              status: event['status'],
-              principal: humanize('amount', event['principal'], event['token'].decimals, 2),
-              interest: humanize('amount', event['interestAccrued'], event['token'].decimals, 2),
-              lender: formatAddress(event['lender']),
-              token: event['token'].symbol,
+              deposit: humanize('amount', event.deposit, event.token.decimals, 2),
+              drate: `${event.drate} %`,
+              frate: `${event.frate} %`,
+              status: event.status,
+              principal: humanize('amount', event.principal, event.token.decimals, 2),
+              interest: humanize('amount', event.interestAccrued, event.token.decimals, 2),
+              lender: formatAddress(event.lender),
+              token: event.token.symbol,
               actions: (
                 <ActionButtons
-                  value={event['id']}
+                  value={event.id}
                   actions={
-                    event['status'] === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE
+                    event.status === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE
                       ? [ApproveMutualConsent]
-                      : isWithdrawable(event['deposit'], event['principal'], event['lender'])
+                      : isWithdrawable(event.deposit, event.principal, event.lender, event.interestRepaid)
                       ? actions
                       : userRoleMetadata.role === BORROWER_POSITION_ROLE
                       ? actions

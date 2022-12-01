@@ -230,8 +230,11 @@ const selectUserPositionMetadata = createSelector(
       available: '0',
     };
 
+    //Map over position table
+    //Create a function to pass down position data
+    //Do this in UTIL
+
     if (!line || !userAddress) return defaultRole;
-    console.log('made it here');
     //@ts-ignore
     const position = selectedPosition ? line!.positions?.[selectedPosition] : undefined;
     console.log('position here', position);

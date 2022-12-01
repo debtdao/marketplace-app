@@ -15,7 +15,7 @@ import {
 import { SummaryCard, ViewContainer, NoWalletCard, SliderCard, LineDetailsDisplay } from '@components/app';
 import { SpinnerLoading, Text } from '@components/common';
 import { halfWidthCss, isValidAddress, formatGetBorrowerQuery } from '@utils';
-import { CreditLinePage } from '@src/core/types';
+import { CreditLinePage, LENDER_POSITION_ROLE, BORROWER_POSITION_ROLE, ARBITER_POSITION_ROLE } from '@src/core/types';
 
 const StyledViewContainer = styled(ViewContainer)`
   display: grid;
@@ -87,38 +87,22 @@ export const Portfolio = () => {
   const borrowerPositions = useAppSelector(LinesSelectors.selectBorrowerPositions);
 
   const userTokensLoading = generalLoading && !userTokens.length;
-  const [currentRole, setRole] = useState<string>('Borrower');
+  const [currentRole, setRole] = useState<string>(BORROWER_POSITION_ROLE);
   const [data, setdata] = useState([]);
   const [aggregatedCreditLinePage, setAggregatedCreditLine] = useState<CreditLinePage>();
 
-  const availableRoles = ['Borrower', 'Lender'];
+  const availableRoles = [BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, ARBITER_POSITION_ROLE];
 
-  const summaryCardItems = [
-    {
+  const SummaryCardItems = availableRoles.map((role: string) => {
+    return {
       header: t(''),
       Component: (
-        <RoleOption
-          onClick={() => setRole(availableRoles[0])}
-          active={availableRoles[0] === currentRole}
-          key={`s-${availableRoles[0]}`}
-        >
-          {t(`settings:${availableRoles[0]}`)}
+        <RoleOption onClick={() => setRole(role)} active={role === currentRole} key={`s-${role}`}>
+          {t(`settings:${role}`)}
         </RoleOption>
       ),
-    },
-    {
-      header: t(''),
-      Component: (
-        <RoleOption
-          onClick={() => setRole(availableRoles[1])}
-          active={availableRoles[1] === currentRole}
-          key={`s-${availableRoles[1]}`}
-        >
-          {t(`settings:${availableRoles[1]}`)}
-        </RoleOption>
-      ),
-    },
-  ];
+    };
+  });
 
   useEffect(() => {
     if (!borrowerAddress || !isValidAddress(borrowerAddress)) {
@@ -152,7 +136,7 @@ export const Portfolio = () => {
 
   return (
     <StyledViewContainer>
-      <HeaderCard items={summaryCardItems} cardSize="small" />
+      <HeaderCard items={SummaryCardItems} cardSize="small" />
 
       {!walletIsConnected && <StyledNoWalletCard />}
 
@@ -169,7 +153,7 @@ export const Portfolio = () => {
         />
       )}
 
-      {aggregatedCreditLinePage && currentRole === 'Borrower' ? (
+      {aggregatedCreditLinePage && currentRole === BORROWER_POSITION_ROLE ? (
         <StyledBorrowerContainer>
           <LineDetailsDisplay page={aggregatedCreditLinePage} line={aggregatedCreditLinePage} />
         </StyledBorrowerContainer>

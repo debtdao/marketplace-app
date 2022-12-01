@@ -190,6 +190,19 @@ export const PositionsTable = (props: PositionsProps) => {
     ? `${t('lineDetails:positions-events.propose-position')}`
     : `${t('components.connect-button.connect')}`;
 
+  const getUserTransactions = (event: CreditPosition) => {
+    if (event.status === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE) {
+      return [ApproveMutualConsent];
+    }
+    if (isWithdrawable(event.deposit, event.principal, event.lender, event.interestRepaid)) {
+      return actions;
+    }
+    if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
+      return actions;
+    }
+    return [];
+  };
+
   return (
     <>
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
@@ -286,20 +299,7 @@ export const PositionsTable = (props: PositionsProps) => {
               interest: humanize('amount', event.interestAccrued, event.token.decimals, 2),
               lender: formatAddress(event.lender),
               token: event.token.symbol,
-              actions: (
-                <ActionButtons
-                  value={event.id}
-                  actions={
-                    event.status === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE
-                      ? [ApproveMutualConsent]
-                      : isWithdrawable(event.deposit, event.principal, event.lender, event.interestRepaid)
-                      ? actions
-                      : userRoleMetadata.role === BORROWER_POSITION_ROLE
-                      ? actions
-                      : []
-                  }
-                />
-              ),
+              actions: <ActionButtons value={event.id} actions={getUserTransactions(event)} />,
             }))}
             SearchBar={
               <>

@@ -32,6 +32,7 @@ export interface RootState {
   // debt dao
   lines: CreditLineState;
   collateral: CollateralState;
+  onChainMetaData: OnChainMetaDataState
 }
 
 export interface AppState {
@@ -199,6 +200,10 @@ export interface CollateralState {
     escrowAllowances: { [line: string]: { [token: string]: string } };
   };
   statusMap: CollateralActionsStatusMap;
+}
+
+export interface OnChainMetaDataState {
+  contractABI?: {}[];
 }
 
 interface TokenCollateralMap {

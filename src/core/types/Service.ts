@@ -452,6 +452,11 @@ export interface CollateralService {
   maxSplit(): BigNumber; // always 100
 }
 
+export interface OnChainMetadataService {
+
+  getContractABI(address: Address): Promise<any | undefined>;
+}
+
 // *************** TOKEN ***************
 export interface TokenService {
   getSupportedTokens: (props: GetSupportedTokensProps) => Promise<Token[]>;

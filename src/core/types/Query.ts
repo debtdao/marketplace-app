@@ -77,6 +77,14 @@ export interface GetBorrowerPositionsArgs {
   borrower: Address;
 }
 
+/**
+ * @typedef {object} GetUserPortfolioArgs
+ * @property {Address} GetUserPortfolioArgs.user - address to fetch borrower, lender, and arbiter portfolio
+ */
+export interface GetUserPortfolioArgs {
+  user: Address;
+}
+
 // React hook args wrapping these queries
 export interface UseCreditLinesParams {
   [key: string]: GetLinesArgs;
@@ -262,4 +270,38 @@ export interface GetBorrowerPositionsResponse extends BaseLineFragResponse {
       value?: string;
     };
   };
+}
+
+//TO-DO: change the schema to meet Sero's criteria
+export interface GetLenderPositionsResponse extends BaseLineFragResponse {
+  positions?: LinePageCreditFragResponse[];
+
+  // events?: LineEventFragResponse[];
+
+  // spigot?: {
+  //   id: Address;
+  //   summaries: SpigotRevenueSummaryFragResponse[];
+  //   spigots: {
+  //     contract: Address;
+  //     active: boolean;
+  //     startTime: number;
+  //   };
+  //   events?: SpigotEventFragResponse[];
+  // };
+
+  // escrow?: BaseEscrowFragResponse & {
+  //   events: {
+  //     __typename: string;
+  //     timestamp: number;
+  //     // only on add/remove collateral
+  //     amount?: string;
+  //     value?: string;
+  //   };
+  // };
+}
+
+export interface GetUserPortfolioResponse extends GetBorrowerPositionsResponse, GetLenderPositionsResponse {
+  borrowerPositions: GetBorrowerPositionsResponse[];
+  lenderPositions: GetLenderPositionsResponse[];
+  arbiterPositions: GetBorrowerPositionsResponse[];
 }

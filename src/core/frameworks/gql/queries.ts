@@ -458,7 +458,7 @@ export const GET_USER_PORTFOLIO_QUERY = gql`
   ${BORROWER_POSITIONS_FRAGMENT}
   ${LENDER_POSITIONS_FRAGMENT}
 
-  query getUserPortfolioPositions($user: String!) {
+  query getUserPortfolio($user: String!) {
     borrowerPositions: lineOfCredits(where: { borrower_contains: $user }) {
       ...BorrowerPositionsFrag
     }

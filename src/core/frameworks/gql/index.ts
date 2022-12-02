@@ -27,6 +27,7 @@ import {
   GET_LINES_QUERY,
   GET_SUPPORTED_ORACLE_TOKENS_QUERY,
   GET_BORROWER_POSITIONS_QUERY,
+  GET_USER_PORTFOLIO_QUERY,
 } from './queries';
 
 const { GRAPH_API_URL, GRAPH_CHAINLINK_FEED_REGISTRY_API_URL } = getEnv();
@@ -125,3 +126,8 @@ const getBorrowerPositionsQuery = createQuery(GET_BORROWER_POSITIONS_QUERY, 'lin
 export const getBorrowerPositions: QueryCreator<GetBorrowerPositionsArgs, CreditPosition[]> = (
   arg: GetBorrowerPositionsArgs
 ) => getBorrowerPositionsQuery(arg);
+
+const getUserPortfolioQuery = createQuery(GET_USER_PORTFOLIO_QUERY);
+export const getUserPortfolio: QueryCreator<GetBorrowerPositionsArgs, CreditPosition[]> = (
+  arg: GetBorrowerPositionsArgs
+) => getUserPortfolioQuery(arg);

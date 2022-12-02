@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { isEmpty } from 'lodash';
 import { useEffect, useState } from 'react';
+import { ethers } from 'ethers';
 
 import { ModalsActions, LinesActions, LinesSelectors, WalletSelectors, WalletActions } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
@@ -92,7 +93,9 @@ export const PositionsTable = (props: PositionsProps) => {
 
   useEffect(() => {
     let Transactions: Transaction[] = [];
-    // TODO integrate UserPositoinMetadata in here
+    if (!userWallet) {
+      Transactions = [];
+    }
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
       Transactions.push({
         name: t('components.transaction.borrow'),
@@ -120,9 +123,6 @@ export const PositionsTable = (props: PositionsProps) => {
         disabled: false,
       });
     }
-    if (!userWallet) {
-      Transactions = [];
-    }
     setActions(Transactions);
   }, [selectedLine, userWallet]);
 
@@ -130,7 +130,6 @@ export const PositionsTable = (props: PositionsProps) => {
     if (!lineAddress) {
       return;
     }
-    console.log('query the page', selectedPage);
     dispatch(LinesActions.getLinePage({ id: lineAddress }));
   }, [selectedPage]);
 
@@ -177,9 +176,32 @@ export const PositionsTable = (props: PositionsProps) => {
     dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
   };
 
+  const isWithdrawable = (deposit: string, borrowed: string, lender: string, interestRepaid: string) => {
+    if (!userWallet) {
+      return;
+    }
+    return (
+      Number(borrowed) < Number(deposit) + Number(interestRepaid) &&
+      ethers.utils.getAddress(lender) === ethers.utils.getAddress(userWallet!)
+    );
+  };
+
   let ctaButtonText = userWallet
     ? `${t('lineDetails:positions-events.propose-position')}`
     : `${t('components.connect-button.connect')}`;
+
+  const getUserTransactions = (event: CreditPosition) => {
+    if (event.status === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE) {
+      return [ApproveMutualConsent];
+    }
+    if (isWithdrawable(event.deposit, event.principal, event.lender, event.interestRepaid)) {
+      return actions;
+    }
+    if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
+      return actions;
+    }
+    return [];
+  };
 
   return (
     <>
@@ -269,28 +291,15 @@ export const PositionsTable = (props: PositionsProps) => {
             ]}
             data={events.map((event) => ({
               // this needs to be humanized to correct amount depending on the token.
-              deposit: humanize('amount', event['deposit'], 18, 2),
-              drate: `${event['drate']} %`,
-              frate: `${event['frate']} %`,
-              status: event['status'],
-              principal: humanize('amount', event['principal'], 18, 2),
-              interest: humanize('amount', event['interestAccrued'], 18, 2),
-              lender: formatAddress(event['lender']),
-              token: event['token'].symbol,
-              actions: (
-                <ActionButtons
-                  value={event['id']}
-                  actions={
-                    event['status'] === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE
-                      ? [ApproveMutualConsent]
-                      : userRoleMetadata.role === LENDER_POSITION_ROLE && event['status'] === 'OPENED'
-                      ? actions
-                      : userRoleMetadata.role === BORROWER_POSITION_ROLE && event['status'] === 'OPENED'
-                      ? actions
-                      : []
-                  }
-                />
-              ),
+              deposit: humanize('amount', event.deposit, event.token.decimals, 2),
+              drate: `${event.drate} %`,
+              frate: `${event.frate} %`,
+              status: event.status,
+              principal: humanize('amount', event.principal, event.token.decimals, 2),
+              interest: humanize('amount', event.interestAccrued, event.token.decimals, 2),
+              lender: formatAddress(event.lender),
+              token: event.token.symbol,
+              actions: <ActionButtons value={event.id} actions={getUserTransactions(event)} />,
             }))}
             SearchBar={
               <>

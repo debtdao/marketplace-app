@@ -155,7 +155,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
     let approvalOBj = {
       spenderAddress: selectedCredit.id,
       tokenAddress: selectedSellTokenAddress,
-      amount: toWei(targetTokenAmount, 18),
+      amount: toWei(targetTokenAmount, selectedSellToken!.decimals),
       network: walletNetwork,
     };
     //@ts-ignore
@@ -196,7 +196,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       lineAddress: selectedCredit.id,
       drate: toWei(drate, 2),
       frate: toWei(frate, 2),
-      amount: toWei(targetTokenAmount, 18),
+      amount: toWei(targetTokenAmount, selectedSellToken!.decimals),
       token: selectedSellTokenAddress,
       lender: lenderAddress,
       network: walletNetwork,
@@ -215,7 +215,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         const updatedPosition = addCreditUpdate(selectedPosition);
         dispatch(
           LinesActions.setPositionData({
-            position: selectedPosition['id'],
+            position: selectedPosition.id,
             lineAddress: selectedCredit.id,
             positionObject: updatedPosition,
             positions: positions,

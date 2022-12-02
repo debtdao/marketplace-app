@@ -328,7 +328,7 @@ export const GET_BORROWER_POSITIONS_QUERY = gql`
   ${ESCROW_FRAGMENT}
 
   query getBorrowerPositions($borrower: String!) {
-    lineOfCredits(where: { borrower_contains: $borrower }) {
+    lineOfCredits(where: { borrower: $borrower }) {
       ...BaseLineFrag
 
       positions(first: 20) {
@@ -459,13 +459,13 @@ export const GET_USER_PORTFOLIO_QUERY = gql`
   ${LENDER_POSITIONS_FRAGMENT}
 
   query getUserPortfolio($user: String!) {
-    borrowerPositions: lineOfCredits(where: { borrower_contains: $user }) {
+    borrowerPositions: lineOfCredits(where: { borrower: $user }) {
       ...BorrowerPositionsFrag
     }
     lenderPositions: lender(id: $user) {
       ...LenderPositionsFrag
     }
-    arbiterPositions: lineOfCredits(where: { arbiter_contains: $user }) {
+    arbiterPositions: lineOfCredits(where: { arbiter: $user }) {
       ...BorrowerPositionsFrag
     }
   }

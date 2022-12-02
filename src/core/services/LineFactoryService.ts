@@ -7,7 +7,7 @@ import { TransactionResponse } from '../types';
 
 import { LineFactoryABI } from './contracts';
 
-const { LineFactory_GOERLI } = getConfig();
+const { LINEFACTORY_GOERLI } = getConfig();
 
 export class LineFactoryServiceImpl {
   private graphUrl: string;
@@ -69,7 +69,7 @@ export class LineFactoryServiceImpl {
     const data = {
       borrower,
       ttl,
-      factoryAddress: LineFactory_GOERLI,
+      factoryAddress: LINEFACTORY_GOERLI,
     };
     console.log(data);
     return <TransactionResponse>(
@@ -97,7 +97,7 @@ export class LineFactoryServiceImpl {
       cratio,
       revenueSplit,
       network,
-      factoryAddress: LineFactory_GOERLI,
+      factoryAddress: LINEFACTORY_GOERLI,
     };
     return await this.executeContractMethod(
       data.factoryAddress,

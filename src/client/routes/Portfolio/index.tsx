@@ -1,18 +1,21 @@
 import styled from 'styled-components';
+import { useState, useEffect } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 
-import { useAppSelector, useAppTranslation, useIsMounting } from '@hooks';
+import { useAppSelector, useAppTranslation, useIsMounting, useAppDispatch } from '@hooks';
 import {
   TokensSelectors,
-  VaultsSelectors,
   WalletSelectors,
-  NetworkSelectors,
   AppSelectors,
   ModalSelectors,
+  LinesActions,
+  LinesSelectors,
+  AlertsActions,
 } from '@store';
-import { SummaryCard, ViewContainer, NoWalletCard, Amount } from '@components/app';
-import { SpinnerLoading } from '@components/common';
-import { toBN, halfWidthCss } from '@utils';
-import { getConfig } from '@config';
+import { SummaryCard, ViewContainer, NoWalletCard, SliderCard, LineDetailsDisplay } from '@components/app';
+import { SpinnerLoading, Text } from '@components/common';
+import { halfWidthCss, isValidAddress, formatGetBorrowerQuery } from '@utils';
+import { CreditLinePage, LENDER_POSITION_ROLE, BORROWER_POSITION_ROLE, ARBITER_POSITION_ROLE } from '@src/core/types';
 
 const StyledViewContainer = styled(ViewContainer)`
   display: grid;
@@ -24,24 +27,9 @@ const HeaderCard = styled(SummaryCard)`
   grid-column: 1 / 3;
 `;
 
-const Row = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  grid-gap: ${({ theme }) => theme.layoutPadding};
-  flex-wrap: wrap;
-  grid-column: 1 / 3;
-`;
-
 const StyledNoWalletCard = styled(NoWalletCard)`
   grid-column: 1 / 3;
   ${halfWidthCss}
-`;
-
-const StyledSummaryCard = styled(SummaryCard)`
-  width: 100%;
-  grid-column: 1 / 3;
-  ${halfWidthCss};
 `;
 
 const StyledSpinnerLoading = styled(SpinnerLoading)`
@@ -50,98 +38,128 @@ const StyledSpinnerLoading = styled(SpinnerLoading)`
   margin: 10rem 0;
 `;
 
+const RoleOption = styled.div<{ active?: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20rem;
+  height: 8rem;
+  border: 2px solid transparent;
+  color: ${({ theme }) => theme.colors.titles};
+  background-color: ${({ theme }) => theme.colors.background};
+  border-radius: ${({ theme }) => theme.globalRadius};
+  font-weight: 700;
+  cursor: pointer;
+
+  ${({ active, theme }) =>
+    active &&
+    `
+    background-color: ${theme.colors.backgroundVariant};
+    color: ${theme.colors.titlesVariant};
+    border-color: ${theme.colors.primary};
+  `}
+`;
+
+const StyledSliderCard = styled(SliderCard)`
+  padding: 3rem;
+  margin: 0;
+`;
+
+const StyledBorrowerContainer = styled.div`
+  grid-column: 1 / 3;
+`;
+
 export const Portfolio = () => {
   const { t } = useAppTranslation(['common', 'home']);
-  const { NETWORK_SETTINGS } = getConfig();
   const isMounting = useIsMounting();
+  const location = useLocation();
+  const dispatch = useAppDispatch();
+  const history = useHistory();
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
 
-  const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
-  const currentNetworkSettings = NETWORK_SETTINGS[currentNetwork];
-  const vaultsSummary = useAppSelector(VaultsSelectors.selectSummaryData);
   // const labsSummary = useAppSelector(LabsSelectors.selectSummaryData);
-  const walletSummary = useAppSelector(TokensSelectors.selectSummaryData);
   const userTokens = useAppSelector(TokensSelectors.selectUserTokens);
   const activeModal = useAppSelector(ModalSelectors.selectActiveModal);
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
   const tokensListStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
   const generalLoading = (appStatus.loading || tokensListStatus.loading || isMounting) && !activeModal;
+  const borrowerAddress: string | undefined = location.pathname.split('/')[2];
+  const borrowerPositions = useAppSelector(LinesSelectors.selectBorrowerPositions);
+
   const userTokensLoading = generalLoading && !userTokens.length;
+  const [currentRole, setRole] = useState<string>(BORROWER_POSITION_ROLE);
+  const [data, setdata] = useState([]);
+  const [aggregatedCreditLinePage, setAggregatedCreditLine] = useState<CreditLinePage>();
 
-  const netWorth = toBN(vaultsSummary.totalDeposits)
-    .plus(walletSummary.totalBalance)
-    // .plus(labsSummary.totalDeposits)
-    .toString();
+  const availableRoles = [BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, ARBITER_POSITION_ROLE];
 
-  const summaryCardItems = [
-    { header: t('dashboard.total-net-worth'), Component: <Amount value={netWorth} input="usdc" /> },
-  ];
-  if (walletIsConnected) {
-    summaryCardItems.push({
-      header: t('dashboard.available-deposit'),
-      Component: <Amount value={walletSummary.totalBalance} input="usdc" />,
-    });
-  }
-  if (currentNetworkSettings.earningsEnabled) {
-    summaryCardItems.push(
-      {
-        header: t('dashboard.vaults-earnings'),
-        Component: <Amount value={vaultsSummary.totalEarnings} input="usdc" />,
-      },
-      {
-        header: t('dashboard.vaults-est-yearly-yield'),
-        Component: <Amount value={vaultsSummary.estYearlyYeild} input="usdc" />,
-      }
-    );
-  }
+  const SummaryCardItems = availableRoles.map((role: string) => {
+    return {
+      header: t(''),
+      Component: (
+        <RoleOption onClick={() => setRole(role)} active={role === currentRole} key={`s-${role}`}>
+          {t(`settings:${role}`)}
+        </RoleOption>
+      ),
+    };
+  });
+
+  useEffect(() => {
+    if (!borrowerAddress || !isValidAddress(borrowerAddress)) {
+      dispatch(AlertsActions.openAlert({ message: 'INVALID_ADDRESS', type: 'error' }));
+      history.push('/market');
+      return;
+    } else if (borrowerAddress.length === 42) {
+      dispatch(LinesActions.getBorrowerPositions({ borrower: borrowerAddress.toLocaleLowerCase() }));
+    }
+  }, [currentRole, walletIsConnected]);
+
+  useEffect(() => {
+    if (borrowerPositions) {
+      let borrowerData: any = [];
+      const keys = Object.keys(borrowerPositions);
+      keys.map((key) => {
+        let data = borrowerPositions[key];
+        borrowerData.push(data);
+      });
+      setdata(borrowerData);
+    }
+  }, [borrowerPositions]);
+
+  useEffect(() => {
+    let aggregate;
+    if (data) {
+      aggregate = formatGetBorrowerQuery(data, borrowerAddress);
+    }
+    setAggregatedCreditLine(aggregate);
+  }, [data]);
 
   return (
     <StyledViewContainer>
-      <HeaderCard items={summaryCardItems} cardSize="small" />
-
-      {walletIsConnected && (
-        <>
-          <Row>
-            <StyledSummaryCard
-              header={t('navigation.vaults')}
-              items={[
-                {
-                  header: t('dashboard.holdings'),
-                  Component: <Amount value={vaultsSummary.totalDeposits} input="usdc" />,
-                },
-                {
-                  header: t('dashboard.apy'),
-                  Component: <Amount value={vaultsSummary.apy} input="percent" />,
-                },
-              ]}
-              redirectTo="vaults"
-              cardSize="small"
-            />
-
-            {/*  {currentNetworkSettings.labsEnabled && (
-              <StyledSummaryCard
-                header={t('navigation.labs')}
-                items={[
-                  {
-                    header: t('dashboard.holdings'),
-                    Component: <Amount value={labsSummary.totalDeposits} input="usdc" />,
-                  },
-                  {
-                    header: t('dashboard.apy'),
-                    Component: <Amount value={labsSummary.estYearlyYield} input="percent" />,
-                  },
-                ]}
-                redirectTo="labs"
-                cardSize="small"
-              />
-            )} */}
-          </Row>
-        </>
-      )}
+      <HeaderCard items={SummaryCardItems} cardSize="small" />
 
       {!walletIsConnected && <StyledNoWalletCard />}
 
       {userTokensLoading && <StyledSpinnerLoading />}
+
+      {!aggregatedCreditLinePage && (
+        <StyledSliderCard
+          header={t('components.no-borrower-positions.header')}
+          Component={
+            <Text>
+              <p>{t('components.no-borrower-positions.content')}</p>
+            </Text>
+          }
+        />
+      )}
+
+      {aggregatedCreditLinePage && currentRole === BORROWER_POSITION_ROLE ? (
+        <StyledBorrowerContainer>
+          <LineDetailsDisplay page={aggregatedCreditLinePage} line={aggregatedCreditLinePage} />
+        </StyledBorrowerContainer>
+      ) : (
+        ''
+      )}
 
       {/* {!userTokensLoading && (
         <TokensCard

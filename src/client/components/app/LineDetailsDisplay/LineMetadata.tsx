@@ -290,11 +290,12 @@ export const LineMetadata = (props: LineMetadataProps) => {
             <Text>
               <p>{t('lineDetails:metadata.collateral-table.no-table')}</p>
 
-              <BannerCtaButton styling="primary" onClick={depositHandler}>
-                {depositCollateralText}
-              </BannerCtaButton>
               <BannerCtaButton styling="primary" onClick={enableAssetHandler}>
                 {enableCollateralText}
+              </BannerCtaButton>
+
+              <BannerCtaButton styling="primary" onClick={depositHandler}>
+                {depositCollateralText}
               </BannerCtaButton>
             </Text>
           }

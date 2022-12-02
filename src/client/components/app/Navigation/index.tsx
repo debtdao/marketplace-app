@@ -2,7 +2,7 @@ import { ElementType, useEffect } from 'react';
 import styled from 'styled-components';
 
 import { useAppDispatch, useAppSelector, useWindowDimensions } from '@hooks';
-import { SettingsActions, SettingsSelectors } from '@store';
+import { SettingsActions, SettingsSelectors, WalletSelectors } from '@store';
 import { WalletIcon, VaultIcon, SettingsIcon, SearchIcon, DiscordIcon } from '@components/common';
 
 import { NavSidebar } from './NavSidebar';
@@ -19,49 +19,52 @@ export interface NavigationLink {
 
 const StyledNavigation = styled.div``;
 
-const navLinks: NavigationLink[] = [
-  {
-    to: '/portfolio',
-    text: 'navigation.portfolio',
-    icon: WalletIcon,
-  },
-  {
-    to: '/market',
-    text: 'navigation.market',
-    icon: VaultIcon,
-  },
-  {
-    to: 'https://docs.debtdao.finance',
-    text: 'navigation.docs',
-    icon: SearchIcon,
-    external: true,
-    optional: true,
-  },
-  {
-    to: 'https://discord.gg/F83xx67fyQ',
-    text: 'navigation.discord',
-    icon: DiscordIcon,
-    external: true,
-    optional: true,
-  },
-  {
-    to: '/settings',
-    text: 'navigation.settings',
-    icon: SettingsIcon,
-    // hideMobile: true,
-  },
-];
-
 interface NavigationProps {
   hideOptionalLinks?: boolean;
 }
 
 export const Navigation = ({ hideOptionalLinks }: NavigationProps) => {
   const { isMobile, isTablet, isDesktop } = useWindowDimensions();
+  const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
+  const dispatch = useAppDispatch();
+
+  const navLinks: NavigationLink[] = [
+    {
+      to: `/portfolio/${userWallet}`,
+      text: 'navigation.portfolio',
+      icon: WalletIcon,
+    },
+    {
+      to: '/market',
+      text: 'navigation.market',
+      icon: VaultIcon,
+    },
+    {
+      to: 'https://docs.debtdao.finance',
+      text: 'navigation.docs',
+      icon: SearchIcon,
+      external: true,
+      optional: true,
+    },
+    {
+      to: 'https://discord.gg/F83xx67fyQ',
+      text: 'navigation.discord',
+      icon: DiscordIcon,
+      external: true,
+      optional: true,
+    },
+    {
+      to: '/settings',
+      text: 'navigation.settings',
+      icon: SettingsIcon,
+      // hideMobile: true,
+    },
+  ];
+
   const displayLinks = navLinks.filter((link) => !(link.optional && hideOptionalLinks));
 
   // NOTE Auto collapse sidenav on mobile
-  const dispatch = useAppDispatch();
+
   const collapsedSidebar = useAppSelector(SettingsSelectors.selectSidebarCollapsed);
 
   useEffect(() => {

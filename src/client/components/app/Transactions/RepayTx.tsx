@@ -6,7 +6,7 @@ import { formatAmount, normalizeAmount, toWei, depositAndRepayUpdate } from '@ut
 import { useAppTranslation, useAppDispatch, useAppSelector, useSelectedSellToken } from '@hooks';
 import { TokensActions, TokensSelectors, VaultsSelectors, LinesSelectors, LinesActions, WalletSelectors } from '@store';
 import { getConstants, testTokens } from '@src/config/constants';
-import { PositionItem, CreditPosition } from '@src/core/types';
+import { CreditPosition } from '@src/core/types';
 
 import { TxContainer } from './components/TxContainer';
 import { TxTokenInput } from './components/TxTokenInput';
@@ -115,14 +115,14 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
 
   const approveRepay = () => {
     setLoading(true);
-    if (!selectedCredit?.id) {
+    if (!selectedCredit?.id || !selectedPosition) {
       setLoading(false);
       return;
     }
     let approvalOBj = {
       spenderAddress: selectedCredit.id,
       tokenAddress: selectedSellTokenAddress,
-      amount: toWei(targetAmount, 18),
+      amount: toWei(targetAmount, selectedPosition['token'].decimals),
       network: walletNetwork,
     };
     //@ts-ignore
@@ -171,6 +171,8 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
       setLoading(false);
       return;
     }
+
+    console.log('repayTX', selectedCredit.id);
 
     dispatch(
       LinesActions.depositAndRepay({
@@ -378,9 +380,9 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
       <TxRateInput
         key={'frate'}
         headerText={t('components.transaction.deposit-and-repay.your-rates')}
-        frate={selectedPosition['frate']}
-        drate={selectedPosition['drate']}
-        amount={selectedPosition['frate']}
+        frate={selectedPosition['fRate']}
+        drate={selectedPosition['dRate']}
+        amount={selectedPosition['fRate']}
         maxAmount={'100'}
         // setRateChange={onFrateChange}
         setRateChange={() => {}}

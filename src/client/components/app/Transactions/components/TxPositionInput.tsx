@@ -161,12 +161,12 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
 
   let selectedItem: PositionItem = {
     id: selectedPosition!.id,
-    lender: selectedPosition!.lender,
+    lender: selectedPosition!.lender.id,
     // icon: '',
     deposit: selectedPosition!.deposit,
     tokenSymbol: selectedPosition!.token.symbol,
-    frate: selectedPosition!.frate,
-    drate: selectedPosition!.drate,
+    frate: selectedPosition!.fRate,
+    drate: selectedPosition!.dRate,
   };
 
   if (positions && positions.length > 1) {
@@ -176,12 +176,12 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
       .map((item) => {
         return {
           id: item!.id,
-          lender: item!.lender,
+          lender: item!.lender.id,
           // icon: '',
           deposit: item!.deposit,
           tokenSymbol: item?.token.symbol,
-          frate: item?.frate,
-          drate: item?.drate,
+          frate: item?.fRate,
+          drate: item?.dRate,
         };
       });
   }
@@ -227,10 +227,10 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
             <CreditLineName>{selectedItem.tokenSymbol}</CreditLineName>
           </CreditLineSelector>
           <CreditLineData>
-            <LineTitle ellipsis> Lender: {selectedPosition?.lender} </LineTitle>
+            <LineTitle ellipsis> Lender: {selectedPosition?.lender.id} </LineTitle>
             <LineTitle ellipsis>
               {`${normalizeAmount(selectedPosition?.deposit, 18)} ${selectedPosition?.token.symbol}
-              @${selectedPosition?.drate}/${selectedPosition?.frate}%`}
+              @${selectedPosition?.dRate}/${selectedPosition?.fRate}%`}
             </LineTitle>
           </CreditLineData>
         </CreditLineInfo>

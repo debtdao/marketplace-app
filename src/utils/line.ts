@@ -22,9 +22,11 @@ import {
   TokenFragRepsonse,
   COLLATERAL_TYPE_REVENUE,
   COLLATERAL_TYPE_ASSET,
+  CreditPosition,
+  Address,
 } from '@types';
 
-import { humanize, normalizeAmount } from './format';
+import { humanize, normalizeAmount, normalize } from './format';
 
 const { parseUnits } = utils;
 
@@ -340,18 +342,19 @@ export const formatLinePageData = (
 
   positions?.map((position, i) => {
     console.log('positions info origin', positions);
-    console.log('position', position);
-
+    console.log('position', position.status);
+    //@ts-ignore
+    const status = position.status === 'OPEN' ? 'OPENED' : position.status;
     let Frate = normalizeAmount(position.fRate, 2);
     let Drate = normalizeAmount(position.dRate, 2);
-
+    console.log('in line.ts', position.status);
     let positionObject = {
-      status: position.status,
-      drate: Drate,
-      frate: Frate,
+      status,
+      dRate: Drate,
+      fRate: Frate,
       deposit: position.deposit,
       token: position.token,
-      lender: position.lender.id,
+      lender: position.lender,
       principal: position.principal,
       interestAccrued: position.interestAccrued,
       interestRepaid: position.interestRepaid,
@@ -429,4 +432,57 @@ const _createTokenView = (tokenResponse: TokenFragRepsonse, amount?: BigNumber, 
     categories: [],
     description: '',
   };
+};
+
+export const formatGetBorrowerQuery = (data: AggregatedCreditLine[], borrowerAddress: Address) => {
+  let aggregate: CreditLinePage = {
+    borrower: borrowerAddress,
+    principal: '0', //done
+    deposit: '0', //done
+    highestApy: ['0', '0', '0'], //todo
+    positions: [], //done
+    escrow: {
+      id: '',
+      cratio: '',
+      minCRatio: '',
+      collateralValue: '',
+      //@ts-ignore
+      deposits: [],
+    }, //todo
+    spigot: {
+      id: '',
+      tokenRevenue: {},
+    }, //todo
+
+    //CreditLinePage data
+    interest: '0', //done
+    totalInterestRepaid: '0', //to review
+    collateralEvents: [], //todo
+    creditEvents: [], //done
+  };
+  if (data) {
+    data.map((data: any, i: number) => {
+      data.positions.map((position: CreditPosition, i: number) => {
+        const normalizedPrincipal = normalize('amount', position.principal, position.token.decimals);
+        const normalizedDeposit = normalize('amount', position.deposit, position.token.decimals);
+        const normalizedInterest = normalize('amount', position.interestAccrued, position.token.decimals);
+        const normalizedInterestRepaid = normalize('amount', position.interestRepaid, position.token.decimals);
+        const totalPrincipal = Number(aggregate.principal) + Number(normalizedPrincipal);
+        const totalDeposit = Number(aggregate.deposit) + Number(normalizedDeposit);
+        const totalInterest = Number(aggregate.interest) + Number(normalizedInterest);
+        const totalInterestRepaid = Number(aggregate.totalInterestRepaid) + Number(normalizedInterestRepaid);
+        const fRate = normalizeAmount(position.fRate, 2);
+        const dRate = normalizeAmount(position.dRate, 2);
+        aggregate?.positions?.push({ ...position, fRate, dRate });
+        aggregate.principal = `${totalPrincipal}`;
+        aggregate.deposit = `${totalDeposit}`;
+        aggregate.interest = `${totalInterest}`;
+        aggregate.totalInterestRepaid = `${totalInterestRepaid}`;
+      });
+      data.events.map((event: any, i: number) => {
+        aggregate.creditEvents.push(event);
+      });
+    });
+    return aggregate;
+  }
 };

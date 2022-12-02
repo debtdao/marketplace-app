@@ -31,8 +31,6 @@ import {
   GetLinePageResponse,
   Network,
   GetBorrowerPositionsProps,
-  CreditLinePage,
-  GetBorrowerPositionsResponse,
 } from '@types';
 import { getConfig } from '@config';
 import { LineOfCreditABI } from '@services/contracts';

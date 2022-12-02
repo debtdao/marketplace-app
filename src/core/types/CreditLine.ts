@@ -52,9 +52,7 @@ export interface AggregatedCreditLine extends BaseCreditLine {
   deposit: string; // | Promise<string>;
   // id, symbol, APY (4 decimals)
   highestApy: [string, string, string];
-
   positions?: CreditPosition[];
-
   escrow?: AggregatedEscrow;
   spigot?: AggregatedSpigot;
 }
@@ -63,8 +61,6 @@ export interface CreditLinePage extends AggregatedCreditLine {
   // total value of asssets repaid *AT TIME OF REPAYMENT*
   interest: string; // | Promise<string>;
   totalInterestRepaid: string; // | Promise<string>;
-
-  positions?: CreditPosition[];
 
   collateralEvents: CollateralEvent[];
   creditEvents: CreditEvent[];
@@ -93,15 +89,21 @@ export interface CreditPosition {
   decimals: string;
   borrower: Address;
   token: TokenView;
-  lender: Address;
-  drate: string;
-  frate: string;
+  lender: {
+    _typename: string;
+    id: Address;
+  };
+  dRate: string;
+  fRate: string;
 }
 
 export interface LinePageCreditPosition extends CreditPosition {
   id: string;
   status: PositionStatusTypes;
-  lender: Address;
+  lender: {
+    _typename: string;
+    id: Address;
+  };
   arbiter: string;
   deposit: string;
   principal: string;

@@ -70,6 +70,7 @@ export const selectDepositTokenOptionsByAsset = createSelector(
             const allowancesMap = userTokensAllowancesMap[address] ?? {};
             return createToken({ tokenData, userTokenData, allowancesMap });
           });
+        subgraphTokens = sortBy(subgraphTokens, (o) => o.symbol);
         return unionBy(mainTokens, subgraphTokens, (o) => o.symbol);
       }
     })

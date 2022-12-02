@@ -176,6 +176,17 @@ const getBorrowerPositions = createAsyncThunk<
   return { borrowerPositions };
 });
 
+const getUserPortfolio = createAsyncThunk<{ userPortfolio: CreditPosition[] | undefined }, { user: string }, ThunkAPI>(
+  'lines/getUserPortfolio',
+  async ({ user }, { extra, getState }) => {
+    const { services } = extra;
+
+    const userPortfolio = await services.creditLineService.getUserPortfolio({ user });
+    console.log('actions', userPortfolio);
+    return { userPortfolio };
+  }
+);
+
 export interface GetExpectedTransactionOutcomeProps {
   transactionType: 'DEPOSIT' | 'WITHDRAW';
   sourceTokenAddress: Address;
@@ -730,6 +741,7 @@ export const LinesActions = {
   getLinePage,
   getUserLinePositions,
   getBorrowerPositions,
+  getUserPortfolio,
   approveDeposit,
   addCredit,
   depositAndRepay,

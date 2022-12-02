@@ -21,6 +21,7 @@ export const initialLineActionsStatusMap: LineActionsStatusMap = {
 export const initialUserMetadataStatusMap: UserLineMetadataStatusMap = {
   getUserLinePositions: initialStatus,
   getBorrowerPositions: initialStatus,
+  getUserPortfolio: initialStatus,
   linesActionsStatusMap: {},
 };
 
@@ -34,6 +35,7 @@ export const linesInitialState: CreditLineState = {
     linePositions: {},
     lineAllowances: {},
     borrowerPositions: {},
+    portfolio: {},
   },
   statusMap: {
     getLines: initialStatus,
@@ -41,6 +43,7 @@ export const linesInitialState: CreditLineState = {
     getLinePage: initialStatus,
     getAllowances: initialStatus,
     getBorrowerPositions: initialStatus,
+    getUserPortfolio: initialStatus,
     deploySecuredLine: initialStatus,
     user: initialUserMetadataStatusMap,
   },
@@ -64,6 +67,7 @@ const {
   setPositionData,
   getUserLinePositions,
   getBorrowerPositions,
+  getUserPortfolio,
   clearLinesData,
   clearUserData,
   // getUserLinesMetadata,
@@ -231,14 +235,32 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.user.getBorrowerPositions = { loading: true };
     })
     .addCase(getBorrowerPositions.fulfilled, (state, { meta, payload: { borrowerPositions } }) => {
-      console.log('positions in reducer', borrowerPositions);
+      console.log('Borrower Positions Reducer: ', borrowerPositions);
       if (!borrowerPositions) return;
       const borrowerPositionsMap = borrowerPositions.reduce((obj, a) => ({ ...obj, [a.id]: a }), {});
+      console.log('Borrower Positions Reducer Map: ', borrowerPositionsMap);
       state.user.borrowerPositions = { ...state.user.borrowerPositions, ...borrowerPositionsMap };
+      console.log('Borrower Positions Reducer: ', state.user.borrowerPositions);
       state.statusMap.user.getBorrowerPositions = {};
     })
     .addCase(getBorrowerPositions.rejected, (state, { meta, error }) => {
       state.statusMap.user.getBorrowerPositions = { error: error.message };
+    })
+
+    /* ------------------------- getUserPortfolio ------------------------- */
+    .addCase(getUserPortfolio.pending, (state, { meta }) => {
+      state.statusMap.user.getUserPortfolio = { loading: true };
+    })
+    .addCase(getUserPortfolio.fulfilled, (state, { meta, payload: { userPortfolio } }) => {
+      console.log('User Portfolio: positions in reducer', userPortfolio);
+      if (!userPortfolio) return;
+      // const userPortfolioMap = userPortfolio.reduce((obj, a) => ({ ...obj, [a.id]: a }), {});
+      // state.user.portfolio = { ...state.user.portfolio, ...userPortfolioMap };
+      // state.user.portfolio = userPortfolio;
+      state.statusMap.user.getUserPortfolio = {};
+    })
+    .addCase(getUserPortfolio.rejected, (state, { meta, error }) => {
+      state.statusMap.user.getUserPortfolio = { error: error.message };
     })
 
     // /* -------------------------- getUserLinePositions -------------------------- */

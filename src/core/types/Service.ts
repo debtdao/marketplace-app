@@ -161,6 +161,7 @@ export interface CreditLineService {
   getLinePageAuxData: (props: GetLinePageProps) => Promise<GetLinePageAuxDataResponse | undefined>;
   getUserLinePositions: (...args: any) => Promise<any | undefined>;
   getBorrowerPositions: (props: GetBorrowerPositionsProps) => Promise<CreditPosition[] | undefined>; // FIXME: needs type
+  getUserPortfolio: (props: GetUserPortfolioProps) => Promise<CreditPosition[] | undefined>; // FIXME: needs type
   getExpectedTransactionOutcome: (...args: any) => Promise<any | undefined>;
   depositAndRepay: (
     props: DepositAndRepayProps
@@ -314,6 +315,10 @@ export interface GetLinePageAuxDataProps extends GetLinePageArgs {
 
 export interface GetBorrowerPositionsProps {
   borrower: string;
+}
+
+export interface GetUserPortfolioProps {
+  user: string;
 }
 
 // Colalteral Service Function Props

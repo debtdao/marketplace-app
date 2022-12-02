@@ -420,21 +420,22 @@ const LENDER_POSITIONS_FRAGMENT = gql`
       }
     }
 
-    spigot: positions(first: 20) {
-      spigot {
-        id
-        spigots {
-          ...BaseSpigotFrag
-        }
-
-        summaries {
-          ...SpigotSummaryFrag
-        }
-        events(first: 20) {
-          ...SpigotEventFrag
-        }
-      }
-    }
+    # TODO: Fix this to be compatible with subgraph data model
+    #spigot: positions(first: 20) {
+    #  spigot {
+    #    id
+    #    spigots {
+    #      ...BaseSpigotFrag
+    #    }
+    #
+    #    summaries {
+    #      ...SpigotSummaryFrag
+    #    }
+    #    events(first: 20) {
+    #      ...SpigotEventFrag
+    #    }
+    #  }
+    #}
 
     escrow: positions(first: 20) {
       line {

@@ -85,6 +85,7 @@ export const Portfolio = () => {
   const generalLoading = (appStatus.loading || tokensListStatus.loading || isMounting) && !activeModal;
   const borrowerAddress: string | undefined = location.pathname.split('/')[2];
   const borrowerPositions = useAppSelector(LinesSelectors.selectBorrowerPositions);
+  const userPortfolio = useAppSelector(LinesSelectors.selectUserPortfolio);
 
   const userTokensLoading = generalLoading && !userTokens.length;
   const [currentRole, setRole] = useState<string>(BORROWER_POSITION_ROLE);
@@ -111,6 +112,7 @@ export const Portfolio = () => {
       return;
     } else if (borrowerAddress.length === 42) {
       dispatch(LinesActions.getBorrowerPositions({ borrower: borrowerAddress.toLocaleLowerCase() }));
+      dispatch(LinesActions.getUserPortfolio({ user: borrowerAddress.toLocaleLowerCase() }));
     }
   }, [currentRole, walletIsConnected]);
 

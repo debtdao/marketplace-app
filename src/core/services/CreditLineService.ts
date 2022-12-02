@@ -32,6 +32,7 @@ import {
   Network,
   GetBorrowerPositionsProps,
   GetUserPortfolioProps,
+  GetUserPortfolioResponse,
 } from '@types';
 import { getConfig } from '@config';
 import { LineOfCreditABI } from '@services/contracts';
@@ -428,7 +429,7 @@ export class CreditLineServiceImpl implements CreditLineService {
     return response;
   }
 
-  public async getUserPortfolio(prop: GetUserPortfolioProps): Promise<CreditPosition[] | undefined> {
+  public async getUserPortfolio(prop: GetUserPortfolioProps): Promise<GetUserPortfolioResponse | undefined> {
     const response = getUserPortfolio(prop)
       .then((data) => data)
       .catch((err) => {

@@ -15,7 +15,8 @@ import {
   IdToCreditPositionMap,
   BORROWER_POSITION_ROLE,
   LENDER_POSITION_ROLE,
-  ARBITER_POSITION_ROLE, // prev. GeneralVaultView, Super indepth data, CreditLinePage is most similar atm
+  ARBITER_POSITION_ROLE,
+  GetUserPortfolioResponse, // prev. GeneralVaultView, Super indepth data, CreditLinePage is most similar atm
 } from '@types';
 import { toBN, unnullify } from '@utils';
 import { getConstants } from '@src/config/constants';
@@ -56,8 +57,8 @@ const selectLinesActionsStatusMap = (state: RootState) => state.lines.statusMap.
 const selectGetLinesStatus = (state: RootState) => state.lines.statusMap.getLines;
 const selectGetLinePageStatus = (state: RootState) => state.lines.statusMap.getLinePage;
 const selectGetUserLinesPositionsStatus = (state: RootState) => state.lines.statusMap.user.getUserLinePositions;
-const selectGetBorrowerPositions = (state: RootState) => state.lines.user.borrowerPositions;
-const selectGetUserPortfolio = (state: RootState) => state.lines.user.portfolio;
+const selectBorrowerPositions = (state: RootState) => state.lines.user.borrowerPositions;
+const selectUserPortfolio = (state: RootState) => state.lines.user.portfolio;
 
 /* ----------------------------- Main Selectors ----------------------------- */
 const selectLines = createSelector([selectLinesMap], (linesMap) => {
@@ -199,18 +200,6 @@ const selectPositions = createSelector([selectSelectedLine], (line) => {
   }
   let positions = line?.positions;
   return positions;
-});
-
-// TODO: this should return the equivalent of CreditLineState.user.borrowerPositions
-const selectBorrowerPositions = createSelector(
-  [selectGetBorrowerPositions],
-  (borrowerPositions): IdToCreditPositionMap => {
-    return borrowerPositions;
-  }
-);
-
-const selectUserPortfolio = createSelector([selectGetUserPortfolio], (portfolio): IdToCreditPositionMap => {
-  return portfolio;
 });
 
 const selectPositionData = createSelector(

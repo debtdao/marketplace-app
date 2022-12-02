@@ -35,7 +35,11 @@ export const linesInitialState: CreditLineState = {
     linePositions: {},
     lineAllowances: {},
     borrowerPositions: {},
-    portfolio: {},
+    portfolio: {
+      borrowerPositions: [],
+      lenderPositions: {},
+      arbiterPositions: [],
+    },
   },
   statusMap: {
     getLines: initialStatus,
@@ -108,6 +112,8 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(clearUserData, (state) => {
       state.user.linePositions = {};
       state.user.lineAllowances = {};
+      state.user.borrowerPositions = {};
+      state.user.portfolio = { borrowerPositions: [], lenderPositions: {}, arbiterPositions: [] };
     })
 
     // .addCase(clearTransactionData, (state) => {
@@ -235,12 +241,9 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.user.getBorrowerPositions = { loading: true };
     })
     .addCase(getBorrowerPositions.fulfilled, (state, { meta, payload: { borrowerPositions } }) => {
-      console.log('Borrower Positions Reducer: ', borrowerPositions);
       if (!borrowerPositions) return;
       const borrowerPositionsMap = borrowerPositions.reduce((obj, a) => ({ ...obj, [a.id]: a }), {});
-      console.log('Borrower Positions Reducer Map: ', borrowerPositionsMap);
       state.user.borrowerPositions = { ...state.user.borrowerPositions, ...borrowerPositionsMap };
-      console.log('Borrower Positions Reducer: ', state.user.borrowerPositions);
       state.statusMap.user.getBorrowerPositions = {};
     })
     .addCase(getBorrowerPositions.rejected, (state, { meta, error }) => {
@@ -254,9 +257,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(getUserPortfolio.fulfilled, (state, { meta, payload: { userPortfolio } }) => {
       console.log('User Portfolio: positions in reducer', userPortfolio);
       if (!userPortfolio) return;
-      // const userPortfolioMap = userPortfolio.reduce((obj, a) => ({ ...obj, [a.id]: a }), {});
-      // state.user.portfolio = { ...state.user.portfolio, ...userPortfolioMap };
-      // state.user.portfolio = userPortfolio;
+      state.user.portfolio = userPortfolio;
       state.statusMap.user.getUserPortfolio = {};
     })
     .addCase(getUserPortfolio.rejected, (state, { meta, error }) => {

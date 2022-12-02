@@ -21,6 +21,7 @@ import {
   DeploySecuredLineProps,
   DeploySecuredLineWithConfigProps,
   GetBorrowerPositionsResponse,
+  GetUserPortfolioResponse,
 } from '@types';
 import {
   formatGetLinesData,
@@ -176,16 +177,17 @@ const getBorrowerPositions = createAsyncThunk<
   return { borrowerPositions };
 });
 
-const getUserPortfolio = createAsyncThunk<{ userPortfolio: CreditPosition[] | undefined }, { user: string }, ThunkAPI>(
-  'lines/getUserPortfolio',
-  async ({ user }, { extra, getState }) => {
-    const { services } = extra;
+const getUserPortfolio = createAsyncThunk<
+  { userPortfolio: GetUserPortfolioResponse | undefined },
+  { user: string },
+  ThunkAPI
+>('lines/getUserPortfolio', async ({ user }, { extra, getState }) => {
+  const { services } = extra;
 
-    const userPortfolio = await services.creditLineService.getUserPortfolio({ user });
-    console.log('actions', userPortfolio);
-    return { userPortfolio };
-  }
-);
+  const userPortfolio = await services.creditLineService.getUserPortfolio({ user });
+  console.log('actions', userPortfolio);
+  return { userPortfolio };
+});
 
 export interface GetExpectedTransactionOutcomeProps {
   transactionType: 'DEPOSIT' | 'WITHDRAW';

@@ -1,4 +1,4 @@
-import { TokenFragRepsonse } from '@types';
+import { TokenFragRepsonse, GetUserPortfolioResponse } from '@types';
 
 import { Alert } from './Alerts';
 import { Address, Network } from './Blockchain';
@@ -114,7 +114,7 @@ export interface CreditLineState {
     linePositions: IdToCreditPositionMap;
     lineAllowances: { [line: string]: { [token: string]: Integer } };
     borrowerPositions: IdToCreditPositionMap;
-    portfolio: IdToCreditPositionMap;
+    portfolio: GetUserPortfolioResponse;
   };
   statusMap: {
     getLines: Status;

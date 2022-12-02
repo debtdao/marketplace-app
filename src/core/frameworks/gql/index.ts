@@ -11,6 +11,7 @@ import {
   GetUserLinePositionsArgs,
   GetBorrowerPositionsArgs,
   GetUserPortfolioArgs,
+  GetUserPortfolioResponse,
   QueryResponse,
   QueryCreator,
   GetLinePageResponse,
@@ -129,5 +130,6 @@ export const getBorrowerPositions: QueryCreator<GetBorrowerPositionsArgs, Credit
 ) => getBorrowerPositionsQuery(arg);
 
 const getUserPortfolioQuery = createQuery(GET_USER_PORTFOLIO_QUERY);
-export const getUserPortfolio: QueryCreator<GetUserPortfolioArgs, CreditPosition[]> = (arg: GetUserPortfolioArgs) =>
-  getUserPortfolioQuery(arg);
+export const getUserPortfolio: QueryCreator<GetUserPortfolioArgs, GetUserPortfolioResponse> = (
+  arg: GetUserPortfolioArgs
+) => getUserPortfolioQuery(arg);

@@ -457,15 +457,15 @@ export const GET_USER_PORTFOLIO_QUERY = gql`
   #${SPIGOT_EVENT_FRAGMENT}
   #${ESCROW_FRAGMENT}
   ${BORROWER_POSITIONS_FRAGMENT}
-  ${LENDER_POSITIONS_FRAGMENT}
+  #${LENDER_POSITIONS_FRAGMENT}
 
   query getUserPortfolio($user: String!) {
     borrowerPositions: lineOfCredits(where: { borrower: $user }) {
       ...BorrowerPositionsFrag
     }
-    lenderPositions: lender(id: $user) {
-      ...LenderPositionsFrag
-    }
+    #lenderPositions: lender(id: $user) {
+    #  ...LenderPositionsFrag
+    #}
     arbiterPositions: lineOfCredits(where: { arbiter: $user }) {
       ...BorrowerPositionsFrag
     }

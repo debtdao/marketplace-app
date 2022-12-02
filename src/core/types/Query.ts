@@ -272,8 +272,8 @@ export interface GetBorrowerPositionsResponse extends BaseLineFragResponse {
   };
 }
 
-//TO-DO: change the schema to meet Sero's criteria
-export interface GetLenderPositionsResponse extends BaseLineFragResponse {
+//TO-DO: change the schema to meet criteria
+export interface LenderPositionsResponse {
   positions?: LinePageCreditFragResponse[];
 
   // events?: LineEventFragResponse[];
@@ -300,8 +300,35 @@ export interface GetLenderPositionsResponse extends BaseLineFragResponse {
   // };
 }
 
-export interface GetUserPortfolioResponse extends GetBorrowerPositionsResponse, GetLenderPositionsResponse {
-  borrowerPositions: GetBorrowerPositionsResponse[];
-  lenderPositions: GetLenderPositionsResponse[];
-  arbiterPositions: GetBorrowerPositionsResponse[];
+export interface BorrowerPositionsResponse {
+  positions?: LinePageCreditFragResponse[];
+
+  events?: LineEventFragResponse[];
+
+  spigot?: {
+    id: Address;
+    summaries: SpigotRevenueSummaryFragResponse[];
+    spigots: {
+      contract: Address;
+      active: boolean;
+      startTime: number;
+    };
+    events?: SpigotEventFragResponse[];
+  };
+
+  escrow?: BaseEscrowFragResponse & {
+    events: {
+      __typename: string;
+      timestamp: number;
+      // only on add/remove collateral
+      amount?: string;
+      value?: string;
+    };
+  };
+}
+
+export interface GetUserPortfolioResponse extends BorrowerPositionsResponse, LenderPositionsResponse {
+  borrowerPositions: BorrowerPositionsResponse[];
+  lenderPositions: LenderPositionsResponse;
+  arbiterPositions: BorrowerPositionsResponse[];
 }

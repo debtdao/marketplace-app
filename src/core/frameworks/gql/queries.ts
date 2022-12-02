@@ -158,6 +158,19 @@ const ESCROW_EVENT_FRAGMENT = gql`
 `;
 
 // QUERIES
+
+// get tokens with associated price oracle
+export const GET_SUPPORTED_ORACLE_TOKENS_QUERY = gql`
+  ${TOKEN_FRAGMENT}
+  query getSupportedOracleTokens {
+    supportedTokens(first: 1000) {
+      token {
+        ...TokenFrag
+      }
+    }
+  }
+`;
+
 // ave to add fragment vars before running your query for frags to be available inside
 export const GET_LINE_QUERY = gql`
   ${BASE_LINE_FRAGMENT}
@@ -346,13 +359,114 @@ export const GET_BORROWER_POSITIONS_QUERY = gql`
   }
 `;
 
-export const GET_SUPPORTED_ORACLE_TOKENS_QUERY = gql`
-  ${TOKEN_FRAGMENT}
-  query getSupportedOracleTokens {
-    supportedTokens(first: 1000) {
-      token {
-        ...TokenFrag
+// create new fragment to get positions for a user
+const BORROWER_POSITIONS_FRAGMENT = gql`
+  ${BASE_LINE_FRAGMENT}
+  ${LINE_PAGE_CREDIT_FRAGMENT}
+  ${LINE_EVENT_FRAGMENT}
+  ${BASE_SPIGOT_FRAGMENT}
+  ${SPIGOT_SUMMARY_FRAGMENT}
+  ${SPIGOT_EVENT_FRAGMENT}
+  ${ESCROW_FRAGMENT}
+
+  fragment BorrowerPositionsFrag on LineOfCredit {
+    ...BaseLineFrag
+
+    positions(first: 20) {
+      ...LinePageCreditFrag
+    }
+
+    events(first: 20) {
+      ...LineEventFrag
+    }
+
+    spigot {
+      id
+      spigots {
+        ...BaseSpigotFrag
       }
+
+      summaries {
+        ...SpigotSummaryFrag
+      }
+      events(first: 20) {
+        ...SpigotEventFrag
+      }
+    }
+    escrow {
+      ...EscrowFrag
+    }
+  }
+`;
+
+// fetches all of a users positions that they lend to
+const LENDER_POSITIONS_FRAGMENT = gql`
+  ${BASE_LINE_FRAGMENT}
+  ${LINE_PAGE_CREDIT_FRAGMENT}
+  ${LINE_EVENT_FRAGMENT}
+  ${BASE_SPIGOT_FRAGMENT}
+  ${SPIGOT_SUMMARY_FRAGMENT}
+  ${SPIGOT_EVENT_FRAGMENT}
+  ${ESCROW_FRAGMENT}
+
+  fragment LenderPositionsFrag on Lender {
+    positions(first: 20) {
+      ...LinePageCreditFrag
+    }
+
+    events: positions(first: 20) {
+      events(first: 20) {
+        ...LineEventFrag
+      }
+    }
+
+    spigot: positions(first: 20) {
+      spigot {
+        id
+        spigots {
+          ...BaseSpigotFrag
+        }
+
+        summaries {
+          ...SpigotSummaryFrag
+        }
+        events(first: 20) {
+          ...SpigotEventFrag
+        }
+      }
+    }
+
+    escrow: positions(first: 20) {
+      line {
+        escrow {
+          ...EscrowFrag
+        }
+      }
+    }
+  }
+`;
+
+// fetches all of a user's positions in their portfolio for which they are a borrower, lender, and/or arbiter
+export const GET_USER_PORTFOLIO_QUERY = gql`
+  #${BASE_LINE_FRAGMENT}
+  #${LINE_PAGE_CREDIT_FRAGMENT}
+  #${LINE_EVENT_FRAGMENT}
+  #${BASE_SPIGOT_FRAGMENT}
+  #${SPIGOT_SUMMARY_FRAGMENT}
+  #${SPIGOT_EVENT_FRAGMENT}
+  #${ESCROW_FRAGMENT}
+  ${BORROWER_POSITIONS_FRAGMENT}
+  ${LENDER_POSITIONS_FRAGMENT}
+
+  query getUserPortfolioPositions($user: String!) {
+    borrowerPositions: lineOfCredits(where: { borrower_contains: $user }) {
+      ...BorrowerPositionsFrag
+    }
+    lenderPositions: lender(id: $user) {
+      ...LenderPositionsFrag
+    }
+    arbiterPositions: lineOfCredits(where: { arbiter_contains: $user }) {
+      ...BorrowerPositionsFrag
     }
   }
 `;

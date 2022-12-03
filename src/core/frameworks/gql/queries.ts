@@ -402,7 +402,6 @@ const BORROWER_POSITIONS_FRAGMENT = gql`
 // fetches all of a users positions that they lend to
 const LENDER_POSITIONS_FRAGMENT = gql`
   ${BASE_LINE_FRAGMENT}
-  ${LINE_PAGE_CREDIT_FRAGMENT}
   ${LINE_EVENT_FRAGMENT}
   ${BASE_SPIGOT_FRAGMENT}
   ${SPIGOT_SUMMARY_FRAGMENT}
@@ -410,35 +409,42 @@ const LENDER_POSITIONS_FRAGMENT = gql`
   ${ESCROW_FRAGMENT}
 
   fragment LenderPositionsFrag on Lender {
-    positions(first: 20) {
-      ...LinePageCreditFrag
-    }
-
-    events: positions(first: 20) {
-      events(first: 20) {
-        ...LineEventFrag
+    positions: positions(first: 20) {
+      id
+      status
+      lender {
+        id
       }
-    }
-
-    # TODO: Fix this to be compatible with subgraph data model
-    #spigot: positions(first: 20) {
-    #  spigot {
-    #    id
-    #    spigots {
-    #      ...BaseSpigotFrag
-    #    }
-    #
-    #    summaries {
-    #      ...SpigotSummaryFrag
-    #    }
-    #    events(first: 20) {
-    #      ...SpigotEventFrag
-    #    }
-    #  }
-    #}
-
-    escrow: positions(first: 20) {
+      deposit
+      principal
+      interestRepaid
+      interestAccrued
+      dRate
+      fRate
+      token {
+        ...TokenFrag
+      }
       line {
+        ...BaseLineFrag
+
+        events(first: 20) {
+          ...LineEventFrag
+        }
+
+        spigot {
+          id
+          spigots {
+            ...BaseSpigotFrag
+          }
+
+          summaries {
+            ...SpigotSummaryFrag
+          }
+          events(first: 20) {
+            ...SpigotEventFrag
+          }
+        }
+
         escrow {
           ...EscrowFrag
         }
@@ -449,24 +455,17 @@ const LENDER_POSITIONS_FRAGMENT = gql`
 
 // fetches all of a user's positions in their portfolio for which they are a borrower, lender, and/or arbiter
 export const GET_USER_PORTFOLIO_QUERY = gql`
-  #${BASE_LINE_FRAGMENT}
-  #${LINE_PAGE_CREDIT_FRAGMENT}
-  #${LINE_EVENT_FRAGMENT}
-  #${BASE_SPIGOT_FRAGMENT}
-  #${SPIGOT_SUMMARY_FRAGMENT}
-  #${SPIGOT_EVENT_FRAGMENT}
-  #${ESCROW_FRAGMENT}
   ${BORROWER_POSITIONS_FRAGMENT}
-  #${LENDER_POSITIONS_FRAGMENT}
+  ${LENDER_POSITIONS_FRAGMENT}
 
   query getUserPortfolio($user: String!) {
-    borrowerPositions: lineOfCredits(where: { borrower: $user }) {
+    borrowerLineOfCredits: lineOfCredits(where: { borrower: $user }) {
       ...BorrowerPositionsFrag
     }
-    #lenderPositions: lender(id: $user) {
-    #  ...LenderPositionsFrag
-    #}
-    arbiterPositions: lineOfCredits(where: { arbiter: $user }) {
+    lenderPositions: lender(id: $user) {
+      ...LenderPositionsFrag
+    }
+    arbiterLineOfCredits: lineOfCredits(where: { arbiter: $user }) {
       ...BorrowerPositionsFrag
     }
   }

@@ -188,23 +188,6 @@ export const GET_LINE_QUERY = gql`
   }
 `;
 
-// use deposit > 0 for all non-closed positions
-export const GET_USER_POSITIONS_QUERY = gql`
-  ${BASE_LINE_FRAGMENT}
-  query getUserPositions($id: ID!) {
-    borrower(id: $id) {
-      debts(where: { deposit_gt: 0 }) {
-        ...BaseLineFrag
-      }
-    }
-    lender(id: $id) {
-      credits(where: { deposit_gt: 0 }) {
-        ...BaseLineFrag
-      }
-    }
-  }
-`;
-
 export const GET_LINE_PAGE_QUERY = gql`
   ${BASE_LINE_FRAGMENT}
   ${LINE_PAGE_CREDIT_FRAGMENT}

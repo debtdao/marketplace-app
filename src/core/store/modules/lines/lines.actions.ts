@@ -172,7 +172,7 @@ const getUserPortfolio = createAsyncThunk<
   const { services } = extra;
 
   const userPortfolio = await services.creditLineService.getUserPortfolio({ user });
-  console.log('actions', userPortfolio);
+  console.log('actions xyz', userPortfolio);
   return { userPortfolio };
 });
 

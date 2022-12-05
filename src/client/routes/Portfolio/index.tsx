@@ -83,12 +83,12 @@ export const Portfolio = () => {
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
   const tokensListStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
   const generalLoading = (appStatus.loading || tokensListStatus.loading || isMounting) && !activeModal;
-  const borrowerAddress: string | undefined = location.pathname.split('/')[2];
+  const userAddress: string | undefined = location.pathname.split('/')[2];
   const userPortfolio = useAppSelector(LinesSelectors.selectUserPortfolio);
 
   const userTokensLoading = generalLoading && !userTokens.length;
   const [currentRole, setRole] = useState<string>(BORROWER_POSITION_ROLE);
-  const [data, setdata] = useState([]);
+  const [data, setdata] = useState<any[]>([]);
   const [aggregatedCreditLinePage, setAggregatedCreditLine] = useState<CreditLinePage>();
 
   const availableRoles = [BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, ARBITER_POSITION_ROLE];
@@ -103,14 +103,13 @@ export const Portfolio = () => {
       ),
     };
   });
-
   useEffect(() => {
-    if (!borrowerAddress || !isValidAddress(borrowerAddress)) {
+    if (!userAddress || !isValidAddress(userAddress)) {
       dispatch(AlertsActions.openAlert({ message: 'INVALID_ADDRESS', type: 'error' }));
       history.push('/market');
       return;
-    } else if (borrowerAddress.length === 42) {
-      dispatch(LinesActions.getUserPortfolio({ user: borrowerAddress.toLocaleLowerCase() }));
+    } else if (userAddress.length === 42) {
+      dispatch(LinesActions.getUserPortfolio({ user: userAddress.toLocaleLowerCase() }));
     }
   }, [currentRole, walletIsConnected]);
 
@@ -129,17 +128,21 @@ export const Portfolio = () => {
   // }, [borrowerPositions]);
 
   useEffect(() => {
+    console.log('user portfolio has been set', userPortfolio);
     if (userPortfolio) {
-      let borrowerData: any = [];
-      borrowerData = userPortfolio.borrowerLinesOfCredit;
+      //Types for returned obj need to be set up correctly
+      //@ts-ignore
+      const borrowerData: any[] = userPortfolio.borrowerLineOfCredits;
+      console.log('pull out borrower data', borrowerData);
       setdata(borrowerData);
     }
   }, [userPortfolio]);
 
   useEffect(() => {
     let aggregate;
+    console.log(data, 'here');
     if (data) {
-      aggregate = formatGetBorrowerQuery(data, borrowerAddress);
+      aggregate = formatGetBorrowerQuery(data, userAddress);
     }
     setAggregatedCreditLine(aggregate);
   }, [data]);

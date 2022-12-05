@@ -15,7 +15,7 @@ import {
   RevenueSummary,
   TokenView,
 } from '@src/core/types';
-import { DetailCard, ActionButtons, TokenIcon, ViewContainer, SliderCard } from '@components/app';
+import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
 import { Button, Text } from '@components/common';
 import { LinesSelectors, ModalsActions, WalletSelectors, WalletActions } from '@src/core/store';
 import { humanize } from '@src/utils';

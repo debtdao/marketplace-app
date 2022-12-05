@@ -62,7 +62,7 @@ export const selectDepositTokenOptionsByAsset = createSelector(
             const allowancesMap = userTokensAllowancesMap[address] ?? {};
             return createToken({ tokenData, userTokenData, allowancesMap });
           });
-        let subgraphTokens: TokenView[] = supportedTokens
+        const subgraphTokens: TokenView[] = supportedTokens
           .filter((address) => !!tokensMap[address])
           .map((address) => {
             const tokenData = tokensMap[address];
@@ -70,8 +70,8 @@ export const selectDepositTokenOptionsByAsset = createSelector(
             const allowancesMap = userTokensAllowancesMap[address] ?? {};
             return createToken({ tokenData, userTokenData, allowancesMap });
           });
-        subgraphTokens = sortBy(subgraphTokens, (o) => o.symbol);
-        return unionBy(mainTokens, subgraphTokens, (o) => o.symbol);
+        const sortedSubgraphTokens = sortBy(subgraphTokens, (o) => o.symbol);
+        return unionBy(mainTokens, sortedSubgraphTokens, (o) => o.symbol);
       }
     })
 );

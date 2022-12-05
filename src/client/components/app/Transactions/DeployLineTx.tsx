@@ -64,8 +64,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
   };
 
   const onAmountChange = (ttl: string) => {
-    let timeToLive = +ttl * 24 * 60 * 60;
-    setTimeToLive(timeToLive.toString());
+    setTimeToLive(ttl.toString());
   };
 
   const onCratioChange = (amount: string) => {
@@ -91,13 +90,14 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
   const deploySecuredLineNoConfig = async () => {
     setLoading(true);
     let checkSumAddress = await isAddress(borrower);
+    let ttl = Number(timeToLive) * 24 * 60 * 60;
 
     if (!checkSumAddress || walletNetwork === undefined) {
       setWarning('Incorrect address, please verify and try again.');
       return;
     }
 
-    if (+timeToLive <= 0) {
+    if (Number(timeToLive) <= 0) {
       setTTLWarning('Increase TTL, cannot be 0.');
       return;
     }
@@ -109,7 +109,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
         LinesActions.deploySecuredLine({
           factory: LineFactory_GOERLI,
           borrower,
-          ttl: BigNumber.from(timeToLive),
+          ttl: BigNumber.from(ttl.toFixed(0)),
           network: walletNetwork,
         })
       ).then((res) => {
@@ -131,12 +131,14 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
     setLoading(true);
     let checkSumAddress = await isAddress(borrower);
 
+    let ttl = Number(timeToLive) * 24 * 60 * 60;
+
     if (!checkSumAddress || walletNetwork === undefined) {
       setWarning('Incorrect address, please verify and try again.');
       return;
     }
 
-    if (+timeToLive <= 0) {
+    if (Number(timeToLive) <= 0) {
       setTTLWarning('Increase TTL, cannot be 0.');
       return;
     }
@@ -155,7 +157,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
         LinesActions.deploySecuredLineWithConfig({
           factory: LineFactory_GOERLI,
           borrower,
-          ttl: BigNumber.from(timeToLive),
+          ttl: BigNumber.from(ttl.toFixed(0)),
           network: walletNetwork,
           //@ts-ignore
           revenueSplit: BNRevenueSplit,

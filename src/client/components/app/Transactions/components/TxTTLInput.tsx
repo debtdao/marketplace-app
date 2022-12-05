@@ -153,9 +153,9 @@ export const TxTTLInput: FC<TxTokenInputProps> = ({
           <AmountTitle ellipsis>{inputText || t('components.transaction.token-input.you-have')}</AmountTitle>
           <AmountInputContainer>
             <StyledAmountInput
-              value={ttlType ? +amount / 60 / 60 / 24 : +amount}
+              value={amount}
               onChange={onAmountChange ? (e) => onAmountChange(e.target.value) : undefined}
-              placeholder={loading ? loadingText : '0'}
+              placeholder={loading ? loadingText : ''}
               readOnly={readOnly}
               error={inputError}
               type="number"

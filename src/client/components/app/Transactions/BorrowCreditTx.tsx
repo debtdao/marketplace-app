@@ -99,7 +99,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
     dispatch(
       LinesActions.borrowCredit({
         line: selectedCredit.id,
-        positionId: selectedPosition['id'],
+        positionId: selectedPosition.id,
         amount: ethers.utils.parseEther(targetAmount),
         network: walletNetwork,
         dryRun: false,
@@ -113,7 +113,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
         const updatedPosition = borrowUpdate(selectedPosition, targetAmount);
         dispatch(
           LinesActions.setPositionData({
-            position: selectedPosition['id'],
+            position: selectedPosition.id,
             lineAddress: selectedCredit.id,
             positionObject: updatedPosition,
             positions: positions,
@@ -192,9 +192,9 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
       <TxRateInput
         key={'frate'}
         headerText={t('components.transaction.borrow-credit.your-rates')}
-        frate={selectedPosition['fRate']}
-        drate={selectedPosition['dRate']}
-        amount={selectedPosition['fRate']}
+        frate={selectedPosition.frate}
+        drate={selectedPosition.drate}
+        amount={selectedPosition.frate}
         maxAmount={'100'}
         // setRateChange={onFrateChange}
         setRateChange={() => {}}

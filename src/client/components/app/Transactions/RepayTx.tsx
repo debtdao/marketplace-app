@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
 
-import { formatAmount, normalizeAmount, toWei, depositAndRepayUpdate } from '@utils';
+import { formatAmount, normalizeAmount, toWei, depositAndRepayUpdate, normalize } from '@utils';
 import { useAppTranslation, useAppDispatch, useAppSelector, useSelectedSellToken } from '@hooks';
 import { TokensActions, TokensSelectors, VaultsSelectors, LinesSelectors, LinesActions, WalletSelectors } from '@store';
 import { getConstants, testTokens } from '@src/config/constants';
@@ -190,7 +190,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
         const updatedPosition = depositAndRepayUpdate(selectedPosition, targetAmount);
         dispatch(
           LinesActions.setPositionData({
-            position: selectedPosition['id'],
+            position: selectedPosition.id,
             lineAddress: selectedCredit.id,
             positionObject: updatedPosition,
             positions: positions,
@@ -308,7 +308,19 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
     dispatch(TokensActions.setSelectedTokenAddress({ tokenAddress }));
   };
 
+  //Calculate maximum repay amount, then humanize for readability
+  const getMaxRepay = () => {
+    if (!selectedPosition) {
+      setErrors([...errors, 'no selected position']);
+      return;
+    }
+    let maxRepay: string = `${Number(selectedPosition.principal) + Number(selectedPosition.interestAccrued)}`;
+    maxRepay = normalize('amount', `${maxRepay}`, selectedPosition.token.decimals);
+    return maxRepay;
+  };
+
   const targetBalance = normalizeAmount(selectedSellToken.balance, selectedSellToken.decimals);
+
   const tokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(targetBalance, 4)} ${
     selectedSellToken.symbol
   }`;
@@ -369,7 +381,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
         amount={targetAmount}
         onAmountChange={onAmountChange}
         amountValue={String(10000000 * Number(targetAmount))}
-        maxAmount={targetBalance}
+        maxAmount={getMaxRepay()}
         selectedToken={selectedSellToken}
         onSelectedTokenChange={onSelectedSellTokenChange}
         tokenOptions={walletNetwork === 'goerli' ? testTokens : sourceAssetOptions}
@@ -380,9 +392,9 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
       <TxRateInput
         key={'frate'}
         headerText={t('components.transaction.deposit-and-repay.your-rates')}
-        frate={selectedPosition['fRate']}
-        drate={selectedPosition['dRate']}
-        amount={selectedPosition['fRate']}
+        frate={selectedPosition.frate}
+        drate={selectedPosition.drate}
+        amount={selectedPosition.frate}
         maxAmount={'100'}
         // setRateChange={onFrateChange}
         setRateChange={() => {}}

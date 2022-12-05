@@ -95,7 +95,9 @@ export const PositionsTable = (props: PositionsProps) => {
 
   useEffect(() => {
     let Transactions: Transaction[] = [];
-    // TODO integrate UserPositoinMetadata in here
+    if (!userWallet) {
+      Transactions = [];
+    }
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
       Transactions.push({
         name: t('components.transaction.borrow'),
@@ -123,9 +125,6 @@ export const PositionsTable = (props: PositionsProps) => {
         disabled: false,
       });
     }
-    if (!userWallet) {
-      Transactions = [];
-    }
     setActions(Transactions);
   }, [selectedLine, userWallet]);
 
@@ -133,7 +132,6 @@ export const PositionsTable = (props: PositionsProps) => {
     if (!lineAddress) {
       return;
     }
-    console.log('query the page', selectedPage);
     dispatch(LinesActions.getLinePage({ id: lineAddress }));
   }, [selectedPage]);
 
@@ -180,10 +178,6 @@ export const PositionsTable = (props: PositionsProps) => {
     dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
   };
 
-  let ctaButtonText = userWallet
-    ? `${t('lineDetails:positions-events.propose-position')}`
-    : `${t('components.connect-button.connect')}`;
-
   const isWithdrawable = (deposit: string, borrowed: string, lender: string, interestRepaid: string) => {
     if (!userWallet) {
       return;
@@ -194,11 +188,15 @@ export const PositionsTable = (props: PositionsProps) => {
     );
   };
 
+  let ctaButtonText = userWallet
+    ? `${t('lineDetails:positions-events.propose-position')}`
+    : `${t('components.connect-button.connect')}`;
+
   const getUserTransactions = (event: CreditPosition) => {
     if (event.status === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE) {
       return [ApproveMutualConsent];
     }
-    if (isWithdrawable(event.deposit, event.principal, event.lender.id, event.interestRepaid)) {
+    if (isWithdrawable(event.deposit, event.principal, event.lender, event.interestRepaid)) {
       return actions;
     }
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
@@ -296,12 +294,12 @@ export const PositionsTable = (props: PositionsProps) => {
             data={events.map((event) => ({
               // this needs to be humanized to correct amount depending on the token.
               deposit: humanize('amount', event.deposit, event.token.decimals, 2),
-              drate: `${event.dRate} %`,
-              frate: `${event.fRate} %`,
+              drate: `${event.drate} %`,
+              frate: `${event.frate} %`,
               status: event.status,
               principal: humanize('amount', event.principal, event.token.decimals, 2),
               interest: humanize('amount', event.interestAccrued, event.token.decimals, 2),
-              lender: formatAddress(event.lender.id),
+              lender: formatAddress(event.lender),
               token: event.token.symbol,
               actions: <ActionButtons value={event.id} actions={getUserTransactions(event)} />,
             }))}

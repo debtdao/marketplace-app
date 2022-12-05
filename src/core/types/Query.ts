@@ -70,14 +70,6 @@ export interface GetUserLinePositionsArgs {
 }
 
 /**
- * @typedef {object} GetBorrowerPositionsArgs
- * @property {Address} GetBorrowerPositionsArgs.borrower - address to fetch borrower positions for
- */
-export interface GetBorrowerPositionsArgs {
-  borrower: Address;
-}
-
-/**
  * @typedef {object} GetUserPortfolioArgs
  * @property {Address} GetUserPortfolioArgs.user - address to fetch borrower, lender, and arbiter portfolio
  */
@@ -96,7 +88,7 @@ export interface UseCreditLineParams {
 
 /**
  * @typedef {object} GetSupportedOracleTokenArgs
- * @property {string} GetBorrowerPositionsArgs.tokenAddress - oracle address to fetch supported tokens
+ * @property {string} GetSupportedOracleTokenArgs.tokenAddress - oracle address to fetch supported tokens
  */
 export interface GetSupportedOracleTokenArgs {
   oracleAddress: string;
@@ -245,39 +237,11 @@ export interface SupportedOracleTokenResponse {
   supportedTokens?: [token: TokenFragRepsonse];
 }
 
-export interface GetBorrowerPositionsResponse extends BaseLineFragResponse {
-  positions?: LinePageCreditFragResponse[];
-
-  events?: LineEventFragResponse[];
-
-  spigot?: {
-    id: Address;
-    summaries: SpigotRevenueSummaryFragResponse[];
-    spigots: {
-      contract: Address;
-      active: boolean;
-      startTime: number;
-    };
-    events?: SpigotEventFragResponse[];
-  };
-
-  escrow?: BaseEscrowFragResponse & {
-    events: {
-      __typename: string;
-      timestamp: number;
-      // only on add/remove collateral
-      amount?: string;
-      value?: string;
-    };
-  };
-}
-
-//TO-DO: change the schema to meet criteria
 export interface LenderPositionsResponse {
   positions?: LinePageCreditFragResponse[];
 }
 
-export interface PositionsResponse {
+export interface LinesOfCreditResponse {
   positions?: LinePageCreditFragResponse[];
 
   events?: LineEventFragResponse[];
@@ -303,8 +267,8 @@ export interface PositionsResponse {
   };
 }
 
-export interface GetUserPortfolioResponse extends PositionsResponse, LenderPositionsResponse {
-  borrowerPositions: PositionsResponse[];
+export interface GetUserPortfolioResponse extends LinesOfCreditResponse, LenderPositionsResponse {
+  borrowerLinesOfCredit: LinesOfCreditResponse[];
   lenderPositions: LenderPositionsResponse;
-  arbiterPositions: PositionsResponse[];
+  arbiterLinesOfCredit: LinesOfCreditResponse[];
 }

@@ -57,7 +57,6 @@ const selectLinesActionsStatusMap = (state: RootState) => state.lines.statusMap.
 const selectGetLinesStatus = (state: RootState) => state.lines.statusMap.getLines;
 const selectGetLinePageStatus = (state: RootState) => state.lines.statusMap.getLinePage;
 const selectGetUserLinesPositionsStatus = (state: RootState) => state.lines.statusMap.user.getUserLinePositions;
-const selectBorrowerPositions = (state: RootState) => state.lines.user.borrowerPositions;
 const selectUserPortfolio = (state: RootState) => state.lines.user.portfolio;
 
 /* ----------------------------- Main Selectors ----------------------------- */
@@ -324,7 +323,6 @@ export const LinesSelectors = {
   selectLinesStatusMap,
   selectUserLinesSummary,
   selectPositions,
-  selectBorrowerPositions,
   selectUserPortfolio,
   selectLinesGeneralStatus,
   selectSelectedLine,

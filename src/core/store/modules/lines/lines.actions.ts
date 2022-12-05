@@ -20,7 +20,6 @@ import {
   Network,
   DeploySecuredLineProps,
   DeploySecuredLineWithConfigProps,
-  GetBorrowerPositionsResponse,
   GetUserPortfolioResponse,
 } from '@types';
 import {
@@ -163,18 +162,6 @@ const getUserLinePositions = createAsyncThunk<
     userAddress,
   });
   return { userLinesPositions };
-});
-
-const getBorrowerPositions = createAsyncThunk<
-  { borrowerPositions: CreditPosition[] | undefined },
-  { borrower: string },
-  ThunkAPI
->('lines/getBorrowerPositions', async ({ borrower }, { extra, getState }) => {
-  const { services } = extra;
-
-  const borrowerPositions = await services.creditLineService.getBorrowerPositions({ borrower });
-  console.log('actions', borrowerPositions);
-  return { borrowerPositions };
 });
 
 const getUserPortfolio = createAsyncThunk<
@@ -742,7 +729,6 @@ export const LinesActions = {
   getLines,
   getLinePage,
   getUserLinePositions,
-  getBorrowerPositions,
   getUserPortfolio,
   approveDeposit,
   addCredit,

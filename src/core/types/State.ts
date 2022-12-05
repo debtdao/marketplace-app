@@ -113,7 +113,6 @@ export interface CreditLineState {
   user: {
     linePositions: IdToCreditPositionMap;
     lineAllowances: { [line: string]: { [token: string]: Integer } };
-    borrowerPositions: IdToCreditPositionMap;
     portfolio: GetUserPortfolioResponse;
   };
   statusMap: {
@@ -121,7 +120,6 @@ export interface CreditLineState {
     getLine: Status;
     getLinePage: Status;
     getAllowances: Status;
-    getBorrowerPositions: Status;
     getUserPortfolio: Status;
     deploySecuredLine: Status;
     user: UserLineMetadataStatusMap;

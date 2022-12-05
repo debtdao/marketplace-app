@@ -9,14 +9,12 @@ import {
   GetLinePageArgs,
   GetLinesArgs,
   GetUserLinePositionsArgs,
-  GetBorrowerPositionsArgs,
   GetUserPortfolioArgs,
   GetUserPortfolioResponse,
   QueryResponse,
   QueryCreator,
   GetLinePageResponse,
   GetLinePageAuxDataResponse,
-  GetBorrowerPositionsResponse,
   GetLinesResponse,
   SupportedOracleTokenResponse,
   CreditPosition,
@@ -28,7 +26,6 @@ import {
   GET_LINE_PAGE_AUX_QUERY,
   GET_LINES_QUERY,
   GET_SUPPORTED_ORACLE_TOKENS_QUERY,
-  GET_BORROWER_POSITIONS_QUERY,
   GET_USER_PORTFOLIO_QUERY,
 } from './queries';
 
@@ -123,11 +120,6 @@ export const getSupportedOracleTokens: QueryCreator<
   undefined,
   SupportedOracleTokenResponse | undefined
 > = (): QueryResponse<SupportedOracleTokenResponse | undefined> => getSupportedOracleTokensQuery();
-
-const getBorrowerPositionsQuery = createQuery(GET_BORROWER_POSITIONS_QUERY, 'lineOfCredits');
-export const getBorrowerPositions: QueryCreator<GetBorrowerPositionsArgs, CreditPosition[]> = (
-  arg: GetBorrowerPositionsArgs
-) => getBorrowerPositionsQuery(arg);
 
 const getUserPortfolioQuery = createQuery(GET_USER_PORTFOLIO_QUERY);
 export const getUserPortfolio: QueryCreator<GetUserPortfolioArgs, GetUserPortfolioResponse> = (

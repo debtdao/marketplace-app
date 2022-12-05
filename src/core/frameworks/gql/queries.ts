@@ -317,50 +317,8 @@ export const GET_SPIGOT_QUERY = gql`
   }
 `;
 
-// fetches all of a users positions that they borrow from
-export const GET_BORROWER_POSITIONS_QUERY = gql`
-  ${BASE_LINE_FRAGMENT}
-  ${LINE_PAGE_CREDIT_FRAGMENT}
-  ${LINE_EVENT_FRAGMENT}
-  ${BASE_SPIGOT_FRAGMENT}
-  ${SPIGOT_SUMMARY_FRAGMENT}
-  ${SPIGOT_EVENT_FRAGMENT}
-  ${ESCROW_FRAGMENT}
-
-  query getBorrowerPositions($borrower: String!) {
-    lineOfCredits(where: { borrower: $borrower }) {
-      ...BaseLineFrag
-
-      positions(first: 20) {
-        ...LinePageCreditFrag
-      }
-
-      events(first: 20) {
-        ...LineEventFrag
-      }
-
-      spigot {
-        id
-        spigots {
-          ...BaseSpigotFrag
-        }
-
-        summaries {
-          ...SpigotSummaryFrag
-        }
-        events(first: 20) {
-          ...SpigotEventFrag
-        }
-      }
-      escrow {
-        ...EscrowFrag
-      }
-    }
-  }
-`;
-
 // create new fragment to get positions for a user
-const BORROWER_POSITIONS_FRAGMENT = gql`
+const POSITIONS_FRAGMENT = gql`
   ${BASE_LINE_FRAGMENT}
   ${LINE_PAGE_CREDIT_FRAGMENT}
   ${LINE_EVENT_FRAGMENT}
@@ -369,7 +327,7 @@ const BORROWER_POSITIONS_FRAGMENT = gql`
   ${SPIGOT_EVENT_FRAGMENT}
   ${ESCROW_FRAGMENT}
 
-  fragment BorrowerPositionsFrag on LineOfCredit {
+  fragment PositionsFrag on LineOfCredit {
     ...BaseLineFrag
 
     positions(first: 20) {
@@ -455,18 +413,18 @@ const LENDER_POSITIONS_FRAGMENT = gql`
 
 // fetches all of a user's positions in their portfolio for which they are a borrower, lender, and/or arbiter
 export const GET_USER_PORTFOLIO_QUERY = gql`
-  ${BORROWER_POSITIONS_FRAGMENT}
+  ${POSITIONS_FRAGMENT}
   ${LENDER_POSITIONS_FRAGMENT}
 
   query getUserPortfolio($user: String!) {
     borrowerLineOfCredits: lineOfCredits(where: { borrower: $user }) {
-      ...BorrowerPositionsFrag
+      ...PositionsFrag
     }
     lenderPositions: lender(id: $user) {
       ...LenderPositionsFrag
     }
     arbiterLineOfCredits: lineOfCredits(where: { arbiter: $user }) {
-      ...BorrowerPositionsFrag
+      ...PositionsFrag
     }
   }
 `;

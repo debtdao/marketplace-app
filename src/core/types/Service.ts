@@ -27,13 +27,11 @@ import {
   GetLineArgs,
   GetLinesArgs,
   GetLinePageArgs,
-  GetBorrowerPositionsArgs,
   GetLinesResponse,
   GetLinePageResponse,
   CreditLinePage,
   GetLinePageAuxDataResponse,
   SupportedOracleTokenResponse,
-  GetBorrowerPositionsResponse,
   GetUserPortfolioResponse,
 } from '@types';
 
@@ -161,8 +159,7 @@ export interface CreditLineService {
   getLinePage: (props: GetLinePageProps) => Promise<GetLinePageResponse | undefined>;
   getLinePageAuxData: (props: GetLinePageProps) => Promise<GetLinePageAuxDataResponse | undefined>;
   getUserLinePositions: (...args: any) => Promise<any | undefined>;
-  getBorrowerPositions: (props: GetBorrowerPositionsProps) => Promise<CreditPosition[] | undefined>; // FIXME: needs type
-  getUserPortfolio: (props: GetUserPortfolioProps) => Promise<GetUserPortfolioResponse | undefined>; // FIXME: needs type
+  getUserPortfolio: (props: GetUserPortfolioProps) => Promise<GetUserPortfolioResponse | undefined>;
   getExpectedTransactionOutcome: (...args: any) => Promise<any | undefined>;
   depositAndRepay: (
     props: DepositAndRepayProps
@@ -312,10 +309,6 @@ export interface GetUserLineProps {
 export interface GetLinePageAuxDataProps extends GetLinePageArgs {
   id: string;
   network: Network;
-}
-
-export interface GetBorrowerPositionsProps {
-  borrower: string;
 }
 
 export interface GetUserPortfolioProps {

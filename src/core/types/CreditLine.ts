@@ -293,7 +293,6 @@ export interface LineActionsStatusMap {
 
 export interface UserLineMetadataStatusMap {
   getUserLinePositions: Status;
-  getBorrowerPositions: Status;
   getUserPortfolio: Status;
   linesActionsStatusMap: { [lineAddress: string]: LineActionsStatusMap };
 }

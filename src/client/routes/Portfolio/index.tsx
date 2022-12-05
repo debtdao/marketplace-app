@@ -84,7 +84,6 @@ export const Portfolio = () => {
   const tokensListStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
   const generalLoading = (appStatus.loading || tokensListStatus.loading || isMounting) && !activeModal;
   const borrowerAddress: string | undefined = location.pathname.split('/')[2];
-  const borrowerPositions = useAppSelector(LinesSelectors.selectBorrowerPositions);
   const userPortfolio = useAppSelector(LinesSelectors.selectUserPortfolio);
 
   const userTokensLoading = generalLoading && !userTokens.length;
@@ -111,7 +110,6 @@ export const Portfolio = () => {
       history.push('/market');
       return;
     } else if (borrowerAddress.length === 42) {
-      dispatch(LinesActions.getBorrowerPositions({ borrower: borrowerAddress.toLocaleLowerCase() }));
       dispatch(LinesActions.getUserPortfolio({ user: borrowerAddress.toLocaleLowerCase() }));
     }
   }, [currentRole, walletIsConnected]);
@@ -133,7 +131,7 @@ export const Portfolio = () => {
   useEffect(() => {
     if (userPortfolio) {
       let borrowerData: any = [];
-      borrowerData = userPortfolio.borrowerPositions;
+      borrowerData = userPortfolio.borrowerLinesOfCredit;
       setdata(borrowerData);
     }
   }, [userPortfolio]);

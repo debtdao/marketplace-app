@@ -20,7 +20,6 @@ export const initialLineActionsStatusMap: LineActionsStatusMap = {
 
 export const initialUserMetadataStatusMap: UserLineMetadataStatusMap = {
   getUserLinePositions: initialStatus,
-  getBorrowerPositions: initialStatus,
   getUserPortfolio: initialStatus,
   linesActionsStatusMap: {},
 };
@@ -34,11 +33,10 @@ export const linesInitialState: CreditLineState = {
   user: {
     linePositions: {},
     lineAllowances: {},
-    borrowerPositions: {},
     portfolio: {
-      borrowerPositions: [],
+      borrowerLinesOfCredit: [],
       lenderPositions: {},
-      arbiterPositions: [],
+      arbiterLinesOfCredit: [],
     },
   },
   statusMap: {
@@ -46,7 +44,6 @@ export const linesInitialState: CreditLineState = {
     getLine: initialStatus,
     getLinePage: initialStatus,
     getAllowances: initialStatus,
-    getBorrowerPositions: initialStatus,
     getUserPortfolio: initialStatus,
     deploySecuredLine: initialStatus,
     user: initialUserMetadataStatusMap,
@@ -70,7 +67,6 @@ const {
   setSelectedLinePosition,
   setPositionData,
   getUserLinePositions,
-  getBorrowerPositions,
   getUserPortfolio,
   clearLinesData,
   clearUserData,
@@ -112,8 +108,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(clearUserData, (state) => {
       state.user.linePositions = {};
       state.user.lineAllowances = {};
-      state.user.borrowerPositions = {};
-      state.user.portfolio = { borrowerPositions: [], lenderPositions: {}, arbiterPositions: [] };
+      state.user.portfolio = { borrowerLinesOfCredit: [], lenderPositions: {}, arbiterLinesOfCredit: [] };
     })
 
     // .addCase(clearTransactionData, (state) => {
@@ -235,19 +230,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
         state.statusMap.user.getUserLinePositions = {};
       });
       state.statusMap.user.getUserLinePositions = { error: error.message };
-    })
-    /* ------------------------- getBorrowerPositions ------------------------- */
-    .addCase(getBorrowerPositions.pending, (state, { meta }) => {
-      state.statusMap.user.getBorrowerPositions = { loading: true };
-    })
-    .addCase(getBorrowerPositions.fulfilled, (state, { meta, payload: { borrowerPositions } }) => {
-      if (!borrowerPositions) return;
-      const borrowerPositionsMap = borrowerPositions.reduce((obj, a) => ({ ...obj, [a.id]: a }), {});
-      state.user.borrowerPositions = { ...state.user.borrowerPositions, ...borrowerPositionsMap };
-      state.statusMap.user.getBorrowerPositions = {};
-    })
-    .addCase(getBorrowerPositions.rejected, (state, { meta, error }) => {
-      state.statusMap.user.getBorrowerPositions = { error: error.message };
     })
 
     /* ------------------------- getUserPortfolio ------------------------- */

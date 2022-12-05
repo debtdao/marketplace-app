@@ -89,7 +89,7 @@ export const Portfolio = () => {
 
   const userTokensLoading = generalLoading && !userTokens.length;
   const [currentRole, setRole] = useState<string>(BORROWER_POSITION_ROLE);
-  const [data, setdata] = useState([]);
+  const [data, setdata] = useState<any[]>([]);
   const [aggregatedCreditLinePage, setAggregatedCreditLine] = useState<CreditLinePage>();
 
   const availableRoles = [BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, ARBITER_POSITION_ROLE];
@@ -104,7 +104,6 @@ export const Portfolio = () => {
       ),
     };
   });
-
   useEffect(() => {
     if (!borrowerAddress || !isValidAddress(borrowerAddress)) {
       dispatch(AlertsActions.openAlert({ message: 'INVALID_ADDRESS', type: 'error' }));
@@ -131,15 +130,18 @@ export const Portfolio = () => {
   // }, [borrowerPositions]);
 
   useEffect(() => {
+    console.log('user portfolio has been set', userPortfolio);
     if (userPortfolio) {
-      let borrowerData: any = [];
-      borrowerData = userPortfolio.borrowerPositions;
+      //@ts-ignore
+      const borrowerData: any[] = userPortfolio.borrowerLineOfCredits;
+      console.log('pull out borrower data', borrowerData);
       setdata(borrowerData);
     }
   }, [userPortfolio]);
 
   useEffect(() => {
     let aggregate;
+    console.log(data, 'here');
     if (data) {
       aggregate = formatGetBorrowerQuery(data, borrowerAddress);
     }

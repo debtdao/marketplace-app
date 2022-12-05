@@ -83,8 +83,7 @@ export const Portfolio = () => {
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
   const tokensListStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
   const generalLoading = (appStatus.loading || tokensListStatus.loading || isMounting) && !activeModal;
-  const borrowerAddress: string | undefined = location.pathname.split('/')[2];
-  const borrowerPositions = useAppSelector(LinesSelectors.selectBorrowerPositions);
+  const userAddress: string | undefined = location.pathname.split('/')[2];
   const userPortfolio = useAppSelector(LinesSelectors.selectUserPortfolio);
 
   const userTokensLoading = generalLoading && !userTokens.length;
@@ -105,13 +104,12 @@ export const Portfolio = () => {
     };
   });
   useEffect(() => {
-    if (!borrowerAddress || !isValidAddress(borrowerAddress)) {
+    if (!userAddress || !isValidAddress(userAddress)) {
       dispatch(AlertsActions.openAlert({ message: 'INVALID_ADDRESS', type: 'error' }));
       history.push('/market');
       return;
-    } else if (borrowerAddress.length === 42) {
-      dispatch(LinesActions.getBorrowerPositions({ borrower: borrowerAddress.toLocaleLowerCase() }));
-      dispatch(LinesActions.getUserPortfolio({ user: borrowerAddress.toLocaleLowerCase() }));
+    } else if (userAddress.length === 42) {
+      dispatch(LinesActions.getUserPortfolio({ user: userAddress.toLocaleLowerCase() }));
     }
   }, [currentRole, walletIsConnected]);
 
@@ -132,6 +130,7 @@ export const Portfolio = () => {
   useEffect(() => {
     console.log('user portfolio has been set', userPortfolio);
     if (userPortfolio) {
+      //Types for returned obj need to be set up correctly
       //@ts-ignore
       const borrowerData: any[] = userPortfolio.borrowerLineOfCredits;
       console.log('pull out borrower data', borrowerData);
@@ -143,7 +142,7 @@ export const Portfolio = () => {
     let aggregate;
     console.log(data, 'here');
     if (data) {
-      aggregate = formatGetBorrowerQuery(data, borrowerAddress);
+      aggregate = formatGetBorrowerQuery(data, userAddress);
     }
     setAggregatedCreditLine(aggregate);
   }, [data]);

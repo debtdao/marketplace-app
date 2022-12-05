@@ -113,20 +113,6 @@ export const Portfolio = () => {
     }
   }, [currentRole, walletIsConnected]);
 
-  // TODO: Remove this as it is unnecessary. See the useEffect() codeblock below as a demonstration of how to use the userPortfolio object from state.
-  // useEffect(() => {
-  //   if (borrowerPositions) {
-  //     let borrowerData: any = [];
-  //     const keys = Object.keys(borrowerPositions);
-  //     keys.map((key) => {
-  //       let data = borrowerPositions[key];
-  //       borrowerData.push(data);
-  //     });
-  //     setdata(borrowerData);
-  //     console.log('Borrower Data State: ', borrowerData);
-  //   }
-  // }, [borrowerPositions]);
-
   useEffect(() => {
     console.log('user portfolio has been set', userPortfolio);
     if (userPortfolio) {

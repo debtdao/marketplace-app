@@ -313,11 +313,11 @@ const POSITIONS_FRAGMENT = gql`
   fragment PositionsFrag on LineOfCredit {
     ...BaseLineFrag
 
-    positions(first: 20) {
+    positions {
       ...LinePageCreditFrag
     }
 
-    events(first: 20) {
+    events {
       ...LineEventFrag
     }
 
@@ -330,7 +330,7 @@ const POSITIONS_FRAGMENT = gql`
       summaries {
         ...SpigotSummaryFrag
       }
-      events(first: 20) {
+      events {
         ...SpigotEventFrag
       }
     }
@@ -350,7 +350,7 @@ const LENDER_POSITIONS_FRAGMENT = gql`
   ${ESCROW_FRAGMENT}
 
   fragment LenderPositionsFrag on Lender {
-    positions: positions(first: 20) {
+    positions: positions {
       id
       status
       lender {
@@ -368,7 +368,7 @@ const LENDER_POSITIONS_FRAGMENT = gql`
       line {
         ...BaseLineFrag
 
-        events(first: 20) {
+        events {
           ...LineEventFrag
         }
 
@@ -381,7 +381,7 @@ const LENDER_POSITIONS_FRAGMENT = gql`
           summaries {
             ...SpigotSummaryFrag
           }
-          events(first: 20) {
+          events {
             ...SpigotEventFrag
           }
         }

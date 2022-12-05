@@ -6,6 +6,9 @@ import { toBN } from '@utils';
 
 /* ---------------------------------- State --------------------------------- */
 const selectTokensState = (state: RootState) => state.tokens;
+const selectTokenAddresses = (state: RootState) => state.tokens.tokensAddresses;
+const selectSupportedTokens = (state: RootState) => state.tokens.supportedTokens;
+const selectSupportedTokensMap = (state: RootState) => state.tokens.supportedTokensMap;
 const selectTokensMap = (state: RootState) => state.tokens.tokensMap;
 const selectSelectedTokenAddress = (state: RootState) => state.tokens.selectedTokenAddress;
 const selectTokensUser = (state: RootState) => state.tokens.user;
@@ -99,6 +102,9 @@ export function createToken(props: CreateTokenProps): TokenView {
 /* --------------------------------- Exports -------------------------------- */
 export const TokensSelectors = {
   selectTokensState,
+  selectTokenAddresses,
+  selectSupportedTokens,
+  selectSupportedTokensMap,
   selectTokensMap,
   selectSelectedTokenAddress,
   selectTokensUser,

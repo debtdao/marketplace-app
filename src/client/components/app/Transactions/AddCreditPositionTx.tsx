@@ -14,7 +14,6 @@ import { ACTIVE_STATUS, BORROWER_POSITION_ROLE } from '@src/core/types';
 import { getConstants } from '@src/config/constants';
 import { TokensActions, TokensSelectors, WalletSelectors, LinesSelectors, LinesActions } from '@store';
 import { Button } from '@components/common';
-import { testTokens } from '@src/config/constants';
 
 import { TxContainer } from './components/TxContainer';
 import { TxTokenInput } from './components/TxTokenInput';
@@ -156,7 +155,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
     let approvalOBj = {
       spenderAddress: selectedCredit.id,
       tokenAddress: selectedSellTokenAddress,
-      amount: toWei(targetTokenAmount, 18),
+      amount: toWei(targetTokenAmount, selectedSellToken!.decimals),
       network: walletNetwork,
     };
     //@ts-ignore
@@ -197,7 +196,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       lineAddress: selectedCredit.id,
       drate: toWei(drate, 2),
       frate: toWei(frate, 2),
-      amount: toWei(targetTokenAmount, 18),
+      amount: toWei(targetTokenAmount, selectedSellToken!.decimals),
       token: selectedSellTokenAddress,
       lender: lenderAddress,
       network: walletNetwork,
@@ -216,7 +215,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         const updatedPosition = addCreditUpdate(selectedPosition);
         dispatch(
           LinesActions.setPositionData({
-            position: selectedPosition['id'],
+            position: selectedPosition.id,
             lineAddress: selectedCredit.id,
             positionObject: updatedPosition,
             positions: positions,
@@ -338,7 +337,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         maxAmount={acceptingOffer ? targetTokenAmount : targetBalance}
         selectedToken={selectedSellToken}
         onSelectedTokenChange={onSelectedSellTokenChange}
-        tokenOptions={walletNetwork === 'goerli' ? testTokens : sourceAssetOptions}
+        tokenOptions={sourceAssetOptions}
         readOnly={acceptingOffer}
       />
 

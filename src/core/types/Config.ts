@@ -20,6 +20,7 @@ export interface Env {
   // ZAPPER_API_KEY: string | undefined;
   GRAPH_API_URL: string | undefined;
   GRAPH_TEST_API_URL: string | undefined;
+  GRAPH_CHAINLINK_FEED_REGISTRY_API_URL: string | undefined;
 }
 
 export interface Constants {

@@ -17,7 +17,7 @@ export interface QueryResponse<ResponseType> extends Promise<ResponseType> {
 
 /**
  * @typedef {object} Query
- * @property {string} Query.query - GraohQL query to send
+ * @property {string} Query.query - GraphQL query to send
  * @property {object} Query.variables - params to input into query
  */
 export interface Query {
@@ -84,6 +84,14 @@ export interface UseCreditLinesParams {
 
 export interface UseCreditLineParams {
   id: Address;
+}
+
+/**
+ * @typedef {object} GetSupportedOracleTokenArgs
+ * @property {string} GetBorrowerPositionsArgs.tokenAddress - oracle address to fetch supported tokens
+ */
+export interface GetSupportedOracleTokenArgs {
+  oracleAddress: string;
 }
 
 /*
@@ -223,6 +231,10 @@ export interface GetLinePageResponse extends BaseLineFragResponse {
       value?: string;
     };
   };
+}
+
+export interface SupportedOracleTokenResponse {
+  supportedTokens?: [token: TokenFragRepsonse];
 }
 
 export interface GetBorrowerPositionsResponse extends BaseLineFragResponse {

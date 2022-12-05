@@ -95,7 +95,9 @@ export const PositionsTable = (props: PositionsProps) => {
 
   useEffect(() => {
     let Transactions: Transaction[] = [];
-    // TODO integrate UserPositoinMetadata in here
+    if (!userWallet) {
+      Transactions = [];
+    }
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
       Transactions.push({
         name: t('components.transaction.borrow'),
@@ -123,9 +125,6 @@ export const PositionsTable = (props: PositionsProps) => {
         disabled: false,
       });
     }
-    if (!userWallet) {
-      Transactions = [];
-    }
     setActions(Transactions);
   }, [selectedLine, userWallet]);
 
@@ -133,7 +132,6 @@ export const PositionsTable = (props: PositionsProps) => {
     if (!lineAddress) {
       return;
     }
-    console.log('query the page', selectedPage);
     dispatch(LinesActions.getLinePage({ id: lineAddress }));
   }, [selectedPage]);
 

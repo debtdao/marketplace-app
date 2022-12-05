@@ -237,7 +237,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.user.getUserPortfolio = { loading: true };
     })
     .addCase(getUserPortfolio.fulfilled, (state, { meta, payload: { userPortfolio } }) => {
-      console.log('User Portfolio: positions in reducer', userPortfolio);
       if (!userPortfolio) return;
       state.user.portfolio = userPortfolio;
       state.statusMap.user.getUserPortfolio = {};

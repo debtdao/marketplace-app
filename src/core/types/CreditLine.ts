@@ -110,7 +110,7 @@ export interface LinePageCreditPosition extends CreditPosition {
   interestAccrued: string;
   interestRepaid: string;
   totalInterestRepaid: string;
-  dRate: string;
+  drate: string;
   token: TokenView;
   // events?: CreditEvent[];
 }
@@ -261,8 +261,8 @@ export interface SetRateEvent {
   __typename: string;
   id: string; // position id
   timestamp: number;
-  dRate: number;
-  fRate: number;
+  drate: number;
+  frate: number;
 }
 
 // Collateral Events

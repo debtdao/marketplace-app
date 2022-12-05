@@ -196,7 +196,7 @@ export const PositionsTable = (props: PositionsProps) => {
     if (event.status === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE) {
       return [ApproveMutualConsent];
     }
-    if (isWithdrawable(event.deposit, event.principal, event.lender, event.interestRepaid)) {
+    if (isWithdrawable(event.deposit, event.principal, event.lender.id, event.interestRepaid)) {
       return actions;
     }
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
@@ -294,12 +294,12 @@ export const PositionsTable = (props: PositionsProps) => {
             data={events.map((event) => ({
               // this needs to be humanized to correct amount depending on the token.
               deposit: humanize('amount', event.deposit, event.token.decimals, 2),
-              drate: `${event.drate} %`,
-              frate: `${event.frate} %`,
+              drate: `${event.dRate} %`,
+              frate: `${event.fRate} %`,
               status: event.status,
               principal: humanize('amount', event.principal, event.token.decimals, 2),
               interest: humanize('amount', event.interestAccrued, event.token.decimals, 2),
-              lender: formatAddress(event.lender),
+              lender: formatAddress(event.lender.id),
               token: event.token.symbol,
               actions: <ActionButtons value={event.id} actions={getUserTransactions(event)} />,
             }))}

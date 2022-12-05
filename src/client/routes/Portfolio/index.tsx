@@ -110,6 +110,7 @@ export const Portfolio = () => {
       history.push('/market');
       return;
     } else if (borrowerAddress.length === 42) {
+      // How to deal with this? since the subgraph has addresses saved in lowercase @kiba
       dispatch(LinesActions.getBorrowerPositions({ borrower: borrowerAddress.toLocaleLowerCase() }));
     }
   }, [currentRole, walletIsConnected]);

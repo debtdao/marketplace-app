@@ -64,7 +64,16 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
   };
 
   const onAmountChange = (ttl: string) => {
-    setTimeToLive(ttl.toString());
+    if (Number(ttl) < 0) {
+      setTTLWarning('Increase TTL, cannot be 0.');
+      return;
+    }
+    if (Number(ttl) > 0) {
+      setTimeToLive(ttl.toString());
+      setTTLWarning('');
+    } else {
+      setTimeToLive(ttl.toString());
+    }
   };
 
   const onCratioChange = (amount: string) => {
@@ -137,12 +146,6 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       setWarning('Incorrect address, please verify and try again.');
       return;
     }
-
-    if (Number(timeToLive) <= 0) {
-      setTTLWarning('Increase TTL, cannot be 0.');
-      return;
-    }
-
     // BPS IS USED so we must multiply by 10^2
     let BNCratio = toWei(cratio, 2);
 

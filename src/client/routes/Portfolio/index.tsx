@@ -12,10 +12,10 @@ import {
   LinesSelectors,
   AlertsActions,
 } from '@store';
-import { SummaryCard, ViewContainer, NoWalletCard, SliderCard, LineDetailsDisplay } from '@components/app';
+import { SummaryCard, ViewContainer, SliderCard, LineDetailsDisplay } from '@components/app';
 import { SpinnerLoading, Text } from '@components/common';
-import { halfWidthCss, isValidAddress, formatGetBorrowerQuery } from '@utils';
-import { CreditLinePage, LENDER_POSITION_ROLE, BORROWER_POSITION_ROLE, ARBITER_POSITION_ROLE } from '@src/core/types';
+import { isValidAddress, formatGetBorrowerQuery } from '@utils';
+import { CreditLinePage, LENDER_POSITION_ROLE, BORROWER_POSITION_ROLE } from '@src/core/types';
 import { PositionsTable } from '@src/client/components/app/LineDetailsDisplay/PositionsTable';
 
 const StyledViewContainer = styled(ViewContainer)`
@@ -26,11 +26,6 @@ const StyledViewContainer = styled(ViewContainer)`
 
 const HeaderCard = styled(SummaryCard)`
   grid-column: 1 / 3;
-`;
-
-const StyledNoWalletCard = styled(NoWalletCard)`
-  grid-column: 1 / 3;
-  ${halfWidthCss}
 `;
 
 const StyledSpinnerLoading = styled(SpinnerLoading)`
@@ -124,8 +119,15 @@ export const Portfolio = () => {
       //Types for returned obj need to be set up correctly
       //@ts-ignore
       const borrowerData: any[] = userPortfolio.borrowerLineOfCredits;
-      console.log('pull out borrower data', borrowerData);
       setdata(borrowerData);
+      if (borrowerData && borrowerData[0].positions[0].id) {
+        const lineId = borrowerData[0].id;
+        const userPositionId = borrowerData[0].positions[0].id;
+        console.log(borrowerData, lineId, userPositionId, 'ids');
+        dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineId }));
+        dispatch(LinesActions.getLinePage({ id: lineId }));
+        dispatch(LinesActions.setSelectedLinePosition({ position: userPositionId }));
+      }
     }
     if (userPortfolio && currentRole === LENDER_POSITION_ROLE) {
       const lenderData = userPortfolio.lenderPositions.positions!;
@@ -145,8 +147,6 @@ export const Portfolio = () => {
   return (
     <StyledViewContainer>
       <HeaderCard items={SummaryCardItems} cardSize="small" />
-
-      {!walletIsConnected && <StyledNoWalletCard />}
 
       {userTokensLoading && <StyledSpinnerLoading />}
 

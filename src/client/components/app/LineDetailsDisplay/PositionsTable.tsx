@@ -292,7 +292,6 @@ export const PositionsTable = (props: PositionsProps) => {
               },
             ]}
             data={events.map((event) => ({
-              // this needs to be humanized to correct amount depending on the token.
               deposit: humanize('amount', event.deposit, event.token.decimals, 2),
               drate: `${event.dRate} %`,
               frate: `${event.fRate} %`,

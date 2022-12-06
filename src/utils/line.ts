@@ -340,9 +340,7 @@ export const formatLinePageData = (
 
   console.log('positions info origin', positions);
 
-  positions?.map((position, i) => {
-    console.log('positions info origin', positions);
-    console.log('position', position.status);
+  positions?.map((position) => {
     let fRate = normalizeAmount(position.fRate, 2);
     let dRate = normalizeAmount(position.dRate, 2);
     let positionObject = {
@@ -362,8 +360,6 @@ export const formatLinePageData = (
     console.log(newFormattedPositions);
   });
   // TODO add spigot events to collateralEvents
-
-  console.log('test position', positions);
 
   const formattedEscrowData = Object.values(escrow?.deposits ?? {}).reduce((obj: any, d: any) => {
     const {
@@ -457,6 +453,7 @@ export const formatGetBorrowerQuery = (data: AggregatedCreditLine[], borrowerAdd
     collateralEvents: [], //todo
     creditEvents: [], //done
   };
+
   if (data) {
     data.map((data: any, i: number) => {
       data.positions.map((position: CreditPosition, i: number) => {

@@ -12,7 +12,6 @@ import {
   CreditLinePage,
   UserPositionMetadata,
   CreditPosition,
-  IdToCreditPositionMap,
   BORROWER_POSITION_ROLE,
   LENDER_POSITION_ROLE,
   ARBITER_POSITION_ROLE,
@@ -222,10 +221,6 @@ const selectUserPositionMetadata = createSelector(
       amount: '0',
       available: '0',
     };
-
-    //Map over position table
-    //Create a function to pass down position data
-    //Do this in UTIL
 
     if (!line || !userAddress) return defaultRole;
     //@ts-ignore

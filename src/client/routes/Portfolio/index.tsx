@@ -113,7 +113,6 @@ export const Portfolio = () => {
   useEffect(() => {
     if (!userAddress || !isValidAddress(userAddress)) {
       dispatch(AlertsActions.openAlert({ message: 'INVALID_ADDRESS', type: 'error' }));
-      history.push('/market');
       return;
     } else if (userAddress.length === 42) {
       dispatch(LinesActions.getUserPortfolio({ user: userAddress.toLocaleLowerCase() }));

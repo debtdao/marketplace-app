@@ -57,9 +57,8 @@ interface Transaction {
 
 export const PositionsTable = (props: PositionsProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
-
-  const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const dispatch = useAppDispatch();
+  const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
   const userRoleMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
@@ -185,13 +184,17 @@ export const PositionsTable = (props: PositionsProps) => {
     ? `${t('lineDetails:positions-events.propose-position')}`
     : `${t('components.connect-button.connect')}`;
 
-  const getUserTransactions = (event: CreditPosition) => {
+  //Returns a list of transactions to display on positions table
+  const getUserPositionActions = (event: CreditPosition) => {
+    //If proposed and user is borrower, display return action (accept/mutualconsent)
     if (event.status === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE) {
       return [ApproveMutualConsent];
     }
+    //If user is lender, and line has amount to withdraw, return withdraw action
     if (isWithdrawable(event.deposit, event.principal, event.lender.id, event.interestRepaid)) {
       return actions;
     }
+    //Returns actions for borrower on open line
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
       return actions;
     }
@@ -280,7 +283,7 @@ export const PositionsTable = (props: PositionsProps) => {
             interest: humanize('amount', event.interestAccrued, event.token.decimals, 2),
             lender: formatAddress(event.lender.id),
             token: event.token.symbol,
-            actions: <ActionButtons value={event.id} actions={getUserTransactions(event)} />,
+            actions: <ActionButtons value={event.id} actions={getUserPositionActions(event)} />,
           }))}
           SearchBar={
             <>

@@ -268,7 +268,7 @@ export interface LinesOfCreditResponse {
 }
 
 export interface GetUserPortfolioResponse extends LinesOfCreditResponse, LenderPositionsResponse {
-  borrowerLinesOfCredit: LinesOfCreditResponse[];
+  borrowerLineOfCredits: LinesOfCreditResponse[];
   lenderPositions: LenderPositionsResponse;
-  arbiterLinesOfCredit: LinesOfCreditResponse[];
+  arbiterLineOfCredits: LinesOfCreditResponse[];
 }

@@ -115,8 +115,6 @@ export const Portfolio = () => {
 
   useEffect(() => {
     if (userPortfolio && currentRole === BORROWER_POSITION_ROLE) {
-      //Types for returned obj need to be set up correctly
-      //@ts-ignore
       const borrowerData: any[] = userPortfolio.borrowerLineOfCredits;
       setdata(borrowerData);
       if (borrowerData && borrowerData[0]) {

@@ -34,9 +34,9 @@ export const linesInitialState: CreditLineState = {
     linePositions: {},
     lineAllowances: {},
     portfolio: {
-      borrowerLinesOfCredit: [],
+      borrowerLineOfCredits: [],
       lenderPositions: {},
-      arbiterLinesOfCredit: [],
+      arbiterLineOfCredits: [],
     },
   },
   statusMap: {
@@ -108,7 +108,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(clearUserData, (state) => {
       state.user.linePositions = {};
       state.user.lineAllowances = {};
-      state.user.portfolio = { borrowerLinesOfCredit: [], lenderPositions: {}, arbiterLinesOfCredit: [] };
+      state.user.portfolio = { borrowerLineOfCredits: [], lenderPositions: {}, arbiterLineOfCredits: [] };
     })
 
     // .addCase(clearTransactionData, (state) => {

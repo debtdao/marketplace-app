@@ -345,11 +345,10 @@ export const formatLinePageData = (
     console.log('position', position.status);
     let fRate = normalizeAmount(position.fRate, 2);
     let dRate = normalizeAmount(position.dRate, 2);
-    console.log('in line.ts', position.status);
     let positionObject = {
+      dRate,
+      fRate,
       status: position.status,
-      dRate: dRate,
-      fRate: fRate,
       deposit: position.deposit,
       token: position.token,
       lender: position.lender,

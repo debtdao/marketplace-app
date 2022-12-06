@@ -188,44 +188,61 @@ export const GET_LINE_QUERY = gql`
   }
 `;
 
-export const GET_LINE_PAGE_QUERY = gql`
+// create new fragment to get positions for a user
+const LINE_OF_CREDITS_FRAGMENT = gql`
   ${BASE_LINE_FRAGMENT}
   ${LINE_PAGE_CREDIT_FRAGMENT}
   ${LINE_EVENT_FRAGMENT}
-
   ${BASE_SPIGOT_FRAGMENT}
   ${SPIGOT_SUMMARY_FRAGMENT}
   ${SPIGOT_EVENT_FRAGMENT}
   ${ESCROW_FRAGMENT}
 
+  fragment LineOfCreditsFrag on LineOfCredit {
+    ...BaseLineFrag
+
+    positions {
+      ...LinePageCreditFrag
+    }
+
+    events {
+      ...LineEventFrag
+    }
+
+    spigot {
+      id
+      spigots {
+        ...BaseSpigotFrag
+      }
+
+      summaries {
+        ...SpigotSummaryFrag
+      }
+      events {
+        ...SpigotEventFrag
+      }
+    }
+    escrow {
+      ...EscrowFrag
+    }
+  }
+`;
+
+export const GET_LINE_PAGE_QUERY = gql`
+  #${BASE_LINE_FRAGMENT}
+  #${LINE_PAGE_CREDIT_FRAGMENT}
+  #${LINE_EVENT_FRAGMENT}
+
+  #${BASE_SPIGOT_FRAGMENT}
+  #${SPIGOT_SUMMARY_FRAGMENT}
+  #${SPIGOT_EVENT_FRAGMENT}
+  #${ESCROW_FRAGMENT}
+
+  ${LINE_OF_CREDITS_FRAGMENT}
+
   query getLinePage($id: ID!) {
     lineOfCredit(id: $id) {
-      ...BaseLineFrag
-
-      positions(first: 20) {
-        ...LinePageCreditFrag
-      }
-
-      events(first: 20) {
-        ...LineEventFrag
-      }
-
-      spigot {
-        id
-        spigots {
-          ...BaseSpigotFrag
-        }
-
-        summaries {
-          ...SpigotSummaryFrag
-        }
-        events(first: 20) {
-          ...SpigotEventFrag
-        }
-      }
-      escrow {
-        ...EscrowFrag
-      }
+      ...LineOfCreditsFrag
     }
   }
 `;
@@ -296,46 +313,6 @@ export const GET_SPIGOT_QUERY = gql`
   query getSpigot($id: ID!) {
     spigotController(id: $id) {
       ...BaseSpigotFrag
-    }
-  }
-`;
-
-// create new fragment to get positions for a user
-const LINE_OF_CREDITS_FRAGMENT = gql`
-  ${BASE_LINE_FRAGMENT}
-  ${LINE_PAGE_CREDIT_FRAGMENT}
-  ${LINE_EVENT_FRAGMENT}
-  ${BASE_SPIGOT_FRAGMENT}
-  ${SPIGOT_SUMMARY_FRAGMENT}
-  ${SPIGOT_EVENT_FRAGMENT}
-  ${ESCROW_FRAGMENT}
-
-  fragment LineOfCreditsFrag on LineOfCredit {
-    ...BaseLineFrag
-
-    positions {
-      ...LinePageCreditFrag
-    }
-
-    events {
-      ...LineEventFrag
-    }
-
-    spigot {
-      id
-      spigots {
-        ...BaseSpigotFrag
-      }
-
-      summaries {
-        ...SpigotSummaryFrag
-      }
-      events {
-        ...SpigotEventFrag
-      }
-    }
-    escrow {
-      ...EscrowFrag
     }
   }
 `;

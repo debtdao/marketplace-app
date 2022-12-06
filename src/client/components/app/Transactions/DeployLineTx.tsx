@@ -19,7 +19,7 @@ import { TxStatus } from './components/TxStatus';
 
 const StyledTransaction = styled(TxContainer)``;
 
-const { LineFactory_GOERLI } = getConstants();
+const { LINEFACTORY_GOERLI } = getConstants();
 
 const SectionContent = styled.div`
   display: flex;
@@ -107,7 +107,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
 
       dispatch(
         LinesActions.deploySecuredLine({
-          factory: LineFactory_GOERLI,
+          factory: LINEFACTORY_GOERLI,
           borrower,
           ttl: BigNumber.from(timeToLive),
           network: walletNetwork,
@@ -153,7 +153,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
 
       dispatch(
         LinesActions.deploySecuredLineWithConfig({
-          factory: LineFactory_GOERLI,
+          factory: LINEFACTORY_GOERLI,
           borrower,
           ttl: BigNumber.from(timeToLive),
           network: walletNetwork,

@@ -1,7 +1,11 @@
 import { AnalyticsBrowser, Context } from '@segment/analytics-next';
 
 import { getEnv } from '@src/config/env';
-import { AnalyticsEventNames, BaseAnalyticsEventData, TrackNavigationEvent } from '@src/core/types/ProductAnalytics';
+import {
+  AnalyticsEventNames,
+  BaseAnalyticsEventData,
+  TrackInternalNavigationEvent,
+} from '@src/core/types/ProductAnalytics';
 
 const { SEGMENT_API_KEY } = getEnv();
 
@@ -22,7 +26,7 @@ init();
 export const idUser = (id: string) => getAnalytics()?.identify(id);
 
 // page name, URL, utm, etc. are automatically tracked by segment
-export const trackPage = (page: TrackNavigationEvent = {}) => {
+export const trackPage = (page: TrackInternalNavigationEvent = {}) => {
   // TODO get SEO from page for window.path and addd to properties
   const hashPath = window.location.href.includes('/#/') && window.location.href.split('/#')[1]; // account for hash router in path which segment doesnt
   console.log('hashpath', hashPath);

@@ -22,24 +22,35 @@ export type AnalyticsEventNames =
   | EVENT_NAVIGATE_EXTERNAL_3RD_PARTY
   | EVENT_NAVIGATE_EXTERNAL_1ST_PARTY;
 
+export type AnalyticsTrackingTypes = 'track' | 'page' | 'id';
+
 // EVENT DATA FORMATS
+
 export interface BaseAnalyticsEventData {
   wallet?: WalletState;
   [key: string]: any;
 }
 
-export interface LogAppAnalyticsActionProps {
-  event: AnalyticsEventNames;
-  data: BaseAnalyticsEventData;
+export interface TrackEventData extends BaseAnalyticsEventData {
+  eventName: AnalyticsEventNames;
 }
 
-// Navigation Events
-
-export interface TrackNavigationEvent extends BaseAnalyticsEventData {
+export interface TrackExternalNavigationEvent extends BaseAnalyticsEventData {
+  to: string;
+  target?: '_blank';
+}
+export interface TrackInternalNavigationEvent extends BaseAnalyticsEventData {
   name?: string; // custom name for page not in html
   category?: string;
   data?: object; // e.g. referrer, SEO keywords
 }
+
+export interface LogAppAnalyticsActionProps {
+  type: AnalyticsTrackingTypes;
+  data: TrackEventData | TrackExternalNavigationEvent | TrackInternalNavigationEvent;
+}
+
+// Navigation Events
 
 // Auth Events
 export interface LoginEventData {

@@ -95,11 +95,11 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
     const isConnected = await wallet.connect({ name: walletName });
 
     // @analytics
-    dispatch(AppActions.id());
+    dispatch(AppActions.logAppAnalytics({ type: 'id', data: {} }));
     dispatch(
       AppActions.logAppAnalytics({
-        event: EVENT_LOGIN,
-        data: { network, walletName },
+        type: 'track',
+        data: { eventName: EVENT_LOGIN },
       })
     );
 

@@ -123,7 +123,6 @@ export interface TxTokenInputProps {
   hideAmount?: boolean;
   loading?: boolean;
   loadingText?: string;
-  ttlType: boolean;
 }
 
 export const TxTTLInput: FC<TxTokenInputProps> = ({
@@ -138,7 +137,6 @@ export const TxTTLInput: FC<TxTokenInputProps> = ({
   loading,
   loadingText,
   children,
-  ttlType,
   ...props
 }) => {
   const { t } = useAppTranslation('common');

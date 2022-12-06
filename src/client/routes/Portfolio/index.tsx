@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { useState, useEffect } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 import { useAppSelector, useAppTranslation, useIsMounting, useAppDispatch } from '@hooks';
 import {
@@ -70,7 +70,6 @@ export const Portfolio = () => {
   const isMounting = useIsMounting();
   const location = useLocation();
   const dispatch = useAppDispatch();
-  const history = useHistory();
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
 
   // const labsSummary = useAppSelector(LabsSelectors.selectSummaryData);
@@ -126,9 +125,8 @@ export const Portfolio = () => {
       }
     }
     if (userPortfolio && currentRole === LENDER_POSITION_ROLE) {
-      const lenderData = userPortfolio.lenderPositions.positions!;
-      console.log('lender positions', lenderData);
-      setdata(lenderData);
+      const lenderData = userPortfolio?.lenderPositions?.positions;
+      setdata(lenderData ? lenderData : []);
       if (lenderData && lenderData[0].id) {
         const lineId = lenderData[0].id;
         dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineId }));
@@ -174,7 +172,14 @@ export const Portfolio = () => {
           <PositionsTable events={data} />
         </StyledBorrowerContainer>
       ) : (
-        ''
+        <StyledSliderCard
+          header={t('components.no-borrower-positions.header')}
+          Component={
+            <Text>
+              <p>{t('components.no-borrower-positions.content')}</p>
+            </Text>
+          }
+        />
       )}
 
       {/* {!userTokensLoading && (

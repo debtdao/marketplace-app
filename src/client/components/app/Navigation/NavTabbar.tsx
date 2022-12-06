@@ -1,9 +1,10 @@
 import styled from 'styled-components';
 import { useLocation } from 'react-router-dom';
 
-import { useAppTranslation } from '@hooks';
+import { useAppTranslation, useAppSelector } from '@hooks';
 import { NavigationLink } from '@components/app';
-import { Link, Icon } from '@components/common';
+import { Link, Icon, WalletIcon } from '@components/common';
+import { WalletSelectors } from '@store';
 
 const linkHoverFilter = 'brightness(90%)';
 const linkTransition = 'filter 200ms ease-in-out';
@@ -75,16 +76,26 @@ interface NavTabbarProps {
 export const NavTabbar = ({ navLinks, ...props }: NavTabbarProps) => {
   const { t } = useAppTranslation('common');
   const location = useLocation();
-
+  const userAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
   const currentPath = '/' + location.pathname.toLowerCase().split('/')[1];
 
   return (
     <StyledTabbar {...props}>
       <LinkList>
+        {/* Link that rely on state data can't remove from component definitions */}
+        <RouterLink
+          to={`/portfolio/${userAddress}`}
+          key={0}
+          selected={`${currentPath}/${userAddress}` === `/portfolio/${userAddress}`}
+          external={false}
+        >
+          <LinkIcon Component={WalletIcon} />
+          <LinkText>{t('navigation.portfolio')}</LinkText>
+        </RouterLink>
         {navLinks.map(
           (link: NavigationLink, index) =>
             !link.hideMobile && (
-              <RouterLink to={link.to} key={index} selected={currentPath === link.to} external={link.external}>
+              <RouterLink to={link.to} key={index + 1} selected={currentPath === link.to} external={link.external}>
                 <LinkIcon Component={link.icon} />
                 <LinkText>{t(link.text)}</LinkText>
               </RouterLink>

@@ -26,8 +26,8 @@ export type LineStatusTypes =
 // Individual lender positoin status types
 type ProposedStatus = 'PROPOSED';
 export const PROPOSED_STATUS: ProposedStatus = 'PROPOSED';
-type OpenedStatus = 'OPENED';
-export const OPENED_STATUS: OpenedStatus = 'OPENED';
+type OpenedStatus = 'OPEN';
+export const OPENED_STATUS: OpenedStatus = 'OPEN';
 type ClosedStatus = 'CLOSED';
 export const CLOSED_STATUS: ClosedStatus = 'CLOSED';
 

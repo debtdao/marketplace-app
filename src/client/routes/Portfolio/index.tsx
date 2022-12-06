@@ -120,19 +120,19 @@ export const Portfolio = () => {
       //@ts-ignore
       const borrowerData: any[] = userPortfolio.borrowerLineOfCredits;
       setdata(borrowerData);
-      if (borrowerData && borrowerData[0].positions[0].id) {
+      if (borrowerData && borrowerData[0]) {
         const lineId = borrowerData[0].id;
-        const userPositionId = borrowerData[0].positions[0].id;
-        console.log(borrowerData, lineId, userPositionId, 'ids');
         dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineId }));
-        dispatch(LinesActions.getLinePage({ id: lineId }));
-        dispatch(LinesActions.setSelectedLinePosition({ position: userPositionId }));
       }
     }
     if (userPortfolio && currentRole === LENDER_POSITION_ROLE) {
       const lenderData = userPortfolio.lenderPositions.positions!;
       console.log('lender positions', lenderData);
       setdata(lenderData);
+      if (lenderData && lenderData[0].id) {
+        const lineId = lenderData[0].id;
+        dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineId }));
+      }
     }
   }, [userPortfolio, currentRole]);
 

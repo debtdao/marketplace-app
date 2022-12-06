@@ -1,13 +1,12 @@
 import styled from 'styled-components';
-import { isEmpty } from 'lodash';
 import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 
 import { ModalsActions, LinesActions, LinesSelectors, WalletSelectors, WalletActions } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { device } from '@themes/default';
-import { DetailCard, ActionButtons, ViewContainer, SliderCard } from '@components/app';
-import { Input, SearchIcon, Text, Button } from '@components/common';
+import { DetailCard, ActionButtons, ViewContainer } from '@components/app';
+import { Input, SearchIcon, Button } from '@components/common';
 import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, CreditPosition } from '@src/core/types';
 import { humanize, formatAddress } from '@src/utils';
 import { getEnv } from '@config/env';
@@ -55,12 +54,6 @@ interface Transaction {
   handler: (e: Event) => void;
   disabled: boolean;
 }
-
-const BannerCtaButton = styled(Button)`
-  width: 80%;
-  max-width: 20rem;
-  margin-top: 1em;
-`;
 
 export const PositionsTable = (props: PositionsProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
@@ -208,121 +201,107 @@ export const PositionsTable = (props: PositionsProps) => {
   return (
     <>
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
-      {isEmpty(events) ? (
-        <SliderCard
-          header={t('lineDetails:positions-events.header')}
-          Component={
-            <Text>
-              <p>{t('lineDetails:positions-events.no-data')}</p>
-
-              <BannerCtaButton styling="primary" onClick={depositHandler}>
-                {ctaButtonText}
-              </BannerCtaButton>
-            </Text>
+      <ViewContainer>
+        <PositionsCard
+          header={t('components.positions-card.positions')}
+          data-testid="vaults-opportunities-list"
+          metadata={[
+            /** @TODO add tags e.g. spigot here */
+            {
+              key: 'status',
+              header: t('components.positions-card.status'),
+              sortable: true,
+              width: '14rem',
+              className: 'col-apy',
+            },
+            {
+              key: 'lender',
+              header: t('components.positions-card.lender'),
+              sortable: true,
+              width: '13rem',
+              className: 'col-available',
+            },
+            {
+              key: 'token',
+              header: t('components.positions-card.token'),
+              sortable: true,
+              width: '10rem',
+              className: 'col-available',
+            },
+            {
+              key: 'deposit',
+              header: t('components.positions-card.total-deposits'),
+              sortable: true,
+              width: '10rem',
+              className: 'col-assets',
+            },
+            {
+              key: 'principal',
+              header: t('components.positions-card.principal'),
+              sortable: true,
+              width: '10rem',
+              className: 'col-assets',
+            },
+            {
+              key: 'interest',
+              header: t('components.positions-card.interest'),
+              sortable: true,
+              width: '10rem',
+              className: 'col-assets',
+            },
+            {
+              key: 'drate',
+              header: t('components.positions-card.drate'),
+              sortable: true,
+              width: '7rem',
+              className: 'col-assets',
+            },
+            {
+              key: 'frate',
+              header: t('components.positions-card.frate'),
+              sortable: true,
+              width: '7rem',
+              className: 'col-assets',
+            },
+            {
+              key: 'actions',
+              align: 'flex-end',
+              width: 'auto',
+              grow: '1',
+            },
+          ]}
+          data={events?.map((event) => ({
+            // this needs to be humanized to correct amount depending on the token.
+            deposit: humanize('amount', event.deposit, event.token.decimals, 2),
+            drate: `${event.drate} %`,
+            frate: `${event.frate} %`,
+            status: event.status,
+            principal: humanize('amount', event.principal, event.token.decimals, 2),
+            interest: humanize('amount', event.interestAccrued, event.token.decimals, 2),
+            lender: formatAddress(event.lender),
+            token: event.token.symbol,
+            actions: <ActionButtons value={event.id} actions={getUserTransactions(event)} />,
+          }))}
+          SearchBar={
+            <>
+              <Input
+                value={''}
+                onChange={(e) => console.log(e)}
+                placeholder={t('components.search-input.search')}
+                Icon={SearchIcon}
+              />
+              <Button onClick={depositHandler}>{ctaButtonText}</Button>
+            </>
           }
+          searching={false}
+          filterLabel="Show 0% APY"
+          //@ts-ignore
+          filterBy={''}
+          initialSortBy="deposit"
+          onAction={() => console.log('action')}
+          wrap
         />
-      ) : (
-        <ViewContainer>
-          <PositionsCard
-            header={t('components.positions-card.positions')}
-            data-testid="vaults-opportunities-list"
-            metadata={[
-              /** @TODO add tags e.g. spigot here */
-              {
-                key: 'status',
-                header: t('components.positions-card.status'),
-                sortable: true,
-                width: '14rem',
-                className: 'col-apy',
-              },
-              {
-                key: 'lender',
-                header: t('components.positions-card.lender'),
-                sortable: true,
-                width: '13rem',
-                className: 'col-available',
-              },
-              {
-                key: 'token',
-                header: t('components.positions-card.token'),
-                sortable: true,
-                width: '10rem',
-                className: 'col-available',
-              },
-              {
-                key: 'deposit',
-                header: t('components.positions-card.total-deposits'),
-                sortable: true,
-                width: '10rem',
-                className: 'col-assets',
-              },
-              {
-                key: 'principal',
-                header: t('components.positions-card.principal'),
-                sortable: true,
-                width: '10rem',
-                className: 'col-assets',
-              },
-              {
-                key: 'interest',
-                header: t('components.positions-card.interest'),
-                sortable: true,
-                width: '10rem',
-                className: 'col-assets',
-              },
-              {
-                key: 'drate',
-                header: t('components.positions-card.drate'),
-                sortable: true,
-                width: '7rem',
-                className: 'col-assets',
-              },
-              {
-                key: 'frate',
-                header: t('components.positions-card.frate'),
-                sortable: true,
-                width: '7rem',
-                className: 'col-assets',
-              },
-              {
-                key: 'actions',
-                align: 'flex-end',
-                width: 'auto',
-                grow: '1',
-              },
-            ]}
-            data={events.map((event) => ({
-              deposit: humanize('amount', event.deposit, event.token.decimals, 2),
-              drate: `${event.dRate} %`,
-              frate: `${event.fRate} %`,
-              status: event.status,
-              principal: humanize('amount', event.principal, event.token.decimals, 2),
-              interest: humanize('amount', event.interestAccrued, event.token.decimals, 2),
-              lender: formatAddress(event.lender.id),
-              token: event.token.symbol,
-              actions: <ActionButtons value={event.id} actions={getUserTransactions(event)} />,
-            }))}
-            SearchBar={
-              <>
-                <Input
-                  value={''}
-                  onChange={(e) => console.log(e)}
-                  placeholder={t('components.search-input.search')}
-                  Icon={SearchIcon}
-                />
-                <Button onClick={depositHandler}>{ctaButtonText}</Button>
-              </>
-            }
-            searching={false}
-            filterLabel="Show 0% APY"
-            //@ts-ignore
-            filterBy={''}
-            initialSortBy="deposit"
-            onAction={() => console.log('action')}
-            wrap
-          />
-        </ViewContainer>
-      )}
+      </ViewContainer>
       <br />
     </>
   );

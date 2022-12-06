@@ -1,7 +1,7 @@
 import { AnalyticsBrowser, Context } from '@segment/analytics-next';
 
 import { getEnv } from '@src/config/env';
-import { AnalyticsEventNames, BaseAnalyticsEventData } from '@src/core/types/ProductAnalytics';
+import { AnalyticsEventNames, BaseAnalyticsEventData, TrackNavigationEvent } from '@src/core/types/ProductAnalytics';
 
 const { SEGMENT_API_KEY } = getEnv();
 
@@ -17,8 +17,17 @@ const getAnalytics = () => {
 // segment wont track until we explicitly tell it to with .load() for privacy.
 export const init = () => getAnalytics()?.load({ writeKey: SEGMENT_API_KEY! });
 init();
+
 // attach user id (wallet address) to all future events emitted by segment
 export const idUser = (id: string) => getAnalytics()?.identify(id);
+
+// page name, URL, utm, etc. are automatically tracked by segment
+export const trackPage = (page: TrackNavigationEvent = {}) => {
+  // TODO get SEO from page for window.path and addd to properties
+  const hashPath = window.location.href.includes('/#/') && window.location.href.split('/#')[1]; // account for hash router in path which segment doesnt
+  console.log('hashpath', hashPath);
+  return getAnalytics()?.page(page.category, page.name, { path: hashPath, ...page.data });
+};
 
 // TODO implement other segment functions
 // console.log(getAnalytics());
@@ -27,11 +36,9 @@ export const idUser = (id: string) => getAnalytics()?.identify(id);
 export const trackAnalyticsEvent =
   <T>(eventName: AnalyticsEventNames) =>
   (eventData: BaseAnalyticsEventData & T): Promise<Context> | undefined => {
-    const a = getAnalytics();
-    const {
-      wallet: { name, networkVersion: chainId, selectedAddress: address },
-      ...data
-    } = eventData;
-    console.log('segmet', a, eventName, eventData);
-    return a?.track(eventName, { ...data, wallet: { name, chainId, address } }); // should event data be an obj or spread op?
+    const { wallet: { name, networkVersion: chainId, selectedAddress: address } = {}, ...data } = eventData;
+    return getAnalytics()?.track(eventName, {
+      ...data,
+      wallet: { name, chainId, address },
+    });
   };

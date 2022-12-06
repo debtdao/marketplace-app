@@ -8,4 +8,3 @@ export * from './useQueryParams';
 export * from './useToggler';
 export * from './windowDimensions';
 export * from './useSelectedSellToken';
-export * from './useSelectedCreditLine';

@@ -146,18 +146,7 @@ export const Portfolio = () => {
     <StyledViewContainer>
       <HeaderCard items={SummaryCardItems} cardSize="small" />
 
-      {userTokensLoading && <StyledSpinnerLoading />}
-
-      {!aggregatedCreditLinePage && !data && (
-        <StyledSliderCard
-          header={t('components.no-borrower-positions.header')}
-          Component={
-            <Text>
-              <p>{t('components.no-borrower-positions.content')}</p>
-            </Text>
-          }
-        />
-      )}
+      {!aggregatedCreditLinePage && !data && <StyledSpinnerLoading />}
 
       {aggregatedCreditLinePage && currentRole === BORROWER_POSITION_ROLE ? (
         <StyledBorrowerContainer>
@@ -167,19 +156,12 @@ export const Portfolio = () => {
         ''
       )}
 
-      {currentRole === LENDER_POSITION_ROLE && data.length > 0 ? (
+      {currentRole === LENDER_POSITION_ROLE ? (
         <StyledBorrowerContainer>
           <PositionsTable events={data} />
         </StyledBorrowerContainer>
       ) : (
-        <StyledSliderCard
-          header={t('components.no-borrower-positions.header')}
-          Component={
-            <Text>
-              <p>{t('components.no-borrower-positions.content')}</p>
-            </Text>
-          }
-        />
+        ''
       )}
 
       {/* {!userTokensLoading && (

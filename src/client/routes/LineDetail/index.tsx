@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { LinesActions, AlertsActions, AppSelectors, TokensSelectors, LinesSelectors, NetworkSelectors } from '@store';
@@ -44,7 +44,7 @@ export const LineDetail = () => {
   const location = useLocation();
   const isMounting = useIsMounting();
   const { NETWORK_SETTINGS } = getConfig();
-
+  const { lineAddress } = useParams<LineDetailRouteParams>();
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedPage = useAppSelector(LinesSelectors.selectSelectedLinePage);
@@ -57,13 +57,7 @@ export const LineDetail = () => {
   //const walletName = useAppSelector(WalletSelectors.selectWallet);
   const currentNetworkSettings = NETWORK_SETTINGS[currentNetwork];
 
-  // 1. get line address from url parms
-  // 2. set selected line as current line
-  // 3. fetch line page
-  // 4.
   useEffect(() => {
-    const lineAddress: string | undefined = location.pathname.split('/')[2];
-
     console.log('line address', lineAddress);
     if (!lineAddress || !isValidAddress(lineAddress)) {
       dispatch(AlertsActions.openAlert({ message: 'INVALID_ADDRESS', type: 'error' }));

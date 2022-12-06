@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 import { useAppSelector, useAppTranslation, useIsMounting, useAppDispatch } from '@hooks';
 import {
@@ -56,29 +56,26 @@ const RoleOption = styled.div<{ active?: boolean }>`
   `}
 `;
 
-const StyledSliderCard = styled(SliderCard)`
-  padding: 3rem;
-  margin: 0;
-`;
-
 const StyledBorrowerContainer = styled.div`
   grid-column: 1 / 3;
 `;
 
+type userParams = {
+  userAddress: string;
+};
+
 export const Portfolio = () => {
   const { t } = useAppTranslation(['common', 'home']);
   const isMounting = useIsMounting();
-  const location = useLocation();
+  const { userAddress } = useParams<userParams>();
   const dispatch = useAppDispatch();
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
 
-  // const labsSummary = useAppSelector(LabsSelectors.selectSummaryData);
   const userTokens = useAppSelector(TokensSelectors.selectUserTokens);
   const activeModal = useAppSelector(ModalSelectors.selectActiveModal);
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
   const tokensListStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
   const generalLoading = (appStatus.loading || tokensListStatus.loading || isMounting) && !activeModal;
-  const userAddress: string | undefined = location.pathname.split('/')[2];
   const userPortfolio = useAppSelector(LinesSelectors.selectUserPortfolio);
 
   const userTokensLoading = generalLoading && !userTokens.length;
@@ -115,6 +112,8 @@ export const Portfolio = () => {
 
   useEffect(() => {
     if (userPortfolio && currentRole === BORROWER_POSITION_ROLE) {
+      //Types for returned obj need to be set up correctly
+      //@ts-ignore
       const borrowerData: any[] = userPortfolio.borrowerLineOfCredits;
       setdata(borrowerData);
       if (borrowerData && borrowerData[0]) {

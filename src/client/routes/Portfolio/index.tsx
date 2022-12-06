@@ -16,6 +16,7 @@ import { SummaryCard, ViewContainer, NoWalletCard, SliderCard, LineDetailsDispla
 import { SpinnerLoading, Text } from '@components/common';
 import { halfWidthCss, isValidAddress, formatGetBorrowerQuery } from '@utils';
 import { CreditLinePage, LENDER_POSITION_ROLE, BORROWER_POSITION_ROLE, ARBITER_POSITION_ROLE } from '@src/core/types';
+import { PositionsTable } from '@src/client/components/app/LineDetailsDisplay/PositionsTable';
 
 const StyledViewContainer = styled(ViewContainer)`
   display: grid;
@@ -91,18 +92,24 @@ export const Portfolio = () => {
   const [data, setdata] = useState<any[]>([]);
   const [aggregatedCreditLinePage, setAggregatedCreditLine] = useState<CreditLinePage>();
 
-  const availableRoles = [BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, ARBITER_POSITION_ROLE];
+  const availableRoles = [BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE];
 
   const SummaryCardItems = availableRoles.map((role: string) => {
     return {
       header: t(''),
       Component: (
-        <RoleOption onClick={() => setRole(role)} active={role === currentRole} key={`s-${role}`}>
+        <RoleOption onClick={() => handleSetRole(role)} active={role === currentRole} key={`s-${role}`}>
           {t(`settings:${role}`)}
         </RoleOption>
       ),
     };
   });
+
+  const handleSetRole = (role: string) => {
+    setdata([]);
+    setRole(role);
+  };
+
   useEffect(() => {
     if (!userAddress || !isValidAddress(userAddress)) {
       dispatch(AlertsActions.openAlert({ message: 'INVALID_ADDRESS', type: 'error' }));
@@ -114,20 +121,23 @@ export const Portfolio = () => {
   }, [currentRole, walletIsConnected]);
 
   useEffect(() => {
-    console.log('user portfolio has been set', userPortfolio);
-    if (userPortfolio) {
+    if (userPortfolio && currentRole === BORROWER_POSITION_ROLE) {
       //Types for returned obj need to be set up correctly
       //@ts-ignore
       const borrowerData: any[] = userPortfolio.borrowerLineOfCredits;
       console.log('pull out borrower data', borrowerData);
       setdata(borrowerData);
     }
-  }, [userPortfolio]);
+    if (userPortfolio && currentRole === LENDER_POSITION_ROLE) {
+      const lenderData = userPortfolio.lenderPositions.positions!;
+      console.log('lender positions', lenderData);
+      setdata(lenderData);
+    }
+  }, [userPortfolio, currentRole]);
 
   useEffect(() => {
     let aggregate;
-    console.log(data, 'here');
-    if (data) {
+    if (data && currentRole === BORROWER_POSITION_ROLE) {
       aggregate = formatGetBorrowerQuery(data, userAddress);
     }
     setAggregatedCreditLine(aggregate);
@@ -141,7 +151,7 @@ export const Portfolio = () => {
 
       {userTokensLoading && <StyledSpinnerLoading />}
 
-      {!aggregatedCreditLinePage && (
+      {!aggregatedCreditLinePage && !data && (
         <StyledSliderCard
           header={t('components.no-borrower-positions.header')}
           Component={
@@ -155,6 +165,14 @@ export const Portfolio = () => {
       {aggregatedCreditLinePage && currentRole === BORROWER_POSITION_ROLE ? (
         <StyledBorrowerContainer>
           <LineDetailsDisplay page={aggregatedCreditLinePage} line={aggregatedCreditLinePage} />
+        </StyledBorrowerContainer>
+      ) : (
+        ''
+      )}
+
+      {currentRole === LENDER_POSITION_ROLE && data.length > 0 ? (
+        <StyledBorrowerContainer>
+          <PositionsTable events={data} />
         </StyledBorrowerContainer>
       ) : (
         ''

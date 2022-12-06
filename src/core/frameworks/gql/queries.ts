@@ -301,7 +301,7 @@ export const GET_SPIGOT_QUERY = gql`
 `;
 
 // create new fragment to get positions for a user
-const POSITIONS_FRAGMENT = gql`
+const LINE_OF_CREDITS_FRAGMENT = gql`
   ${BASE_LINE_FRAGMENT}
   ${LINE_PAGE_CREDIT_FRAGMENT}
   ${LINE_EVENT_FRAGMENT}
@@ -310,7 +310,7 @@ const POSITIONS_FRAGMENT = gql`
   ${SPIGOT_EVENT_FRAGMENT}
   ${ESCROW_FRAGMENT}
 
-  fragment PositionsFrag on LineOfCredit {
+  fragment LineOfCreditsFrag on LineOfCredit {
     ...BaseLineFrag
 
     positions {
@@ -396,18 +396,18 @@ const LENDER_POSITIONS_FRAGMENT = gql`
 
 // fetches all of a user's positions in their portfolio for which they are a borrower, lender, and/or arbiter
 export const GET_USER_PORTFOLIO_QUERY = gql`
-  ${POSITIONS_FRAGMENT}
+  ${LINE_OF_CREDITS_FRAGMENT}
   ${LENDER_POSITIONS_FRAGMENT}
 
   query getUserPortfolio($user: String!) {
     borrowerLineOfCredits: lineOfCredits(where: { borrower: $user }) {
-      ...PositionsFrag
+      ...LineOfCreditsFrag
     }
     lenderPositions: lender(id: $user) {
       ...LenderPositionsFrag
     }
     arbiterLineOfCredits: lineOfCredits(where: { arbiter: $user }) {
-      ...PositionsFrag
+      ...LineOfCreditsFrag
     }
   }
 `;

@@ -123,6 +123,7 @@ export const Portfolio = () => {
     }
     if (userPortfolio && currentRole === LENDER_POSITION_ROLE) {
       const lenderData = userPortfolio?.lenderPositions?.positions;
+      console.log('User Portfolio - Lender: ', lenderData);
       setdata(lenderData ? lenderData : []);
       if (lenderData && lenderData[0].id) {
         const lineId = lenderData[0].id;
@@ -135,6 +136,7 @@ export const Portfolio = () => {
     let aggregate;
     if (data && currentRole === BORROWER_POSITION_ROLE) {
       aggregate = formatGetBorrowerQuery(data, userAddress);
+      console.log('User Portfolio Aggregate: ', aggregate);
     }
     setAggregatedCreditLine(aggregate);
   }, [data]);

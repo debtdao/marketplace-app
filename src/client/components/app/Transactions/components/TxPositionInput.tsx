@@ -165,8 +165,8 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
     // icon: '',
     deposit: selectedPosition!.deposit,
     tokenSymbol: selectedPosition!.token.symbol,
-    frate: selectedPosition!.fRate,
-    drate: selectedPosition!.dRate,
+    fRate: selectedPosition!.fRate,
+    dRate: selectedPosition!.dRate,
   };
 
   if (positions && positions.length > 1) {
@@ -180,8 +180,8 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
           // icon: '',
           deposit: item!.deposit,
           tokenSymbol: item?.token.symbol,
-          frate: item?.fRate,
-          drate: item?.dRate,
+          fRate: item?.fRate,
+          dRate: item?.dRate,
         };
       });
   }

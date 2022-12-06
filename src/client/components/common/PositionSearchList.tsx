@@ -142,7 +142,7 @@ export const PositionSearchList: FC<PositionSearchListProps> = ({
                   <br />
                   Deposit: {normalizeAmount(item.deposit, 18)}
                   <br />
-                  Rates: {item.frate} / {item.drate}%
+                  Rates: {item.fRate} / {item.dRate}%
                 </ItemLabel>
               </ListItem>
             )

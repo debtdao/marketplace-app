@@ -122,7 +122,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
     let approvalOBj = {
       spenderAddress: selectedCredit.id,
       tokenAddress: selectedSellTokenAddress,
-      amount: toWei(targetAmount, selectedPosition['token'].decimals),
+      amount: toWei(targetAmount, selectedPosition.token.decimals),
       network: walletNetwork,
     };
     //@ts-ignore
@@ -212,8 +212,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
     dispatch(
       LinesActions.depositAndClose({
         lineAddress: selectedCredit.id,
-        //@ts-ignore
-        id: selectedPosition['id'],
+        id: selectedPosition.id,
         network: walletNetwork,
       })
     ).then((res) => {

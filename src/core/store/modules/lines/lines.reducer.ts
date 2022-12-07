@@ -3,6 +3,7 @@ import { createReducer } from '@reduxjs/toolkit';
 import { ethers } from 'ethers';
 
 import {
+  Line,
   initialStatus,
   CreditLineState,
   UserLineMetadataStatusMap,
@@ -32,6 +33,7 @@ export const linesInitialState: CreditLineState = {
   selectedLineAddress: undefined,
   selectedPosition: undefined,
   linesMap: {},
+  positionsMap: {},
   pagesMap: {},
   categories: {},
   user: {
@@ -198,9 +200,11 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(getLinePage.fulfilled, (state, { payload: { linePageData } }) => {
       if (linePageData) {
         state.pagesMap = { ...state.pagesMap, [linePageData.id]: linePageData };
-        state.linesMap = { ...state.linesMap, [linePageData.id]: linePageData as AggregatedCreditLine };
+        // overwrite actual positions with referential ids
+        const { positions, ...pageData } = linePageData;
+        state.linesMap = { ...state.linesMap, [linePageData.id]: pageData };
+        state.positionsMap = { ...state.positionsMap, ...positions };
       }
-
       state.statusMap.getLinePage = {};
     })
     .addCase(getLinePage.rejected, (state, { error }) => {

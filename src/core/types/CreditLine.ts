@@ -48,10 +48,16 @@ export interface BaseCreditLine {
   totalInterestRepaid: string;
   // id, symbol, APY (4 decimals)
   highestApy: [string, string, string];
-  positions?: CreditPosition[];
 }
 
-export interface AggregatedCreditLine extends BaseCreditLine {
+export type PositionMap = { [id: string]: CreditPosition };
+
+export interface Line extends BaseCreditLine {
+  positionIds?: string[]; // referential ids stored in redux state
+}
+
+export interface AggregatedCreditLine extends Line {
+  positions?: PositionMap;
   // real-time aggregate usd value across all credits
   escrow?: AggregatedEscrow;
   spigot?: AggregatedSpigot;
@@ -78,6 +84,7 @@ export interface CreditLinePageAuxData {
 
 export interface CreditPosition {
   id: string;
+  line?: string;
   status: PositionStatusTypes;
   lender: {
     id: Address;
@@ -183,6 +190,7 @@ export interface RevenueSummary extends Collateral {
   firstRevenueTimestamp: number;
   lastRevenueTimestamp: number;
 }
+
 export interface AggregatedSpigot {
   id: Address;
   // aggregated revenue in USD by token across all spigots

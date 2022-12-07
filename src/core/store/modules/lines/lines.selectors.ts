@@ -11,6 +11,7 @@ import {
   Address,
   CreditLinePage,
   UserPositionMetadata,
+  PositionMap,
   CreditPosition,
   BORROWER_POSITION_ROLE,
   LENDER_POSITION_ROLE,
@@ -31,6 +32,7 @@ const selectLinesState = (state: RootState) => state.lines;
 
 // const selectUserLinesMetadataMap = (state: RootState) => state.lines.user.userLinesMetadataMap;
 const selectLinesMap = (state: RootState) => state.lines.linesMap;
+const selectPositionsForLineMap = (state: RootState) => state.lines.positionsMap;
 const selectLinePagesMap = (state: RootState) => state.lines.pagesMap;
 const selectLineCategories = (state: RootState) => state.lines.categories;
 //const selectLinesAddresses = (state: RootState) => Object.keys(state.lines.linesMap);
@@ -60,6 +62,37 @@ const selectLines = createSelector([selectLinesMap], (linesMap) => {
 const selectLiveLines = createSelector([selectLines], (lines): AggregatedCreditLine[] => {
   return lines.filter((line: AggregatedCreditLine) => line.end < Date.now() / 1000);
 });
+
+const selectSelectedLine = createSelector([selectLines, selectSelectedLineAddress], (lines, selectedLineAddress) => {
+  if (!selectedLineAddress) {
+    return undefined;
+  }
+  return lines.find((line) => line.id === selectedLineAddress);
+});
+
+const selectSelectedLinePage = createSelector(
+  [selectLinePagesMap, selectSelectedLineAddress],
+  (pages, line): CreditLinePage | undefined => {
+    return line ? pages[line] : undefined;
+  }
+);
+
+const selectPositionsForLine = createSelector(
+  [selectSelectedLine, selectPositionsForLineMap],
+  (line, positions): PositionMap => {
+    return _.zipObject(
+      _.keys(positions),
+      _.values(positions).filter((p: CreditPosition) => p.line === line)
+    ); // todo checksum address
+  }
+);
+
+const selectLinePage = createSelector(
+  [selectSelectedLine, selectPositionsForLine, selectEventsForLine],
+  (line, positions): CreditLinePage => {
+    return { ...line, positions /** events */ };
+  }
+);
 
 const selectUserPortfolioMetadata = (state: RootState) => state.lines.user.portfolio;
 
@@ -136,40 +169,18 @@ const selectLinesGeneralStatus = createSelector([selectLinesStatusMap], (statusM
   return { loading, error };
 });
 
-const selectSelectedLine = createSelector([selectLines, selectSelectedLineAddress], (lines, selectedLineAddress) => {
-  if (!selectedLineAddress) {
-    return undefined;
-  }
-  return lines.find((line) => line.id === selectedLineAddress);
-});
+// const selectSelectedPosition = createSelector(
+//   [selectSelectedLine, selectSelectedPosition],
+//   (line, selectSelectedPosition) => {
+//     if (!selectSelectedPosition) return;
 
-const selectSelectedLinePage = createSelector(
-  [selectLinePagesMap, selectSelectedLineAddress],
-  (pages, line): CreditLinePage | undefined => {
-    return line ? pages[line] : undefined;
-  }
-);
-
-const selectPositions = createSelector([selectSelectedLine], (line) => {
-  if (line === undefined) {
-    return;
-  }
-  let positions = line?.positions;
-  return positions;
-});
-
-const selectPositionData = createSelector(
-  [selectSelectedLine, selectSelectedPosition],
-  (line, selectSelectedPosition) => {
-    if (!selectSelectedPosition) return;
-
-    let selectedPositionData = _.find(
-      line?.positions,
-      (position: CreditPosition) => position.id === selectSelectedPosition
-    );
-    return selectedPositionData;
-  }
-);
+//     let selectedPositionData = _.find(
+//       line?.positions,
+//       (position: CreditPosition) => position.id === selectSelectedPosition
+//     );
+//     return selectedPositionData;
+//   }
+// );
 
 const selectUserPositionMetadata = createSelector(
   [selectUserWallet, selectSelectedLine, selectSelectedPosition],
@@ -252,7 +263,7 @@ export const LinesSelectors = {
   selectLinesActionsStatusMap,
   selectLinesStatusMap,
   selectUserLinesSummary,
-  selectPositions,
+  selectPositionsForLine,
   selectUserPortfolio,
   // selectUserPositions,
   selectLinesGeneralStatus,
@@ -264,7 +275,6 @@ export const LinesSelectors = {
   selectSummaryData,
   //selectRecommendations,
   selectGetLinePageStatus,
-  selectPositionData,
   selectLine,
   // selectExpectedTxOutcome,
   // selectExpectedTxOutcomeStatus,

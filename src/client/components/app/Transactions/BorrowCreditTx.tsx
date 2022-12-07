@@ -34,11 +34,11 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionLoading, setLoading] = useState(false);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
-  const selectedPosition = useAppSelector(LinesSelectors.selectPositionData);
+  const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
   const [errors, setErrors] = useState<string[]>(['']);
   const [targetAmount, setTargetAmount] = useState('1');
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
-  const positions = useAppSelector(LinesSelectors.selectPositions);
+  const positions = useAppSelector(LinesSelectors.selectPositionsForLine);
 
   console.log('positions', positions);
 

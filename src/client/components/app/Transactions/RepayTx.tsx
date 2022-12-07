@@ -36,7 +36,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
   const dispatch = useAppDispatch();
   const { acceptingOffer, header, onClose, onPositionChange } = props;
   const [repayType, setRepayType] = useState({ id: '1', label: 'Repay from:', value: 'Wallet' });
-  const selectedPosition = useAppSelector(LinesSelectors.selectPositionData);
+  const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionLoading, setLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>(['']);
@@ -48,7 +48,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
   //const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
   const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
   const initialToken: string = selectedSellTokenAddress || DAI;
-  const positions = useAppSelector(LinesSelectors.selectPositions);
+  const positions = useAppSelector(LinesSelectors.selectPositionsForLine);
 
   const repaymentOptions = [
     { id: '1', label: 'Repay from:', value: 'Wallet' },

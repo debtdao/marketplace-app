@@ -1,4 +1,5 @@
 import {
+  Line,
   TokenFragRepsonse,
   GetUserPortfolioResponse,
   LineOfCreditsResponse,
@@ -112,7 +113,8 @@ export interface IdToCreditPositionMap {
 export interface CreditLineState {
   selectedLineAddress: string | undefined;
   selectedPosition: string | undefined;
-  linesMap: { [lineAddress: string]: AggregatedCreditLine };
+  linesMap: { [lineAddress: string]: Line };
+  positionsMap: { [id: string]: CreditPosition };
   // probs can just consolidate line/linePage since we need a lot of derived data in linePage for basic functionality
   pagesMap: { [lineAddress: string]: CreditLinePage };
   categories: { [category: string]: string[] };

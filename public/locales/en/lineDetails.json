@@ -33,7 +33,6 @@
       "add-collateral": "Deposit",
       "no-table": "No Collateral added"
     }
-
   },
   "credit-events": {
     "title": "Payment History",

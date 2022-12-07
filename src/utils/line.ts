@@ -141,6 +141,7 @@ export function formatGetLinesData(
       ...rest
     } = data;
     const { credit, spigot, escrow } = formatAggregatedCreditLineData(
+      rest.id,
       positions,
       escrowRes?.deposits ?? [],
       spigotRes?.revenues ?? [],
@@ -179,7 +180,8 @@ export function formatGetLinePageAuxData(
 }
 
 export const formatAggregatedCreditLineData = (
-  positions: (BasePositionFragResponse | BasePositionFragResponse)[],
+  line: Address,
+  positionFrags: (BasePositionFragResponse | BasePositionFragResponse)[],
   collateralDeposits: BaseEscrowDepositFragResponse[],
   revenues: SpigotRevenueSummaryFragResponse[],
   tokenPrices: { [token: string]: BigNumber }
@@ -190,7 +192,8 @@ export const formatAggregatedCreditLineData = (
     deposit: string;
     interest: string;
     totalInterestRepaid: string;
-    positions: CreditPosition[];
+    positionIds: string[];
+    positions: { [id: string]: CreditPosition };
   };
   spigot: { tokenRevenue: { [key: string]: string } };
   escrow: {
@@ -208,7 +211,7 @@ export const formatAggregatedCreditLineData = (
   const principal = BigNumber.from(0);
   const deposit = BigNumber.from(0);
 
-  const credit = positions.reduce(
+  const credit = positionFrags.reduce(
     (agg: any, c) => {
       const price = tokenPrices[c.token?.id] || BigNumber.from(0);
       // const highestApy = BigNumber.from(c.dRate).gt(BigNumber.from(agg.highestApy[2]))
@@ -256,39 +259,36 @@ export const formatAggregatedCreditLineData = (
     return { ...r, [r.token]: (r.totalVolumeUsd ?? '0').toString() };
   }, {});
 
-  const formattedPositions = positions.reduce(
-    (obj: any, c: BasePositionFragResponse): { [id: string]: CreditPosition } => {
-      const {
-        dRate,
-        fRate,
+  const positions = positionFrags.reduce((obj: any, c: BasePositionFragResponse): { [id: string]: CreditPosition } => {
+    const {
+      dRate,
+      fRate,
+      id,
+      lender,
+      token,
+      ...financials
+      // events: graphEvents,
+    } = c;
+
+    const currentUsdPrice = tokenPrices[c.token?.id];
+    // const events = graphEvents ? formatCreditEvents(c.token.symbol, currentUsdPrice, graphEvents!) : [];
+    // creditEvents.concat(events);
+    return {
+      ...obj,
+      [id]: {
         id,
-        lender,
-        token,
-        ...financials
-        // events: graphEvents,
-      } = c;
+        line,
+        lender: lender.id,
+        ...financials,
+        dRate: normalizeAmount(fRate, 2),
+        fRate: normalizeAmount(dRate, 2),
+        token: _createTokenView(token, BigNumber.from(principal), currentUsdPrice),
+        // events,
+      },
+    };
+  }, {});
 
-      const currentUsdPrice = tokenPrices[c.token?.id];
-      // const events = graphEvents ? formatCreditEvents(c.token.symbol, currentUsdPrice, graphEvents!) : [];
-      // creditEvents.concat(events);
-      return {
-        ...obj,
-        [id]: {
-          id,
-          lender: lender.id,
-          ...financials,
-          dRate: normalizeAmount(fRate, 2),
-          fRate: normalizeAmount(dRate, 2),
-          token: _createTokenView(token, BigNumber.from(principal), currentUsdPrice),
-          // events,
-        },
-      };
-    },
-    {}
-  );
-
-  console.log('formatted page positions', formattedPositions, positions);
-
+  console.log('formatted page positions', positionFrags, positions);
   return {
     credit: {
       highestApy,
@@ -296,7 +296,8 @@ export const formatAggregatedCreditLineData = (
       deposit: parseUnits(unnullify(credit.deposit), 'ether').toString(),
       interest: '0', // TODO
       totalInterestRepaid: '0', // TODO
-      positions: Object.values(formattedPositions),
+      positionIds: Object.keys(positions),
+      positions,
     },
     escrow,
     spigot: { tokenRevenue },
@@ -321,7 +322,13 @@ export const formatLinePageData = (
     credit,
     spigot: spigotData,
     escrow: escrowData,
-  } = formatAggregatedCreditLineData(positions!, escrow?.deposits || [], spigot?.summaries || [], tokenPrices);
+  } = formatAggregatedCreditLineData(
+    metadata.id,
+    positions!,
+    escrow?.deposits || [],
+    spigot?.summaries || [],
+    tokenPrices
+  );
   const lineAddress = metadata.id;
 
   console.log('get line page escrow', escrow, escrowData);
@@ -401,7 +408,13 @@ export const formatUserPortfolioData = (
         credit,
         spigot: spigotData,
         escrow: escrowData,
-      } = formatAggregatedCreditLineData(positions, escrow?.deposits || [], spigot?.summaries || [], tokenPrices);
+      } = formatAggregatedCreditLineData(
+        rest.id,
+        positions,
+        escrow?.deposits || [],
+        spigot?.summaries || [],
+        tokenPrices
+      );
 
       return {
         ...rest,

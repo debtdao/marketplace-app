@@ -153,7 +153,7 @@ export const Portfolio = () => {
 
       {portfolioLoaded && selectedLine && currentRole === BORROWER_POSITION_ROLE ? (
         <StyledBorrowerContainer>
-          <LineDetailsDisplay page={selectedLine as CreditLinePage} line={selectedLine} />
+          {/* <LineDetailsDisplay page={selectedLine as CreditLinePage} line={selectedLine} /> */}
         </StyledBorrowerContainer>
       ) : (
         ''

@@ -23,7 +23,6 @@ export const initialLineActionsStatusMap: LineActionsStatusMap = {
 };
 
 export const initialUserMetadataStatusMap: UserLineMetadataStatusMap = {
-  getUserLinePositions: initialStatus,
   getUserPortfolio: initialStatus,
   linesActionsStatusMap: {},
 };
@@ -218,41 +217,17 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(deploySecuredLine.rejected, (state, { error }) => {
       state.statusMap.deploySecuredLine = { error: error.message };
     })
-    /* ------------------------- getUserLinePositions ------------------------- */
-    // .addCase(getUserLinePositions.pending, (state, { meta }) => {
-    //   const lineAddresses = meta.arg.lineAddresses || [];
-    //   lineAddresses.forEach((address) => {
-    //     checkAndInitUserLineStatus(state, address);
-    //     state.statusMap.user.getUserLinePositions = { loading: true };
-    //   });
-    //   state.statusMap.user.getUserLinePositions = { loading: true };
-    // })
-    // .addCase(getUserLinePositions.fulfilled, (state, { meta, payload: { userLinesPositions } }) => {
-    //   const linesPositionsMap = userLinesPositions.reduce((obj, a) => ({ ...obj, [a.id]: a }), {});
-    //   state.user.linePositions = { ...state.user.linePositions, ...linesPositionsMap };
-    //   state.statusMap.user.getUserLinePositions = {};
-    // })
-    // .addCase(getUserLinePositions.rejected, (state, { meta, error }) => {
-    //   const lineAddresses = meta.arg.lineAddresses || [];
-    //   lineAddresses.forEach((address) => {
-    //     state.statusMap.user.getUserLinePositions = {};
-    //   });
-    //   state.statusMap.user.getUserLinePositions = { error: error.message };
-    // })
 
     /* ------------------------- getUserPortfolio ------------------------- */
     .addCase(getUserPortfolio.pending, (state, { meta }) => {
       state.statusMap.user.getUserPortfolio = { loading: true };
     })
     .addCase(getUserPortfolio.fulfilled, (state, { meta, payload: { address, lines, positions } }) => {
-      state.linesMap = {
-        ...state.linesMap,
-        ...lines,
-      };
+      state.linesMap = { ...state.linesMap, ...lines };
       const linesByRole: LinesByRole = _.entries<AggregatedCreditLine>(lines).reduce(
         ({ borrowing, arbiting }: LinesByRole, [addy, line]) => {
-          if (line.borrower === address) return { arbiting, borrowing: [...(borrowing ?? []), addy] };
-          if (line.arbiter === address) return { borrowing, arbiting: [...(arbiting ?? []), addy] };
+          if (line.borrower === address) return { arbiting, borrowing: [...borrowing, addy] };
+          if (line.arbiter === address) return { borrowing, arbiting: [...arbiting, addy] };
           return { borrowing, arbiting };
         },
         { borrowing: [], arbiting: [] }
@@ -274,19 +249,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(getUserPortfolio.rejected, (state, { meta, error }) => {
       state.statusMap.user.getUserPortfolio = { error: error.message };
     })
-
-    // /* -------------------------- getUserLinePositions -------------------------- */
-    // .addCase(getUserLinePositions.pending, (state) => {
-    //   state.statusMap.user.getUserLinePositions = { loading: true };
-    // })
-    // .addCase(getUserLinePositions.fulfilled, (state, { payload: { userLinesPositions } }) => {
-    //   // TODO fix data missmatch between types PositionSummary and BasicCreditLine
-    //   // state.user.linePositions = userLinesPositions.reduce((map, line) => ({ ...map, [line]: state.linesMap[line]}), {});
-    //   state.statusMap.user.getUserLinePositions = {};
-    // })
-    // .addCase(getUserLinePositions.rejected, (state, { error }) => {
-    //   state.statusMap.user.getUserLinePositions = { error: error.message };
-    // })
 
     /* ---------------------- getExpectedTransactionOutcome --------------------- */
     // .addCase(getExpectedTransactionOutcome.pending, (state) => {

@@ -341,6 +341,8 @@ export const formatLinePageData = (
     };
   }, {});
 
+  console.log('formatted page positions', formattedPositions, positions);
+
   // TODO add spigot events to collateralEvents
 
   const formattedEscrowData = Object.values(escrow?.deposits ?? {}).reduce((obj: any, d: any) => {
@@ -380,7 +382,7 @@ export const formatLinePageData = (
     collateralEvents,
     creditEvents,
     //@ts-ignore
-    positions: formattedPositions,
+    positions: Object.values(formattedPositions), // TODO keep as object for state
     // collateral data
     spigot: formattedSpigot,
     escrow: isEmpty(escrow?.deposits) ? undefined : { ...escrow!, ...escrowData },

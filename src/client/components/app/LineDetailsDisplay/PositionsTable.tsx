@@ -46,7 +46,7 @@ const TableHeader = styled.h3`
 `;
 
 interface PositionsProps {
-  events: CreditPosition[];
+  positions: CreditPosition[];
 }
 
 interface Transaction {
@@ -66,7 +66,7 @@ export const PositionsTable = (props: PositionsProps) => {
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const [actions, setActions] = useState<Transaction[]>([]);
-  const { events } = props;
+  const { positions } = props;
   const { NETWORK } = getEnv();
 
   //Initial set up for positions table
@@ -181,7 +181,7 @@ export const PositionsTable = (props: PositionsProps) => {
   };
 
   let ctaButtonText = userWallet
-    ? `${t('lineDetails:positions-events.propose-position')}`
+    ? `${t('lineDetails:positions-positions.propose-position')}`
     : `${t('components.connect-button.connect')}`;
 
   //Returns a list of transactions to display on positions table
@@ -201,6 +201,7 @@ export const PositionsTable = (props: PositionsProps) => {
     return [];
   };
 
+  console.log('positions table', positions);
   return (
     <>
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
@@ -273,17 +274,17 @@ export const PositionsTable = (props: PositionsProps) => {
               grow: '1',
             },
           ]}
-          data={events?.map((event) => ({
+          data={positions?.map((p) => ({
             // this needs to be humanized to correct amount depending on the token.
-            deposit: humanize('amount', event.deposit, event.token.decimals, 2),
-            drate: `${event.dRate} %`,
-            frate: `${event.fRate} %`,
-            status: event.status,
-            principal: humanize('amount', event.principal, event.token.decimals, 2),
-            interest: humanize('amount', event.interestAccrued, event.token.decimals, 2),
-            lender: formatAddress(event.lender.id),
-            token: event.token.symbol,
-            actions: <ActionButtons value={event.id} actions={getUserPositionActions(event)} />,
+            deposit: humanize('amount', p.deposit, p.token.decimals, 2),
+            drate: `${p.dRate} %`,
+            frate: `${p.fRate} %`,
+            status: p.status,
+            principal: humanize('amount', p.principal, p.token.decimals, 2),
+            interest: humanize('amount', p.interestAccrued, p.token.decimals, 2),
+            lender: formatAddress(p.lender.id),
+            token: p.token.symbol,
+            actions: <ActionButtons value={p.id} actions={getUserPositionActions(p)} />,
           }))}
           SearchBar={
             <>

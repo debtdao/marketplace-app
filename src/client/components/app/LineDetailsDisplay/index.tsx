@@ -78,7 +78,7 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
           startTime={start}
           endTime={end}
         />
-        <PositionsTable events={positions} />
+        <PositionsTable positions={positions} />
       </Container>
     );
   } else {

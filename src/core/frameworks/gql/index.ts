@@ -108,13 +108,6 @@ export const getLines: QueryCreator<GetLinesArgs, GetLinesResponse[]> = <GetLine
   arg: GetLinesArgs
 ): QueryResponse<GetLinesResponse[]> => getLinesQuery({ ...arg, blacklist });
 
-const getUserLinePositionsQuery = createQuery(GET_LINES_QUERY);
-export const getUserLinePositions: QueryCreator<GetUserLinePositionsArgs, CreditPosition[]> = <
-  GetUserLinePositionsArgs
->(
-  arg: GetUserLinePositionsArgs
-) => getUserLinePositionsQuery(arg);
-
 const getSupportedOracleTokensQuery = createQuery(GET_SUPPORTED_ORACLE_TOKENS_QUERY, undefined, true);
 export const getSupportedOracleTokens: QueryCreator<
   undefined,

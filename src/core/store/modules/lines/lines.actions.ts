@@ -190,6 +190,8 @@ const getUserPortfolio = createAsyncThunk<
   if (!userPortfolio) return { address: user, lines: {}, positions: [] };
 
   const { lines, positions } = formatUserPortfolioData(userPortfolio, tokenPrices);
+  console.log('formatted user portfolio', lines, positions);
+
   // console.log('User Portfolio Actions Borrower Lines: ', borrowerLineData);
   return { address: user, lines, positions };
 });
@@ -387,7 +389,6 @@ const depositAndRepay = createAsyncThunk<
     // await transactionService.handleTransaction({ tx, network: network.current, useExternalService: notifyEnabled });
     //dispatch(getLinePage({ id: lineAddress }));
     // dispatch(getUserLinesSummary());
-    //dispatch(getUserLinePositions({ lineAddresses: [lineAddress] }));
     // dispatch(getUserLinesMetadata({ linesAddresses: [lineAddress] }));
     //dispatch(TokensActions.getUserTokens({ addresses: [tokenAddress, lineAddress] }));
   },
@@ -506,7 +507,6 @@ const liquidate = createAsyncThunk<
     // await transactionService.handleTransaction({ tx, network: network.current, useExternalService: notifyEnabled });
     // dispatch(getLinePage({ id: lineAddress }));
     // // dispatch(getUserLinesSummary());
-    // dispatch(getUserLinePositions({ lineAddresses: [lineAddress] }));
     // // dispatch(getUserLinesMetadata({ linesAddresses: [lineAddress] }));
     // dispatch(TokensActions.getUserTokens({ addresses: [tokenAddress, lineAddress] }));
   },
@@ -569,7 +569,6 @@ const withdrawLine = createAsyncThunk<
     // await transactionService.handleTransaction({ tx, network: network.current, useExternalService: notifyEnabled });
     //dispatch(getLinePage({ id: lineAddress }));
     // dispatch(getUserLinesSummary());
-    //dispatch(getUserLinePositions({ lineAddresses: [lineAddress] }));
     // dispatch(getUserLinesMetadata({ linesAddresses: [lineAddress] }));
     //dispatch(TokensActions.getUserTokens({ addresses: [targetTokenAddress, lineAddress] }));
   },
@@ -727,7 +726,6 @@ const getWithdrawAllowance = createAsyncThunk<
 //       event: 'positionsOf',
 //       action: (lineAddresses: string[]) => {
 //         dispatch(getUserLinesSummary());
-//         dispatch(getUserLinePositions({ lineAddresses }));
 //         dispatch(getUserLinesMetadata({ linesAddresses: lineAddresses }));
 //       },
 //     });

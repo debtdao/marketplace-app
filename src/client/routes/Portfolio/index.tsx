@@ -156,7 +156,7 @@ export const Portfolio = () => {
 
       {portfolioLoaded && currentRole === LENDER_POSITION_ROLE && lenderData.length > 0 ? (
         <StyledBorrowerContainer>
-          <PositionsTable events={lenderData} />
+          <PositionsTable positions={lenderData} />
         </StyledBorrowerContainer>
       ) : (
         ''

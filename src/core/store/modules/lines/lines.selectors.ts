@@ -51,7 +51,6 @@ const selectLinesActionsStatusMap = (state: RootState) => state.lines.statusMap.
 
 const selectGetLinesStatus = (state: RootState) => state.lines.statusMap.getLines;
 const selectGetLinePageStatus = (state: RootState) => state.lines.statusMap.getLinePage;
-const selectGetUserLinesPositionsStatus = (state: RootState) => state.lines.statusMap.user.getUserLinePositions;
 
 /* ----------------------------- Main Selectors ----------------------------- */
 const selectLines = createSelector([selectLinesMap], (linesMap) => {
@@ -143,26 +142,6 @@ const selectSelectedLine = createSelector([selectLines, selectSelectedLineAddres
   }
   return lines.find((line) => line.id === selectedLineAddress);
 });
-
-const selectLinesStatus = createSelector(
-  [selectGetLinesStatus, selectGetUserLinesPositionsStatus],
-  (getLinesStatus, getUserLinesPositionsStatus): Status => {
-    return {
-      loading: getLinesStatus.loading || getUserLinesPositionsStatus.loading,
-      error: getLinesStatus.error || getUserLinesPositionsStatus.error,
-    };
-  }
-);
-
-//const selectLinePageStatus = createSelector(
-//  [selectGetLinePageStatus, selectGetUserLinesPositionsStatus],
-//  (getLinesStatus, getUserLinesPositionsStatus): Status => {
-//    return {
-//      loading: getLinesStatus.loading || getUserLinesPositionsStatus.loading,
-//      error: getLinesStatus.error || getUserLinesPositionsStatus.error,
-//    };
-//  }
-//);
 
 const selectSelectedLinePage = createSelector(
   [selectLinePagesMap, selectSelectedLineAddress],
@@ -259,28 +238,6 @@ const selectUserPositionMetadata = createSelector(
   }
 );
 
-/* --------------------------------- Helper --------------------------------- */
-// interface CreateLineProps {
-//   lineData: AggregatedCreditLine;
-//   // tokenAllowancesMap: AllowancesMap;
-//   positions: { [key: string]: PositionSummary };
-//   // userLinesMetadataMap: UserPositionMetadata;
-//   lineAllowancesMap: AllowancesMap;
-// }
-// function createLine(props: CreateLineProps):AggregatedCreditLine{
-//   const {
-//     lineData,
-//     // tokenAllowancesMap,
-//     lineAllowancesMap,
-//     positions,
-//     // userLinesMetadataMap,
-//   } = props;
-
-//   return {
-//     ...lineData,
-//   };
-// }
-
 export const LinesSelectors = {
   selectLinesState,
   selectLinesMap,
@@ -306,7 +263,6 @@ export const LinesSelectors = {
   // selectDepositedLines,
   selectSummaryData,
   //selectRecommendations,
-  selectLinesStatus,
   selectGetLinePageStatus,
   selectPositionData,
   selectLine,

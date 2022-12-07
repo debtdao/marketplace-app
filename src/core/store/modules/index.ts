@@ -62,6 +62,10 @@ import { LinesSelectors } from './lines/lines.selectors';
 import collateralReducer, { collateralInitialState } from './collateral/collateral.reducer';
 import { CollateralActions } from './collateral/collateral.actions';
 import { CollateralSelectors } from './collateral/collateral.selectors';
+// OnChain MetaData
+import { onChainMetaDataReducer, initialOnChainMetaDataState } from './etherscan/etherscan.reducer';
+import { OnChainMetaDataActions } from './etherscan/etherscan.actions';
+import { OnChainMetaDataSelector } from './etherscan/etherscan.selector';
 
 const rootReducer: Reducer<RootState> = combineReducers({
   app: appReducer,
@@ -77,6 +81,7 @@ const rootReducer: Reducer<RootState> = combineReducers({
   partner: partnerReducer,
   lines: linesReducer,
   collateral: collateralReducer,
+  metadata: onChainMetaDataReducer,
 });
 
 export default rootReducer;
@@ -98,6 +103,7 @@ export {
   PartnerActions,
   LinesActions,
   CollateralActions,
+  OnChainMetaDataActions,
 };
 
 // Selectors
@@ -116,6 +122,7 @@ export {
   PartnerSelectors,
   LinesSelectors,
   CollateralSelectors,
+  OnChainMetaDataSelector,
 };
 
 // initialState
@@ -135,4 +142,5 @@ export {
   partnerInitialState,
   linesInitialState,
   collateralInitialState,
+  initialOnChainMetaDataState,
 };

@@ -15,6 +15,7 @@ import {
   TokensSelectors,
   WalletSelectors,
   LinesSelectors,
+  OnChainMetaDataActions,
   CollateralActions,
   selectDepositTokenOptionsByAsset,
   CollateralSelectors,
@@ -88,11 +89,12 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const [settingOwnerSplit, setOwnerSplit] = useState('100');
   const [settingClaimFunc, setClaimFunc] = useState('');
   const [settingTransferFunc, setTransferFunc] = useState('');
+  const [revenueContractAdd, setRevenueContractAdd] = useState<string>('');
 
   const selectedAssetAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress) || TOKEN_ADDRESSES.DAI;
   // TODO pull colalteralOptions from subgraph instread of default yearn tokens
   const collateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
-  //const selectedAsset = _.find(collateralOptions, (t) => t.address === selectedAssetAddress);
+  //const selectedAsset  _.find(collateralOptions, (t) => t.address === selectedAssetAddress);
   // TODO get token prices from yearn API and display
 
   useEffect(() => {
@@ -101,6 +103,14 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       dispatch(CollateralActions.setSelectedEscrow({ escrowAddress: selectedLine.spigot.id }));
     }
   });
+
+  useEffect(() => {
+    console.log('made it to revenue call');
+    if (revenueContractAdd.length === 42) {
+      console.log('making the call');
+      dispatch(OnChainMetaDataActions.getABI({ address: revenueContractAdd }));
+    }
+  }, [revenueContractAdd]);
 
   const handleClaimChange = (byteCode: string) => {
     setClaimFunc(byteCode);
@@ -174,6 +184,10 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     });
   };
 
+  const handleChangeRevenue = (address: string) => {
+    setRevenueContractAdd(address);
+  };
+
   if (!selectedLine) return null;
 
   if (transactionCompleted === 1) {
@@ -202,7 +216,11 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
 
   return (
     <StyledTransaction onClose={onClose} header={header}>
-      <TxAddressInput headerText={t('components.transaction.enable-spigot.revenue-contract')} address="" />
+      <TxAddressInput
+        headerText={t('components.transaction.enable-spigot.revenue-contract')}
+        address={revenueContractAdd}
+        onAddressChange={handleChangeRevenue}
+      />
       <TxByteInput
         headerText={t('components.transaction.enable-spigot.function-revenue')}
         inputText={' '}

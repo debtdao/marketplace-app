@@ -32,7 +32,7 @@ export interface RootState {
   // debt dao
   lines: CreditLineState;
   collateral: CollateralState;
-  onChainMetaData: OnChainMetaDataState
+  metadata: OnChainMetaDataState;
 }
 
 export interface AppState {

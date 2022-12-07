@@ -80,7 +80,7 @@ export const Portfolio = () => {
 
   const userTokensLoading = generalLoading && !userTokens.length;
   const [currentRole, setRole] = useState<string>(BORROWER_POSITION_ROLE);
-  const [data, setdata] = useState<any[]>([]);
+  const [lenderData, setLenderData] = useState<any[]>([]);
   const [aggregatedCreditLinePage, setAggregatedCreditLine] = useState<CreditLinePage>();
 
   const availableRoles = [BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE];
@@ -97,7 +97,7 @@ export const Portfolio = () => {
   });
 
   const handleSetRole = (role: string) => {
-    setdata([]);
+    setLenderData([]);
     setRole(role);
   };
 
@@ -125,7 +125,7 @@ export const Portfolio = () => {
     if (userPortfolio && currentRole === LENDER_POSITION_ROLE) {
       const lenderData = userPortfolio?.lenderPositions;
       console.log('User Portfolio - Lender: ', lenderData);
-      setdata(lenderData ? lenderData : []);
+      setLenderData(lenderData ? lenderData : []);
       if (lenderData && lenderData[0].id) {
         const lineId = lenderData[0].id;
         dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineId }));
@@ -137,7 +137,7 @@ export const Portfolio = () => {
     <StyledViewContainer>
       <HeaderCard items={SummaryCardItems} cardSize="small" />
 
-      {!aggregatedCreditLinePage && !data && <StyledSpinnerLoading />}
+      {!aggregatedCreditLinePage && !lenderData && <StyledSpinnerLoading />}
 
       {aggregatedCreditLinePage && currentRole === BORROWER_POSITION_ROLE ? (
         <StyledBorrowerContainer>
@@ -149,7 +149,7 @@ export const Portfolio = () => {
 
       {currentRole === LENDER_POSITION_ROLE ? (
         <StyledBorrowerContainer>
-          <PositionsTable events={data} />
+          <PositionsTable events={lenderData} />
         </StyledBorrowerContainer>
       ) : (
         ''

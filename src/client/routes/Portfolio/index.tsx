@@ -117,7 +117,9 @@ export const Portfolio = () => {
       setAggregatedCreditLine(aggregatedData);
       if (borrowerData && borrowerData[0]) {
         const lineId = borrowerData[0].id;
+        const positionId = borrowerData[0].positions[0]?.id;
         dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineId }));
+        dispatch(LinesActions.setSelectedLinePosition({ position: positionId }));
       }
     }
     if (userPortfolio && currentRole === LENDER_POSITION_ROLE) {

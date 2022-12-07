@@ -186,7 +186,7 @@ export const getConstants = memoize((): Constants => {
     DUST_AMOUNT_USD: '10000000',
     ASSETS_ICON_URL: 'https://raw.githubusercontent.com/yearn/yearn-assets/master/icons/multichain-tokens/1/',
     // Arbiter_GOERLI: '0xde8f0f6769284e41bf0f82d0545141c15a3e4ad1', // FIXME: return the arbiter to the original address
-    Arbiter_GOERLI: '0xA59cC6DE45706DB1aF3eFb0EE08514b66434f9CB',
+    Arbiter_GOERLI: '0x1A6784925814a13334190Fd249ae0333B90b6443',
     Oracle_GOERLI: '0x7233038e589913dca4b6d15ff8bba263a433aed2',
     SwapTarget_GOERLI: '0xcb7b9188ada88cb0c991c807acc6b44097059dec',
     LineFactory_GOERLI: '0xc23b896F2b4aE3E6362B0D536113Fa2F0C9b8886',

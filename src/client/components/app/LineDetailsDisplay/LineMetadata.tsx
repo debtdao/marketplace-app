@@ -128,12 +128,12 @@ const MetricDataDisplay = ({ title, data, displaySubmetrics = false, submetrics 
 
 export const LineMetadata = (props: LineMetadataProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
-  const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
-  const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const dispatch = useAppDispatch();
   const { NETWORK } = getEnv();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
+  const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
+  const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const { principal, deposit, totalInterestPaid, revenue, deposits } = props;
   const modules = [revenue && 'revenue', deposits && 'escrow'].filter((x) => !!x);
   const totalRevenue = isEmpty(revenue)
@@ -210,7 +210,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const getCollateralRowActionForRole = (role: string) => {
     switch (role) {
       case ARBITER_POSITION_ROLE:
-        return 'liquidate';
+        //This should be liquidate, currently in testing
+        return 'add-collateral';
       case BORROWER_POSITION_ROLE:
       default:
         console.log('add collateral action selected for buuton');

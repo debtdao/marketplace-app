@@ -131,7 +131,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
     onClose();
   };
 
-  if (collateralOptions.length === 0) {
+  if (collateralOptions.length < 0) {
     return (
       <StyledTransaction onClose={onClose} header={t('components.transaction.add-collateral.no-assets-enabled.title')}>
         <BadLineErrorContainer>
@@ -288,6 +288,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
   }
 
   const isActive = selectedLine.status === ACTIVE_STATUS;
+  console.log('s-ac', selectedLine.status, ACTIVE_STATUS);
   if (!isActive) {
     const toMarketplace = () => {
       onClose();

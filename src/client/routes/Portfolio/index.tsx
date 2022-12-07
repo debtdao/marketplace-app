@@ -3,7 +3,15 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { useAppSelector, useAppTranslation, useIsMounting, useAppDispatch } from '@hooks';
-import { TokensSelectors, WalletSelectors, AppSelectors, ModalSelectors, LinesActions, LinesSelectors } from '@store';
+import {
+  TokensSelectors,
+  WalletSelectors,
+  AppSelectors,
+  ModalSelectors,
+  LinesActions,
+  LinesSelectors,
+  AlertsActions,
+} from '@store';
 import { SummaryCard, ViewContainer, LineDetailsDisplay, NoWalletCard } from '@components/app';
 import { SpinnerLoading } from '@components/common';
 import { isValidAddress, formatGetBorrowerQuery, halfWidthCss } from '@utils';
@@ -101,7 +109,7 @@ export const Portfolio = () => {
 
   useEffect(() => {
     if (!isValidAddress(portfolioAddress!)) {
-      console.log('no wallet');
+      dispatch(AlertsActions.openAlert({ message: 'Please connect wallet.', type: 'error' }));
     } else if (portfolioAddress && isValidAddress(portfolioAddress)) {
       dispatch(LinesActions.getUserPortfolio({ user: portfolioAddress.toLocaleLowerCase() }));
       setPortfolioLoaded(true);
@@ -124,7 +132,6 @@ export const Portfolio = () => {
     }
     if (userPortfolio && currentRole === LENDER_POSITION_ROLE) {
       const lenderData = userPortfolio?.lenderPositions;
-      console.log('User Portfolio - Lender: ', lenderData);
       setLenderData(lenderData ? lenderData : []);
       if (lenderData && lenderData[0]) {
         const lineId = lenderData[0].id;

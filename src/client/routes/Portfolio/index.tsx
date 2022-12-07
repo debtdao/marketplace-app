@@ -102,9 +102,8 @@ export const Portfolio = () => {
   };
 
   useEffect(() => {
-    if ((!userAddress || !isValidAddress(userAddress)) && isValidAddress(userWallet!)) {
+    if (!isValidAddress(userAddress!) && isValidAddress(userWallet!)) {
       dispatch(LinesActions.getUserPortfolio({ user: userWallet!.toLocaleLowerCase() }));
-      return;
     } else if (userAddress && userAddress.length === 42) {
       dispatch(LinesActions.getUserPortfolio({ user: userAddress.toLocaleLowerCase() }));
     }
@@ -115,7 +114,9 @@ export const Portfolio = () => {
       //Types for returned obj need to be set up correctly
       //@ts-ignore
       const borrowerData: any[] = userPortfolio.borrowerLineOfCredits;
-      setdata(borrowerData);
+      const borrowerAddress = userAddress ? userAddress : userWallet;
+      const aggregatedData = formatGetBorrowerQuery(borrowerData, borrowerAddress!);
+      setAggregatedCreditLine(aggregatedData);
       if (borrowerData && borrowerData[0]) {
         const lineId = borrowerData[0].id;
         dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineId }));
@@ -131,15 +132,6 @@ export const Portfolio = () => {
       }
     }
   }, [userPortfolio, currentRole]);
-
-  useEffect(() => {
-    let aggregate;
-    if (data && currentRole === BORROWER_POSITION_ROLE) {
-      aggregate = formatGetBorrowerQuery(data, userAddress);
-      console.log('User Portfolio Aggregate: ', aggregate);
-    }
-    setAggregatedCreditLine(aggregate);
-  }, [data]);
 
   return (
     <StyledViewContainer>

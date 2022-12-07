@@ -2,9 +2,9 @@ import styled from 'styled-components';
 import { useLocation, useHistory } from 'react-router-dom';
 
 import { useAppTranslation, useAppSelector } from '@hooks';
-import { SettingsSelectors, WalletSelectors } from '@store';
+import { SettingsSelectors } from '@store';
 import { NavigationLink } from '@components/app';
-import { Link, Icon, Logo, RedirectIcon, WalletIcon } from '@components/common';
+import { Link, Icon, Logo, RedirectIcon } from '@components/common';
 
 const linkTransition = 'filter 200ms ease-in-out';
 
@@ -146,7 +146,6 @@ export const NavSidebar = ({ navLinks, ...props }: NavSidebarProps) => {
   const { t } = useAppTranslation('common');
   const location = useLocation();
   const history = useHistory();
-  const userAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
   const collapsedSidebar = useAppSelector(SettingsSelectors.selectSidebarCollapsed);
 
   const currentPath = '/' + location.pathname.toLowerCase().split('/')[1];
@@ -161,15 +160,6 @@ export const NavSidebar = ({ navLinks, ...props }: NavSidebarProps) => {
 
   const linkList = (
     <LinkList className="link-list">
-      <RouterLink
-        to={`/portfolio/${userAddress}`}
-        key={0}
-        selected={`${currentPath}/${userAddress}` === `/portfolio/${userAddress}`}
-        external={false}
-      >
-        <LinkIcon Component={WalletIcon} />
-        <LinkText>{t('navigation.portfolio')}</LinkText>
-      </RouterLink>
       {navLinks.map((link, index) => {
         return (
           <RouterLink to={link.to} key={index} selected={currentPath === link.to} external={link.external}>

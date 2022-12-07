@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import { useAppDispatch, useAppSelector, useWindowDimensions } from '@hooks';
 import { SettingsActions, SettingsSelectors } from '@store';
-import { VaultIcon, SettingsIcon, SearchIcon, DiscordIcon } from '@components/common';
+import { VaultIcon, SettingsIcon, SearchIcon, DiscordIcon, WalletIcon } from '@components/common';
 
 import { NavSidebar } from './NavSidebar';
 import { NavTabbar } from './NavTabbar';
@@ -24,6 +24,11 @@ interface NavigationProps {
 }
 
 const navLinks: NavigationLink[] = [
+  {
+    to: '/portfolio',
+    text: 'navigation.portfolio',
+    icon: WalletIcon,
+  },
   {
     to: '/market',
     text: 'navigation.market',

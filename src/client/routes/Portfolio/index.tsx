@@ -70,7 +70,7 @@ export const Portfolio = () => {
   const { userAddress } = useParams<userParams>();
   const dispatch = useAppDispatch();
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
-
+  const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const userTokens = useAppSelector(TokensSelectors.selectUserTokens);
   const activeModal = useAppSelector(ModalSelectors.selectActiveModal);
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
@@ -102,13 +102,13 @@ export const Portfolio = () => {
   };
 
   useEffect(() => {
-    if (!userAddress || !isValidAddress(userAddress)) {
-      dispatch(AlertsActions.openAlert({ message: 'INVALID_ADDRESS', type: 'error' }));
+    if ((!userAddress || !isValidAddress(userAddress)) && userWallet) {
+      dispatch(LinesActions.getUserPortfolio({ user: userWallet.toLocaleLowerCase() }));
       return;
     } else if (userAddress.length === 42) {
       dispatch(LinesActions.getUserPortfolio({ user: userAddress.toLocaleLowerCase() }));
     }
-  }, [currentRole, walletIsConnected]);
+  }, [currentRole, walletIsConnected, userWallet]);
 
   useEffect(() => {
     if (userPortfolio && currentRole === BORROWER_POSITION_ROLE) {

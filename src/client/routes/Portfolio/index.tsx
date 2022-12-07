@@ -102,10 +102,10 @@ export const Portfolio = () => {
   };
 
   useEffect(() => {
-    if ((!userAddress || !isValidAddress(userAddress)) && userWallet) {
-      dispatch(LinesActions.getUserPortfolio({ user: userWallet.toLocaleLowerCase() }));
+    if ((!userAddress || !isValidAddress(userAddress)) && isValidAddress(userWallet!)) {
+      dispatch(LinesActions.getUserPortfolio({ user: userWallet!.toLocaleLowerCase() }));
       return;
-    } else if (userAddress.length === 42) {
+    } else if (userAddress && userAddress.length === 42) {
       dispatch(LinesActions.getUserPortfolio({ user: userAddress.toLocaleLowerCase() }));
     }
   }, [currentRole, walletIsConnected, userWallet]);

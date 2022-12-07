@@ -1,3 +1,5 @@
+import { TokenFragRepsonse } from '@types';
+
 import { Alert } from './Alerts';
 import { Address, Network } from './Blockchain';
 import { ExternalServiceId } from './General';
@@ -172,8 +174,10 @@ export interface UserTokenActionsMap {
 
 export interface TokensState {
   tokensAddresses: string[];
+  supportedTokens: string[];
   activeNetworkTokenAddresses: string[];
   tokensMap: { [address: string]: Token };
+  supportedTokensMap: { [address: string]: TokenFragRepsonse };
   selectedTokenAddress: Address | undefined;
   user: {
     userTokensAddresses: string[];
@@ -182,6 +186,7 @@ export interface TokensState {
   };
   statusMap: {
     getTokens: Status;
+    getSupportedTokens: Status;
     user: {
       getUserTokens: Status;
       getUserTokensAllowances: Status;

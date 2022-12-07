@@ -12,7 +12,13 @@ import { ExternalServiceId } from './General';
 import { PartnerId } from './Partner';
 import { Theme } from './Settings';
 import { Status } from './Status';
-import { CreditLinePage, UserLineMetadataStatusMap, AggregatedCreditLine, CreditPosition } from './CreditLine';
+import {
+  CreditLinePage,
+  UserLineMetadataStatusMap,
+  AggregatedCreditLine,
+  CreditPosition,
+  LinePageCreditPosition,
+} from './CreditLine';
 import {
   Position,
   Token,
@@ -121,11 +127,11 @@ export interface CreditLineState {
     lineAllowances: { [line: string]: { [token: string]: Integer } };
     // portfolio: GetUserPortfolioResponse;
     portfolio: {
-      borrowerLineOfCredits: LineOfCreditsResponse[];
-      borrowerLineOfCreditAddresses: string[];
-      lenderPositions: LinePageCreditFragResponse[];
-      arbiterLineOfCredits: LineOfCreditsResponse[];
-      arbiterLineOfCreditAddresses: string[];
+      borrowerLineOfCredits: Address[];
+      // borrowerLineOfCreditAddresses: string[];
+      lenderPositions: LinePageCreditPosition[];
+      arbiterLineOfCredits: Address[];
+      // arbiterLineOfCreditAddresses: string[];
     };
   };
   statusMap: {

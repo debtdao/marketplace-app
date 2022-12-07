@@ -21,6 +21,7 @@ import {
   DeploySecuredLineProps,
   DeploySecuredLineWithConfigProps,
   GetUserPortfolioResponse,
+  LinePageCreditPosition,
 } from '@types';
 import {
   formatGetLinesData,
@@ -168,31 +169,29 @@ const getUserLinePositions = createAsyncThunk<
 // TODO: Return borrowerLineOfCredits and arbiterLineOfCredits within response
 // as AggregatedCreditLine[] type to consume in lines.reducer.ts
 const getUserPortfolio = createAsyncThunk<
-  { userPortfolio: GetUserPortfolioResponse | undefined },
+  { address: string; lines: { [address: string]: CreditLinePage }; positions: LinePageCreditPosition[] },
   { user: string },
   ThunkAPI
 >('lines/getUserPortfolio', async ({ user }, { extra, getState }) => {
   const { creditLineService } = extra.services;
-  // const {
-  //   network,
-  //   lines: { linesMap, pagesMap },
-  //   tokens: { tokensMap },
-  // } = getState();
+  const {
+    network,
+    lines: { linesMap, pagesMap },
+    tokens: { tokensMap },
+  } = getState();
 
-  // const tokenPrices = Object.entries(tokensMap).reduce(
-  //   (prices, [addy, { priceUsdc }]) => ({ ...prices, [addy]: priceUsdc }),
-  //   {}
-  // );
+  const tokenPrices = Object.entries(tokensMap).reduce(
+    (prices, [addy, { priceUsdc }]) => ({ ...prices, [addy]: priceUsdc }),
+    {}
+  );
 
   const userPortfolio = await creditLineService.getUserPortfolio({ user });
+  console.log('get user portfolio', userPortfolio);
+  if (!userPortfolio) return { address: user, lines: {}, positions: [] };
 
-  // const borrowerLineData = userPortfolio
-  //   ? formatUserPortfolioData(userPortfolio.borrowerLineOfCredits[0], tokenPrices)
-  //   : undefined;
-
+  const { lines, positions } = formatUserPortfolioData(userPortfolio, tokenPrices);
   // console.log('User Portfolio Actions Borrower Lines: ', borrowerLineData);
-
-  return { userPortfolio };
+  return { address: user, lines, positions };
 });
 
 export interface GetExpectedTransactionOutcomeProps {

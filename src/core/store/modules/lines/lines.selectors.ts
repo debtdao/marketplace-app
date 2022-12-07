@@ -28,11 +28,7 @@ const { ZERO_ADDRESS } = getConstants();
 const selectUserWallet = (state: RootState) => state.wallet.selectedAddress;
 console.log('selectUserWallet', selectUserWallet);
 const selectLinesState = (state: RootState) => state.lines;
-const selectUserLinesPositionsMap = (state: RootState) =>
-  _.filter(
-    state.lines.user.linePositions,
-    (p) => state.wallet.selectedAddress !== p.lender.id || state.wallet.selectedAddress !== p.borrower
-  );
+
 // const selectUserLinesMetadataMap = (state: RootState) => state.lines.user.userLinesMetadataMap;
 const selectLinesMap = (state: RootState) => state.lines.linesMap;
 const selectLinePagesMap = (state: RootState) => state.lines.pagesMap;
@@ -56,7 +52,6 @@ const selectLinesActionsStatusMap = (state: RootState) => state.lines.statusMap.
 const selectGetLinesStatus = (state: RootState) => state.lines.statusMap.getLines;
 const selectGetLinePageStatus = (state: RootState) => state.lines.statusMap.getLinePage;
 const selectGetUserLinesPositionsStatus = (state: RootState) => state.lines.statusMap.user.getUserLinePositions;
-const selectUserPortfolio = (state: RootState) => state.lines.user.portfolio;
 
 /* ----------------------------- Main Selectors ----------------------------- */
 const selectLines = createSelector([selectLinesMap], (linesMap) => {
@@ -67,47 +62,15 @@ const selectLiveLines = createSelector([selectLines], (lines): AggregatedCreditL
   return lines.filter((line: AggregatedCreditLine) => line.end < Date.now() / 1000);
 });
 
-// TODO: Replace selectUserPortfolio with selectUserPositions after updating state.linesMap
-// and state.user.portfolio in the lines.actions.ts and lines.reducers.ts files.
-// const selectUserPositions = createSelector([selectLinesMap, selectUserPortfolio], (linesMap, userPortfolio) => {
-//   console.log('User Portfolio Selectors: ', userPortfolio);
-//   const borrowerPositions = userPortfolio.borrowerLineOfCreditAddresses.map((borrower) => {
-//     return linesMap[borrower];
-//   });
-//   console.log('User Portfolio Selectors - Borrower Positions', borrowerPositions);
-//   const arbiterPositions = userPortfolio.arbiterLineOfCreditAddresses.map((arbiter) => {
-//     return linesMap[arbiter];
-//   });
-//   console.log('User Portfolio Selectors - Arbiter Positions', arbiterPositions);
-//   const userPositions = {
-//     borrowerPositions,
-//     lenderPositions: userPortfolio.lenderPositions,
-//     arbiterPositions,
-//   };
-//   return userPortfolio;
-// });
+const selectUserPortfolioMetadata = (state: RootState) => state.lines.user.portfolio;
 
-// Not needed yet. TODO: Select all past-term lines
-// const selectDeprecatedLines = createSelector([selectLines], (lines): PositionSummary[] => {
-//   const deprecatedLines = lines
-//     .filter((line) => line.hideIfNoDeposits)
-//     .map(({ token, ...rest }) => ({ token, ...rest }));
-//   return deprecatedLines.filter((line) => toBN(line.userDeposited).gt(0));
-// });
-
-// const selectDepositedLines = createSelector(
-//   [selectUserLinesPositionsMap, selectUserWallet],
-//   (positions, wallet): UserPositionSummary[] => {
-//     return Object.values(positions)
-//       .filter((p) => p.lender === wallet)
-//       .map((p) => ({
-//         ...p,
-//         role: LENDER_POSITION_ROLE,
-//         available: p.deposit - p.principal,
-//         amount: p.deposit,
-//       }));
-//   }
-// );
+const selectUserPortfolio = createSelector([selectLinesMap, selectUserPortfolioMetadata], (linesMap, userPortfolio) => {
+  return {
+    borrowerLineOfCredits: userPortfolio.borrowerLineOfCredits.map((addy) => linesMap[addy]).filter((l) => !!l),
+    lenderPositions: userPortfolio.lenderPositions,
+    arbiterLineOfCredits: userPortfolio.arbiterLineOfCredits.map((addy) => linesMap[addy]).filter((l) => !!l),
+  };
+});
 
 const selectSelectedLineActionsStatusMap = createSelector(
   [selectLinesActionsStatusMap, selectSelectedLineAddress],
@@ -166,10 +129,6 @@ const selectSummaryData = createSelector([selectUserLinesSummary], (userLinesSum
 const selectLine = createSelector([selectLinesMap], (linesMap) =>
   memoize((lineAddress: string) => linesMap[lineAddress])
 );
-
-const selectUnderlyingTokensAddresses = createSelector([selectUserLinesPositionsMap], (positions): Address[] => {
-  return Object.values(positions).map((p) => p.token.address);
-});
 
 /* -------------------------------- Statuses -------------------------------- */
 const selectLinesGeneralStatus = createSelector([selectLinesStatusMap], (statusMap): Status => {
@@ -330,7 +289,6 @@ export const LinesSelectors = {
   selectLinesForCategories,
   selectUserPositionMetadata,
   // selectDeprecatedLines,
-  selectUserLinesPositionsMap,
   selectUserTokensMap,
   selectTokensMap,
   selectSelectedLineAddress,
@@ -354,5 +312,4 @@ export const LinesSelectors = {
   selectLine,
   // selectExpectedTxOutcome,
   // selectExpectedTxOutcomeStatus,
-  selectUnderlyingTokensAddresses,
 };

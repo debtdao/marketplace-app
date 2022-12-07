@@ -86,11 +86,10 @@ export interface CreditPosition {
   principal: string;
   interestAccrued: string;
   interestRepaid: string;
-  decimals: string;
-  borrower: Address;
+  // decimals: string;
+  // borrower: Address;
   token: TokenView;
   lender: {
-    _typename: string;
     id: Address;
   };
   dRate: string;
@@ -101,10 +100,9 @@ export interface LinePageCreditPosition extends CreditPosition {
   id: string;
   status: PositionStatusTypes;
   lender: {
-    _typename: string;
     id: Address;
   };
-  arbiter: string;
+  // arbiter: string;
   deposit: string;
   principal: string;
   interestAccrued: string;
@@ -130,21 +128,14 @@ export const COLLATERAL_TYPE_ASSET: CollateralTypeAsset = 'asset';
 type CollateralTypeRevenue = 'revenue';
 export const COLLATERAL_TYPE_REVENUE: CollateralTypeRevenue = 'revenue';
 
+export type LinesByRole = { borrowing: Address[]; arbiting: Address[] };
+
 type CollateralTypes = CollateralTypeAsset | CollateralTypeRevenue | undefined;
 
 export interface UserPositionMetadata {
   role: PositionRole; // borrower/lender/arbiter
   amount: string; // principal/deposit/collateral
   available: string; // borrowable/withdrawable/liquidatable
-}
-
-export interface PositionItem {
-  dRate: string;
-  fRate: string;
-  lender: string;
-  deposit: string;
-  tokenSymbol: string;
-  id: string;
 }
 
 export interface UserPositionSummary extends CreditPosition, UserPositionMetadata {}

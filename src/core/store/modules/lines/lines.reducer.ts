@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { createReducer } from '@reduxjs/toolkit';
 
 import {
@@ -7,6 +8,9 @@ import {
   LineActionsStatusMap,
   AggregatedCreditLine,
   CreditPosition,
+  BORROWER_POSITION_ROLE,
+  Address,
+  LinesByRole,
 } from '@types';
 
 import { LinesActions } from './lines.actions';
@@ -34,14 +38,9 @@ export const linesInitialState: CreditLineState = {
     linePositions: {},
     lineAllowances: {},
     portfolio: {
-      // borrowerLineOfCredits: [],
-      // lenderPositions: {},
-      // arbiterLineOfCredits: [],
       borrowerLineOfCredits: [],
-      borrowerLineOfCreditAddresses: [],
       lenderPositions: [],
       arbiterLineOfCredits: [],
-      arbiterLineOfCreditAddresses: [],
     },
   },
   statusMap: {
@@ -115,10 +114,8 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.user.lineAllowances = {};
       state.user.portfolio = {
         borrowerLineOfCredits: [],
-        borrowerLineOfCreditAddresses: [],
         lenderPositions: [],
         arbiterLineOfCredits: [],
-        arbiterLineOfCreditAddresses: [],
       };
     })
 
@@ -222,68 +219,57 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.deploySecuredLine = { error: error.message };
     })
     /* ------------------------- getUserLinePositions ------------------------- */
-    .addCase(getUserLinePositions.pending, (state, { meta }) => {
-      const lineAddresses = meta.arg.lineAddresses || [];
-      lineAddresses.forEach((address) => {
-        checkAndInitUserLineStatus(state, address);
-        state.statusMap.user.getUserLinePositions = { loading: true };
-      });
-      state.statusMap.user.getUserLinePositions = { loading: true };
-    })
-    .addCase(getUserLinePositions.fulfilled, (state, { meta, payload: { userLinesPositions } }) => {
-      const linesPositionsMap = userLinesPositions.reduce((obj, a) => ({ ...obj, [a.id]: a }), {});
-      state.user.linePositions = { ...state.user.linePositions, ...linesPositionsMap };
-      state.statusMap.user.getUserLinePositions = {};
-    })
-    .addCase(getUserLinePositions.rejected, (state, { meta, error }) => {
-      const lineAddresses = meta.arg.lineAddresses || [];
-      lineAddresses.forEach((address) => {
-        state.statusMap.user.getUserLinePositions = {};
-      });
-      state.statusMap.user.getUserLinePositions = { error: error.message };
-    })
+    // .addCase(getUserLinePositions.pending, (state, { meta }) => {
+    //   const lineAddresses = meta.arg.lineAddresses || [];
+    //   lineAddresses.forEach((address) => {
+    //     checkAndInitUserLineStatus(state, address);
+    //     state.statusMap.user.getUserLinePositions = { loading: true };
+    //   });
+    //   state.statusMap.user.getUserLinePositions = { loading: true };
+    // })
+    // .addCase(getUserLinePositions.fulfilled, (state, { meta, payload: { userLinesPositions } }) => {
+    //   const linesPositionsMap = userLinesPositions.reduce((obj, a) => ({ ...obj, [a.id]: a }), {});
+    //   state.user.linePositions = { ...state.user.linePositions, ...linesPositionsMap };
+    //   state.statusMap.user.getUserLinePositions = {};
+    // })
+    // .addCase(getUserLinePositions.rejected, (state, { meta, error }) => {
+    //   const lineAddresses = meta.arg.lineAddresses || [];
+    //   lineAddresses.forEach((address) => {
+    //     state.statusMap.user.getUserLinePositions = {};
+    //   });
+    //   state.statusMap.user.getUserLinePositions = { error: error.message };
+    // })
 
     /* ------------------------- getUserPortfolio ------------------------- */
     .addCase(getUserPortfolio.pending, (state, { meta }) => {
       state.statusMap.user.getUserPortfolio = { loading: true };
     })
-    .addCase(getUserPortfolio.fulfilled, (state, { meta, payload: { userPortfolio } }) => {
-      if (!userPortfolio) return;
-
-      const { borrowerLineOfCredits, lenderPositions, arbiterLineOfCredits } = userPortfolio;
-
-      // TODO: Save borrower and arbiter lines of credit into state.linesMap
-      // const borrowerLinesMap = borrowerLineOfCredits.reduce((obj, a) => ({ ...obj, [a.id]: a }), {});
-      // const arbiterLinesMap = arbiterLineOfCredits.reduce((obj, a) => ({ ...obj, [a.id]: a }), {});
-      // const newLinesMap = {
-      //   ...borrowerLinesMap,
-      //   ...arbiterLinesMap,
-      // };
-      // state.linesMap = { ...state.linesMap, ...newLinesMap };
-      const borrowerLineOfCreditAddresses = borrowerLineOfCredits.map((loc) => {
-        return loc.id;
-      });
-      const arbiterLineOfCreditAddresses = arbiterLineOfCredits.map((loc) => {
-        return loc.id;
-      });
-
-      // TODO: Remove borrowerLineOfCredits and arbiterLineOfCredits from state.user.portfolio
-      // after adding borrower and arbiter lines of credit into state.linesMap
-      state.user.portfolio = {
-        borrowerLineOfCredits: borrowerLineOfCredits,
-        borrowerLineOfCreditAddresses: borrowerLineOfCreditAddresses,
-        lenderPositions: (lenderPositions && lenderPositions.positions) || [],
-        arbiterLineOfCredits: arbiterLineOfCredits,
-        arbiterLineOfCreditAddresses: arbiterLineOfCreditAddresses,
+    .addCase(getUserPortfolio.fulfilled, (state, { meta, payload: { address, lines, positions } }) => {
+      state.linesMap = {
+        ...state.linesMap,
+        ...lines,
       };
-      // console.log('User Portfolio borrower lines map: ', borrowerLinesMap);
-      // console.log('User Portfolio arbiter lines map: ', arbiterLinesMap);
-      // console.log('User Portfolio Borrower LOC Addresses: ', borrowerLineOfCreditAddresses);
-      // console.log('User Portfolio Arbiter LOC Addresses: ', arbiterLineOfCreditAddresses);
+      const linesByRole: LinesByRole = _.entries<AggregatedCreditLine>(lines).reduce(
+        ({ borrowing, arbiting }: LinesByRole, [addy, line]) => {
+          if (line.borrower === address) return { arbiting, borrowing: [...(borrowing ?? []), addy] };
+          if (line.arbiter === address) return { borrowing, arbiting: [...(arbiting ?? []), addy] };
+          return { borrowing, arbiting };
+        },
+        { borrowing: [], arbiting: [] }
+      );
 
-      // console.log('User Portfolio Lines Map: ', state.linesMap);
-      // console.log('User Portfolio new lines map: ', newLinesMap);
-      // console.log('User Portfolio Borrower LOCs: ', borrowerLineOfCredits);
+      // if ( positions ) {
+      // state.positions = {
+      //   ...state.positionsMap,
+      //   ...positions,
+      // }
+      // }
+
+      state.user.portfolio = {
+        borrowerLineOfCredits: linesByRole.borrowing,
+        lenderPositions: positions,
+        arbiterLineOfCredits: linesByRole.arbiting,
+      };
     })
     .addCase(getUserPortfolio.rejected, (state, { meta, error }) => {
       state.statusMap.user.getUserPortfolio = { error: error.message };

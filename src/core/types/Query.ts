@@ -124,7 +124,7 @@ export interface BaseCreditFragResponse {
   deposit: string;
   dRate: string;
   fRate: string;
-  arbiter: string;
+  // arbiter: string;
   token: TokenFragRepsonse;
 }
 
@@ -132,6 +132,7 @@ export interface LinePageCreditFragResponse extends BaseCreditFragResponse {
   status: PositionStatusTypes;
   interestRepaid: string;
   interestAccrued: string;
+  totalInterestRepaid: string;
   dRate: string;
   fRate: string;
 

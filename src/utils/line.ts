@@ -1,4 +1,4 @@
-import { isEmpty } from 'lodash';
+import { isEmpty, zipWith } from 'lodash';
 import { BigNumber, utils } from 'ethers';
 
 import {
@@ -25,6 +25,8 @@ import {
   COLLATERAL_TYPE_ASSET,
   CreditPosition,
   Address,
+  GetUserPortfolioResponse,
+  LinePageCreditPosition,
 } from '@types';
 
 import { humanize, normalizeAmount, normalize } from './format';
@@ -147,7 +149,7 @@ export function formatGetLinesData(
       tokenPrices
     );
 
-    const deposits = escrowRes?.deposits.map((d: any) => ({ ...d, token: d.token.id }));
+    // const deposits = escrowRes?.deposits.map((d: any) => ({ ...d, token: d.token.id }));
     // formatAggData (positions, deposits, summaries);
 
     return {
@@ -303,6 +305,8 @@ export const formatLinePageData = (
   //  all recent borrow/lend events
   const creditEvents: CreditEvent[] = [];
 
+  // TODO  @thomas, move to formatAggregatedCreditLineData and return in `credit.positions` field
+  // TODO then implement in all functions using formatAgg...
   const formattedPositions = positions?.reduce((obj: any, c: LinePageCreditFragResponse) => {
     const {
       dRate,
@@ -326,8 +330,8 @@ export const formatLinePageData = (
         id,
         lender: lender.id,
         deposit,
-        dRate,
-        fRate,
+        dRate: normalizeAmount(fRate, 2),
+        fRate: normalizeAmount(dRate, 2),
         principal,
         interestAccrued,
         interestRepaid,
@@ -337,29 +341,6 @@ export const formatLinePageData = (
     };
   }, {});
 
-  let newFormattedPositions: any[] = [];
-
-  console.log('positions info origin', positions);
-
-  positions?.map((position) => {
-    let fRate = normalizeAmount(position.fRate, 2);
-    let dRate = normalizeAmount(position.dRate, 2);
-    let positionObject = {
-      dRate,
-      fRate,
-      status: position.status,
-      deposit: position.deposit,
-      token: position.token,
-      lender: position.lender,
-      principal: position.principal,
-      interestAccrued: position.interestAccrued,
-      interestRepaid: position.interestRepaid,
-      id: position.id,
-    };
-
-    newFormattedPositions.push(positionObject);
-    console.log(newFormattedPositions);
-  });
   // TODO add spigot events to collateralEvents
 
   const formattedEscrowData = Object.values(escrow?.deposits ?? {}).reduce((obj: any, d: any) => {
@@ -399,7 +380,7 @@ export const formatLinePageData = (
     collateralEvents,
     creditEvents,
     //@ts-ignore
-    positions: newFormattedPositions,
+    positions: formattedPositions,
     // collateral data
     spigot: formattedSpigot,
     escrow: isEmpty(escrow?.deposits) ? undefined : { ...escrow!, ...escrowData },
@@ -409,86 +390,46 @@ export const formatLinePageData = (
 };
 
 export const formatUserPortfolioData = (
-  lineData: LineOfCreditsResponse,
+  portfolioData: GetUserPortfolioResponse,
   tokenPrices: { [token: string]: BigNumber }
-): CreditLinePage => {
+): { lines: { [address: string]: CreditLinePage }; positions: LinePageCreditPosition[] } => {
   // add token Prices as arg
-  const { spigot, escrow, positions, borrower, status, ...metadata } = lineData;
-  const { spigot: spigotData, escrow: escrowData } = formatAggregatedCreditLineData(
-    positions!,
-    escrow?.deposits || [],
-    spigot?.summaries || [],
-    tokenPrices
-  );
+  // const { spigot, escrow, positions, borrower, status, ...metadata } = lineData;
+  const { borrowerLineOfCredits, lenderPositions, arbiterLineOfCredits } = portfolioData;
+  const lines = [...borrowerLineOfCredits, ...arbiterLineOfCredits]
+    .map(({ borrower, status, positions = [], escrow, spigot, ...rest }) => {
+      const {
+        credit,
+        spigot: spigotData,
+        escrow: escrowData,
+      } = formatAggregatedCreditLineData(positions, escrow?.deposits || [], spigot?.summaries || [], tokenPrices);
 
-  // derivative or aggregated data we need to compute and store while mapping position data
+      return {
+        ...rest,
+        ...credit,
+        status: status.toLowerCase() as LineStatusTypes,
+        positions,
+        borrower,
+        spigot: {
+          ...(spigotData ?? {}),
+          ...spigot,
+        },
+        escrow: {
+          ...(escrowData ?? {}),
+          ...escrow,
+        },
+      };
+    })
+    .reduce((lines, line) => ({ ...lines, [line.id]: line }), {});
 
-  // position id and APY
-  const highestApy: [string, string, string] = ['', '', '0'];
+  // positions tokenFragResponse -> TokenView
+  const positions: LinePageCreditPosition[] =
+    lenderPositions?.positions?.map((p) => ({
+      ...p,
+      token: _createTokenView(p.token, unnullify(p.principal, true), tokenPrices[p.token.id]),
+    })) ?? [];
 
-  // aggregated revenue in USD by token across all spigots
-  const principal = BigNumber.from(0);
-  const deposit = BigNumber.from(0);
-  const interest = BigNumber.from(0);
-  const totalInterestRepaid = BigNumber.from(0);
-  //  all recent Spigot and Escrow events
-  let collateralEvents: CollateralEvent[] = [];
-  //  all recent borrow/lend events
-  const creditEvents: CreditEvent[] = [];
-
-  let newFormattedPositions: any[] = [];
-
-  console.log('positions info origin', positions);
-
-  positions?.map((position) => {
-    let fRate = normalizeAmount(position.fRate, 2);
-    let dRate = normalizeAmount(position.dRate, 2);
-    let positionObject = {
-      dRate,
-      fRate,
-      status: position.status,
-      deposit: position.deposit,
-      token: position.token,
-      lender: position.lender,
-      principal: position.principal,
-      interestAccrued: position.interestAccrued,
-      interestRepaid: position.interestRepaid,
-      id: position.id,
-    };
-
-    newFormattedPositions.push(positionObject);
-    console.log(newFormattedPositions);
-  });
-  // TODO add spigot events to collateralEvents
-
-  const formattedSpigot = {
-    ...spigot!,
-    ...spigotData,
-  };
-
-  const pageData: CreditLinePage = {
-    // metadata
-    ...metadata,
-    status: status.toLowerCase() as LineStatusTypes,
-    borrower: borrower.id,
-    // todo add UsePositionMetada,
-    // debt data
-    principal: principal.toString(),
-    deposit: deposit.toString(),
-    interest: interest.toString(),
-    totalInterestRepaid: totalInterestRepaid.toString(),
-    highestApy: highestApy.map((s) => s.toString()) as [string, string, string],
-    // all recent events
-    collateralEvents,
-    creditEvents,
-    //@ts-ignore
-    positions: newFormattedPositions,
-    // collateral data
-    spigot: formattedSpigot,
-    escrow: isEmpty(escrow?.deposits) ? undefined : { ...escrow!, ...escrowData },
-  };
-  console.log('page data', pageData);
-  return pageData;
+  return { lines, positions };
 };
 
 const _createTokenView = (tokenResponse: TokenFragRepsonse, amount?: BigNumber, price?: BigNumber) => {
@@ -509,58 +450,4 @@ const _createTokenView = (tokenResponse: TokenFragRepsonse, amount?: BigNumber, 
     categories: [],
     description: '',
   };
-};
-
-export const formatGetBorrowerQuery = (data: AggregatedCreditLine[], borrowerAddress: Address) => {
-  let aggregate: CreditLinePage = {
-    borrower: borrowerAddress,
-    principal: '0', //done
-    deposit: '0', //done
-    highestApy: ['0', '0', '0'], //todo
-    positions: [], //done
-    escrow: {
-      id: '',
-      cratio: '',
-      minCRatio: '',
-      collateralValue: '',
-      //@ts-ignore
-      deposits: [],
-    }, //todo
-    spigot: {
-      id: '',
-      tokenRevenue: {},
-    }, //todo
-
-    //CreditLinePage data
-    interest: '0', //done
-    totalInterestRepaid: '0', //to review
-    collateralEvents: [], //todo
-    creditEvents: [], //done
-  };
-
-  if (data) {
-    data.map((data: any, i: number) => {
-      data.positions.map((position: CreditPosition, i: number) => {
-        const normalizedPrincipal = normalize('amount', position.principal, position.token.decimals);
-        const normalizedDeposit = normalize('amount', position.deposit, position.token.decimals);
-        const normalizedInterest = normalize('amount', position.interestAccrued, position.token.decimals);
-        const normalizedInterestRepaid = normalize('amount', position.interestRepaid, position.token.decimals);
-        const totalPrincipal = Number(aggregate.principal) + Number(normalizedPrincipal);
-        const totalDeposit = Number(aggregate.deposit) + Number(normalizedDeposit);
-        const totalInterest = Number(aggregate.interest) + Number(normalizedInterest);
-        const totalInterestRepaid = Number(aggregate.totalInterestRepaid) + Number(normalizedInterestRepaid);
-        const fRate = normalizeAmount(position.fRate, 2);
-        const dRate = normalizeAmount(position.dRate, 2);
-        aggregate?.positions?.push({ ...position, fRate, dRate });
-        aggregate.principal = `${totalPrincipal}`;
-        aggregate.deposit = `${totalDeposit}`;
-        aggregate.interest = `${totalInterest}`;
-        aggregate.totalInterestRepaid = `${totalInterestRepaid}`;
-      });
-      data.events.map((event: any, i: number) => {
-        aggregate.creditEvents.push(event);
-      });
-    });
-    return aggregate;
-  }
 };

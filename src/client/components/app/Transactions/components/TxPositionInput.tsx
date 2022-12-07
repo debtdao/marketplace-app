@@ -5,7 +5,7 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppTranslation } from '@hooks';
 import { Text, Icon, ZapIcon, LogoIcon } from '@components/common';
 import { PositionSearchList } from '@src/client/components/common/PositionSearchList';
-import { CreditPosition, PositionItem } from '@src/core/types';
+import { CreditPosition } from '@src/core/types';
 import { normalizeAmount } from '@src/utils';
 
 import { TokenIcon } from '../../TokenIcon';
@@ -155,49 +155,32 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
   ...props
 }) => {
   const { t } = useAppTranslation('common');
+  const [openedSearch, setOpenedSearch] = useState(false);
 
-  let listItems: PositionItem[] = [];
-  //let zappableItems: PositionItem[] = [];
+  if (!positions || positions.length < 1) return null;
+  const position = selectedPosition || positions[0];
 
-  let selectedItem: PositionItem = {
-    id: selectedPosition!.id,
-    lender: selectedPosition!.lender.id,
-    // icon: '',
-    deposit: selectedPosition!.deposit,
-    tokenSymbol: selectedPosition!.token.symbol,
-    fRate: selectedPosition!.fRate,
-    dRate: selectedPosition!.dRate,
-  };
-
-  if (positions && positions.length > 1) {
-    console.log('positions 2', positions);
-    listItems = positions
-      .filter((s) => !!s)
-      .map((item) => {
-        return {
-          id: item!.id,
-          lender: item!.lender.id,
-          // icon: '',
-          deposit: item!.deposit,
-          tokenSymbol: item?.token.symbol,
-          fRate: item?.fRate,
-          dRate: item?.dRate,
-        };
-      });
-  }
+  const listItems = positions
+    .filter((s) => !!s)
+    .map((item) => {
+      return {
+        id: item!.id,
+        lender: item!.lender.id,
+        // icon: '',
+        deposit: item!.deposit,
+        tokenSymbol: item?.token.symbol,
+        fRate: item?.fRate,
+        dRate: item?.dRate,
+      };
+    });
 
   const openSearchList = () => {
     setOpenedSearch(true);
   };
 
-  const [openedSearch, setOpenedSearch] = useState(false);
   const searchListHeader = readOnly
     ? t('components.transaction.borrow-credit.select-line')
     : t('components.transaction.borrow-credit.select-line');
-
-  if (selectedPosition === undefined) {
-    return;
-  }
 
   return (
     <StyledTxCreditLineInput {...props}>
@@ -208,7 +191,7 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
             list={listItems}
             headerText={searchListHeader}
             //@ts-ignore
-            selected={selectedItem}
+            selected={position}
             //@ts-ignore
             setSelected={(item) => (onSelectedPositionChange ? onSelectedPositionChange(item) : undefined)}
             onCloseList={() => setOpenedSearch(false)}
@@ -221,16 +204,16 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
         <CreditLineInfo center={false} onClick={openSearchList}>
           <CreditLineSelector onClick={listItems?.length > 1 ? openSearchList : undefined} center={false}>
             <CreditLineIconContainer onClick={openSearchList}>
-              <TokenIcon SVG={LogoIcon} symbol={selectedItem.tokenSymbol} size="xxBig" />
+              <TokenIcon SVG={LogoIcon} symbol={position.token.symbol} size="xxBig" />
               {listItems?.length > 1 && <CreditLineListIcon Component={ZapIcon} />}
             </CreditLineIconContainer>
-            <CreditLineName>{selectedItem.tokenSymbol}</CreditLineName>
+            <CreditLineName>{position.token.symbol}</CreditLineName>
           </CreditLineSelector>
           <CreditLineData>
-            <LineTitle ellipsis> Lender: {selectedPosition?.lender.id} </LineTitle>
+            <LineTitle ellipsis> Lender: {position?.lender.id} </LineTitle>
             <LineTitle ellipsis>
-              {`${normalizeAmount(selectedPosition?.deposit, 18)} ${selectedPosition?.token.symbol}
-              @${selectedPosition?.dRate}/${selectedPosition?.fRate}%`}
+              {`${normalizeAmount(position?.deposit, 18)} ${position?.token.symbol}
+              @${position?.dRate}/${position?.fRate}%`}
             </LineTitle>
           </CreditLineData>
         </CreditLineInfo>

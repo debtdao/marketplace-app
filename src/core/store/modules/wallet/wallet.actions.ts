@@ -2,10 +2,11 @@ import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 
 import { AppDispatch, ThunkAPI } from '@frameworks/redux';
 import { getEthersProvider, ExternalProvider } from '@frameworks/ethers';
-import { Theme, RootState, DIContainer, Subscriptions, Network } from '@types';
+import { Theme, RootState, DIContainer, Subscriptions, Network, EVENT_LOGIN } from '@types';
 import { isValidAddress, getProviderType, getNetwork } from '@utils';
 
 import { NetworkActions } from '../network/network.actions';
+import { AppActions } from '../app/app.actions';
 
 const walletChange = createAction<{ walletName: string }>('wallet/walletChange');
 const addressChange = createAction<{ address: string }>('wallet/addressChange');
@@ -92,6 +93,16 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
       wallet.create(network ?? NETWORK, subscriptions, theme.current);
     }
     const isConnected = await wallet.connect({ name: walletName });
+
+    // @analytics
+    dispatch(AppActions.logAppAnalytics({ type: 'id', data: {} }));
+    dispatch(
+      AppActions.logAppAnalytics({
+        type: 'track',
+        data: { eventName: EVENT_LOGIN },
+      })
+    );
+
     return { isConnected };
   }
 );

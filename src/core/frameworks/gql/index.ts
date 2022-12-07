@@ -16,6 +16,7 @@ import {
   GetLinePageAuxDataResponse,
   GetBorrowerPositionsResponse,
   GetLinesResponse,
+  SupportedOracleTokenResponse,
   CreditPosition,
 } from '@src/core/types';
 
@@ -24,10 +25,11 @@ import {
   GET_LINE_PAGE_QUERY,
   GET_LINE_PAGE_AUX_QUERY,
   GET_LINES_QUERY,
+  GET_SUPPORTED_ORACLE_TOKENS_QUERY,
   GET_BORROWER_POSITIONS_QUERY,
 } from './queries';
 
-const { GRAPH_API_URL } = getEnv();
+const { GRAPH_API_URL, GRAPH_CHAINLINK_FEED_REGISTRY_API_URL } = getEnv();
 const { BLACKLISTED_LINES: blacklist } = getConstants();
 
 let client: any;
@@ -37,8 +39,18 @@ const createClient = (): typeof ApolloClient => {
     uri: GRAPH_API_URL,
     cache: new InMemoryCache(),
   });
-
   return client;
+};
+
+let priceFeedClient: any;
+export const getPriceFeedClient = (isOracle?: boolean) =>
+  priceFeedClient ? priceFeedClient : createPriceFeedClient(isOracle);
+const createPriceFeedClient = (isOracle?: boolean): typeof ApolloClient => {
+  priceFeedClient = new ApolloClient({
+    uri: GRAPH_CHAINLINK_FEED_REGISTRY_API_URL,
+    cache: new InMemoryCache(),
+  });
+  return priceFeedClient;
 };
 
 /**
@@ -54,20 +66,20 @@ const createClient = (): typeof ApolloClient => {
  *        1. for creating curried func and 2. for defining arg/return types of that func
  */
 export const createQuery =
-  (query: DocumentNode, path?: string): Function =>
+  (query: DocumentNode, path?: string, isOracle?: boolean): Function =>
   <A, R>(variables: A): Promise<QueryResponse<R>> =>
     new Promise(async (resolve, reject) => {
-      getClient()
+      const client = isOracle ? getPriceFeedClient() : getClient();
+      client
         .query({ query, variables })
         .then((result: QueryResult) => {
           const { data, error } = result;
           const requestedData = path ? at(data, [path])[0] : data;
-
           if (error) return reject(error);
           else return resolve(requestedData);
         })
         .catch((error: any) => {
-          console.log('gql request error', error);
+          console.log('TokenService gql request error', error);
           reject(error);
         });
     });
@@ -102,6 +114,12 @@ export const getUserLinePositions: QueryCreator<GetUserLinePositionsArgs, Credit
 >(
   arg: GetUserLinePositionsArgs
 ) => getUserLinePositionsQuery(arg);
+
+const getSupportedOracleTokensQuery = createQuery(GET_SUPPORTED_ORACLE_TOKENS_QUERY, undefined, true);
+export const getSupportedOracleTokens: QueryCreator<
+  undefined,
+  SupportedOracleTokenResponse | undefined
+> = (): QueryResponse<SupportedOracleTokenResponse | undefined> => getSupportedOracleTokensQuery();
 
 const getBorrowerPositionsQuery = createQuery(GET_BORROWER_POSITIONS_QUERY, 'lineOfCredits');
 export const getBorrowerPositions: QueryCreator<GetBorrowerPositionsArgs, CreditPosition[]> = (

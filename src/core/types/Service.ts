@@ -454,11 +454,11 @@ export interface CollateralService {
   maxSplit(): BigNumber; // always 100
 }
 
-export interface OnChainMetadataService {
-  getContractABI(props: OnChainMetadataServiceProps): Promise<any | undefined>;
+export interface OnChainMetaDataService {
+  getContractABI(props: OnChainMetaDataServiceProps): Promise<any | undefined>;
 }
 
-export interface OnChainMetadataServiceProps {
+export interface OnChainMetaDataServiceProps {
   address: String;
 }
 

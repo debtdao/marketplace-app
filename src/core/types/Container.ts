@@ -12,7 +12,7 @@ import {
   LineFactoryService,
   InterestRateCreditService,
   YearnSdk,
-  OnChainMetadataService,
+  OnChainMetaDataService,
 } from '@types';
 
 export interface DIContainer {
@@ -36,7 +36,7 @@ export interface ServiceContainer {
   collateralService: CollateralService;
   interestRateCreditService: InterestRateCreditService;
   lineFactoryService: LineFactoryService;
-  onChainMetaDataService: OnChainMetadataService;
+  onChainMetaDataService: OnChainMetaDataService;
 }
 
 export interface ConfigContainer extends Config {}

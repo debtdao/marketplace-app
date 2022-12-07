@@ -20,6 +20,7 @@ import {
   GasFees,
   Overrides,
   Network,
+  Wallet,
   TokenAllowance,
   AggregatedCreditLine,
   CreditPosition,
@@ -31,6 +32,7 @@ import {
   GetLinePageResponse,
   CreditLinePage,
   GetLinePageAuxDataResponse,
+  SupportedOracleTokenResponse,
   GetBorrowerPositionsResponse,
 } from '@types';
 
@@ -455,6 +457,7 @@ export interface CollateralService {
 // *************** TOKEN ***************
 export interface TokenService {
   getSupportedTokens: (props: GetSupportedTokensProps) => Promise<Token[]>;
+  getSupportedOracleTokens: () => Promise<SupportedOracleTokenResponse | undefined>;
   getTokensDynamicData: (props: GetTokensDynamicDataProps) => Promise<TokenDynamicData[]>;
   getUserTokensData: (props: GetUserTokensDataProps) => Promise<Balance[]>;
   getTokenAllowance: (props: GetTokenAllowanceProps) => Promise<Integer>;
@@ -464,6 +467,12 @@ export interface TokenService {
 export interface GetSupportedTokensProps {
   network: Network;
 }
+
+// TODO: use wallet state for props in getSupportedOracleTokens()
+// to determine which subgraph to query from based on wallet's network
+// export interface GetSupportedOracleTokensProps {
+//   wallet: Wallet;
+// }
 
 export interface GetTokensDynamicDataProps {
   network: Network;

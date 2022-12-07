@@ -1,7 +1,7 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 
 import { ThunkAPI } from '@frameworks/redux';
-import { TokenDynamicData, Token, Balance, Integer } from '@types';
+import { TokenDynamicData, Token, Balance, Integer, SupportedOracleTokenResponse } from '@types';
 import { Network } from '@types';
 
 /* -------------------------------------------------------------------------- */
@@ -30,6 +30,15 @@ const getTokens = createAsyncThunk<{ tokensData: Token[] }, string | undefined, 
     const { network } = getState();
     const { tokenService } = extra.services;
     const tokensData: Token[] = await tokenService.getSupportedTokens({ network: network.current });
+    return { tokensData };
+  }
+);
+
+const getSupportedOracleTokens = createAsyncThunk<{ tokensData: any }, string | undefined, ThunkAPI>(
+  'tokens/getSupportedTokens',
+  async (_arg, { getState, extra }) => {
+    const { tokenService } = extra.services;
+    const tokensData: SupportedOracleTokenResponse | undefined = await tokenService.getSupportedOracleTokens();
     return { tokensData };
   }
 );
@@ -156,6 +165,7 @@ export const TokensActions = {
   setSelectedTokenAddress,
   setTokenAllowance,
   getTokens,
+  getSupportedOracleTokens,
   getTokensDynamicData,
   getUserTokens,
   getTokenAllowance,

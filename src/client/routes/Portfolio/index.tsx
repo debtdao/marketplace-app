@@ -1,20 +1,12 @@
 import styled from 'styled-components';
 import { useState, useEffect } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import { useAppSelector, useAppTranslation, useIsMounting, useAppDispatch } from '@hooks';
-import {
-  TokensSelectors,
-  WalletSelectors,
-  AppSelectors,
-  ModalSelectors,
-  LinesActions,
-  LinesSelectors,
-  AlertsActions,
-} from '@store';
-import { SummaryCard, ViewContainer, SliderCard, LineDetailsDisplay } from '@components/app';
-import { SpinnerLoading, Text } from '@components/common';
-import { isValidAddress, formatGetBorrowerQuery } from '@utils';
+import { TokensSelectors, WalletSelectors, AppSelectors, ModalSelectors, LinesActions, LinesSelectors } from '@store';
+import { SummaryCard, ViewContainer, LineDetailsDisplay, NoWalletCard } from '@components/app';
+import { SpinnerLoading } from '@components/common';
+import { isValidAddress, formatGetBorrowerQuery, halfWidthCss } from '@utils';
 import { CreditLinePage, LENDER_POSITION_ROLE, BORROWER_POSITION_ROLE } from '@src/core/types';
 import { PositionsTable } from '@src/client/components/app/LineDetailsDisplay/PositionsTable';
 
@@ -64,6 +56,11 @@ type userParams = {
   userAddress: string;
 };
 
+const StyledNoWalletCard = styled(NoWalletCard)`
+  grid-column: 1 / 3;
+  ${halfWidthCss}
+`;
+
 export const Portfolio = () => {
   const { t } = useAppTranslation(['common', 'home']);
   const isMounting = useIsMounting();
@@ -77,8 +74,9 @@ export const Portfolio = () => {
   const tokensListStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
   const generalLoading = (appStatus.loading || tokensListStatus.loading || isMounting) && !activeModal;
   const userPortfolio = useAppSelector(LinesSelectors.selectUserPortfolio);
-
+  const portfolioAddress = userAddress ? userAddress : userWallet;
   const userTokensLoading = generalLoading && !userTokens.length;
+  const [portfolioLoaded, setPortfolioLoaded] = useState<boolean>(false);
   const [currentRole, setRole] = useState<string>(BORROWER_POSITION_ROLE);
   const [lenderData, setLenderData] = useState<any[]>([]);
   const [aggregatedCreditLinePage, setAggregatedCreditLine] = useState<CreditLinePage>();
@@ -102,10 +100,11 @@ export const Portfolio = () => {
   };
 
   useEffect(() => {
-    if (!isValidAddress(userAddress!) && isValidAddress(userWallet!)) {
-      dispatch(LinesActions.getUserPortfolio({ user: userWallet!.toLocaleLowerCase() }));
-    } else if (userAddress && userAddress.length === 42) {
-      dispatch(LinesActions.getUserPortfolio({ user: userAddress.toLocaleLowerCase() }));
+    if (!isValidAddress(portfolioAddress!)) {
+      console.log('no wallet');
+    } else if (portfolioAddress && isValidAddress(portfolioAddress)) {
+      dispatch(LinesActions.getUserPortfolio({ user: portfolioAddress.toLocaleLowerCase() }));
+      setPortfolioLoaded(true);
     }
   }, [currentRole, walletIsConnected, userWallet]);
 
@@ -114,8 +113,7 @@ export const Portfolio = () => {
       //Types for returned obj need to be set up correctly
       //@ts-ignore
       const borrowerData: any[] = userPortfolio.borrowerLineOfCredits;
-      const borrowerAddress = userAddress ? userAddress : userWallet;
-      const aggregatedData = formatGetBorrowerQuery(borrowerData, borrowerAddress!);
+      const aggregatedData = formatGetBorrowerQuery(borrowerData, portfolioAddress!);
       setAggregatedCreditLine(aggregatedData);
       if (borrowerData && borrowerData[0]) {
         const lineId = borrowerData[0].id;
@@ -126,7 +124,7 @@ export const Portfolio = () => {
       const lenderData = userPortfolio?.lenderPositions;
       console.log('User Portfolio - Lender: ', lenderData);
       setLenderData(lenderData ? lenderData : []);
-      if (lenderData && lenderData[0].id) {
+      if (lenderData && lenderData[0]) {
         const lineId = lenderData[0].id;
         dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineId }));
       }
@@ -139,7 +137,7 @@ export const Portfolio = () => {
 
       {!aggregatedCreditLinePage && !lenderData && <StyledSpinnerLoading />}
 
-      {aggregatedCreditLinePage && currentRole === BORROWER_POSITION_ROLE ? (
+      {portfolioLoaded && aggregatedCreditLinePage && currentRole === BORROWER_POSITION_ROLE ? (
         <StyledBorrowerContainer>
           <LineDetailsDisplay page={aggregatedCreditLinePage} line={aggregatedCreditLinePage} />
         </StyledBorrowerContainer>
@@ -147,7 +145,7 @@ export const Portfolio = () => {
         ''
       )}
 
-      {currentRole === LENDER_POSITION_ROLE ? (
+      {portfolioLoaded && currentRole === LENDER_POSITION_ROLE && lenderData.length > 0 ? (
         <StyledBorrowerContainer>
           <PositionsTable events={lenderData} />
         </StyledBorrowerContainer>
@@ -155,6 +153,7 @@ export const Portfolio = () => {
         ''
       )}
 
+      {!portfolioLoaded && <StyledNoWalletCard />}
       {/* {!userTokensLoading && (
         <TokensCard
           header={t('components.list-card.wallet')}

@@ -13,11 +13,10 @@ import {
   GetLinePageResponse,
   LineOfCreditsResponse,
   GetLinesResponse,
-  BaseCreditFragResponse,
   BaseEscrowDepositFragResponse,
   SpigotRevenueSummaryFragResponse,
   GetLinePageAuxDataResponse,
-  LinePageCreditFragResponse,
+  BasePositionFragResponse,
   LineEventFragResponse,
   EscrowDepositList,
   TokenFragRepsonse,
@@ -26,7 +25,6 @@ import {
   CreditPosition,
   Address,
   GetUserPortfolioResponse,
-  LinePageCreditPosition,
 } from '@types';
 
 import { humanize, normalizeAmount, normalize } from './format';
@@ -181,7 +179,7 @@ export function formatGetLinePageAuxData(
 }
 
 export const formatAggregatedCreditLineData = (
-  positions: (BaseCreditFragResponse | LinePageCreditFragResponse)[],
+  positions: (BasePositionFragResponse | BasePositionFragResponse)[],
   collateralDeposits: BaseEscrowDepositFragResponse[],
   revenues: SpigotRevenueSummaryFragResponse[],
   tokenPrices: { [token: string]: BigNumber }
@@ -190,6 +188,9 @@ export const formatAggregatedCreditLineData = (
     highestApy: [string, string, string];
     principal: string;
     deposit: string;
+    interest: string;
+    totalInterestRepaid: string;
+    positions: CreditPosition[];
   };
   spigot: { tokenRevenue: { [key: string]: string } };
   escrow: {
@@ -255,11 +256,47 @@ export const formatAggregatedCreditLineData = (
     return { ...r, [r.token]: (r.totalVolumeUsd ?? '0').toString() };
   }, {});
 
+  const formattedPositions = positions.reduce(
+    (obj: any, c: BasePositionFragResponse): { [id: string]: CreditPosition } => {
+      const {
+        dRate,
+        fRate,
+        id,
+        lender,
+        token,
+        ...financials
+        // events: graphEvents,
+      } = c;
+
+      const currentUsdPrice = tokenPrices[c.token?.id];
+      // const events = graphEvents ? formatCreditEvents(c.token.symbol, currentUsdPrice, graphEvents!) : [];
+      // creditEvents.concat(events);
+      return {
+        ...obj,
+        [id]: {
+          id,
+          lender: lender.id,
+          ...financials,
+          dRate: normalizeAmount(fRate, 2),
+          fRate: normalizeAmount(dRate, 2),
+          token: _createTokenView(token, BigNumber.from(principal), currentUsdPrice),
+          // events,
+        },
+      };
+    },
+    {}
+  );
+
+  console.log('formatted page positions', formattedPositions, positions);
+
   return {
     credit: {
       highestApy,
       principal: parseUnits(unnullify(credit.principal), 'ether').toString(),
       deposit: parseUnits(unnullify(credit.deposit), 'ether').toString(),
+      interest: '0', // TODO
+      totalInterestRepaid: '0', // TODO
+      positions: Object.values(formattedPositions),
     },
     escrow,
     spigot: { tokenRevenue },
@@ -295,7 +332,6 @@ export const formatLinePageData = (
   const highestApy: [string, string, string] = ['', '', '0'];
 
   // aggregated revenue in USD by token across all spigots
-  const tokenRevenue: { [key: string]: string } = {};
   const principal = BigNumber.from(0);
   const deposit = BigNumber.from(0);
   const interest = BigNumber.from(0);
@@ -305,43 +341,7 @@ export const formatLinePageData = (
   //  all recent borrow/lend events
   const creditEvents: CreditEvent[] = [];
 
-  // TODO  @thomas, move to formatAggregatedCreditLineData and return in `credit.positions` field
-  // TODO then implement in all functions using formatAgg...
-  const formattedPositions = positions?.reduce((obj: any, c: LinePageCreditFragResponse) => {
-    const {
-      dRate,
-      fRate,
-      id,
-      lender,
-      events: graphEvents,
-      principal,
-      deposit,
-      interestAccrued,
-      interestRepaid,
-      token,
-    } = c;
-
-    const currentUsdPrice = tokenPrices[c.token?.id];
-    const events = graphEvents ? formatCreditEvents(c.token.symbol, currentUsdPrice, graphEvents!) : [];
-    creditEvents.concat(events);
-    return {
-      ...obj,
-      [id]: {
-        id,
-        lender: lender.id,
-        deposit,
-        dRate: normalizeAmount(fRate, 2),
-        fRate: normalizeAmount(dRate, 2),
-        principal,
-        interestAccrued,
-        interestRepaid,
-        token: { symbol: token.symbol, lastPriceUSD: currentUsdPrice },
-        events,
-      },
-    };
-  }, {});
-
-  console.log('formatted page positions', formattedPositions, positions);
+  console.log('formatted page positions', positions, credit.positions);
 
   // TODO add spigot events to collateralEvents
 
@@ -369,20 +369,17 @@ export const formatLinePageData = (
   const pageData: CreditLinePage = {
     // metadata
     ...metadata,
-    status: status.toLowerCase() as LineStatusTypes,
-    borrower: borrower.id,
-    // todo add UsePositionMetada,
     // debt data
-    principal: principal.toString(),
-    deposit: deposit.toString(),
+    ...credit,
+    borrower: borrower.id,
+    status: status.toLowerCase() as LineStatusTypes,
+    // TODO add to credit response
     interest: interest.toString(),
     totalInterestRepaid: totalInterestRepaid.toString(),
-    highestApy: highestApy.map((s) => s.toString()) as [string, string, string],
+    // todo add UsePositionMetada,
     // all recent events
     collateralEvents,
     creditEvents,
-    //@ts-ignore
-    positions: Object.values(formattedPositions), // TODO keep as object for state
     // collateral data
     spigot: formattedSpigot,
     escrow: isEmpty(escrow?.deposits) ? undefined : { ...escrow!, ...escrowData },
@@ -394,7 +391,7 @@ export const formatLinePageData = (
 export const formatUserPortfolioData = (
   portfolioData: GetUserPortfolioResponse,
   tokenPrices: { [token: string]: BigNumber }
-): { lines: { [address: string]: CreditLinePage }; positions: LinePageCreditPosition[] } => {
+): { lines: { [address: string]: CreditLinePage }; positions: CreditPosition[] } => {
   // add token Prices as arg
   // const { spigot, escrow, positions, borrower, status, ...metadata } = lineData;
   const { borrowerLineOfCredits, lenderPositions, arbiterLineOfCredits } = portfolioData;
@@ -409,9 +406,9 @@ export const formatUserPortfolioData = (
       return {
         ...rest,
         ...credit,
+        borrower: borrower.id,
         status: status.toLowerCase() as LineStatusTypes,
         positions,
-        borrower,
         spigot: {
           ...(spigotData ?? {}),
           ...spigot,
@@ -425,7 +422,7 @@ export const formatUserPortfolioData = (
     .reduce((lines, line) => ({ ...lines, [line.id]: line }), {});
 
   // positions tokenFragResponse -> TokenView
-  const positions: LinePageCreditPosition[] =
+  const positions: CreditPosition[] =
     lenderPositions?.positions?.map((p) => ({
       ...p,
       token: _createTokenView(p.token, unnullify(p.principal, true), tokenPrices[p.token.id]),

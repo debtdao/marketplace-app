@@ -2,7 +2,7 @@ import {
   TokenFragRepsonse,
   GetUserPortfolioResponse,
   LineOfCreditsResponse,
-  LinePageCreditFragResponse,
+  BasePositionFragResponse,
   LenderPositionsResponse,
 } from '@types';
 
@@ -12,13 +12,7 @@ import { ExternalServiceId } from './General';
 import { PartnerId } from './Partner';
 import { Theme } from './Settings';
 import { Status } from './Status';
-import {
-  CreditLinePage,
-  UserLineMetadataStatusMap,
-  AggregatedCreditLine,
-  CreditPosition,
-  LinePageCreditPosition,
-} from './CreditLine';
+import { CreditLinePage, UserLineMetadataStatusMap, AggregatedCreditLine, CreditPosition } from './CreditLine';
 import {
   Position,
   Token,
@@ -129,7 +123,7 @@ export interface CreditLineState {
     portfolio: {
       borrowerLineOfCredits: Address[];
       // borrowerLineOfCreditAddresses: string[];
-      lenderPositions: LinePageCreditPosition[];
+      lenderPositions: CreditPosition[];
       arbiterLineOfCredits: Address[];
       // arbiterLineOfCreditAddresses: string[];
     };

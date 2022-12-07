@@ -8,7 +8,6 @@ import {
   GetLineArgs,
   GetLinePageArgs,
   GetLinesArgs,
-  GetUserLinePositionsArgs,
   GetUserPortfolioArgs,
   GetUserPortfolioResponse,
   QueryResponse,

@@ -13,7 +13,6 @@ import {
   GetLineArgs,
   GetLinesArgs,
   GetLinePageArgs,
-  CreditPosition,
   AddCreditProps,
   UseCreditLinesParams,
   BorrowCreditProps,
@@ -21,7 +20,7 @@ import {
   DeploySecuredLineProps,
   DeploySecuredLineWithConfigProps,
   GetUserPortfolioResponse,
-  LinePageCreditPosition,
+  CreditPosition,
 } from '@types';
 import {
   formatGetLinesData,
@@ -169,7 +168,7 @@ const getUserLinePositions = createAsyncThunk<
 // TODO: Return borrowerLineOfCredits and arbiterLineOfCredits within response
 // as AggregatedCreditLine[] type to consume in lines.reducer.ts
 const getUserPortfolio = createAsyncThunk<
-  { address: string; lines: { [address: string]: CreditLinePage }; positions: LinePageCreditPosition[] },
+  { address: string; lines: { [address: string]: CreditLinePage }; positions: CreditPosition[] },
   { user: string },
   ThunkAPI
 >('lines/getUserPortfolio', async ({ user }, { extra, getState }) => {
@@ -186,13 +185,11 @@ const getUserPortfolio = createAsyncThunk<
   );
 
   const userPortfolio = await creditLineService.getUserPortfolio({ user });
-  console.log('get user portfolio', userPortfolio);
   if (!userPortfolio) return { address: user, lines: {}, positions: [] };
 
   const { lines, positions } = formatUserPortfolioData(userPortfolio, tokenPrices);
   console.log('formatted user portfolio', lines, positions);
 
-  // console.log('User Portfolio Actions Borrower Lines: ', borrowerLineData);
   return { address: user, lines, positions };
 });
 

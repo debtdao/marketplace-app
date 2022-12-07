@@ -181,7 +181,7 @@ export const PositionsTable = (props: PositionsProps) => {
   };
 
   let ctaButtonText = userWallet
-    ? `${t('lineDetails:positions-positions.propose-position')}`
+    ? `${t('lineDetails:positions-table.new-position')}`
     : `${t('components.connect-button.connect')}`;
 
   //Returns a list of transactions to display on positions table

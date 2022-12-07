@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { createReducer } from '@reduxjs/toolkit';
+import { ethers } from 'ethers';
 
 import {
   initialStatus,
@@ -183,7 +184,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       );
       // merge new lines with old
       state.linesMap = { ...state.linesMap, ...lines };
-      console.log('User Portfolio Lines Map OG: ', state.linesMap);
+
       // merge new categories with old
       state.categories = { ...state.categories, ...categories };
     })
@@ -239,7 +240,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       //   ...positions,
       // }
       // }
-
       state.user.portfolio = {
         borrowerLineOfCredits: linesByRole.borrowing,
         lenderPositions: positions,

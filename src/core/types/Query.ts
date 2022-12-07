@@ -62,14 +62,6 @@ export interface GetLinesArgs {
 }
 
 /**
- * @typedef {object} GetUserLinePositionsArgs
- * @property {Address} GetUserLinePositionsArgs.id - address to look up credit.debit positions for
- */
-export interface GetUserLinePositionsArgs {
-  id: Address;
-}
-
-/**
  * @typedef {object} GetUserPortfolioArgs
  * @property {Address} GetUserPortfolioArgs.user - address to fetch borrower, lender, and arbiter portfolio
  */
@@ -117,30 +109,21 @@ export interface BaseLineFragResponse {
   };
 }
 
-export interface BaseCreditFragResponse {
+export interface BasePositionFragResponse {
   id: Address;
   status: PositionStatusTypes;
+  lender: {
+    id: string;
+  };
   principal: string;
   deposit: string;
+  interestAccrued: string;
+  interestRepaid: string;
+  totalInterestRepaid: string;
   dRate: string;
   fRate: string;
   // arbiter: string;
   token: TokenFragRepsonse;
-}
-
-export interface LinePageCreditFragResponse extends BaseCreditFragResponse {
-  status: PositionStatusTypes;
-  interestRepaid: string;
-  interestAccrued: string;
-  totalInterestRepaid: string;
-  dRate: string;
-  fRate: string;
-
-  lender: {
-    id: string;
-  };
-
-  events?: LineEventFragResponse[];
 }
 
 export interface LineEventFragResponse {
@@ -190,7 +173,7 @@ export interface BaseEscrowFragResponse {
 
 export interface GetLinesResponse {
   lines: BaseLineFragResponse & {
-    positions: BaseCreditFragResponse[];
+    positions: BasePositionFragResponse[];
     escrow: BaseEscrowFragResponse;
     spigot: {
       id: Address;
@@ -211,7 +194,7 @@ export interface GetLinePageAuxDataResponse {
 }
 
 export interface GetLinePageResponse extends BaseLineFragResponse {
-  positions?: LinePageCreditFragResponse[];
+  positions?: BasePositionFragResponse[];
 
   spigot?: {
     id: Address;
@@ -239,11 +222,11 @@ export interface SupportedOracleTokenResponse {
 }
 
 export interface LenderPositionsResponse {
-  positions?: LinePageCreditFragResponse[];
+  positions?: BasePositionFragResponse[];
 }
 
 export interface LineOfCreditsResponse extends BaseLineFragResponse {
-  positions?: LinePageCreditFragResponse[];
+  positions?: BasePositionFragResponse[];
 
   events?: LineEventFragResponse[];
 
@@ -269,12 +252,7 @@ export interface LineOfCreditsResponse extends BaseLineFragResponse {
 }
 
 export interface GetUserPortfolioResponse extends LineOfCreditsResponse, LenderPositionsResponse {
-  // REFACTOR THIS: save addresses, not full line of credit objects
   borrowerLineOfCredits: LineOfCreditsResponse[];
-
-  // DO NOT REFACTOR THIS - do this tomorrow with Kiba
   lenderPositions: LenderPositionsResponse;
-
-  // REFACTOR THIS: save addresses, not full line of credit objects
   arbiterLineOfCredits: LineOfCreditsResponse[];
 }

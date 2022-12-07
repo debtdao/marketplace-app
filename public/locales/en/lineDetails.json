@@ -33,15 +33,15 @@
       "add-collateral": "Deposit",
       "no-table": "No Collateral added"
     }
-    
+
   },
   "credit-events": {
     "title": "Payment History",
     "no-data": "No payment history on this line"
   },
-  "positions-events" : {
-    "header": "Positions Table",
+  "positions-table" : {
+    "header": "Positions",
     "no-data": "No positions on this Line of Credit",
-    "propose-position": "Propose Position"
+    "new-position": "Propose Position"
   }
 }

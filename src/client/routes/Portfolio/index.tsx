@@ -74,6 +74,8 @@ export const Portfolio = () => {
   const isMounting = useIsMounting();
   const { userAddress } = useParams<userParams>();
   const dispatch = useAppDispatch();
+
+  // TODO: pull all selectors in with single import statement
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const userTokens = useAppSelector(TokensSelectors.selectUserTokens);
@@ -82,10 +84,13 @@ export const Portfolio = () => {
   const tokensListStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
   const generalLoading = (appStatus.loading || tokensListStatus.loading || isMounting) && !activeModal;
   const userPortfolio = useAppSelector(LinesSelectors.selectUserPortfolio);
+  const linesMap = useAppSelector(LinesSelectors.selectLinesMap);
   const portfolioAddress = userAddress ? userAddress : userWallet;
   const userTokensLoading = generalLoading && !userTokens.length;
   const [portfolioLoaded, setPortfolioLoaded] = useState<boolean>(false);
   const [currentRole, setRole] = useState<string>(BORROWER_POSITION_ROLE);
+
+  // TODO: Add types
   const [lenderData, setLenderData] = useState<any[]>([]);
 
   const setSelectedLine = (address: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress: address }));
@@ -131,12 +136,12 @@ export const Portfolio = () => {
       // }
     }
     if (userPortfolio && currentRole === LENDER_POSITION_ROLE) {
-      // const lenderData = userPortfolio?.lenderPositions;
-      // setLenderData(lenderData ? lenderData : []);
-      // if (lenderData && lenderData[0]) {
-      //   const lineId = lenderData[0].id;
-      //   dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineId }));
-      // }
+      const lenderData = userPortfolio?.lenderPositions;
+      setLenderData(lenderData ? lenderData : []);
+      if (lenderData && lenderData[0]) {
+        const lineId = lenderData[0].id;
+        setSelectedLine(lineId);
+      }
     }
   }, [userPortfolio, currentRole]);
 

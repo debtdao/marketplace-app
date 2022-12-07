@@ -29,33 +29,18 @@ const BASE_LINE_FRAGMENT = gql`
   }
 `;
 
-const BASE_CREDIT_FRAGMENT = gql`
+const BASE_POSITION_FRAGMENT = gql`
   ${TOKEN_FRAGMENT}
-  fragment BaseCreditFrag on Position {
-    id
-    status
-    principal
-    deposit
-    dRate
-    fRate
-    token {
-      ...TokenFrag
-    }
-  }
-`;
-
-const LINE_PAGE_CREDIT_FRAGMENT = gql`
-  ${TOKEN_FRAGMENT}
-  fragment LinePageCreditFrag on Position {
+  fragment BasePositionFrag on Position {
     id
     status
     lender {
       id
     }
-    deposit
     principal
-    interestRepaid
+    deposit
     interestAccrued
+    interestRepaid
     dRate
     fRate
     token {
@@ -189,20 +174,20 @@ export const GET_LINE_QUERY = gql`
 `;
 
 // create new fragment to get positions for a user
-const LINE_OF_CREDITS_FRAGMENT = gql`
+const LINE_OF_CREDIT_FRAGMENT = gql`
   ${BASE_LINE_FRAGMENT}
-  ${LINE_PAGE_CREDIT_FRAGMENT}
+  ${BASE_POSITION_FRAGMENT}
   ${LINE_EVENT_FRAGMENT}
   ${BASE_SPIGOT_FRAGMENT}
   ${SPIGOT_SUMMARY_FRAGMENT}
   ${SPIGOT_EVENT_FRAGMENT}
   ${ESCROW_FRAGMENT}
 
-  fragment LineOfCreditsFrag on LineOfCredit {
+  fragment LineOfCreditFrag on LineOfCredit {
     ...BaseLineFrag
 
     positions {
-      ...LinePageCreditFrag
+      ...BasePositionFrag
     }
 
     events {
@@ -229,11 +214,11 @@ const LINE_OF_CREDITS_FRAGMENT = gql`
 `;
 
 export const GET_LINE_PAGE_QUERY = gql`
-  ${LINE_OF_CREDITS_FRAGMENT}
+  ${LINE_OF_CREDIT_FRAGMENT}
 
   query getLinePage($id: ID!) {
     lineOfCredit(id: $id) {
-      ...LineOfCreditsFrag
+      ...LineOfCreditFrag
     }
   }
 `;
@@ -259,7 +244,7 @@ export const GET_LINE_PAGE_AUX_QUERY = gql`
 
 export const GET_LINES_QUERY = gql`
   ${BASE_LINE_FRAGMENT}
-  ${BASE_CREDIT_FRAGMENT}
+  ${BASE_POSITION_FRAGMENT}
   ${ESCROW_FRAGMENT}
   ${SPIGOT_SUMMARY_FRAGMENT}
   ${TOKEN_FRAGMENT}
@@ -269,7 +254,7 @@ export const GET_LINES_QUERY = gql`
       ...BaseLineFrag
 
       positions {
-        ...BaseCreditFrag
+        ...BasePositionFrag
       }
 
       escrow {
@@ -289,7 +274,7 @@ export const GET_LINES_QUERY = gql`
 // TODO
 // export const GET_HOMEPAGE_LINES_QUERY = gql`
 //   ${BASE_LINE_FRAGMENT}
-//   ${BASE_CREDIT_FRAGMENT}
+//   ${BASE_POSITION_FRAGMENT}
 
 //   query getHomepageLines() {
 //     newest: lineOfCredits(first: 5, orderBy: start, orderDirection: desc) {
@@ -311,6 +296,7 @@ export const GET_SPIGOT_QUERY = gql`
 // fetches all of a users positions that they lend to
 const LENDER_POSITIONS_FRAGMENT = gql`
   ${BASE_LINE_FRAGMENT}
+  ${BASE_POSITION_FRAGMENT}
   ${LINE_EVENT_FRAGMENT}
   ${BASE_SPIGOT_FRAGMENT}
   ${SPIGOT_SUMMARY_FRAGMENT}
@@ -319,20 +305,8 @@ const LENDER_POSITIONS_FRAGMENT = gql`
 
   fragment LenderPositionsFrag on Lender {
     positions: positions {
-      id
-      status
-      lender {
-        id
-      }
-      deposit
-      principal
-      interestRepaid
-      interestAccrued
-      dRate
-      fRate
-      token {
-        ...TokenFrag
-      }
+      ...BasePositionFrag
+
       line {
         ...BaseLineFrag
 
@@ -364,18 +338,18 @@ const LENDER_POSITIONS_FRAGMENT = gql`
 
 // fetches all of a user's positions in their portfolio for which they are a borrower, lender, and/or arbiter
 export const GET_USER_PORTFOLIO_QUERY = gql`
-  ${LINE_OF_CREDITS_FRAGMENT}
+  ${LINE_OF_CREDIT_FRAGMENT}
   ${LENDER_POSITIONS_FRAGMENT}
 
   query getUserPortfolio($user: String!) {
     borrowerLineOfCredits: lineOfCredits(where: { borrower: $user }) {
-      ...LineOfCreditsFrag
+      ...LineOfCreditFrag
     }
     lenderPositions: lender(id: $user) {
       ...LenderPositionsFrag
     }
     arbiterLineOfCredits: lineOfCredits(where: { arbiter: $user }) {
-      ...LineOfCreditsFrag
+      ...LineOfCreditFrag
     }
   }
 `;

@@ -35,33 +35,30 @@ export type PositionStatusTypes = ProposedStatus | OpenedStatus | ClosedStatus;
 
 export interface BaseCreditLine {
   id: Address;
-  type?: string;
+  borrower: string;
+  arbiter: string;
+  status: LineStatusTypes;
   start: number;
   end: number;
-  status: LineStatusTypes;
-  borrower: Address;
-  arbiter: Address;
+  // aggregate usd values accross all positions at current time
+  principal: string;
+  deposit: string;
+  interest: string;
+  // lifetime stats
+  totalInterestRepaid: string;
+  // id, symbol, APY (4 decimals)
+  highestApy: [string, string, string];
   positions?: CreditPosition[];
-  escrow?: { id: Address };
-  spigot?: { id: Address };
 }
 
 export interface AggregatedCreditLine extends BaseCreditLine {
   // real-time aggregate usd value across all credits
-  principal: string; // | Promise<string>;
-  deposit: string; // | Promise<string>;
-  // id, symbol, APY (4 decimals)
-  highestApy: [string, string, string];
-  positions?: CreditPosition[];
   escrow?: AggregatedEscrow;
   spigot?: AggregatedSpigot;
 }
 
 export interface CreditLinePage extends AggregatedCreditLine {
   // total value of asssets repaid *AT TIME OF REPAYMENT*
-  interest: string; // | Promise<string>;
-  totalInterestRepaid: string; // | Promise<string>;
-
   collateralEvents: CollateralEvent[];
   creditEvents: CreditEvent[];
 }
@@ -82,36 +79,37 @@ export interface CreditLinePageAuxData {
 export interface CreditPosition {
   id: string;
   status: PositionStatusTypes;
-  deposit: string;
-  principal: string;
-  interestAccrued: string;
-  interestRepaid: string;
-  // decimals: string;
-  // borrower: Address;
+  lender: {
+    id: Address;
+  };
   token: TokenView;
-  lender: {
-    id: Address;
-  };
-  dRate: string;
-  fRate: string;
-}
-
-export interface LinePageCreditPosition extends CreditPosition {
-  id: string;
-  status: PositionStatusTypes;
-  lender: {
-    id: Address;
-  };
-  // arbiter: string;
   deposit: string;
   principal: string;
   interestAccrued: string;
   interestRepaid: string;
   totalInterestRepaid: string;
+  // decimals: string;
+  // borrower: Address;
   dRate: string;
-  token: TokenView;
-  // events?: CreditEvent[];
+  fRate: string;
 }
+
+// export interface CreditPosition extends CreditPosition {
+//   id: string;
+//   status: PositionStatusTypes;
+//   lender: {
+//     id: Address;
+//   };
+//   // arbiter: string;
+//   deposit: string;
+//   principal: string;
+//   interestAccrued: string;
+//   interestRepaid: string;
+//   totalInterestRepaid: string;
+//   dRate: string;
+//   token: TokenView;
+//   // events?: CreditEvent[];
+// }
 
 // bare minimum to display about a user on a position
 
@@ -285,15 +283,4 @@ export interface LineActionsStatusMap {
 export interface UserLineMetadataStatusMap {
   getUserPortfolio: Status;
   linesActionsStatusMap: { [lineAddress: string]: LineActionsStatusMap };
-}
-
-// Transaction data
-
-export interface DeploySecuredLineTxData {
-  oracle: Address;
-  arbiter: Address;
-  factoryAddress: Address;
-  swapTarget: Address;
-  borrower: Address;
-  ttl: number;
 }

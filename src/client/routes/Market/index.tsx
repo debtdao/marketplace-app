@@ -139,7 +139,7 @@ export const Market = () => {
             <StyledRecommendationsCard
               header={t(key)}
               key={key}
-              items={val.map(({ id, borrower, type, spigot, escrow, principal, deposit, start, end }) => ({
+              items={val.map(({ id, borrower, spigot, escrow, principal, deposit, start, end }) => ({
                 icon: '',
                 name: borrower,
                 start: start,
@@ -154,7 +154,7 @@ export const Market = () => {
                   .reduce((sum, val) => sum.add(val), utils.parseUnits('0', 'ether'))
                   .toString(),
                 tags: [spigot ? 'revenue' : '', escrow ? 'collateral' : ''].filter((x) => !!x),
-                info: type || 'DAO Line of Credit',
+                info: 'DAO Line of Credit',
                 infoDetail: 'EYY',
                 onAction: () => history.push(`/lines/${id}`),
               }))}

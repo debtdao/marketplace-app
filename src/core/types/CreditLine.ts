@@ -101,23 +101,6 @@ export interface CreditPosition {
   fRate: string;
 }
 
-// export interface CreditPosition extends CreditPosition {
-//   id: string;
-//   status: PositionStatusTypes;
-//   lender: {
-//     id: Address;
-//   };
-//   // arbiter: string;
-//   deposit: string;
-//   principal: string;
-//   interestAccrued: string;
-//   interestRepaid: string;
-//   totalInterestRepaid: string;
-//   dRate: string;
-//   token: TokenView;
-//   // events?: CreditEvent[];
-// }
-
 // bare minimum to display about a user on a position
 
 type LenderRole = 'lender';

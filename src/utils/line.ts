@@ -11,6 +11,7 @@ import {
   SPIGOT_MODULE_NAME,
   LineStatusTypes,
   GetLinePageResponse,
+  LineOfCreditsResponse,
   GetLinesResponse,
   BaseCreditFragResponse,
   BaseEscrowDepositFragResponse,
@@ -376,6 +377,89 @@ export const formatLinePageData = (
     formatCollateralEvents(ESCROW_MODULE_NAME, symbol, currentUsdPrice, events); // normalize and save events
     return { ...obj, [tokenId]: { symbol, currentUsdPrice, amount, enabled, token: tokenId } };
   }, {});
+
+  const formattedSpigot = {
+    ...spigot!,
+    ...spigotData,
+  };
+
+  const pageData: CreditLinePage = {
+    // metadata
+    ...metadata,
+    status: status.toLowerCase() as LineStatusTypes,
+    borrower: borrower.id,
+    // todo add UsePositionMetada,
+    // debt data
+    principal: principal.toString(),
+    deposit: deposit.toString(),
+    interest: interest.toString(),
+    totalInterestRepaid: totalInterestRepaid.toString(),
+    highestApy: highestApy.map((s) => s.toString()) as [string, string, string],
+    // all recent events
+    collateralEvents,
+    creditEvents,
+    //@ts-ignore
+    positions: newFormattedPositions,
+    // collateral data
+    spigot: formattedSpigot,
+    escrow: isEmpty(escrow?.deposits) ? undefined : { ...escrow!, ...escrowData },
+  };
+  console.log('page data', pageData);
+  return pageData;
+};
+
+export const formatUserPortfolioData = (
+  lineData: LineOfCreditsResponse,
+  tokenPrices: { [token: string]: BigNumber }
+): CreditLinePage => {
+  // add token Prices as arg
+  const { spigot, escrow, positions, borrower, status, ...metadata } = lineData;
+  const { spigot: spigotData, escrow: escrowData } = formatAggregatedCreditLineData(
+    positions!,
+    escrow?.deposits || [],
+    spigot?.summaries || [],
+    tokenPrices
+  );
+
+  // derivative or aggregated data we need to compute and store while mapping position data
+
+  // position id and APY
+  const highestApy: [string, string, string] = ['', '', '0'];
+
+  // aggregated revenue in USD by token across all spigots
+  const principal = BigNumber.from(0);
+  const deposit = BigNumber.from(0);
+  const interest = BigNumber.from(0);
+  const totalInterestRepaid = BigNumber.from(0);
+  //  all recent Spigot and Escrow events
+  let collateralEvents: CollateralEvent[] = [];
+  //  all recent borrow/lend events
+  const creditEvents: CreditEvent[] = [];
+
+  let newFormattedPositions: any[] = [];
+
+  console.log('positions info origin', positions);
+
+  positions?.map((position) => {
+    let fRate = normalizeAmount(position.fRate, 2);
+    let dRate = normalizeAmount(position.dRate, 2);
+    let positionObject = {
+      dRate,
+      fRate,
+      status: position.status,
+      deposit: position.deposit,
+      token: position.token,
+      lender: position.lender,
+      principal: position.principal,
+      interestAccrued: position.interestAccrued,
+      interestRepaid: position.interestRepaid,
+      id: position.id,
+    };
+
+    newFormattedPositions.push(positionObject);
+    console.log(newFormattedPositions);
+  });
+  // TODO add spigot events to collateralEvents
 
   const formattedSpigot = {
     ...spigot!,

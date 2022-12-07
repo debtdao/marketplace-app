@@ -34,9 +34,14 @@ export const linesInitialState: CreditLineState = {
     linePositions: {},
     lineAllowances: {},
     portfolio: {
+      // borrowerLineOfCredits: [],
+      // lenderPositions: {},
+      // arbiterLineOfCredits: [],
       borrowerLineOfCredits: [],
-      lenderPositions: {},
+      borrowerLineOfCreditAddresses: [],
+      lenderPositions: [],
       arbiterLineOfCredits: [],
+      arbiterLineOfCreditAddresses: [],
     },
   },
   statusMap: {
@@ -108,7 +113,13 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(clearUserData, (state) => {
       state.user.linePositions = {};
       state.user.lineAllowances = {};
-      state.user.portfolio = { borrowerLineOfCredits: [], lenderPositions: {}, arbiterLineOfCredits: [] };
+      state.user.portfolio = {
+        borrowerLineOfCredits: [],
+        borrowerLineOfCreditAddresses: [],
+        lenderPositions: [],
+        arbiterLineOfCredits: [],
+        arbiterLineOfCreditAddresses: [],
+      };
     })
 
     // .addCase(clearTransactionData, (state) => {
@@ -174,9 +185,9 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
           categories[category] = [...(categories[category] || []), l.id];
         })
       );
-
       // merge new lines with old
       state.linesMap = { ...state.linesMap, ...lines };
+      console.log('User Portfolio Lines Map OG: ', state.linesMap);
       // merge new categories with old
       state.categories = { ...state.categories, ...categories };
     })
@@ -238,8 +249,41 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
     .addCase(getUserPortfolio.fulfilled, (state, { meta, payload: { userPortfolio } }) => {
       if (!userPortfolio) return;
-      state.user.portfolio = userPortfolio;
-      state.statusMap.user.getUserPortfolio = {};
+
+      const { borrowerLineOfCredits, lenderPositions, arbiterLineOfCredits } = userPortfolio;
+
+      // TODO: Save borrower and arbiter lines of credit into state.linesMap
+      // const borrowerLinesMap = borrowerLineOfCredits.reduce((obj, a) => ({ ...obj, [a.id]: a }), {});
+      // const arbiterLinesMap = arbiterLineOfCredits.reduce((obj, a) => ({ ...obj, [a.id]: a }), {});
+      // const newLinesMap = {
+      //   ...borrowerLinesMap,
+      //   ...arbiterLinesMap,
+      // };
+      // state.linesMap = { ...state.linesMap, ...newLinesMap };
+      const borrowerLineOfCreditAddresses = borrowerLineOfCredits.map((loc) => {
+        return loc.id;
+      });
+      const arbiterLineOfCreditAddresses = arbiterLineOfCredits.map((loc) => {
+        return loc.id;
+      });
+
+      // TODO: Remove borrowerLineOfCredits and arbiterLineOfCredits from state.user.portfolio
+      // after adding borrower and arbiter lines of credit into state.linesMap
+      state.user.portfolio = {
+        borrowerLineOfCredits: borrowerLineOfCredits,
+        borrowerLineOfCreditAddresses: borrowerLineOfCreditAddresses,
+        lenderPositions: (lenderPositions && lenderPositions.positions) || [],
+        arbiterLineOfCredits: arbiterLineOfCredits,
+        arbiterLineOfCreditAddresses: arbiterLineOfCreditAddresses,
+      };
+      // console.log('User Portfolio borrower lines map: ', borrowerLinesMap);
+      // console.log('User Portfolio arbiter lines map: ', arbiterLinesMap);
+      // console.log('User Portfolio Borrower LOC Addresses: ', borrowerLineOfCreditAddresses);
+      // console.log('User Portfolio Arbiter LOC Addresses: ', arbiterLineOfCreditAddresses);
+
+      // console.log('User Portfolio Lines Map: ', state.linesMap);
+      // console.log('User Portfolio new lines map: ', newLinesMap);
+      // console.log('User Portfolio Borrower LOCs: ', borrowerLineOfCredits);
     })
     .addCase(getUserPortfolio.rejected, (state, { meta, error }) => {
       state.statusMap.user.getUserPortfolio = { error: error.message };

@@ -122,7 +122,7 @@ export const Portfolio = () => {
       }
     }
     if (userPortfolio && currentRole === LENDER_POSITION_ROLE) {
-      const lenderData = userPortfolio?.lenderPositions?.positions;
+      const lenderData = userPortfolio?.lenderPositions;
       console.log('User Portfolio - Lender: ', lenderData);
       setdata(lenderData ? lenderData : []);
       if (lenderData && lenderData[0].id) {

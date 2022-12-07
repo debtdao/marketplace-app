@@ -1,4 +1,10 @@
-import { TokenFragRepsonse, GetUserPortfolioResponse } from '@types';
+import {
+  TokenFragRepsonse,
+  GetUserPortfolioResponse,
+  LineOfCreditsResponse,
+  LinePageCreditFragResponse,
+  LenderPositionsResponse,
+} from '@types';
 
 import { Alert } from './Alerts';
 import { Address, Network } from './Blockchain';
@@ -113,7 +119,14 @@ export interface CreditLineState {
   user: {
     linePositions: IdToCreditPositionMap;
     lineAllowances: { [line: string]: { [token: string]: Integer } };
-    portfolio: GetUserPortfolioResponse;
+    // portfolio: GetUserPortfolioResponse;
+    portfolio: {
+      borrowerLineOfCredits: LineOfCreditsResponse[];
+      borrowerLineOfCreditAddresses: string[];
+      lenderPositions: LinePageCreditFragResponse[];
+      arbiterLineOfCredits: LineOfCreditsResponse[];
+      arbiterLineOfCreditAddresses: string[];
+    };
   };
   statusMap: {
     getLines: Status;

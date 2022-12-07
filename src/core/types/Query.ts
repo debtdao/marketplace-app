@@ -241,7 +241,7 @@ export interface LenderPositionsResponse {
   positions?: LinePageCreditFragResponse[];
 }
 
-export interface LinesOfCreditResponse {
+export interface LineOfCreditsResponse extends BaseLineFragResponse {
   positions?: LinePageCreditFragResponse[];
 
   events?: LineEventFragResponse[];
@@ -267,8 +267,13 @@ export interface LinesOfCreditResponse {
   };
 }
 
-export interface GetUserPortfolioResponse extends LinesOfCreditResponse, LenderPositionsResponse {
-  borrowerLineOfCredits: LinesOfCreditResponse[];
+export interface GetUserPortfolioResponse extends LineOfCreditsResponse, LenderPositionsResponse {
+  // REFACTOR THIS: save addresses, not full line of credit objects
+  borrowerLineOfCredits: LineOfCreditsResponse[];
+
+  // DO NOT REFACTOR THIS - do this tomorrow with Kiba
   lenderPositions: LenderPositionsResponse;
-  arbiterLineOfCredits: LinesOfCreditResponse[];
+
+  // REFACTOR THIS: save addresses, not full line of credit objects
+  arbiterLineOfCredits: LineOfCreditsResponse[];
 }

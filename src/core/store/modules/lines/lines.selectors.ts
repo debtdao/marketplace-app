@@ -67,6 +67,26 @@ const selectLiveLines = createSelector([selectLines], (lines): AggregatedCreditL
   return lines.filter((line: AggregatedCreditLine) => line.end < Date.now() / 1000);
 });
 
+// TODO: Replace selectUserPortfolio with selectUserPositions after updating state.linesMap
+// and state.user.portfolio in the lines.actions.ts and lines.reducers.ts files.
+// const selectUserPositions = createSelector([selectLinesMap, selectUserPortfolio], (linesMap, userPortfolio) => {
+//   console.log('User Portfolio Selectors: ', userPortfolio);
+//   const borrowerPositions = userPortfolio.borrowerLineOfCreditAddresses.map((borrower) => {
+//     return linesMap[borrower];
+//   });
+//   console.log('User Portfolio Selectors - Borrower Positions', borrowerPositions);
+//   const arbiterPositions = userPortfolio.arbiterLineOfCreditAddresses.map((arbiter) => {
+//     return linesMap[arbiter];
+//   });
+//   console.log('User Portfolio Selectors - Arbiter Positions', arbiterPositions);
+//   const userPositions = {
+//     borrowerPositions,
+//     lenderPositions: userPortfolio.lenderPositions,
+//     arbiterPositions,
+//   };
+//   return userPortfolio;
+// });
+
 // Not needed yet. TODO: Select all past-term lines
 // const selectDeprecatedLines = createSelector([selectLines], (lines): PositionSummary[] => {
 //   const deprecatedLines = lines
@@ -319,6 +339,7 @@ export const LinesSelectors = {
   selectUserLinesSummary,
   selectPositions,
   selectUserPortfolio,
+  // selectUserPositions,
   selectLinesGeneralStatus,
   selectSelectedLine,
   selectSelectedLinePage,

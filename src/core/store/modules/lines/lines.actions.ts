@@ -25,6 +25,7 @@ import {
 import {
   formatGetLinesData,
   formatLinePageData,
+  formatUserPortfolioData,
   // validateLineDeposit,
   // validateLineWithdraw,
   // validateMigrateLineAllowance,
@@ -164,14 +165,33 @@ const getUserLinePositions = createAsyncThunk<
   return { userLinesPositions };
 });
 
+// TODO: Return borrowerLineOfCredits and arbiterLineOfCredits within response
+// as AggregatedCreditLine[] type to consume in lines.reducer.ts
 const getUserPortfolio = createAsyncThunk<
   { userPortfolio: GetUserPortfolioResponse | undefined },
   { user: string },
   ThunkAPI
 >('lines/getUserPortfolio', async ({ user }, { extra, getState }) => {
-  const { services } = extra;
+  const { creditLineService } = extra.services;
+  // const {
+  //   network,
+  //   lines: { linesMap, pagesMap },
+  //   tokens: { tokensMap },
+  // } = getState();
 
-  const userPortfolio = await services.creditLineService.getUserPortfolio({ user });
+  // const tokenPrices = Object.entries(tokensMap).reduce(
+  //   (prices, [addy, { priceUsdc }]) => ({ ...prices, [addy]: priceUsdc }),
+  //   {}
+  // );
+
+  const userPortfolio = await creditLineService.getUserPortfolio({ user });
+
+  // const borrowerLineData = userPortfolio
+  //   ? formatUserPortfolioData(userPortfolio.borrowerLineOfCredits[0], tokenPrices)
+  //   : undefined;
+
+  // console.log('User Portfolio Actions Borrower Lines: ', borrowerLineData);
+
   return { userPortfolio };
 });
 

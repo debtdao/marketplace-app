@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import _ from 'lodash';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -15,7 +16,13 @@ import {
 import { SummaryCard, ViewContainer, LineDetailsDisplay, NoWalletCard } from '@components/app';
 import { SpinnerLoading } from '@components/common';
 import { isValidAddress, halfWidthCss } from '@utils';
-import { CreditLinePage, LENDER_POSITION_ROLE, BORROWER_POSITION_ROLE } from '@src/core/types';
+import {
+  CreditLinePage,
+  LENDER_POSITION_ROLE,
+  BORROWER_POSITION_ROLE,
+  AggregatedCreditLine,
+  CreditPosition,
+} from '@src/core/types';
 import { PositionsTable } from '@src/client/components/app/LineDetailsDisplay/PositionsTable';
 
 const StyledViewContainer = styled(ViewContainer)`
@@ -84,19 +91,20 @@ export const Portfolio = () => {
   const tokensListStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
   const generalLoading = (appStatus.loading || tokensListStatus.loading || isMounting) && !activeModal;
   const userPortfolio = useAppSelector(LinesSelectors.selectUserPortfolio);
-  const linesMap = useAppSelector(LinesSelectors.selectLinesMap);
   const portfolioAddress = userAddress ? userAddress : userWallet;
   const userTokensLoading = generalLoading && !userTokens.length;
   const [portfolioLoaded, setPortfolioLoaded] = useState<boolean>(false);
   const [currentRole, setRole] = useState<string>(BORROWER_POSITION_ROLE);
 
   // TODO: Add types
-  const [lenderData, setLenderData] = useState<any[]>([]);
+  const [lenderPositions, setLenderPositions] = useState<CreditPosition[]>([]);
+  const [borrowerPositions, setBorrowerPositions] = useState<CreditPosition[]>([]);
 
   const setSelectedLine = (address: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress: address }));
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
 
-  console.log('user portfolio', userPortfolio, selectedLine);
+  // console.log('user portfolio', userPortfolio, selectedLine);
+  // console.log('user portfolio lines map: ', linesMap);
 
   const availableRoles = [BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE];
 
@@ -112,7 +120,8 @@ export const Portfolio = () => {
   });
 
   const handleSetRole = (role: string) => {
-    setLenderData([]);
+    setLenderPositions([]);
+    setBorrowerPositions([]);
     setRole(role);
   };
 
@@ -127,21 +136,20 @@ export const Portfolio = () => {
 
   useEffect(() => {
     if (userPortfolio && currentRole === BORROWER_POSITION_ROLE) {
-      // const borrowerData: any[] = userPortfolio.borrowerLineOfCredits;
-      // if (borrowerData && borrowerData[0]) {
-      //   const lineId = borrowerData[0].id;
-      //   setSelectedLine(lineId);
-      // const positionId = borrowerData[0].positions[0]?.id;
-      // dispatch(LinesActions.setSelectedLinePosition({ position: positionId }));
-      // }
+      const { borrowerLineOfCredits } = userPortfolio;
+      const borrowerPositions: CreditPosition[] = _.flatten(
+        _.merge(
+          borrowerLineOfCredits.map((loc) => {
+            console.log(loc);
+            return loc.positions;
+          })
+        )
+      );
+      setBorrowerPositions(borrowerPositions ?? []);
     }
     if (userPortfolio && currentRole === LENDER_POSITION_ROLE) {
-      const lenderData = userPortfolio?.lenderPositions;
-      setLenderData(lenderData ? lenderData : []);
-      if (lenderData && lenderData[0]) {
-        const lineId = lenderData[0].id;
-        setSelectedLine(lineId);
-      }
+      const lenderPositions = userPortfolio?.lenderPositions;
+      setLenderPositions(lenderPositions ? lenderPositions : []);
     }
   }, [userPortfolio, currentRole]);
 
@@ -149,19 +157,19 @@ export const Portfolio = () => {
     <StyledViewContainer>
       <HeaderCard items={SummaryCardItems} cardSize="small" />
 
-      {!selectedLine && !lenderData && <StyledSpinnerLoading />}
+      {!selectedLine && !lenderPositions && <StyledSpinnerLoading />}
 
-      {portfolioLoaded && selectedLine && currentRole === BORROWER_POSITION_ROLE ? (
+      {portfolioLoaded && currentRole === BORROWER_POSITION_ROLE && borrowerPositions.length > 0 ? (
         <StyledBorrowerContainer>
-          <LineDetailsDisplay page={selectedLine as CreditLinePage} line={selectedLine} />
+          <PositionsTable positions={borrowerPositions} />
         </StyledBorrowerContainer>
       ) : (
         ''
       )}
 
-      {portfolioLoaded && currentRole === LENDER_POSITION_ROLE && lenderData.length > 0 ? (
+      {portfolioLoaded && currentRole === LENDER_POSITION_ROLE && lenderPositions.length > 0 ? (
         <StyledBorrowerContainer>
-          <PositionsTable positions={lenderData} />
+          <PositionsTable positions={lenderPositions} />
         </StyledBorrowerContainer>
       ) : (
         ''

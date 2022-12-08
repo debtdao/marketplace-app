@@ -21,6 +21,8 @@ import {
   DeploySecuredLineWithConfigProps,
   GetUserPortfolioResponse,
   CreditPosition,
+  RootState,
+  PositionMap,
 } from '@types';
 import {
   formatGetLinesData,
@@ -35,6 +37,7 @@ import { unnullify } from '@utils';
 
 import { TokensActions } from '../tokens/tokens.actions';
 import { TokensSelectors } from '../tokens/tokens.selectors';
+import { CollateralActions } from '../collateral/collateral.actions';
 
 import { LinesSelectors } from './lines.selectors';
 
@@ -114,14 +117,18 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
 
 const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | undefined }, GetLinePageArgs, ThunkAPI>(
   'lines/getLinePage',
-  async ({ id }, { getState, extra }) => {
-    const state = getState();
+  async ({ id }, { getState, extra, dispatch }) => {
+    const state: RootState = getState();
     const { creditLineService } = extra.services;
     // gets all primary + aux line data avaliable by defeault
     const selectedLine = LinesSelectors.selectSelectedLinePage(state);
     const tokenPrices = TokensSelectors.selectTokenPrices(state);
 
+    console.log('get linme page', selectedLine, tokenPrices, state);
+    // @TODO check if events exist to
+    debugger;
     if (selectedLine) {
+      console.log('have line page', selectedLine, tokenPrices, state);
       return { linePageData: selectedLine };
     } else {
       try {
@@ -131,6 +138,16 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
         );
 
         console.log('getLinePage data ', linePageData);
+
+        // @TODO dispatch actions to save collateral and events
+        // enable collateral or add collateral
+        // save module to Map
+        // dispatch(CollateralActions.saveModuleToMap(spigot.id, spigot ));
+        // function does not exist in this file
+        // save events to map
+        // dispatch(LineActions.setCreditEvetntsModule(spigot.id, collateralEvents ));
+        // save events to map
+        // dispatch(CollateralActions.saveEventsToMap(spigot.id, collateralEvents ));
 
         if (!linePageData) throw new Error();
         return { linePageData };
@@ -163,7 +180,7 @@ const getUserLinePositions = createAsyncThunk<
 // TODO: Return borrowerLineOfCredits and arbiterLineOfCredits within response
 // as SecuredLine[] type to consume in lines.reducer.ts
 const getUserPortfolio = createAsyncThunk<
-  { address: string; lines: { [address: string]: SecuredLineWithEvents }; positions: CreditPosition[] },
+  { address: string; lines: { [address: string]: SecuredLineWithEvents }; positions: PositionMap },
   { user: string },
   ThunkAPI
 >('lines/getUserPortfolio', async ({ user }, { extra, getState }) => {
@@ -171,7 +188,7 @@ const getUserPortfolio = createAsyncThunk<
   const tokenPrices = TokensSelectors.selectTokenPrices(getState());
 
   const userPortfolio = await creditLineService.getUserPortfolio({ user });
-  if (!userPortfolio) return { address: user, lines: {}, positions: [] };
+  if (!userPortfolio) return { address: user, lines: {}, positions: {} };
 
   const { lines, positions } = formatUserPortfolioData(userPortfolio, tokenPrices);
   console.log('formatted user portfolio', lines, positions);

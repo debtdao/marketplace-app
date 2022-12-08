@@ -165,7 +165,7 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
     .map((item) => {
       return {
         id: item!.id,
-        lender: item!.lender.id,
+        lender: item!.lender,
         // icon: '',
         deposit: item!.deposit,
         tokenSymbol: item?.token.symbol,
@@ -210,7 +210,7 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
             <CreditLineName>{position.token.symbol}</CreditLineName>
           </CreditLineSelector>
           <CreditLineData>
-            <LineTitle ellipsis> Lender: {position?.lender.id} </LineTitle>
+            <LineTitle ellipsis> Lender: {position?.lender} </LineTitle>
             <LineTitle ellipsis>
               {`${normalizeAmount(position?.deposit, 18)} ${position?.token.symbol}
               @${position?.dRate}/${position?.fRate}%`}

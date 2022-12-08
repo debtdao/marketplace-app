@@ -191,7 +191,7 @@ export const PositionsTable = (props: PositionsProps) => {
       return [ApproveMutualConsent];
     }
     //If user is lender, and line has amount to withdraw, return withdraw action
-    if (isWithdrawable(event.deposit, event.principal, event.lender.id, event.interestRepaid)) {
+    if (isWithdrawable(event.deposit, event.principal, event.lender, event.interestRepaid)) {
       return actions;
     }
     //Returns actions for borrower on open line
@@ -282,7 +282,7 @@ export const PositionsTable = (props: PositionsProps) => {
             status: p.status,
             principal: humanize('amount', p.principal, p.token.decimals, 2),
             interest: humanize('amount', p.interestAccrued, p.token.decimals, 2),
-            lender: formatAddress(p.lender.id),
+            lender: formatAddress(p.lender),
             token: p.token.symbol,
             actions: <ActionButtons value={p.id} actions={getUserPositionActions(p)} />,
           }))}

@@ -13,7 +13,6 @@ import {
   GetLinePageResponse,
   LineOfCreditsResponse,
   CollateralTypes,
-  CollateralModule,
   GetLinesResponse,
   BaseEscrowDepositFragResponse,
   SpigotRevenueSummaryFragResponse,
@@ -27,6 +26,7 @@ import {
   CreditPosition,
   Address,
   GetUserPortfolioResponse,
+  PositionMap,
 } from '@types';
 
 import { humanize, normalizeAmount, normalize } from './format';
@@ -195,7 +195,7 @@ export const formatSecuredLineData = (
     interest: string;
     totalInterestRepaid: string;
     positionIds: string[];
-    positions: { [id: string]: CreditPosition };
+    positions: PositionMap;
   };
   spigot: { type: CollateralTypes; line: string; tokenRevenue: { [key: string]: string } };
   escrow: {
@@ -265,7 +265,7 @@ export const formatSecuredLineData = (
     return { ...r, [r.token]: (r.totalVolumeUsd ?? '0').toString() };
   }, {});
 
-  const positions = positionFrags.reduce((obj: any, c: BasePositionFragResponse): { [id: string]: CreditPosition } => {
+  const positions = positionFrags.reduce((obj: any, c: BasePositionFragResponse): PositionMap => {
     const {
       dRate,
       fRate,
@@ -284,10 +284,12 @@ export const formatSecuredLineData = (
       [id]: {
         id,
         line,
-        lender: lender.id,
+        lender,
         ...financials,
-        dRate: normalizeAmount(fRate, 2),
-        fRate: normalizeAmount(dRate, 2),
+        // dRate: normalizeAmount(fRate, 2),
+        // fRate: normalizeAmount(dRate, 2),
+        dRate,
+        fRate,
         token: _createTokenView(token, BigNumber.from(principal), currentUsdPrice),
         // events,
       },
@@ -340,8 +342,6 @@ export const formatLinePageData = (
   const highestApy: [string, string, string] = ['', '', '0'];
 
   // aggregated revenue in USD by token across all spigots
-  const principal = BigNumber.from(0);
-  const deposit = BigNumber.from(0);
   const interest = BigNumber.from(0);
   const totalInterestRepaid = BigNumber.from(0);
   //  all recent Spigot and Escrow events
@@ -352,23 +352,6 @@ export const formatLinePageData = (
   console.log('formatted page positions', positions, credit.positions);
 
   // TODO add spigot events to collateralEvents
-
-  const formattedEscrowData = Object.values(escrow?.deposits ?? {}).reduce((obj: any, d: any) => {
-    const {
-      id,
-      amount,
-      enabled,
-      token: { id: tokenId, symbol },
-      events,
-    } = d;
-    console.log('format escrow deposit data', tokenId, amount, enabled);
-    // TODO promise.all token price fetching for better performance
-    // const currentUsdPrice = await fetchTokenPrice(symbol, Datre.now());
-    const currentUsdPrice = tokenPrices[tokenId];
-    formatCollateralEvents(ESCROW_MODULE_NAME, symbol, currentUsdPrice, events); // normalize and save events
-    return { ...obj, [tokenId]: { symbol, currentUsdPrice, amount, enabled, token: tokenId } };
-  }, {});
-
   const formattedSpigot = {
     ...spigot!,
     ...spigotData,
@@ -399,7 +382,7 @@ export const formatLinePageData = (
 export const formatUserPortfolioData = (
   portfolioData: GetUserPortfolioResponse,
   tokenPrices: { [token: string]: BigNumber }
-): { lines: { [address: string]: SecuredLineWithEvents }; positions: CreditPosition[] } => {
+): { lines: { [address: string]: SecuredLineWithEvents }; positions: PositionMap } => {
   // add token Prices as arg
   // const { spigot, escrow, positions, borrower, status, ...metadata } = lineData;
   const { borrowerLineOfCredits, lenderPositions, arbiterLineOfCredits } = portfolioData;
@@ -430,11 +413,14 @@ export const formatUserPortfolioData = (
     .reduce((lines, line) => ({ ...lines, [line.id]: line }), {});
 
   // positions tokenFragResponse -> TokenView
-  const positions: CreditPosition[] =
-    lenderPositions?.positions?.map((p) => ({
-      ...p,
-      token: _createTokenView(p.token, unnullify(p.principal, true), tokenPrices[p.token.id]),
-    })) ?? [];
+  const positions: PositionMap =
+    lenderPositions?.positions?.reduce(
+      (map, p) => ({
+        ...map,
+        [p.id]: { ...p, token: _createTokenView(p.token, unnullify(p.principal, true), tokenPrices[p.token.id]) },
+      }),
+      {}
+    ) ?? {};
 
   return { lines, positions };
 };

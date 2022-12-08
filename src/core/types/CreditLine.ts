@@ -76,9 +76,7 @@ export interface CreditPosition {
   id: string;
   line?: string;
   status: PositionStatusTypes;
-  lender: {
-    id: Address;
-  };
+  lender: string;
   token: TokenView;
   deposit: string;
   principal: string;
@@ -119,7 +117,7 @@ export interface UserPositionMetadata {
 export interface UserPositionSummary extends CreditPosition, UserPositionMetadata {}
 
 // Collateral Module Types
-export interface CollateralModule {
+export interface BaseCollateralModule {
   type: CollateralTypes;
   line: string;
 }
@@ -131,7 +129,7 @@ export interface Collateral {
   value: string;
 }
 
-export interface BaseEscrow extends CollateralModule {
+export interface BaseEscrow extends BaseCollateralModule {
   id: Address;
   cratio: string;
   minCRatio: string;
@@ -169,7 +167,7 @@ export interface RevenueSummary extends Collateral {
   lastRevenueTimestamp: number;
 }
 
-export interface AggregatedSpigot extends CollateralModule {
+export interface AggregatedSpigot extends BaseCollateralModule {
   id: Address;
   // aggregated revenue in USD by token across all spigots
   tokenRevenue: { [key: string]: string }; // TODO: RevenueSummary
@@ -178,6 +176,8 @@ export interface AggregatedSpigot extends CollateralModule {
 export interface LinePageSpigot extends AggregatedSpigot {
   spigots?: { [address: string]: RevenueContract };
 }
+
+export type CollateralModule = AggregatedEscrow | AggregatedSpigot;
 
 export interface RevenueContract {
   active: boolean;

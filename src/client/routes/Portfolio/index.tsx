@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { useState, useEffect } from 'react';
+import _ from 'lodash';
 import { useParams } from 'react-router-dom';
 
 import { useAppSelector, useAppTranslation, useIsMounting, useAppDispatch } from '@hooks';
@@ -91,7 +92,7 @@ export const Portfolio = () => {
   const [currentRole, setRole] = useState<string>(BORROWER_POSITION_ROLE);
 
   // TODO: Add types
-  const [lenderData, setLenderData] = useState<any[]>([]);
+  const [lenderPositions, setLenderData] = useState<any[]>([]);
 
   const setSelectedLine = (address: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress: address }));
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
@@ -104,23 +105,20 @@ export const Portfolio = () => {
     return {
       header: t(''),
       Component: (
-        <RoleOption onClick={() => handleSetRole(role)} active={role === currentRole} key={`s-${role}`}>
+        <RoleOption onClick={() => setRole(role)} active={role === currentRole} key={`s-${role}`}>
           {t(`settings:${role}`)}
         </RoleOption>
       ),
     };
   });
 
-  const handleSetRole = (role: string) => {
-    setLenderData([]);
-    setRole(role);
-  };
-
   useEffect(() => {
     if (!isValidAddress(portfolioAddress!)) {
       dispatch(AlertsActions.openAlert({ message: 'Please connect wallet.', type: 'error' }));
     } else if (portfolioAddress && isValidAddress(portfolioAddress)) {
       dispatch(LinesActions.getUserPortfolio({ user: portfolioAddress.toLocaleLowerCase() }));
+      // @TODO dispatch action to set wallet address == portfolioAddress.
+      //  Need to say portfolioAddress is lender instead of user wallet
       setPortfolioLoaded(true);
     }
   }, [currentRole, walletIsConnected, userWallet]);
@@ -131,15 +129,13 @@ export const Portfolio = () => {
       // if (borrowerData && borrowerData[0]) {
       //   const lineId = borrowerData[0].id;
       //   setSelectedLine(lineId);
-      // const positionId = borrowerData[0].positions[0]?.id;
-      // dispatch(LinesActions.setSelectedLinePosition({ position: positionId }));
+      //   const positionId = borrowerData[0].positions[0]?.id;
+      //   dispatch(LinesActions.setSelectedLinePosition({ position: positionId }));
       // }
     }
     if (userPortfolio && currentRole === LENDER_POSITION_ROLE) {
-      const lenderData = userPortfolio?.lenderPositions;
-      setLenderData(lenderData ? lenderData : []);
-      if (lenderData && lenderData[0]) {
-        const lineId = lenderData[0].id;
+      if (!_.isEmpty(lenderPositions)) {
+        const lineId = lenderPositions[0].id;
         setSelectedLine(lineId);
       }
     }
@@ -149,7 +145,7 @@ export const Portfolio = () => {
     <StyledViewContainer>
       <HeaderCard items={SummaryCardItems} cardSize="small" />
 
-      {!selectedLine && !lenderData && <StyledSpinnerLoading />}
+      {!selectedLine && !lenderPositions && <StyledSpinnerLoading />}
 
       {portfolioLoaded && selectedLine && currentRole === BORROWER_POSITION_ROLE ? (
         <StyledBorrowerContainer>
@@ -159,9 +155,9 @@ export const Portfolio = () => {
         ''
       )}
 
-      {portfolioLoaded && currentRole === LENDER_POSITION_ROLE && lenderData.length > 0 ? (
+      {portfolioLoaded && currentRole === LENDER_POSITION_ROLE && _.isEmpty(lenderPositions) ? (
         <StyledBorrowerContainer>
-          <PositionsTable positions={lenderData} />
+          <PositionsTable positions={lenderPositions} />
         </StyledBorrowerContainer>
       ) : (
         ''

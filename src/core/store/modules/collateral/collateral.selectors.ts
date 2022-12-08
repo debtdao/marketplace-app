@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 
-import { Address, AggregatedEscrow, AggregatedSpigot, CollateralModule, RootState } from '@types';
+import { Address, AggregatedEscrow, AggregatedSpigot, RootState } from '@types';
 
 import {} from './collateral.reducer';
 
@@ -33,4 +33,5 @@ export const CollateralSelectors = {
   selectSelectedSpigotAddress,
   selectSelectedCollateralAsset,
   selectSelectedRevenueContractAddress,
+  selectCollateralEventsMap,
 };

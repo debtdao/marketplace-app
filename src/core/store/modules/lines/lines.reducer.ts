@@ -192,10 +192,13 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(getLinePage.fulfilled, (state, { payload: { linePageData } }) => {
       if (linePageData) {
         // overwrite actual positions with referential ids
-        const { positions, collateralEvents, creditEvents, ...pageData } = linePageData;
-        state.linesMap = { ...state.linesMap, [linePageData.id]: pageData };
+        const { positions, collateralEvents, creditEvents, escrow, spigot, ...metadata } = linePageData;
+        state.linesMap = { ...state.linesMap, [linePageData.id]: { ...metadata } };
         state.positionsMap = { ...state.positionsMap, ...positions };
+
+        // we also update state.collateral on this action  being fullfilled in collateral.reducer.ts
       }
+
       state.statusMap.getLinePage = {};
     })
     .addCase(getLinePage.rejected, (state, { error }) => {
@@ -237,7 +240,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       // }
       state.user.portfolio = {
         borrowerLineOfCredits: linesByRole.borrowing,
-        lenderPositions: positions,
+        lenderPositions: _.values(positions),
         arbiterLineOfCredits: linesByRole.arbiting,
       };
     })

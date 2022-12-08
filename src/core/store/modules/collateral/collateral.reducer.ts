@@ -3,6 +3,8 @@ import _ from 'lodash';
 
 import { CollateralState, CollateralActionsStatusMap } from '@types';
 
+import { LinesActions } from '../lines/lines.actions';
+
 import { CollateralActions } from './collateral.actions';
 
 export const initialCollateralActionsStatusMap: CollateralActionsStatusMap = {
@@ -26,6 +28,8 @@ export const collateralInitialState: CollateralState = {
   statusMap: initialCollateralActionsStatusMap,
 };
 
+const { getLinePage } = LinesActions;
+
 const {
   setSelectedEscrow,
   setSelectedSpigot,
@@ -33,6 +37,8 @@ const {
   setSelectedCollateralAsset,
   addCollateral,
   enableCollateral,
+  saveModuleToMap,
+  saveEventsToMap,
 } = CollateralActions;
 
 const collateralReducer = createReducer(collateralInitialState, (builder) => {
@@ -53,11 +59,15 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
       state.selectedCollateralAsset = assetAddress;
     })
 
-    // .addCase(setCollateralEvents, (state, { payload: { moduleAddress, events } }) => {
-    //   state.collateraEventslMap[moduleAddress] = [ ...events ]
+    // .addCase(getLinePage.fulfilled, (state, { payload: { linePageData } })} => {
+    //   state.eventsMap[moduleAddress] = events;
+    // }
+
+    // .addCase(saveEventsToMap.fulfilled, (state, { payload: { moduleAddress, events } }) => {
+    //   state.eventsMap[moduleAddress] = events;
     // })
-    // .addCase(setCollateralModule, (state, { payload: { line, collateral } }) => {
-    //   state.collateralMap[moduleAddress] = collateral
+    // .addCase(saveModuleToMap.fulfilled, (state, { payload: { moduleAddress, module } }) => {
+    //   state.collateralMap[moduleAddress] = module;
     // })
 
     /* -------------------------------- enableCollateral ------------------------------- */

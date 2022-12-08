@@ -245,7 +245,7 @@ const selectUserPositionMetadata = createSelector(
           ...arbiterData,
         };
 
-      case getAddress(position?.lender.id ?? ZERO_ADDRESS):
+      case getAddress(position?.lender ?? ZERO_ADDRESS):
         const lenderData = {
           amount: position!.deposit,
           available: toBN(position!.deposit).minus(toBN(position!.principal)).toString(),

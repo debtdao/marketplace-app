@@ -11,8 +11,6 @@ import { LineMetadata } from './LineMetadata';
 import { PositionsTable } from './PositionsTable';
 
 interface LineDetailsProps {
-  line?: SecuredLine;
-  page?: SecuredLineWithEvents;
   onAddCollateral?: Function;
 }
 
@@ -36,21 +34,9 @@ const BorrowerName = styled(Text)`
 
 export const LineDetailsDisplay = (props: LineDetailsProps) => {
   const { t } = useAppTranslation('common');
-  const dispatch = useAppDispatch();
-  const { line, page } = props;
 
-  const [allDataLoaded, setAllDataLoaded] = useState(false);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
-  const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
-
-  const [positions, setPositions] = useState<CreditPosition[]>();
-
-  useEffect(() => {
-    if (!selectedLine && line) {
-      dispatch(LinesActions.setSelectedLineAddress({ lineAddress: line.id }));
-    }
-    // LineDetails page handles getLinePage query
-  }, [page]);
+  const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
 
   if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
   const { principal, deposit, escrow, spigot, borrower, start, end } = selectedLine;
@@ -66,36 +52,20 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   );
 
   // allow passing in core data first if we have it already and let Page data render once returned
-  if (allDataLoaded && positions) {
-    // if we have all data render full UI
-    return (
-      <Container>
-        <StandardMetadata
-          revenue={spigot?.tokenRevenue}
-          deposits={escrow?.deposits}
-          deposit={deposit}
-          principal={principal}
-          totalInterestPaid={'0'}
-          startTime={start}
-          endTime={end}
-        />
-        <PositionsTable positions={positions} />
-      </Container>
-    );
-  } else {
-    // render partial UI with core data
-    return (
-      <Container>
-        <StandardMetadata
-          revenue={spigot?.tokenRevenue}
-          deposits={escrow?.deposits}
-          deposit={deposit}
-          principal={principal}
-          totalInterestPaid={'0'}
-          startTime={start}
-          endTime={end}
-        />
-      </Container>
-    );
-  }
+  // if we have all data render full UI
+  return (
+    <Container>
+      <StandardMetadata
+        revenue={spigot?.tokenRevenue}
+        deposits={escrow?.deposits}
+        deposit={deposit}
+        principal={principal}
+        totalInterestPaid={'0'}
+        startTime={start}
+        endTime={end}
+      />
+
+      {positions && <PositionsTable positions={_.values(positions)} />}
+    </Container>
+  );
 };

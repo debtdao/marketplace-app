@@ -18,6 +18,8 @@ export const initialCollateralActionsStatusMap: CollateralActionsStatusMap = {
 export const collateralInitialState: CollateralState = {
   selectedEscrow: undefined,
   selectedSpigot: undefined,
+  collateralMap: {},
+  eventsMap: {},
   user: {
     escrowAllowances: {},
   },
@@ -50,6 +52,13 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
     .addCase(setSelectedCollateralAsset, (state, { payload: { assetAddress } }) => {
       state.selectedCollateralAsset = assetAddress;
     })
+
+    // .addCase(setCollateralEvents, (state, { payload: { moduleAddress, events } }) => {
+    //   state.collateraEventslMap[moduleAddress] = [ ...events ]
+    // })
+    // .addCase(setCollateralModule, (state, { payload: { line, collateral } }) => {
+    //   state.collateralMap[moduleAddress] = collateral
+    // })
 
     /* -------------------------------- enableCollateral ------------------------------- */
     .addCase(enableCollateral.pending, (state, payload) => {

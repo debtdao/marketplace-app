@@ -8,7 +8,7 @@ import { useAppSelector, useAppDispatch, useAppTranslation, useQueryParams } fro
 import { ModalsActions, LinesActions, LinesSelectors, WalletActions, WalletSelectors } from '@store';
 import { RecommendationsCard, SliderCard, ViewContainer } from '@components/app';
 import { SpinnerLoading, Text, Button } from '@components/common';
-import { AggregatedCreditLine, UseCreditLinesParams } from '@src/core/types';
+import { SecuredLine, UseCreditLinesParams } from '@src/core/types';
 import { GoblinTown } from '@assets/images';
 import { getEnv } from '@config/env';
 
@@ -134,7 +134,7 @@ export const Market = () => {
       {getLinesStatus.loading || _.isEmpty(lineCategoriesForDisplay) ? (
         <SpinnerLoading flex="1" width="100%" />
       ) : (
-        Object.entries(lineCategoriesForDisplay!).map(([key, val]: [string, AggregatedCreditLine[]], i: number) => {
+        Object.entries(lineCategoriesForDisplay!).map(([key, val]: [string, SecuredLine[]], i: number) => {
           return (
             <StyledRecommendationsCard
               header={t(key)}

@@ -7,16 +7,19 @@ import {
   RootState,
   Status,
   LineActionsStatusMap,
-  AggregatedCreditLine,
+  SecuredLine,
   Address,
-  CreditLinePage,
+  SecuredLineWithEvents,
   UserPositionMetadata,
   PositionMap,
   CreditPosition,
   BORROWER_POSITION_ROLE,
   LENDER_POSITION_ROLE,
   ARBITER_POSITION_ROLE,
-  GetUserPortfolioResponse, // prev. GeneralVaultView, Super indepth data, CreditLinePage is most similar atm
+  GetUserPortfolioResponse,
+  LineEvents,
+  AggregatedEscrow,
+  AggregatedSpigot, // prev. GeneralVaultView, Super indepth data, SecuredLineWithEvents is most similar atm
 } from '@types';
 import { toBN, unnullify } from '@utils';
 import { getConstants } from '@src/config/constants';
@@ -32,8 +35,8 @@ const selectLinesState = (state: RootState) => state.lines;
 
 // const selectUserLinesMetadataMap = (state: RootState) => state.lines.user.userLinesMetadataMap;
 const selectLinesMap = (state: RootState) => state.lines.linesMap;
-const selectPositionsForLineMap = (state: RootState) => state.lines.positionsMap;
-const selectLinePagesMap = (state: RootState) => state.lines.pagesMap;
+const selectPositionsMap = (state: RootState) => state.lines.positionsMap;
+const selectCreditEventsMap = (state: RootState) => state.lines.eventsMap;
 const selectLineCategories = (state: RootState) => state.lines.categories;
 //const selectLinesAddresses = (state: RootState) => Object.keys(state.lines.linesMap);
 const selectUserTokensMap = (state: RootState) => state.tokens.user.userTokensMap;
@@ -41,7 +44,10 @@ const selectUserTokensMap = (state: RootState) => state.tokens.user.userTokensMa
 //const selectLinesAllowancesMap = (state: RootState) => state.lines.user.lineAllowances;
 const selectTokensMap = (state: RootState) => state.tokens.tokensMap;
 const selectSelectedLineAddress = (state: RootState) => state.lines.selectedLineAddress;
-const selectSelectedPosition = (state: RootState) => state.lines.selectedPosition;
+const selectSelectedPositionId = (state: RootState) => state.lines.selectedPosition;
+
+const selectCollateralMap = (state: RootState) => state.collateral.collateralMap;
+const selectCollateralEventsMap = (state: RootState) => state.collateral.eventsMap;
 
 // const selectExpectedTxOutcome = (state: RootState) => state.lines.transaction.expectedOutcome;
 // const selectExpectedTxOutcomeStatus = (state: RootState) => state.lines.statusMap.getExpectedTransactionOutcome;
@@ -59,38 +65,68 @@ const selectLines = createSelector([selectLinesMap], (linesMap) => {
   return Object.values(linesMap);
 });
 
-const selectLiveLines = createSelector([selectLines], (lines): AggregatedCreditLine[] => {
-  return lines.filter((line: AggregatedCreditLine) => line.end < Date.now() / 1000);
+const selectLiveLines = createSelector([selectLines], (lines): SecuredLine[] => {
+  return lines.filter((line: SecuredLine) => line.end < Date.now() / 1000);
 });
 
-const selectSelectedLine = createSelector([selectLines, selectSelectedLineAddress], (lines, selectedLineAddress) => {
-  if (!selectedLineAddress) {
-    return undefined;
-  }
-  return lines.find((line) => line.id === selectedLineAddress);
+const selectSelectedLine = createSelector([selectLinesMap, selectSelectedLineAddress], (lines, selectedLineAddress) => {
+  if (!selectedLineAddress) return undefined;
+  return lines[selectedLineAddress];
 });
+
+const selectSelectedPosition = createSelector(
+  [selectPositionsMap, selectSelectedPositionId],
+  (positions, id = ''): CreditPosition | undefined => {
+    return positions[id];
+  }
+);
+const selectPositionsForSelectedLine = createSelector(
+  [selectPositionsMap, selectSelectedLineAddress],
+  (positions, line): PositionMap => {
+    if (!line) {
+      return {};
+    } else {
+      const linePositions = _.values(positions).filter((p) => p.line === line);
+      return _.zipObject(
+        _.keys(positions),
+        linePositions // todo checksum address
+      );
+    }
+  }
+);
+
+const selectCollateralForSelectedLine = createSelector(
+  [selectSelectedLineAddress, selectCollateralMap],
+  (line, allCollateral) => {
+    return {
+      escrow: _.find(allCollateral, (m) => m.type === 'asset' && m.line === line) as AggregatedEscrow,
+      spigot: _.find(allCollateral, (m) => m.type === 'revenue' && m.line === line) as AggregatedSpigot,
+    };
+  }
+);
+
+const selectCollateralEventsForSelectedLine = createSelector(
+  [selectCollateralEventsMap, selectCollateralForSelectedLine],
+  (events, collateral) => {
+    const escrowEvents = events[collateral.escrow?.id ?? ''] ?? [];
+    const spigotEvents = events[collateral.spigot?.id ?? ''] ?? [];
+    return { collateralEvents: _.concat(escrowEvents, spigotEvents) };
+  }
+);
+
+const selectEventsForLine = createSelector(
+  [selectSelectedLineAddress, selectCreditEventsMap, selectCollateralEventsForSelectedLine], // selectCollateralEvents, - from collateral state
+  (line = '', creditEvents, collateralEvents): LineEvents => {
+    // return hecksum address
+    return { creditEvents: creditEvents[line], ...collateralEvents };
+  }
+);
 
 const selectSelectedLinePage = createSelector(
-  [selectLinePagesMap, selectSelectedLineAddress],
-  (pages, line): CreditLinePage | undefined => {
-    return line ? pages[line] : undefined;
-  }
-);
-
-const selectPositionsForLine = createSelector(
-  [selectSelectedLine, selectPositionsForLineMap],
-  (line, positions): PositionMap => {
-    return _.zipObject(
-      _.keys(positions),
-      _.values(positions).filter((p: CreditPosition) => p.line === line)
-    ); // todo checksum address
-  }
-);
-
-const selectLinePage = createSelector(
-  [selectSelectedLine, selectPositionsForLine, selectEventsForLine],
-  (line, positions): CreditLinePage => {
-    return { ...line, positions /** events */ };
+  [selectSelectedLine, selectPositionsForSelectedLine, selectCollateralForSelectedLine, selectEventsForLine],
+  (line, positions, collateral, events): SecuredLineWithEvents | undefined => {
+    if (!line) return undefined;
+    return { ...line, positions, ...collateral, ...events };
   }
 );
 
@@ -113,11 +149,11 @@ const selectSelectedLineActionsStatusMap = createSelector(
 
 const selectLinesForCategories = createSelector(
   [selectLinesMap, selectLineCategories],
-  (linesMap, categories): { [key: string]: AggregatedCreditLine[] } => {
+  (linesMap, categories): { [key: string]: SecuredLine[] } => {
     return Object.entries(categories).reduce(
       (obj: object, [category, lines]: [string, string[]]) => ({
         ...obj,
-        [category]: lines.map((l: string): AggregatedCreditLine => linesMap[l]),
+        [category]: lines.map((l: string): SecuredLine => linesMap[l]),
       }),
       {}
     );
@@ -136,8 +172,8 @@ const selectSummaryData = createSelector([selectUserLinesSummary], (userLinesSum
 //const selectRecommendations = createSelector([selectLiveLines, selectLinesMap], (activeLines, linesMap) => {
 //const stableCoinSymbols = ['DAI', 'sUSD'];
 //const targetTokenSymbols = ['ETH'];
-//const stableLines: CreditLinePage[] = [];
-//const tokenLines: CreditLinePage[] = [];
+//const stableLines: SecuredLineWithEvents[] = [];
+//const tokenLines: SecuredLineWithEvents[] = [];
 // stableCoinsSymbols.forEach((symbol) => {
 //   const line = lines.find((line) => line.token.symbol === symbol);
 //   if (!line) return;
@@ -169,22 +205,15 @@ const selectLinesGeneralStatus = createSelector([selectLinesStatusMap], (statusM
   return { loading, error };
 });
 
-// const selectSelectedPosition = createSelector(
-//   [selectSelectedLine, selectSelectedPosition],
-//   (line, selectSelectedPosition) => {
-//     if (!selectSelectedPosition) return;
-
-//     let selectedPositionData = _.find(
-//       line?.positions,
-//       (position: CreditPosition) => position.id === selectSelectedPosition
-//     );
-//     return selectedPositionData;
-//   }
-// );
-
 const selectUserPositionMetadata = createSelector(
-  [selectUserWallet, selectSelectedLine, selectSelectedPosition],
-  (userAddress, line, selectedPosition): UserPositionMetadata => {
+  [
+    selectUserWallet,
+    selectSelectedLine,
+    selectSelectedPosition,
+    selectPositionsForSelectedLine,
+    selectCollateralForSelectedLine,
+  ],
+  (userAddress, line, selectedPosition, positions, collateral): UserPositionMetadata => {
     const defaultRole = {
       role: LENDER_POSITION_ROLE,
       amount: '0',
@@ -192,9 +221,9 @@ const selectUserPositionMetadata = createSelector(
     };
 
     if (!line || !userAddress) return defaultRole;
-    //@ts-ignore
-    const position = selectedPosition ? line!.positions?.[selectedPosition] : undefined;
-    console.log('position here', position);
+
+    const position = selectedPosition || positions[0];
+    console.log('select user position metadata', position);
 
     switch (getAddress(userAddress!)) {
       case getAddress(line.borrower):
@@ -208,15 +237,15 @@ const selectUserPositionMetadata = createSelector(
 
       case getAddress(line.arbiter):
         const arbiterData = {
-          amount: unnullify(line.escrow?.collateralValue),
-          available: unnullify(line.escrow?.collateralValue),
+          amount: unnullify(collateral.escrow?.collateralValue),
+          available: unnullify(collateral.escrow?.collateralValue),
         };
         return {
           role: ARBITER_POSITION_ROLE,
           ...arbiterData,
         };
 
-      case getAddress(position?.lender ?? ZERO_ADDRESS):
+      case getAddress(position?.lender.id ?? ZERO_ADDRESS):
         const lenderData = {
           amount: position!.deposit,
           available: toBN(position!.deposit).minus(toBN(position!.principal)).toString(),
@@ -263,19 +292,23 @@ export const LinesSelectors = {
   selectLinesActionsStatusMap,
   selectLinesStatusMap,
   selectUserLinesSummary,
-  selectPositionsForLine,
+  selectPositionsForSelectedLine,
   selectUserPortfolio,
   // selectUserPositions,
   selectLinesGeneralStatus,
   selectSelectedLine,
   selectSelectedLinePage,
-  selectSelectedPosition,
+  selectSelectedPositionId,
   selectSelectedLineActionsStatusMap,
+  selectSelectedPosition,
   // selectDepositedLines,
   selectSummaryData,
   //selectRecommendations,
   selectGetLinePageStatus,
   selectLine,
+  selectCollateralForSelectedLine,
+  selectCollateralEventsForSelectedLine,
+  selectEventsForLine,
   // selectExpectedTxOutcome,
   // selectExpectedTxOutcomeStatus,
 };

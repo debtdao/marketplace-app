@@ -4,8 +4,8 @@ import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 
 import { ThunkAPI } from '@frameworks/redux';
 import {
-  AggregatedCreditLine,
-  CreditLinePage,
+  SecuredLine,
+  SecuredLineWithEvents,
   TransactionOutcome,
   Address,
   Wei,
@@ -34,6 +34,9 @@ import {
 import { unnullify } from '@utils';
 
 import { TokensActions } from '../tokens/tokens.actions';
+import { TokensSelectors } from '../tokens/tokens.selectors';
+
+import { LinesSelectors } from './lines.selectors';
 
 /* -------------------------------------------------------------------------- */
 /*                                   Setters                                  */
@@ -41,12 +44,7 @@ import { TokensActions } from '../tokens/tokens.actions';
 
 const setSelectedLineAddress = createAction<{ lineAddress?: string }>('lines/setSelectedLineAddress');
 const setSelectedLinePosition = createAction<{ position?: string }>('lines/setSelectedLinePosition');
-const setPositionData = createAction<{
-  positionObject: CreditPosition;
-  lineAddress: string;
-  position: string;
-  positions: CreditPosition[];
-}>('lines/setUpdatedPositionData');
+const setPosition = createAction<{ id: string; position: CreditPosition }>('lines/setPosition');
 
 /* -------------------------------------------------------------------------- */
 /*                                 Clear State                                */
@@ -69,7 +67,7 @@ const clearLineStatus = createAction<{ lineAddress: string }>('lines/clearLineSt
 //   }
 // );
 
-const getLine = createAsyncThunk<{ lineData: AggregatedCreditLine | undefined }, GetLineArgs, ThunkAPI>(
+const getLine = createAsyncThunk<{ lineData: SecuredLine | undefined }, GetLineArgs, ThunkAPI>(
   'lines/getLine',
   async (params, { getState, extra }) => {
     const { network } = getState();
@@ -79,50 +77,14 @@ const getLine = createAsyncThunk<{ lineData: AggregatedCreditLine | undefined },
   }
 );
 
-const getLines = createAsyncThunk<
-  { linesData: { [category: string]: AggregatedCreditLine[] } },
-  UseCreditLinesParams,
-  ThunkAPI
->('lines/getLines', async (categories, { getState, extra }) => {
-  const {
-    network,
-    tokens: { tokensMap },
-  } = getState();
-
-  const { creditLineService } = extra.services;
-
-  const tokenPrices = Object.entries(tokensMap).reduce(
-    (prices, [addy, { priceUsdc }]) => ({ ...prices, [addy]: priceUsdc }),
-    {}
-  );
-
-  // ensure consistent ordering of categories
-  const categoryKeys = Object.keys(categories);
-  //@ts-ignore
-  const promises = await Promise.all(
-    categoryKeys
-      .map((k) => categories[k])
-      .map((params: GetLinesArgs) => creditLineService.getLines({ network: network.current, ...params }))
-  );
-  //@ts-ignore
-  const linesData = categoryKeys.reduce(
-    (all, category, i) =>
-      // @dev assumes `promises` is same order as `categories`
-      !promises[i] ? all : { ...all, [category]: formatGetLinesData(promises[i]!, tokenPrices) },
-    {}
-  );
-
-  return { linesData };
-});
-
-const getLinePage = createAsyncThunk<{ linePageData: CreditLinePage | undefined }, GetLinePageArgs, ThunkAPI>(
-  'lines/getLinePage',
-  async ({ id }, { getState, extra }) => {
+const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine[] } }, UseCreditLinesParams, ThunkAPI>(
+  'lines/getLines',
+  async (categories, { getState, extra }) => {
     const {
       network,
-      lines: { linesMap, pagesMap },
       tokens: { tokensMap },
     } = getState();
+
     const { creditLineService } = extra.services;
 
     const tokenPrices = Object.entries(tokensMap).reduce(
@@ -130,20 +92,53 @@ const getLinePage = createAsyncThunk<{ linePageData: CreditLinePage | undefined 
       {}
     );
 
-    const pageData = pagesMap[id];
-    if (pageData) {
-      return { linePageData: pageData };
+    // ensure consistent ordering of categories
+    const categoryKeys = Object.keys(categories);
+    //@ts-ignore
+    const promises = await Promise.all(
+      categoryKeys
+        .map((k) => categories[k])
+        .map((params: GetLinesArgs) => creditLineService.getLines({ network: network.current, ...params }))
+    );
+    //@ts-ignore
+    const linesData = categoryKeys.reduce(
+      (all, category, i) =>
+        // @dev assumes `promises` is same order as `categories`
+        !promises[i] ? all : { ...all, [category]: formatGetLinesData(promises[i]!, tokenPrices) },
+      {}
+    );
+
+    return { linesData };
+  }
+);
+
+const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | undefined }, GetLinePageArgs, ThunkAPI>(
+  'lines/getLinePage',
+  async ({ id }, { getState, extra }) => {
+    const state = getState();
+    const { creditLineService } = extra.services;
+    // gets all primary + aux line data avaliable by defeault
+    const selectedLine = LinesSelectors.selectSelectedLinePage(state);
+    const tokenPrices = TokensSelectors.selectTokenPrices(state);
+
+    if (selectedLine) {
+      return { linePageData: selectedLine };
+    } else {
+      try {
+        const linePageData = formatLinePageData(
+          await creditLineService.getLinePage({ network: state.network.current, id }),
+          tokenPrices
+        );
+
+        console.log('getLinePage data ', linePageData);
+
+        if (!linePageData) throw new Error();
+        return { linePageData };
+      } catch (e) {
+        console.log('failed getting full line page data', e);
+        return { linePageData: undefined };
+      }
     }
-
-    const basicData = linesMap[id];
-
-    // navigated directly to line page, need to fetch basic data
-    const linePageResponse = await creditLineService.getLinePage({
-      network: network.current,
-      id,
-    });
-    const linePageData = linePageResponse ? formatLinePageData(linePageResponse, tokenPrices) : undefined;
-    return { linePageData };
   }
 );
 
@@ -166,23 +161,14 @@ const getUserLinePositions = createAsyncThunk<
 });
 
 // TODO: Return borrowerLineOfCredits and arbiterLineOfCredits within response
-// as AggregatedCreditLine[] type to consume in lines.reducer.ts
+// as SecuredLine[] type to consume in lines.reducer.ts
 const getUserPortfolio = createAsyncThunk<
-  { address: string; lines: { [address: string]: CreditLinePage }; positions: CreditPosition[] },
+  { address: string; lines: { [address: string]: SecuredLineWithEvents }; positions: CreditPosition[] },
   { user: string },
   ThunkAPI
 >('lines/getUserPortfolio', async ({ user }, { extra, getState }) => {
   const { creditLineService } = extra.services;
-  const {
-    network,
-    lines: { linesMap, pagesMap },
-    tokens: { tokensMap },
-  } = getState();
-
-  const tokenPrices = Object.entries(tokensMap).reduce(
-    (prices, [addy, { priceUsdc }]) => ({ ...prices, [addy]: priceUsdc }),
-    {}
-  );
+  const tokenPrices = TokensSelectors.selectTokenPrices(getState());
 
   const userPortfolio = await creditLineService.getUserPortfolio({ user });
   if (!userPortfolio) return { address: user, lines: {}, positions: [] };
@@ -736,7 +722,7 @@ const getWithdrawAllowance = createAsyncThunk<
 export const LinesActions = {
   setSelectedLineAddress,
   setSelectedLinePosition,
-  setPositionData,
+  setPosition,
   // initiateSaveLines,
   getLine,
   getLines,

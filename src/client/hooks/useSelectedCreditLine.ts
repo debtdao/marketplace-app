@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 
-import { AggregatedCreditLine } from '@src/core/types';
+import { SecuredLine } from '@src/core/types';
 
-export const useSelectedCreditLine = (): [AggregatedCreditLine | undefined, Function] => {
-  const [creditLine, setCreditLine] = useState<AggregatedCreditLine | undefined>();
+export const useSelectedCreditLine = (): [SecuredLine | undefined, Function] => {
+  const [creditLine, setCreditLine] = useState<SecuredLine | undefined>();
 
   useEffect(() => {
     // if(!creditLine && )

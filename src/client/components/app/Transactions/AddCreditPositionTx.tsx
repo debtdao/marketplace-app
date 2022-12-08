@@ -67,7 +67,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   //in case user is on Goerli Testnet, we set up a testnet state:
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
-  const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
+  const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPositionId);
   const walletAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
   const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
@@ -214,7 +214,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         }
         const updatedPosition = addCreditUpdate(selectedPosition);
         dispatch(
-          LinesActions.setPositionData({
+          LinesActions.setPosition({
             position: selectedPosition.id,
             lineAddress: selectedCredit.id,
             positionObject: updatedPosition,

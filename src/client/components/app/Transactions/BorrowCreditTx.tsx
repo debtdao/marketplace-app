@@ -34,7 +34,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionLoading, setLoading] = useState(false);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
-  const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
+  const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPositionId);
   const [errors, setErrors] = useState<string[]>(['']);
   const [targetAmount, setTargetAmount] = useState('1');
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
@@ -112,7 +112,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
       if (res.meta.requestStatus === 'fulfilled') {
         const updatedPosition = borrowUpdate(selectedPosition, targetAmount);
         dispatch(
-          LinesActions.setPositionData({
+          LinesActions.setPosition({
             position: selectedPosition.id,
             lineAddress: selectedCredit.id,
             positionObject: updatedPosition,

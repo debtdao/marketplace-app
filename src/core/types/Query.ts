@@ -89,7 +89,7 @@ export interface GetSupportedOracleTokenArgs {
 /*
   Query Responses Types
 */
-//type QueryResponseTypes = AggregatedCreditLine | AggregatedCreditLine[] | CreditLinePage;
+//type QueryResponseTypes = SecuredLine | SecuredLine[] | SecuredLineWithEvents;
 
 export interface TokenFragRepsonse {
   id: Address;

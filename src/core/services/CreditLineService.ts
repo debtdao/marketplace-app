@@ -5,7 +5,7 @@ import { keccak256 } from 'ethers/lib/utils';
 import {
   BorrowCreditProps,
   CreditLineService,
-  AggregatedCreditLine,
+  SecuredLine,
   TransactionService,
   Web3Provider,
   Config,
@@ -373,7 +373,7 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   /* Subgraph Getters */
 
-  public async getLine(props: GetLineProps): Promise<AggregatedCreditLine | undefined> {
+  public async getLine(props: GetLineProps): Promise<SecuredLine | undefined> {
     return;
   }
 

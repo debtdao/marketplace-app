@@ -15,7 +15,7 @@ import {
 import { SummaryCard, ViewContainer, LineDetailsDisplay, NoWalletCard } from '@components/app';
 import { SpinnerLoading } from '@components/common';
 import { isValidAddress, halfWidthCss } from '@utils';
-import { CreditLinePage, LENDER_POSITION_ROLE, BORROWER_POSITION_ROLE } from '@src/core/types';
+import { SecuredLineWithEvents, LENDER_POSITION_ROLE, BORROWER_POSITION_ROLE } from '@src/core/types';
 import { PositionsTable } from '@src/client/components/app/LineDetailsDisplay/PositionsTable';
 
 const StyledViewContainer = styled(ViewContainer)`
@@ -153,7 +153,7 @@ export const Portfolio = () => {
 
       {portfolioLoaded && selectedLine && currentRole === BORROWER_POSITION_ROLE ? (
         <StyledBorrowerContainer>
-          {/* <LineDetailsDisplay page={selectedLine as CreditLinePage} line={selectedLine} /> */}
+          {/* <LineDetailsDisplay page={selectedLine as SecuredLineWithEvents} line={selectedLine} /> */}
         </StyledBorrowerContainer>
       ) : (
         ''

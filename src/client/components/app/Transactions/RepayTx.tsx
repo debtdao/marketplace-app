@@ -48,7 +48,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
   //const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
   const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
   const initialToken: string = selectedSellTokenAddress || DAI;
-  const positions = useAppSelector(LinesSelectors.selectPositionsForLine);
+  const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
 
   const repaymentOptions = [
     { id: '1', label: 'Repay from:', value: 'Wallet' },
@@ -189,11 +189,9 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
         setTransactionCompleted(1);
         const updatedPosition = depositAndRepayUpdate(selectedPosition, targetAmount);
         dispatch(
-          LinesActions.setPositionData({
-            position: selectedPosition.id,
-            lineAddress: selectedCredit.id,
-            positionObject: updatedPosition,
-            positions: positions,
+          LinesActions.setPosition({
+            id: selectedPosition.id,
+            position: updatedPosition,
           })
         );
         setLoading(false);
@@ -356,7 +354,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
         inputText={t('components.transaction.borrow-credit.select-line')}
         onSelectedPositionChange={onSelectedPositionChange}
         selectedPosition={selectedPosition}
-        positions={positions}
+        positions={Object.values(positions)}
         // creditOptions={sourceCreditOptions}
         // inputError={!!sourceStatus.error}
         readOnly={false}

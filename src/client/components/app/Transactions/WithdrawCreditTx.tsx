@@ -38,7 +38,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
   const [targetAmount, setTargetAmount] = useState('1');
   const [errors, setErrors] = useState<string[]>(['']);
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
-  const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
+  const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPositionId);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
   const positions = useAppSelector(LinesSelectors.selectPositionsForLine);
@@ -134,7 +134,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
         setTransactionCompleted(1);
         const updatedPosition = withdrawUpdate(selectedPosition, targetAmount);
         dispatch(
-          LinesActions.setPositionData({
+          LinesActions.setPosition({
             position: selectedPosition.id,
             lineAddress: selectedCredit.id,
             positionObject: updatedPosition,

@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import _ from 'lodash';
 
-import { AggregatedCreditLine, CreditLinePage, CreditPosition } from '@src/core/types';
-import { useAppTranslation } from '@hooks';
+import { SecuredLine, SecuredLineWithEvents, CreditPosition } from '@types';
+import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { Text } from '@components/common';
+import { LinesActions, LinesSelectors } from '@store';
 
 import { LineMetadata } from './LineMetadata';
 import { PositionsTable } from './PositionsTable';
 
 interface LineDetailsProps {
-  line?: AggregatedCreditLine;
-  page?: CreditLinePage;
+  line?: SecuredLine;
+  page?: SecuredLineWithEvents;
   onAddCollateral?: Function;
 }
 
@@ -34,25 +36,24 @@ const BorrowerName = styled(Text)`
 
 export const LineDetailsDisplay = (props: LineDetailsProps) => {
   const { t } = useAppTranslation('common');
+  const dispatch = useAppDispatch();
   const { line, page } = props;
 
   const [allDataLoaded, setAllDataLoaded] = useState(false);
-  const [lineData, setLineData] = useState<AggregatedCreditLine | CreditLinePage>(line!);
+  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
+  const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPositionId);
+
   const [positions, setPositions] = useState<CreditPosition[]>();
 
-  const { principal, deposit, escrow, spigot, borrower, start, end } = lineData;
-
   useEffect(() => {
-    if (page && page.positions) {
-      setAllDataLoaded(true);
-      setLineData(page);
-      setPositions(page.positions);
+    if (!selectedLine && line) {
+      dispatch(LinesActions.setSelectedLineAddress({ lineAddress: line.id }));
     }
-    console.log('updating in line details', page);
     // LineDetails page handles getLinePage query
   }, [page]);
 
-  if (!line && !page) return <Container>{t('lineDetails:line.no-data')}</Container>;
+  if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
+  const { principal, deposit, escrow, spigot, borrower, start, end } = selectedLine;
 
   const StandardMetadata = (metadataProps: any) => (
     <>

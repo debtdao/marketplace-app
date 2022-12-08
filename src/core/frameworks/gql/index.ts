@@ -4,7 +4,7 @@ import { at } from 'lodash';
 import { getEnv } from '@config/env';
 import { getConstants } from '@src/config/constants';
 import {
-  AggregatedCreditLine,
+  SecuredLine,
   GetLineArgs,
   GetLinePageArgs,
   GetLinesArgs,
@@ -85,9 +85,9 @@ export const createQuery =
 
 const getLineQuery = createQuery(GET_LINE_QUERY);
 
-export const getLine: QueryCreator<GetLineArgs, AggregatedCreditLine> = <GetLineArgs, AggregatedCreditLine>(
+export const getLine: QueryCreator<GetLineArgs, SecuredLine> = <GetLineArgs, SecuredLine>(
   arg: GetLineArgs
-): QueryResponse<AggregatedCreditLine> => getLineQuery(arg);
+): QueryResponse<SecuredLine> => getLineQuery(arg);
 
 const getLinePageQuery = createQuery(GET_LINE_PAGE_QUERY, 'lineOfCredit');
 export const getLinePage: QueryCreator<GetLinePageArgs, GetLinePageResponse> = <GetLinePageArgs, GetLinePageResponse>(

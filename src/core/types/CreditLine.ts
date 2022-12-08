@@ -33,7 +33,7 @@ export const CLOSED_STATUS: ClosedStatus = 'CLOSED';
 
 export type PositionStatusTypes = ProposedStatus | OpenedStatus | ClosedStatus;
 
-export interface BaseCreditLine {
+export interface LineOfCredit {
   id: Address;
   borrower: string;
   arbiter: string;
@@ -52,35 +52,25 @@ export interface BaseCreditLine {
 
 export type PositionMap = { [id: string]: CreditPosition };
 
-export interface Line extends BaseCreditLine {
-  positionIds?: string[]; // referential ids stored in redux state
-}
-
-export interface AggregatedCreditLine extends Line {
-  positions?: PositionMap;
+export type LineCollateral = {
   // real-time aggregate usd value across all credits
   escrow?: AggregatedEscrow;
   spigot?: AggregatedSpigot;
+};
+
+export interface SecuredLine extends LineOfCredit, LineCollateral {
+  positionIds?: string[]; // referential ids stored in redux state
+  positions?: PositionMap;
 }
 
-export interface CreditLinePage extends AggregatedCreditLine {
-  // total value of asssets repaid *AT TIME OF REPAYMENT*
-  collateralEvents: CollateralEvent[];
-  creditEvents: CreditEvent[];
-}
-
-// data that isnt included in AggregatedCreditLine that we need to fetch for full CreditLinePage dattype
+// data that isnt included in SecuredLine that we need to fetch for full SecuredLineWithEvents dattype
 // gets merged into existing AggregatedCredit to form LinePageData
-export interface CreditLinePageAuxData {
-  positions: {
-    [id: string]: {
-      dRate: string;
-      token: Address;
-    };
-  }[];
+export interface LineEvents {
   collateralEvents: CollateralEvent[];
   creditEvents: CreditEvent[];
 }
+
+export interface SecuredLineWithEvents extends SecuredLine, LineEvents {}
 
 export interface CreditPosition {
   id: string;
@@ -118,7 +108,7 @@ export const COLLATERAL_TYPE_REVENUE: CollateralTypeRevenue = 'revenue';
 
 export type LinesByRole = { borrowing: Address[]; arbiting: Address[] };
 
-type CollateralTypes = CollateralTypeAsset | CollateralTypeRevenue | undefined;
+export type CollateralTypes = CollateralTypeAsset | CollateralTypeRevenue | undefined;
 
 export interface UserPositionMetadata {
   role: PositionRole; // borrower/lender/arbiter
@@ -129,6 +119,11 @@ export interface UserPositionMetadata {
 export interface UserPositionSummary extends CreditPosition, UserPositionMetadata {}
 
 // Collateral Module Types
+export interface CollateralModule {
+  type: CollateralTypes;
+  line: string;
+}
+
 export interface Collateral {
   type: CollateralTypes;
   token: TokenView;
@@ -136,7 +131,7 @@ export interface Collateral {
   value: string;
 }
 
-export interface BaseEscrow {
+export interface BaseEscrow extends CollateralModule {
   id: Address;
   cratio: string;
   minCRatio: string;
@@ -174,7 +169,7 @@ export interface RevenueSummary extends Collateral {
   lastRevenueTimestamp: number;
 }
 
-export interface AggregatedSpigot {
+export interface AggregatedSpigot extends CollateralModule {
   id: Address;
   // aggregated revenue in USD by token across all spigots
   tokenRevenue: { [key: string]: string }; // TODO: RevenueSummary

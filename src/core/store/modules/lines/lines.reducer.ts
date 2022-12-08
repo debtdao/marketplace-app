@@ -3,12 +3,11 @@ import { createReducer } from '@reduxjs/toolkit';
 import { ethers } from 'ethers';
 
 import {
-  Line,
   initialStatus,
   CreditLineState,
   UserLineMetadataStatusMap,
   LineActionsStatusMap,
-  AggregatedCreditLine,
+  SecuredLine,
   CreditPosition,
   BORROWER_POSITION_ROLE,
   Address,
@@ -34,7 +33,7 @@ export const linesInitialState: CreditLineState = {
   selectedPosition: undefined,
   linesMap: {},
   positionsMap: {},
-  pagesMap: {},
+  eventsMap: {},
   categories: {},
   user: {
     linePositions: {},
@@ -71,7 +70,7 @@ const {
   // initiateSaveLines,
   setSelectedLineAddress,
   setSelectedLinePosition,
-  setPositionData,
+  setPosition,
   getUserLinePositions,
   getUserPortfolio,
   clearLinesData,
@@ -95,15 +94,8 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.selectedPosition = position;
     })
 
-    .addCase(setPositionData, (state, { payload: { position, lineAddress, positionObject, positions } }) => {
-      if (positionObject) {
-        const newPositions: CreditPosition[] = positions.filter(
-          (positionObj: CreditPosition) => position !== positionObj.id
-        );
-        newPositions.push({ ...positionObject });
-
-        state.pagesMap[lineAddress].positions = newPositions;
-      }
+    .addCase(setPosition, (state, { payload: { id, position } }) => {
+      state.positionsMap[id] = position;
     })
     /* -------------------------------------------------------------------------- */
     /*                                 Clear State                                */
@@ -173,7 +165,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.getLines = {};
 
       const categories: { [key: string]: string[] } = {};
-      const lines: { [key: string]: AggregatedCreditLine } = {};
+      const lines: { [key: string]: SecuredLine } = {};
 
       // loop over nested structure of new Lines and update state
       Object.entries(linesData).map(([category, ls]) =>
@@ -199,9 +191,8 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
     .addCase(getLinePage.fulfilled, (state, { payload: { linePageData } }) => {
       if (linePageData) {
-        state.pagesMap = { ...state.pagesMap, [linePageData.id]: linePageData };
         // overwrite actual positions with referential ids
-        const { positions, ...pageData } = linePageData;
+        const { positions, collateralEvents, creditEvents, ...pageData } = linePageData;
         state.linesMap = { ...state.linesMap, [linePageData.id]: pageData };
         state.positionsMap = { ...state.positionsMap, ...positions };
       }
@@ -229,7 +220,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
     .addCase(getUserPortfolio.fulfilled, (state, { meta, payload: { address, lines, positions } }) => {
       state.linesMap = { ...state.linesMap, ...lines };
-      const linesByRole: LinesByRole = _.entries<AggregatedCreditLine>(lines).reduce(
+      const linesByRole: LinesByRole = _.entries<SecuredLine>(lines).reduce(
         ({ borrowing, arbiting }: LinesByRole, [addy, line]) => {
           if (line.borrower === address) return { arbiting, borrowing: [...borrowing, addy] };
           if (line.arbiter === address) return { borrowing, arbiting: [...arbiting, addy] };

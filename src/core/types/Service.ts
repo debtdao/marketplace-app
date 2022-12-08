@@ -22,14 +22,14 @@ import {
   Network,
   Wallet,
   TokenAllowance,
-  AggregatedCreditLine,
+  SecuredLine,
   CreditPosition,
   GetLineArgs,
   GetLinesArgs,
   GetLinePageArgs,
   GetLinesResponse,
   GetLinePageResponse,
-  CreditLinePage,
+  SecuredLineWithEvents,
   GetLinePageAuxDataResponse,
   SupportedOracleTokenResponse,
   GetUserPortfolioResponse,
@@ -154,7 +154,7 @@ export interface InterestRateCreditService {
 }
 
 export interface CreditLineService {
-  getLine: (props: GetLineProps) => Promise<AggregatedCreditLine | undefined>;
+  getLine: (props: GetLineProps) => Promise<SecuredLine | undefined>;
   getLines: (props: GetLinesProps) => Promise<GetLinesResponse[] | undefined>;
   getLinePage: (props: GetLinePageProps) => Promise<GetLinePageResponse | undefined>;
   getLinePageAuxData: (props: GetLinePageProps) => Promise<GetLinePageAuxDataResponse | undefined>;

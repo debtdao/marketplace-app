@@ -2,8 +2,8 @@ import { isEmpty, zipWith } from 'lodash';
 import { BigNumber, utils } from 'ethers';
 
 import {
-  CreditLinePage,
-  AggregatedCreditLine,
+  SecuredLineWithEvents,
+  SecuredLine,
   CreditEvent,
   CollateralEvent,
   ModuleNames,
@@ -12,6 +12,8 @@ import {
   LineStatusTypes,
   GetLinePageResponse,
   LineOfCreditsResponse,
+  CollateralTypes,
+  CollateralModule,
   GetLinesResponse,
   BaseEscrowDepositFragResponse,
   SpigotRevenueSummaryFragResponse,
@@ -130,7 +132,7 @@ export const unnullify = (thing: any, toBN?: boolean) => {
 export function formatGetLinesData(
   response: GetLinesResponse[],
   tokenPrices: { [token: string]: BigNumber }
-): AggregatedCreditLine[] {
+): SecuredLine[] {
   return response.map((data: any) => {
     const {
       borrower: { id: borrower },
@@ -140,7 +142,7 @@ export function formatGetLinesData(
       status,
       ...rest
     } = data;
-    const { credit, spigot, escrow } = formatAggregatedCreditLineData(
+    const { credit, spigot, escrow } = formatSecuredLineData(
       rest.id,
       positions,
       escrowRes?.deposits ?? [],
@@ -171,7 +173,7 @@ export function formatGetLinesData(
 
 export function formatGetLinePageAuxData(
   response: GetLinePageAuxDataResponse,
-  line: AggregatedCreditLine,
+  line: SecuredLine,
   tokenPrices: { [token: string]: BigNumber }
 ): GetLinePageAuxDataResponse | undefined {
   const { ...rest } = response;
@@ -179,7 +181,7 @@ export function formatGetLinePageAuxData(
   return;
 }
 
-export const formatAggregatedCreditLineData = (
+export const formatSecuredLineData = (
   line: Address,
   positionFrags: (BasePositionFragResponse | BasePositionFragResponse)[],
   collateralDeposits: BaseEscrowDepositFragResponse[],
@@ -195,8 +197,10 @@ export const formatAggregatedCreditLineData = (
     positionIds: string[];
     positions: { [id: string]: CreditPosition };
   };
-  spigot: { tokenRevenue: { [key: string]: string } };
+  spigot: { type: CollateralTypes; line: string; tokenRevenue: { [key: string]: string } };
   escrow: {
+    type: CollateralTypes;
+    line: string;
     collateralValue: string;
     cratio: string;
     deposits: EscrowDepositList;
@@ -247,6 +251,8 @@ export const formatAggregatedCreditLineData = (
   );
 
   const escrow = {
+    type: COLLATERAL_TYPE_ASSET,
+    line,
     deposits,
     collateralValue: collateralValue.toString(),
     cratio: parseUnits(unnullify(credit.principal).toString(), 'ether').eq(0)
@@ -300,14 +306,15 @@ export const formatAggregatedCreditLineData = (
       positions,
     },
     escrow,
-    spigot: { tokenRevenue },
+    spigot: { type: COLLATERAL_TYPE_REVENUE, line, tokenRevenue },
   };
 };
 
 export const formatLinePageData = (
-  lineData: GetLinePageResponse,
+  lineData: GetLinePageResponse | undefined,
   tokenPrices: { [token: string]: BigNumber }
-): CreditLinePage => {
+): SecuredLineWithEvents | undefined => {
+  if (!lineData) return undefined;
   // add token Prices as arg
   const {
     spigot,
@@ -322,13 +329,7 @@ export const formatLinePageData = (
     credit,
     spigot: spigotData,
     escrow: escrowData,
-  } = formatAggregatedCreditLineData(
-    metadata.id,
-    positions!,
-    escrow?.deposits || [],
-    spigot?.summaries || [],
-    tokenPrices
-  );
+  } = formatSecuredLineData(metadata.id, positions!, escrow?.deposits || [], spigot?.summaries || [], tokenPrices);
   const lineAddress = metadata.id;
 
   console.log('get line page escrow', escrow, escrowData);
@@ -373,7 +374,7 @@ export const formatLinePageData = (
     ...spigotData,
   };
 
-  const pageData: CreditLinePage = {
+  const pageData: SecuredLineWithEvents = {
     // metadata
     ...metadata,
     // debt data
@@ -398,7 +399,7 @@ export const formatLinePageData = (
 export const formatUserPortfolioData = (
   portfolioData: GetUserPortfolioResponse,
   tokenPrices: { [token: string]: BigNumber }
-): { lines: { [address: string]: CreditLinePage }; positions: CreditPosition[] } => {
+): { lines: { [address: string]: SecuredLineWithEvents }; positions: CreditPosition[] } => {
   // add token Prices as arg
   // const { spigot, escrow, positions, borrower, status, ...metadata } = lineData;
   const { borrowerLineOfCredits, lenderPositions, arbiterLineOfCredits } = portfolioData;
@@ -408,13 +409,7 @@ export const formatUserPortfolioData = (
         credit,
         spigot: spigotData,
         escrow: escrowData,
-      } = formatAggregatedCreditLineData(
-        rest.id,
-        positions,
-        escrow?.deposits || [],
-        spigot?.summaries || [],
-        tokenPrices
-      );
+      } = formatSecuredLineData(rest.id, positions, escrow?.deposits || [], spigot?.summaries || [], tokenPrices);
 
       return {
         ...rest,

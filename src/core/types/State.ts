@@ -1,5 +1,4 @@
 import {
-  Line,
   TokenFragRepsonse,
   GetUserPortfolioResponse,
   LineOfCreditsResponse,
@@ -13,7 +12,19 @@ import { ExternalServiceId } from './General';
 import { PartnerId } from './Partner';
 import { Theme } from './Settings';
 import { Status } from './Status';
-import { CreditLinePage, UserLineMetadataStatusMap, AggregatedCreditLine, CreditPosition } from './CreditLine';
+import {
+  SecuredLineWithEvents,
+  UserLineMetadataStatusMap,
+  SecuredLine,
+  CreditPosition,
+  LineOfCredit,
+  LineEvents,
+  CreditEvent,
+  LineCollateral,
+  CollateralEvent,
+  AggregatedEscrow,
+  AggregatedSpigot,
+} from './CreditLine';
 import {
   Position,
   Token,
@@ -78,26 +89,6 @@ export interface ThemeState {
   current: Theme;
 }
 
-export interface VaultActionsStatusMap {
-  get: Status;
-  approve: Status;
-  deposit: Status;
-  approveZapOut: Status;
-  signZapOut: Status;
-  withdraw: Status;
-  approveMigrate: Status;
-  migrate: Status;
-}
-
-export interface UserVaultActionsStatusMap {
-  getPosition: Status;
-  getMetadata: Status;
-}
-
-export interface VaultPositionsMap {
-  DEPOSIT: Position;
-}
-
 export interface AllowancesMap {
   [spender: string]: Integer;
 }
@@ -113,10 +104,9 @@ export interface IdToCreditPositionMap {
 export interface CreditLineState {
   selectedLineAddress: string | undefined;
   selectedPosition: string | undefined;
-  linesMap: { [lineAddress: string]: Line };
+  linesMap: { [lineAddress: string]: LineOfCredit };
   positionsMap: { [id: string]: CreditPosition };
-  // probs can just consolidate line/linePage since we need a lot of derived data in linePage for basic functionality
-  pagesMap: { [lineAddress: string]: CreditLinePage };
+  eventsMap: { [line: string]: CreditEvent[] };
   categories: { [category: string]: string[] };
   user: {
     linePositions: IdToCreditPositionMap;
@@ -139,6 +129,34 @@ export interface CreditLineState {
     deploySecuredLine: Status;
     user: UserLineMetadataStatusMap;
   };
+}
+
+export interface CollateralState {
+  selectedEscrow?: Address;
+  selectedSpigot?: Address;
+  selectedRevenueContract?: Address;
+  selectedCollateralAsset?: Address;
+  collateralMap: { [module: string]: AggregatedEscrow | AggregatedSpigot };
+  eventsMap: { [module: string]: CollateralEvent[] };
+  // collateralTradeData?: ZeroExApiResponse;
+  user: {
+    escrowAllowances: { [line: string]: { [token: string]: string } };
+  };
+  statusMap: CollateralActionsStatusMap;
+}
+
+interface TokenCollateralMap {
+  [contract: string]: { [token: string]: Status };
+}
+export interface CollateralActionsStatusMap {
+  getLineCollateralData: Status;
+  approve: TokenCollateralMap;
+  addCollateral: TokenCollateralMap;
+  enableCollateral: TokenCollateralMap;
+
+  addSpigot: Status;
+  releaseSpigot: Status;
+  updateOwnerSplit: Status;
 }
 
 export interface VaultsState {
@@ -209,30 +227,24 @@ export interface TokensState {
   };
 }
 
-export interface CollateralState {
-  selectedEscrow?: Address;
-  selectedSpigot?: Address;
-  selectedRevenueContract?: Address;
-  selectedCollateralAsset?: Address;
-  // collateralTradeData?: ZeroExApiResponse;
-  user: {
-    escrowAllowances: { [line: string]: { [token: string]: string } };
-  };
-  statusMap: CollateralActionsStatusMap;
+export interface VaultActionsStatusMap {
+  get: Status;
+  approve: Status;
+  deposit: Status;
+  approveZapOut: Status;
+  signZapOut: Status;
+  withdraw: Status;
+  approveMigrate: Status;
+  migrate: Status;
 }
 
-interface TokenCollateralMap {
-  [contract: string]: { [token: string]: Status };
+export interface UserVaultActionsStatusMap {
+  getPosition: Status;
+  getMetadata: Status;
 }
-export interface CollateralActionsStatusMap {
-  getLineCollateralData: Status;
-  approve: TokenCollateralMap;
-  addCollateral: TokenCollateralMap;
-  enableCollateral: TokenCollateralMap;
 
-  addSpigot: Status;
-  releaseSpigot: Status;
-  updateOwnerSplit: Status;
+export interface VaultPositionsMap {
+  DEPOSIT: Position;
 }
 
 export interface SettingsState {

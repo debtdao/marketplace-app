@@ -114,11 +114,16 @@ const selectCollateralEventsForSelectedLine = createSelector(
   }
 );
 
+const selectCreditEventsForSelectedLine = createSelector(
+  [selectCreditEventsMap, selectSelectedLineAddress],
+  (events, line = '') => ({ creditEvents: events[line] })
+);
+
 const selectEventsForLine = createSelector(
-  [selectSelectedLineAddress, selectCreditEventsMap, selectCollateralEventsForSelectedLine], // selectCollateralEvents, - from collateral state
-  (line = '', creditEvents, collateralEvents): LineEvents => {
-    // return hecksum address
-    return { creditEvents: creditEvents[line], ...collateralEvents };
+  [selectCreditEventsForSelectedLine, selectCollateralEventsForSelectedLine], // selectCollateralEvents, - from collateral state
+  (creditEvents, collateralEvents): LineEvents => {
+    // @TODO return xhecksum address
+    return { ...creditEvents, ...collateralEvents };
   }
 );
 

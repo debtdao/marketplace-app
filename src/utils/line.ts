@@ -277,7 +277,6 @@ export const formatSecuredLineData = (
     } = c;
 
     const currentUsdPrice = tokenPrices[c.token?.id];
-    // const events = graphEvents ? formatCreditEvents(c.token.symbol, currentUsdPrice, graphEvents!) : [];
     // creditEvents.concat(events);
     return {
       ...obj,
@@ -347,7 +346,7 @@ export const formatLinePageData = (
   //  all recent Spigot and Escrow events
   let collateralEvents: CollateralEvent[] = [];
   //  all recent borrow/lend events
-  const creditEvents: CreditEvent[] = [];
+  // const creditEvents: CreditEvent[] = [];
 
   console.log('formatted page positions', positions, credit.positions);
 

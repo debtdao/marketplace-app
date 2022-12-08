@@ -108,7 +108,8 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     console.log('made it to revenue call');
     if (revenueContractAdd.length === 42) {
       console.log('making the call');
-      dispatch(OnChainMetaDataActions.getABI({ address: revenueContractAdd }));
+      console.log(revenueContractAdd);
+      dispatch(OnChainMetaDataActions.getABI(revenueContractAdd));
     }
   }, [revenueContractAdd]);
 

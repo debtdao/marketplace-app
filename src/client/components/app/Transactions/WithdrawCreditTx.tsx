@@ -38,10 +38,10 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
   const [targetAmount, setTargetAmount] = useState('1');
   const [errors, setErrors] = useState<string[]>(['']);
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
-  const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPositionId);
+  const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
-  const positions = useAppSelector(LinesSelectors.selectPositionsForLine);
+  const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
 
   //Calculate maximum withdraw amount, then humanize for readability
   const getMaxWithdraw = () => {
@@ -135,10 +135,8 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
         const updatedPosition = withdrawUpdate(selectedPosition, targetAmount);
         dispatch(
           LinesActions.setPosition({
-            position: selectedPosition.id,
-            lineAddress: selectedCredit.id,
-            positionObject: updatedPosition,
-            positions: positions,
+            id: selectedPosition.id,
+            position: selectedPosition,
           })
         );
         setLoading(false);

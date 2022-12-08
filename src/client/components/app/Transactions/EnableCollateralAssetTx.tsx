@@ -80,18 +80,18 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
   const [transactionApproved, setTransactionApproved] = useState(true);
   const [transactionLoading, setLoading] = useState(false);
 
+  // @cleanup CollateralSelectors.selectedCollateralAsset
   const selectedAssetAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress) || TOKEN_ADDRESSES.DAI;
-  // TODO pull colalteralOptions from subgraph instread of default yearn tokens
-  const collateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
-  const selectedAsset = _.find(collateralOptions, (t) => t.address === selectedAssetAddress);
-  // TODO get token prices from yearn API and display
 
   //const enabledCollateralAddressess = _.values(selectedLine?.escrow?.deposits)?.map((d) => d.token.address);
+  // @cleanup TODO pull colalteralOptions from subgraph instread of default yearn tokens
+  const collateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
+  const selectedAsset = _.find(collateralOptions, (t) => t.address === selectedAssetAddress);
 
   useEffect(() => {
     // if escrow not set yet then correct state
-    if (selectedLine?.escrow && !selectedEscrow) {
-      dispatch(CollateralActions.setSelectedEscrow({ escrowAddress: selectedLine.escrow.id }));
+    if (!selectedEscrow) {
+      console.log('no escrow seelcted for enabling collaeral', selectedLine);
     }
   });
 
@@ -174,7 +174,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
     }
 
     const transactionData: EnableCollateralAssetProps = {
-      escrowAddress: selectedEscrow,
+      escrowAddress: selectedEscrow.id,
       token: selectedAssetAddress,
       network: walletNetwork,
       dryRun: false,

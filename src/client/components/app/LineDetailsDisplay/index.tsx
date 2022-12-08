@@ -41,7 +41,7 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
 
   const [allDataLoaded, setAllDataLoaded] = useState(false);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
-  const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPositionId);
+  const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
 
   const [positions, setPositions] = useState<CreditPosition[]>();
 

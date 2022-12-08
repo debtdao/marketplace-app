@@ -1,6 +1,7 @@
 import { FC, useState } from 'react';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
+import _ from 'lodash';
 
 import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
 import { LinesSelectors, LinesActions, WalletSelectors } from '@store';
@@ -34,11 +35,11 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionLoading, setLoading] = useState(false);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
-  const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPositionId);
+  const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
   const [errors, setErrors] = useState<string[]>(['']);
   const [targetAmount, setTargetAmount] = useState('1');
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
-  const positions = useAppSelector(LinesSelectors.selectPositionsForLine);
+  const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
 
   console.log('positions', positions);
 
@@ -113,10 +114,8 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
         const updatedPosition = borrowUpdate(selectedPosition, targetAmount);
         dispatch(
           LinesActions.setPosition({
-            position: selectedPosition.id,
-            lineAddress: selectedCredit.id,
-            positionObject: updatedPosition,
-            positions: positions,
+            id: selectedPosition.id,
+            position: selectedPosition,
           })
         );
         setTransactionCompleted(1);
@@ -169,7 +168,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
         inputText={t('components.transaction.borrow-credit.select-line')}
         onSelectedPositionChange={onSelectedPositionChange}
         selectedPosition={selectedPosition}
-        positions={positions}
+        positions={_.values(positions)}
         // creditOptions={sourceCreditOptions}
         // inputError={!!sourceStatus.error}
         readOnly={false}

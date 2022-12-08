@@ -1,9 +1,8 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 
 import { ThunkAPI } from '@frameworks/redux';
-import { OnChainMetaDataServiceProps } from '@src/core/types';
 
-const getABI = createAsyncThunk<{ ABI: any[] }, OnChainMetaDataServiceProps, ThunkAPI>(
+const getABI = createAsyncThunk<{ ABI: any[] }, String, ThunkAPI>(
   'etherscan/getABI',
   async (props, { extra, getState }) => {
     const { onChainMetaDataService } = extra.services;

@@ -455,12 +455,12 @@ export interface CollateralService {
 }
 
 export interface OnChainMetaDataService {
-  getContractABI(props: OnChainMetaDataServiceProps): Promise<any | undefined>;
+  getContractABI(address: String): Promise<any | undefined>;
 }
 
-export interface OnChainMetaDataServiceProps {
-  address: String;
-}
+// export interface OnChainMetaDataServiceProps {
+//   address: String;
+// }
 
 // *************** TOKEN ***************
 export interface TokenService {

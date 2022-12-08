@@ -50,7 +50,7 @@ export class Container implements DIContainer {
       transactionService: awilix.asClass(TransactionServiceImpl),
       interestRateCreditService: awilix.asClass(InterestRateCreditServiceImpl),
       lineFactoryService: awilix.asClass(LineFactoryServiceImpl),
-      OnChainMetaDataService: awilix.asClass(OnChainMetaDataServiceImpl),
+      onChainMetaDataService: awilix.asClass(OnChainMetaDataServiceImpl),
     });
   }
 
@@ -79,7 +79,7 @@ export class Container implements DIContainer {
       interestRateCreditService: this.container.cradle.interestRateCreditService,
       lineFactoryService: this.container.cradle.lineFactoryService,
       collateralService: this.container.cradle.collateralService,
-      onChainMetaDataService: this.container.cradle.OnChainMetaDataService,
+      onChainMetaDataService: this.container.cradle.onChainMetaDataService,
     };
   }
 

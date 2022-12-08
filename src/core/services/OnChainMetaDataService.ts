@@ -1,14 +1,11 @@
 import { _getContractABI } from '@src/utils';
-import { OnChainMetaDataService, OnChainMetaDataState, OnChainMetaDataServiceProps } from '@types';
+import { OnChainMetaDataService } from '@types';
 
 export class OnChainMetaDataServiceImpl implements OnChainMetaDataService {
-  private onChainMetaDataService: OnChainMetaDataService;
-  constructor({ onChainMetaDataService }: { onChainMetaDataService: OnChainMetaDataService }) {
-    this.onChainMetaDataService = onChainMetaDataService;
-  }
+  constructor() {}
 
-  public async getContractABI(props: OnChainMetaDataServiceProps): Promise<any> {
+  public async getContractABI(address: String): Promise<any | undefined> {
     console.log('Made it to Service');
-    return await _getContractABI(props.address);
+    return await _getContractABI(address);
   }
 }

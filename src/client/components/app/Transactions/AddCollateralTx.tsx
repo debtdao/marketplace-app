@@ -239,8 +239,10 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
       return;
     }
 
+    console.log('escrow', selectedLine.escrow.id);
+
     const transactionData = {
-      lineAddress: selectedLine.escrow.id,
+      escrowAddress: selectedLine.escrow.id,
       amount: ethers.utils.parseEther(targetTokenAmount),
       token: selectedCollateralAsset,
       network: walletNetwork,

@@ -8,7 +8,7 @@ import { device } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer } from '@components/app';
 import { Input, SearchIcon, Button } from '@components/common';
 import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, CreditPosition } from '@src/core/types';
-import { humanize, formatAddress } from '@src/utils';
+import { humanize, normalizeAmount, formatAddress } from '@src/utils';
 import { getEnv } from '@config/env';
 
 const PositionsCard = styled(DetailCard)`
@@ -171,6 +171,8 @@ export const PositionsTable = (props: PositionsProps) => {
   };
 
   const isWithdrawable = (deposit: string, borrowed: string, lender: string, interestRepaid: string) => {
+    // console.log('User Portfolio Lender', lender);
+    // Withdraw/Accept are not working on Portfolio / Lender
     if (!userWallet) {
       return;
     }
@@ -201,7 +203,7 @@ export const PositionsTable = (props: PositionsProps) => {
     return [];
   };
 
-  console.log('positions table', positions);
+  // console.log('user portfolio positions table', positions);
   return (
     <>
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
@@ -274,18 +276,21 @@ export const PositionsTable = (props: PositionsProps) => {
               grow: '1',
             },
           ]}
-          data={positions?.map((p) => ({
-            // this needs to be humanized to correct amount depending on the token.
-            deposit: humanize('amount', p.deposit, p.token.decimals, 2),
-            drate: `${p.dRate} %`,
-            frate: `${p.fRate} %`,
-            status: p.status,
-            principal: humanize('amount', p.principal, p.token.decimals, 2),
-            interest: humanize('amount', p.interestAccrued, p.token.decimals, 2),
-            lender: formatAddress(p.lender),
-            token: p.token.symbol,
-            actions: <ActionButtons value={p.id} actions={getUserPositionActions(p)} />,
-          }))}
+          data={positions?.map((p) => {
+            console.log('render position', p);
+            return {
+              // this needs to be humanized to correct amount depending on the token.
+              deposit: humanize('amount', p.deposit, p.token.decimals, 2),
+              drate: `${normalizeAmount(p.dRate, 2)} %`,
+              frate: `${normalizeAmount(p.fRate, 2)} %`,
+              status: p.status,
+              principal: humanize('amount', p.principal, p.token.decimals, 2),
+              interest: humanize('amount', p.interestAccrued, p.token.decimals, 2),
+              lender: formatAddress(p.lender),
+              token: p.token.symbol,
+              actions: <ActionButtons value={p.id} actions={getUserPositionActions(p)} />,
+            };
+          })}
           SearchBar={
             <>
               <Input
@@ -294,6 +299,7 @@ export const PositionsTable = (props: PositionsProps) => {
                 placeholder={t('components.search-input.search')}
                 Icon={SearchIcon}
               />
+              {/*Do not render if user is lender*/}
               <Button onClick={depositHandler}>{ctaButtonText}</Button>
             </>
           }

@@ -186,15 +186,9 @@ export interface GetLinesResponse {
   };
 }
 
-export interface GetLinePageAuxDataResponse {
-  events?: LineEventFragResponse[];
-  spigot?: {
-    events: SpigotEventFragResponse[];
-  };
-}
-
 export interface GetLinePageResponse extends BaseLineFragResponse {
   positions?: BasePositionFragResponse[];
+  events?: LineEventFragResponse[];
 
   spigot?: {
     id: Address;

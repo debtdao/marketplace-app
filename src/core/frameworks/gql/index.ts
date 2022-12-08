@@ -13,7 +13,6 @@ import {
   QueryResponse,
   QueryCreator,
   GetLinePageResponse,
-  GetLinePageAuxDataResponse,
   GetLinesResponse,
   SupportedOracleTokenResponse,
   CreditPosition,
@@ -93,14 +92,6 @@ const getLinePageQuery = createQuery(GET_LINE_PAGE_QUERY, 'lineOfCredit');
 export const getLinePage: QueryCreator<GetLinePageArgs, GetLinePageResponse> = <GetLinePageArgs, GetLinePageResponse>(
   arg: GetLinePageArgs
 ): QueryResponse<GetLinePageResponse> => getLinePageQuery(arg);
-
-const getLinePageAuxDataQuery = createQuery(GET_LINE_PAGE_AUX_QUERY);
-export const getLinePageAuxData: QueryCreator<GetLinePageArgs, GetLinePageAuxDataResponse> = <
-  GetLinePageArgs,
-  GetLinePageResponse
->(
-  arg: GetLinePageArgs
-): QueryResponse<GetLinePageResponse> => getLinePageAuxDataQuery(arg);
 
 const getLinesQuery = createQuery(GET_LINES_QUERY, 'lineOfCredits');
 export const getLines: QueryCreator<GetLinesArgs, GetLinesResponse[]> = <GetLinesArgs, GetLinesResponse>(

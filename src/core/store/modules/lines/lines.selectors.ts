@@ -137,13 +137,38 @@ const selectSelectedLinePage = createSelector(
 
 const selectUserPortfolioMetadata = (state: RootState) => state.lines.user.portfolio;
 
-const selectUserPortfolio = createSelector([selectLinesMap, selectUserPortfolioMetadata], (linesMap, userPortfolio) => {
-  return {
-    borrowerLineOfCredits: userPortfolio.borrowerLineOfCredits.map((addy) => linesMap[addy]).filter((l) => !!l),
-    lenderPositions: userPortfolio.lenderPositions,
-    arbiterLineOfCredits: userPortfolio.arbiterLineOfCredits.map((addy) => linesMap[addy]).filter((l) => !!l),
-  };
-});
+const selectUserPortfolio = createSelector(
+  [
+    selectLinesMap,
+    selectUserPortfolioMetadata,
+    selectPositionsMap,
+    selectCollateralMap,
+    selectCreditEventsMap,
+    selectCollateralEventsMap,
+  ],
+  (linesMap, userPortfolio, positions, collaterals, creditEvents, collatEvents) => {
+    console.log('select portfolio data positions', positions);
+    const getSecuredLineData = (line: string): SecuredLine => {
+      return {
+        ...linesMap[line],
+        escrow: _.find(collaterals, (m) => m.type === 'asset' && m.line === line) as AggregatedEscrow,
+        spigot: _.find(collaterals, (m) => m.type === 'revenue' && m.line === line) as AggregatedSpigot,
+        positions: _.filter(positions, (p) => p.line === line).reduce((map, p) => ({ ...map, [p.id]: p }), {}),
+        // creditEvents: creditEvents[line],
+        // get collateralEvents() {
+        //   return [...collatEvents[this.escrow?.id ?? ''], ...collatEvents[this.spigot?.id ?? '']]
+        // }
+      };
+    };
+    // @TODO return secured lines type here
+    // can copy selSelLinePage but do better sorting on events/modules to construct
+    return {
+      borrowerLineOfCredits: userPortfolio.borrowerLineOfCredits.map(getSecuredLineData),
+      lenderPositions: userPortfolio.lenderPositions,
+      arbiterLineOfCredits: userPortfolio.arbiterLineOfCredits.map(getSecuredLineData),
+    };
+  }
+);
 
 const selectSelectedLineActionsStatusMap = createSelector(
   [selectLinesActionsStatusMap, selectSelectedLineAddress],
@@ -224,7 +249,6 @@ const selectUserPositionMetadata = createSelector(
       amount: '0',
       available: '0',
     };
-
     if (!line || !userAddress) return defaultRole;
 
     const position = selectedPosition || positions[0];
@@ -288,6 +312,7 @@ export const LinesSelectors = {
   selectLinesMap,
   selectLines,
   selectLiveLines,
+  selectPositionsMap,
   selectLinesForCategories,
   selectUserPositionMetadata,
   // selectDeprecatedLines,

@@ -26,8 +26,6 @@ import {
   DepositAndRepayProps,
   DepositAndCloseProps,
   GetLinesResponse,
-  GetLinePageAuxDataProps,
-  GetLinePageAuxDataResponse,
   GetLinePageResponse,
   Network,
   GetUserPortfolioProps,
@@ -36,7 +34,7 @@ import {
 import { getConfig } from '@config';
 import { LineOfCreditABI } from '@services/contracts';
 import { getContract } from '@frameworks/ethers';
-import { getLinePage, getLinePageAuxData, getLines, getUserPortfolio } from '@frameworks/gql';
+import { getLinePage, getLines, getUserPortfolio } from '@frameworks/gql';
 
 const { GRAPH_API_URL } = getConfig();
 
@@ -396,14 +394,6 @@ export class CreditLineServiceImpl implements CreditLineService {
         console.log('CreditLineService: error fetching lines', err);
         return undefined;
       });
-  }
-
-  public async getLinePageAuxData(prop: GetLinePageAuxDataProps): Promise<GetLinePageAuxDataResponse | undefined> {
-    const response = getLinePageAuxData(prop).catch((err) => {
-      console.log('CreditLineService: error fetching lines', err);
-      return undefined;
-    });
-    return response;
   }
 
   public async getUserLinePositions(prop: GetUserLinesProps): Promise<any | undefined> {

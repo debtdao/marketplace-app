@@ -30,7 +30,6 @@ import {
   GetLinesResponse,
   GetLinePageResponse,
   SecuredLineWithEvents,
-  GetLinePageAuxDataResponse,
   SupportedOracleTokenResponse,
   GetUserPortfolioResponse,
 } from '@types';
@@ -157,7 +156,6 @@ export interface CreditLineService {
   getLine: (props: GetLineProps) => Promise<SecuredLine | undefined>;
   getLines: (props: GetLinesProps) => Promise<GetLinesResponse[] | undefined>;
   getLinePage: (props: GetLinePageProps) => Promise<GetLinePageResponse | undefined>;
-  getLinePageAuxData: (props: GetLinePageProps) => Promise<GetLinePageAuxDataResponse | undefined>;
   getUserLinePositions: (...args: any) => Promise<any | undefined>;
   getUserPortfolio: (props: GetUserPortfolioProps) => Promise<GetUserPortfolioResponse | undefined>;
   getExpectedTransactionOutcome: (...args: any) => Promise<any | undefined>;
@@ -304,11 +302,6 @@ export interface GetLinePageProps extends GetLinePageArgs {
 
 export interface GetUserLineProps {
   id: string;
-}
-
-export interface GetLinePageAuxDataProps extends GetLinePageArgs {
-  id: string;
-  network: Network;
 }
 
 export interface GetUserPortfolioProps {

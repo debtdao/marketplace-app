@@ -2,8 +2,10 @@ import { createAsyncThunk, createAction } from '@reduxjs/toolkit';
 
 import { ThunkAPI } from '@frameworks/redux';
 import { isGnosisApp, isLedgerLive, isCoinbaseApp, get } from '@utils';
-import { ExternalServiceId } from '@types';
+import { ExternalServiceId, EVENT_NAVIGATE_EXTERNAL_1ST_PARTY, EVENT_NAVIGATE_EXTERNAL_3RD_PARTY } from '@types';
+import { idUser, trackPage, trackAnalyticsEvent } from '@frameworks/segment';
 import { getEnv } from '@config/env';
+import { AnalyticsEventNames, LogAppAnalyticsActionProps } from '@src/core/types/ProductAnalytics';
 
 import { WalletActions } from '../wallet/wallet.actions';
 import { TokensActions } from '../tokens/tokens.actions';
@@ -120,6 +122,46 @@ const checkExternalServicesStatus = createAsyncThunk<void, void, ThunkAPI>(
 // );
 
 /* -------------------------------------------------------------------------- */
+/*                                Analytics                               */
+/* -------------------------------------------------------------------------- */
+
+const logAppAnalytics = createAsyncThunk<void, LogAppAnalyticsActionProps, ThunkAPI>(
+  'app/logAnalytics',
+  async ({ type, data }, { dispatch, getState, extra }) => {
+    const { wallet, ...state } = getState();
+    switch (type) {
+      case 'track':
+        if (data.eventName) return;
+        trackAnalyticsEvent(data.eventName!)({ wallet, ...data });
+        break;
+      case 'id':
+        const { selectedAddress } = wallet;
+        if (!selectedAddress) return;
+        idUser(selectedAddress);
+        break;
+      case 'page':
+        const { to } = data;
+        if (!to) return;
+
+        // TODO do Regex for different  parts of url
+        const isInternal = to.startsWith('/') || window.location.host === to;
+        const isSubdomain = to.split('.').length > 2; // false positive on files (.pdf) but we want those in new tabs too"
+
+        if (isInternal) {
+          trackPage({ data: { wallet } });
+          break;
+        } else if (isSubdomain) {
+          trackAnalyticsEvent(EVENT_NAVIGATE_EXTERNAL_1ST_PARTY)({ ...data });
+          break;
+        } else {
+          trackAnalyticsEvent(EVENT_NAVIGATE_EXTERNAL_3RD_PARTY)({ ...data });
+          break;
+        }
+    }
+  }
+);
+
+/* -------------------------------------------------------------------------- */
 /*                                   Exports                                  */
 /* -------------------------------------------------------------------------- */
 
@@ -128,5 +170,7 @@ export const AppActions = {
   clearAppData,
   clearUserAppData,
   initApp,
+
+  logAppAnalytics,
   // initSubscriptions,
 };

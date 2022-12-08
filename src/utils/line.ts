@@ -16,7 +16,6 @@ import {
   GetLinesResponse,
   BaseEscrowDepositFragResponse,
   SpigotRevenueSummaryFragResponse,
-  GetLinePageAuxDataResponse,
   BasePositionFragResponse,
   LineEventFragResponse,
   EscrowDepositList,
@@ -171,16 +170,6 @@ export function formatGetLinesData(
   });
 }
 
-export function formatGetLinePageAuxData(
-  response: GetLinePageAuxDataResponse,
-  line: SecuredLine,
-  tokenPrices: { [token: string]: BigNumber }
-): GetLinePageAuxDataResponse | undefined {
-  const { ...rest } = response;
-  // TODO for Line Page
-  return;
-}
-
 export const formatSecuredLineData = (
   line: Address,
   positionFrags: (BasePositionFragResponse | BasePositionFragResponse)[],
@@ -211,7 +200,7 @@ export const formatSecuredLineData = (
 
   // position id, token address, APY
   const highestApy: [string, string, string] = ['', '', '0'];
-
+  const creditEvents: CreditEvent[] = [];
   const principal = BigNumber.from(0);
   const deposit = BigNumber.from(0);
 
@@ -266,18 +255,9 @@ export const formatSecuredLineData = (
   }, {});
 
   const positions = positionFrags.reduce((obj: any, c: BasePositionFragResponse): PositionMap => {
-    const {
-      dRate,
-      fRate,
-      id,
-      lender,
-      token,
-      ...financials
-      // events: graphEvents,
-    } = c;
+    const { dRate, fRate, id, lender, token, ...financials } = c;
 
     const currentUsdPrice = tokenPrices[c.token?.id];
-    // creditEvents.concat(events);
     return {
       ...obj,
       [id]: {
@@ -331,24 +311,16 @@ export const formatLinePageData = (
     spigot: spigotData,
     escrow: escrowData,
   } = formatSecuredLineData(metadata.id, positions!, escrow?.deposits || [], spigot?.summaries || [], tokenPrices);
-  const lineAddress = metadata.id;
-
-  console.log('get line page escrow', escrow, escrowData);
 
   // derivative or aggregated data we need to compute and store while mapping position data
 
   // position id and APY
-  const highestApy: [string, string, string] = ['', '', '0'];
 
   // aggregated revenue in USD by token across all spigots
-  const interest = BigNumber.from(0);
-  const totalInterestRepaid = BigNumber.from(0);
   //  all recent Spigot and Escrow events
   let collateralEvents: CollateralEvent[] = [];
   //  all recent borrow/lend events
   // const creditEvents: CreditEvent[] = [];
-
-  console.log('formatted page positions', positions, credit.positions);
 
   // TODO add spigot events to collateralEvents
   const formattedSpigot = {
@@ -361,20 +333,18 @@ export const formatLinePageData = (
     ...metadata,
     // debt data
     ...credit,
+    creditEvents: [], // @ TODO add to formatSecuredLineData
     borrower: borrower.id,
     status: status.toLowerCase() as LineStatusTypes,
-    // TODO add to credit response
-    interest: interest.toString(),
-    totalInterestRepaid: totalInterestRepaid.toString(),
-    // todo add UsePositionMetada,
+    // TODO add UsePositionMetada,
+
     // all recent events
+    // TODO add creditEvents
     collateralEvents,
-    creditEvents,
     // collateral data
     spigot: formattedSpigot,
     escrow: isEmpty(escrow?.deposits) ? undefined : { ...escrow!, ...escrowData },
   };
-  console.log('page data', pageData);
   return pageData;
 };
 
@@ -398,7 +368,6 @@ export const formatUserPortfolioData = (
         ...credit,
         borrower: borrower.id,
         status: status.toLowerCase() as LineStatusTypes,
-        positions,
         spigot: {
           ...(spigotData ?? {}),
           ...spigot,
@@ -413,10 +382,14 @@ export const formatUserPortfolioData = (
 
   // positions tokenFragResponse -> TokenView
   const positions: PositionMap =
-    lenderPositions?.positions?.reduce(
+    lenderPositions.positions?.reduce(
       (map, p) => ({
         ...map,
-        [p.id]: { ...p, token: _createTokenView(p.token, unnullify(p.principal, true), tokenPrices[p.token.id]) },
+        [p.id]: {
+          ...p,
+          lender: p.lender.id,
+          token: _createTokenView(p.token, unnullify(p.principal, true), tokenPrices[p.token.id]),
+        },
       }),
       {}
     ) ?? {};
@@ -427,7 +400,6 @@ export const formatUserPortfolioData = (
 const _createTokenView = (tokenResponse: TokenFragRepsonse, amount?: BigNumber, price?: BigNumber) => {
   // might already have for token in state but we only pass in prices to these util functions
   // will need to merge and prefer state vs this jank
-  console.log('create token', tokenResponse, amount, price);
   return {
     address: tokenResponse.id,
     name: tokenResponse.name,

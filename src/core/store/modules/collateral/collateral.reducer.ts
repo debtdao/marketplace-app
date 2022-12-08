@@ -59,6 +59,7 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
       state.selectedCollateralAsset = assetAddress;
     })
 
+    /* -------------------------------- getLinePage ------------------------------- */
     // .addCase(getLinePage.fulfilled, (state, { payload: { linePageData } })} => {
     //   state.eventsMap[moduleAddress] = events;
     // }
@@ -66,6 +67,7 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
     // .addCase(saveEventsToMap.fulfilled, (state, { payload: { moduleAddress, events } }) => {
     //   state.eventsMap[moduleAddress] = events;
     // })
+
     // .addCase(saveModuleToMap.fulfilled, (state, { payload: { moduleAddress, module } }) => {
     //   state.collateralMap[moduleAddress] = module;
     // })

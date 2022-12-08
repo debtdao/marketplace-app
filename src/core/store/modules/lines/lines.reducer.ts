@@ -190,10 +190,12 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.getLinePage = { loading: true };
     })
     .addCase(getLinePage.fulfilled, (state, { payload: { linePageData } }) => {
+      console.log('get line page positions saved to state', linePageData);
       if (linePageData) {
         // overwrite actual positions with referential ids
         const { positions, collateralEvents, creditEvents, ...metadata } = linePageData;
         state.linesMap = { ...state.linesMap, [linePageData.id]: { ...metadata } };
+        console.log('get line page positions saved to state', positions);
         state.positionsMap = { ...state.positionsMap, ...positions };
         state.eventsMap = { ...state.eventsMap, [metadata.id]: creditEvents };
         // we also update state.collateral on this action  being fullfilled in collateral.reducer.ts
@@ -223,21 +225,30 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
     .addCase(getUserPortfolio.fulfilled, (state, { meta, payload: { address, lines, positions } }) => {
       state.linesMap = { ...state.linesMap, ...lines };
+      let allPositions = {};
+      let allEvents = {};
+      let allModules = {};
       const linesByRole: LinesByRole = _.entries<SecuredLine>(lines).reduce(
         ({ borrowing, arbiting }: LinesByRole, [addy, line]) => {
+          console.log('FST getUserPort reducer', line.positions);
+          allPositions = { ...allPositions, ...line.positions };
+
           if (line.borrower === address) return { arbiting, borrowing: [...borrowing, addy] };
           if (line.arbiter === address) return { borrowing, arbiting: [...arbiting, addy] };
+          // allEvents = { ...allEvents, ...line.events }; TODO return events from tight
+          // allModules = { ...allModules, ...line.positions }
           return { borrowing, arbiting };
         },
         { borrowing: [], arbiting: [] }
       );
 
-      // if ( positions ) {
-      // state.positions = {
-      //   ...state.positionsMap,
-      //   ...positions,
-      // }
-      // }
+      console.log('SCN getUserPort reducer', allPositions);
+      state.positionsMap = { ...state.positionsMap, ...allPositions };
+      state.eventsMap = { ...state.eventsMap, ...allEvents };
+
+      // TODO update in collateral.reducer
+      // state.collateralMap = { ...state.positionsMap, ...allPositions }
+
       state.user.portfolio = {
         borrowerLineOfCredits: linesByRole.borrowing,
         lenderPositions: _.values(positions),

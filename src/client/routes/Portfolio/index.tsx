@@ -16,7 +16,7 @@ import {
 import { SummaryCard, ViewContainer, LineDetailsDisplay, NoWalletCard } from '@components/app';
 import { SpinnerLoading } from '@components/common';
 import { isValidAddress, halfWidthCss } from '@utils';
-import { SecuredLineWithEvents, LENDER_POSITION_ROLE, BORROWER_POSITION_ROLE } from '@src/core/types';
+import { SecuredLineWithEvents, LENDER_POSITION_ROLE, BORROWER_POSITION_ROLE, CreditPosition } from '@src/core/types';
 import { PositionsTable } from '@src/client/components/app/LineDetailsDisplay/PositionsTable';
 
 const StyledViewContainer = styled(ViewContainer)`
@@ -85,20 +85,14 @@ export const Portfolio = () => {
   const tokensListStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
   const generalLoading = (appStatus.loading || tokensListStatus.loading || isMounting) && !activeModal;
   const userPortfolio = useAppSelector(LinesSelectors.selectUserPortfolio);
-  const linesMap = useAppSelector(LinesSelectors.selectLinesMap);
   const portfolioAddress = userAddress ? userAddress : userWallet;
+  const allPositions = useAppSelector(LinesSelectors.selectPositionsMap);
   const userTokensLoading = generalLoading && !userTokens.length;
   const [portfolioLoaded, setPortfolioLoaded] = useState<boolean>(false);
   const [currentRole, setRole] = useState<string>(BORROWER_POSITION_ROLE);
 
-  // TODO: Add types
-  const [lenderPositions, setLenderData] = useState<any[]>([]);
-
   const setSelectedLine = (address: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress: address }));
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
-
-  console.log('user portfolio', userPortfolio, selectedLine);
-
   const availableRoles = [BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE];
 
   const SummaryCardItems = availableRoles.map((role: string) => {
@@ -123,18 +117,34 @@ export const Portfolio = () => {
     }
   }, [currentRole, walletIsConnected, userWallet]);
 
+  // Get an array of borrowerPositions by flattening
+  // an array of Position arrays from borrowerLineOfCredits map
+  const borrowerPositions: CreditPosition[] = _.flatten(
+    _.merge(userPortfolio.borrowerLineOfCredits.map((loc) => _.values(loc.positions)))
+  );
+
+  const lenderPositions = userPortfolio?.lenderPositions;
+
+  console.log(
+    'zl portfolio page borrower pos',
+    borrowerPositions,
+    userPortfolio.borrowerLineOfCredits,
+    lenderPositions
+  );
+
   useEffect(() => {
     if (userPortfolio && currentRole === BORROWER_POSITION_ROLE) {
-      // const borrowerData: any[] = userPortfolio.borrowerLineOfCredits;
-      // if (borrowerData && borrowerData[0]) {
-      //   const lineId = borrowerData[0].id;
-      //   setSelectedLine(lineId);
-      //   const positionId = borrowerData[0].positions[0]?.id;
-      //   dispatch(LinesActions.setSelectedLinePosition({ position: positionId }));
-      // }
+      const { borrowerLineOfCredits } = userPortfolio;
+      // filter positions by line in all borrower lines
+      // const borrowerPositions = _.filter(_.values(allPositions), ({ line }) => _.find(userPortfolio.borrowerLineOfCredits, line))
+
+      if (borrowerLineOfCredits && borrowerLineOfCredits[0]) {
+        const lineId = borrowerLineOfCredits[0].id;
+        setSelectedLine(lineId);
+      }
     }
     if (userPortfolio && currentRole === LENDER_POSITION_ROLE) {
-      if (!_.isEmpty(lenderPositions)) {
+      if (lenderPositions && lenderPositions[0]) {
         const lineId = lenderPositions[0].id;
         setSelectedLine(lineId);
       }
@@ -145,22 +155,18 @@ export const Portfolio = () => {
     <StyledViewContainer>
       <HeaderCard items={SummaryCardItems} cardSize="small" />
 
-      {!selectedLine && !lenderPositions && <StyledSpinnerLoading />}
+      {/* {!selectedLine && !lenderPositions && <StyledSpinnerLoading />} */}
 
-      {portfolioLoaded && selectedLine && currentRole === BORROWER_POSITION_ROLE ? (
+      {currentRole === BORROWER_POSITION_ROLE && (
         <StyledBorrowerContainer>
-          {/* <LineDetailsDisplay page={selectedLine as SecuredLineWithEvents} line={selectedLine} /> */}
+          <PositionsTable positions={borrowerPositions} />
         </StyledBorrowerContainer>
-      ) : (
-        ''
       )}
 
-      {portfolioLoaded && currentRole === LENDER_POSITION_ROLE && _.isEmpty(lenderPositions) ? (
+      {currentRole === LENDER_POSITION_ROLE && (
         <StyledBorrowerContainer>
           <PositionsTable positions={lenderPositions} />
         </StyledBorrowerContainer>
-      ) : (
-        ''
       )}
 
       {!portfolioLoaded && <StyledNoWalletCard />}

@@ -95,17 +95,11 @@ export const Portfolio = () => {
   const userTokensLoading = generalLoading && !userTokens.length;
   const [portfolioLoaded, setPortfolioLoaded] = useState<boolean>(false);
   const [currentRole, setRole] = useState<string>(BORROWER_POSITION_ROLE);
-
-  // TODO: Add types
   const [lenderPositions, setLenderPositions] = useState<CreditPosition[]>([]);
   const [borrowerPositions, setBorrowerPositions] = useState<CreditPosition[]>([]);
 
   const setSelectedLine = (address: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress: address }));
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
-
-  // console.log('user portfolio', userPortfolio, selectedLine);
-  // console.log('user portfolio lines map: ', linesMap);
-
   const availableRoles = [BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE];
 
   const SummaryCardItems = availableRoles.map((role: string) => {
@@ -120,8 +114,6 @@ export const Portfolio = () => {
   });
 
   const handleSetRole = (role: string) => {
-    // setLenderPositions([]);
-    // setBorrowerPositions([]);
     setRole(role);
   };
 
@@ -138,6 +130,8 @@ export const Portfolio = () => {
     if (userPortfolio && currentRole === BORROWER_POSITION_ROLE) {
       const { borrowerLineOfCredits } = userPortfolio;
 
+      // Get an array of borrowerPositions by flattening
+      // an array of Position arrays from borrowerLineOfCredits map
       const borrowerPositions: CreditPosition[] = _.flatten(
         _.merge(
           borrowerLineOfCredits.map((loc) => {
@@ -146,16 +140,13 @@ export const Portfolio = () => {
         )
       );
       setBorrowerPositions(borrowerPositions ?? []);
-      // console.log('User Portfolio Borrower Positions: ', borrowerPositions);
       if (borrowerLineOfCredits && borrowerLineOfCredits[0]) {
         const lineId = borrowerLineOfCredits[0].id;
-        // console.log('User Portfolio Borrower Line: ', borrowerLineOfCredits[0]);
         setSelectedLine(lineId);
       }
     }
     if (userPortfolio && currentRole === LENDER_POSITION_ROLE) {
       const lenderPositions = userPortfolio?.lenderPositions;
-      // console.log('User Portfolio Lender Positions: ', lenderPositions);
       setLenderPositions(lenderPositions ?? []);
       if (lenderPositions && lenderPositions[0]) {
         const lineId = lenderPositions[0].id;

@@ -188,7 +188,6 @@ const getUserPortfolio = createAsyncThunk<
   if (!userPortfolio) return { address: user, lines: {}, positions: [] };
 
   const { lines, positions } = formatUserPortfolioData(userPortfolio, tokenPrices);
-  console.log('formatted user portfolio', lines, positions);
 
   return { address: user, lines, positions };
 });

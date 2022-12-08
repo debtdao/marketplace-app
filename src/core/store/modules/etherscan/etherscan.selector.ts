@@ -1,7 +1,9 @@
 import { RootState } from '@src/core/types';
 
-import { initialOnChainMetaDataState } from './etherscan.reducer';
+//import { createSelector } from '@reduxjs/toolkit';
 
-const seletctOnChainMetaData = (state: RootState) => state.metadata.contractABI;
+//import { initialOnChainMetaDataState } from './etherscan.reducer';
 
-export const OnChainMetaDataSelector = { seletctOnChainMetaData };
+const selectABI = (state: RootState) => state.metadata.contractABI;
+
+export const OnChainMetaDataSelector = { selectABI };

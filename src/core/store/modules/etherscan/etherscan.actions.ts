@@ -2,7 +2,7 @@ import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 
 import { ThunkAPI } from '@frameworks/redux';
 
-const getABI = createAsyncThunk<{ ABI: String }, String, ThunkAPI>(
+const getABI = createAsyncThunk<{ ABI: [] }, String, ThunkAPI>(
   'etherscan/getABI',
   async (address, { extra, getState }) => {
     const { onChainMetaDataService } = extra.services;
@@ -15,9 +15,9 @@ const getABI = createAsyncThunk<{ ABI: String }, String, ThunkAPI>(
     console.log(address);
     //@ts-ignore
     const OnChainMetaDataServiceResponse = await onChainMetaDataService.getContractABI(address);
-    console.log('on chain meta data', OnChainMetaDataServiceResponse);
+    console.log('on chain meta data', OnChainMetaDataServiceResponse.data.result.types);
     return {
-      ABI: OnChainMetaDataServiceResponse,
+      ABI: OnChainMetaDataServiceResponse.data.result,
     };
   }
 );

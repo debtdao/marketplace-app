@@ -209,6 +209,7 @@ export interface CollateralState {
 
 export interface OnChainMetaDataState {
   contractABI: [] | undefined;
+  contractFunctions: [] | undefined;
 }
 
 interface TokenCollateralMap {

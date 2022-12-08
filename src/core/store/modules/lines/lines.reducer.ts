@@ -225,6 +225,9 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
     .addCase(getUserPortfolio.fulfilled, (state, { meta, payload: { address, lines, positions } }) => {
       state.linesMap = { ...state.linesMap, ...lines };
+      console.log('User Portfolio reducer linesMap: ', state.linesMap);
+      console.log('User Portfolio reducer lines: ', lines);
+      console.log('User Portfolio reducer lender positions', positions);
       const linesByRole: LinesByRole = _.entries<AggregatedCreditLine>(lines).reduce(
         ({ borrowing, arbiting }: LinesByRole, [addy, line]) => {
           if (line.borrower === address) return { arbiting, borrowing: [...borrowing, addy] };
@@ -240,6 +243,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       //   ...positions,
       // }
       // }
+      console.log('User Portfolio reducer linesbyrole: ', linesByRole);
       state.user.portfolio = {
         borrowerLineOfCredits: linesByRole.borrowing,
         lenderPositions: positions,

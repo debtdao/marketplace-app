@@ -120,8 +120,8 @@ export const Portfolio = () => {
   });
 
   const handleSetRole = (role: string) => {
-    setLenderPositions([]);
-    setBorrowerPositions([]);
+    // setLenderPositions([]);
+    // setBorrowerPositions([]);
     setRole(role);
   };
 
@@ -137,19 +137,30 @@ export const Portfolio = () => {
   useEffect(() => {
     if (userPortfolio && currentRole === BORROWER_POSITION_ROLE) {
       const { borrowerLineOfCredits } = userPortfolio;
+
       const borrowerPositions: CreditPosition[] = _.flatten(
         _.merge(
           borrowerLineOfCredits.map((loc) => {
-            console.log(loc);
             return loc.positions;
           })
         )
       );
       setBorrowerPositions(borrowerPositions ?? []);
+      // console.log('User Portfolio Borrower Positions: ', borrowerPositions);
+      if (borrowerLineOfCredits && borrowerLineOfCredits[0]) {
+        const lineId = borrowerLineOfCredits[0].id;
+        // console.log('User Portfolio Borrower Line: ', borrowerLineOfCredits[0]);
+        setSelectedLine(lineId);
+      }
     }
     if (userPortfolio && currentRole === LENDER_POSITION_ROLE) {
       const lenderPositions = userPortfolio?.lenderPositions;
-      setLenderPositions(lenderPositions ? lenderPositions : []);
+      // console.log('User Portfolio Lender Positions: ', lenderPositions);
+      setLenderPositions(lenderPositions ?? []);
+      if (lenderPositions && lenderPositions[0]) {
+        const lineId = lenderPositions[0].id;
+        setSelectedLine(lineId);
+      }
     }
   }, [userPortfolio, currentRole]);
 

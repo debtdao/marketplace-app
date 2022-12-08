@@ -179,11 +179,9 @@ const selectUserPositionMetadata = createSelector(
       amount: '0',
       available: '0',
     };
-
     if (!line || !userAddress) return defaultRole;
     //@ts-ignore
     const position = selectedPosition ? line!.positions?.[selectedPosition] : undefined;
-    console.log('position here', position);
 
     switch (getAddress(userAddress!)) {
       case getAddress(line.borrower):

@@ -271,14 +271,16 @@ export const formatAggregatedCreditLineData = (
       const currentUsdPrice = tokenPrices[c.token?.id];
       // const events = graphEvents ? formatCreditEvents(c.token.symbol, currentUsdPrice, graphEvents!) : [];
       // creditEvents.concat(events);
+      // this formatting does not return same data structure as formatUserPortfolio
       return {
         ...obj,
         [id]: {
           id,
-          lender: lender.id,
+          // lender: lender.id,
+          lender,
           ...financials,
-          dRate: normalizeAmount(fRate, 2),
-          fRate: normalizeAmount(dRate, 2),
+          dRate,
+          fRate,
           token: _createTokenView(token, BigNumber.from(principal), currentUsdPrice),
           // events,
         },
@@ -421,13 +423,12 @@ export const formatUserPortfolioData = (
     })
     .reduce((lines, line) => ({ ...lines, [line.id]: line }), {});
 
-  // positions tokenFragResponse -> TokenView
+  // positions tokenFragResponse -> TokenView something suspicious here
   const positions: CreditPosition[] =
     lenderPositions?.positions?.map((p) => ({
       ...p,
       token: _createTokenView(p.token, unnullify(p.principal, true), tokenPrices[p.token.id]),
     })) ?? [];
-
   return { lines, positions };
 };
 

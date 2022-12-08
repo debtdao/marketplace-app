@@ -171,6 +171,8 @@ export const PositionsTable = (props: PositionsProps) => {
   };
 
   const isWithdrawable = (deposit: string, borrowed: string, lender: string, interestRepaid: string) => {
+    // console.log('User Portfolio Lender', lender);
+    // Withdraw/Accept are not working on Portfolio / Lender
     if (!userWallet) {
       return;
     }
@@ -191,6 +193,7 @@ export const PositionsTable = (props: PositionsProps) => {
       return [ApproveMutualConsent];
     }
     //If user is lender, and line has amount to withdraw, return withdraw action
+    // console.log('User Portfolio Event', event);
     if (isWithdrawable(event.deposit, event.principal, event.lender.id, event.interestRepaid)) {
       return actions;
     }
@@ -201,7 +204,7 @@ export const PositionsTable = (props: PositionsProps) => {
     return [];
   };
 
-  console.log('positions table', positions);
+  // console.log('user portfolio positions table', positions);
   return (
     <>
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
@@ -294,6 +297,7 @@ export const PositionsTable = (props: PositionsProps) => {
                 placeholder={t('components.search-input.search')}
                 Icon={SearchIcon}
               />
+              {/*Do not render if user is lender*/}
               <Button onClick={depositHandler}>{ctaButtonText}</Button>
             </>
           }

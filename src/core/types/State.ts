@@ -111,13 +111,10 @@ export interface CreditLineState {
   user: {
     linePositions: IdToCreditPositionMap;
     lineAllowances: { [line: string]: { [token: string]: Integer } };
-    // portfolio: GetUserPortfolioResponse;
     portfolio: {
       borrowerLineOfCredits: Address[];
-      // borrowerLineOfCreditAddresses: string[];
       lenderPositions: CreditPosition[];
       arbiterLineOfCredits: Address[];
-      // arbiterLineOfCreditAddresses: string[];
     };
   };
   statusMap: {

@@ -199,9 +199,9 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
         // console.log('get line page positions saved to state', positions);
 
         // TODO: Add this back in after fixing the infinite loop in getLinePage action.
-        // TODO: Remove the positions with undefined values from the positions array in
         // linePage object
-        // state.positionsMap = { ...state.positionsMap, ...positions };
+        state.positionsMap = { ...state.positionsMap, ...positions };
+        console.log('User Portfolio Reducer positionsMap: ', state.positionsMap);
 
         // console.log('User Portfolio Reducer positionsMap', state.positionsMap, positions);
         state.eventsMap = { ...state.eventsMap, [metadata.id]: creditEvents };

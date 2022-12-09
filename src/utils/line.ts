@@ -318,7 +318,6 @@ export const formatLinePageData = (
   } = formatSecuredLineData(metadata.id, positions!, escrow?.deposits || [], spigot?.summaries || [], tokenPrices);
 
   // derivative or aggregated data we need to compute and store while mapping position data
-
   // position id and APY
 
   // aggregated revenue in USD by token across all spigots

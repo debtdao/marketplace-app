@@ -37,6 +37,8 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
 
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
+  console.log('User Portfolio select positions for line id: ', selectedLine);
+  console.log('User Portfolio select positions for line: ', positions);
 
   if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
   const { principal, deposit, escrow, spigot, borrower, start, end } = selectedLine;

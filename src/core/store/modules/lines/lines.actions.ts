@@ -121,14 +121,14 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
     const state: RootState = getState();
     const { creditLineService } = extra.services;
     // gets all primary + aux line data avaliable by defeault
+
     const selectedLine = LinesSelectors.selectSelectedLinePage(state);
     const tokenPrices = TokensSelectors.selectTokenPrices(state);
 
-    console.log('get line page', selectedLine, tokenPrices, state);
     // @TODO check if events exist to
-    // debugger;
+    debugger;
     if (selectedLine) {
-      console.log('have line page', selectedLine, tokenPrices, state);
+      console.log('User Portfolio actions selectedLine: ', selectedLine);
       // console.log('user portfolio')
       return { linePageData: selectedLine };
     } else {
@@ -138,7 +138,7 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
           tokenPrices
         );
 
-        console.log('getLinePage data ', linePageData);
+        console.log('user portfolio getLinePage data ', linePageData);
 
         // @TODO dispatch actions to save collateral and events
         // enable collateral or add collateral
@@ -159,6 +159,25 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
     }
   }
 );
+
+// const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | undefined }, GetLinePageArgs, ThunkAPI>(
+//   'lines/getLinePage',
+//   async ({ id }, { getState, extra, dispatch }) => {
+//     const state: RootState = getState();
+//     const { creditLineService } = extra.services;
+//     // gets all primary + aux line data avaliable by defeault
+
+//     // const selectedLine = LinesSelectors.selectSelectedLinePage(state);
+//     const tokenPrices = TokensSelectors.selectTokenPrices(state);
+//     console.log('User Portfolio actions state: ', state);
+//     debugger;
+//     const linePageResponse = await creditLineService.getLinePage({ network: state.network.current, id });
+//     const linePageData = linePageResponse ? formatLinePageData(linePageResponse, tokenPrices) : undefined;
+//     console.log('User Portfolio actions linepagedata: ', linePageResponse);
+//     console.log('User Portfolio actions linepagedata: ', linePageData);
+//     return { linePageData };
+//   }
+// );
 
 const getUserLinePositions = createAsyncThunk<
   { userLinesPositions: CreditPosition[] },

@@ -67,7 +67,9 @@ export const LineDetail = () => {
 
     dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineAddress }));
     dispatch(LinesActions.getLinePage({ id: lineAddress }));
-
+    console.log('Market selected line address: ', lineAddress);
+    console.log('Market selected Page: ', selectedPage);
+    console.log('Market selected line: ', selectedLine);
     return () => {
       dispatch(LinesActions.clearSelectedLineAndStatus());
     };

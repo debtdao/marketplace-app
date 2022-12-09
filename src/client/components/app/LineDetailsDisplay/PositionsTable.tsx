@@ -72,6 +72,7 @@ export const PositionsTable = (props: PositionsProps) => {
   //Initial set up for positions table
 
   useEffect(() => {
+    console.log('user portfolio selected line: ', selectedLine);
     if (!selectedLine) {
       return;
     }
@@ -121,11 +122,16 @@ export const PositionsTable = (props: PositionsProps) => {
   }, [selectedLine, userWallet]);
 
   useEffect(() => {
+    console.log('user portfolio am I repeating myself 1?');
+    console.log('user portfolio selected page', selectedPage);
+    console.log('user portfolio selected page line address', lineAddress);
     if (!lineAddress) {
       return;
     }
     dispatch(LinesActions.getLinePage({ id: lineAddress }));
-  }, [selectedPage]);
+
+    // TODO: should useEffect at lineAddress or selectedPage
+  }, [lineAddress]);
 
   //Action Handlers for positions table
 

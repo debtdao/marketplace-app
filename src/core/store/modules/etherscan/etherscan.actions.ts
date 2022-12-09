@@ -23,7 +23,7 @@ const getABI = createAsyncThunk<{ ABI: []; Functions: [] }, String, ThunkAPI>(
     for (const k in iface.functions) {
       Functions.push(iface.functions[k].name);
     }
-
+    console.log(iface.functions);
     return {
       ABI,
       Functions,

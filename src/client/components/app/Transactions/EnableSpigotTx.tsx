@@ -94,7 +94,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const [settingTransferFunc, setTransferFunc] = useState('');
   const [revenueContractAdd, setRevenueContractAdd] = useState<string>('');
   const [revContractABI, setRevenueContractABI] = useState(false);
-  const [funcType, setFuncType] = useState({ id: '1', label: 'Repay from:', value: 'Wallet' })
+  const [funcType, setFuncType] = useState({ id: '1', label: 'Repay from:', value: 'Wallet' });
 
   const selectedAssetAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress) || TOKEN_ADDRESSES.DAI;
   // TODO pull colalteralOptions from subgraph instread of default yearn tokens
@@ -120,6 +120,8 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       console.log(revenueContractAdd);
       dispatch(OnChainMetaDataActions.getABI(revenueContractAdd));
       setRevenueContractABI(true);
+    } else if (revenueContractAdd == '') {
+      console.log('ClEAR STATE');
     }
   }, [revenueContractAdd]);
 
@@ -225,26 +227,50 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     );
   }
 
-
   const renderRevFunc = () => {
     if (revContractABI) {
       return (
         <TxDropdown
-          headerText='Rev Contract Funcs'
+          headerText="2. Rev Contract Funcs"
           typeOptions={selectedContractFunctions}
           selectedType={funcType}
-        >
-        </TxDropdown>
-      )
+        ></TxDropdown>
+      );
     } else {
-      <TxByteInput
-        headerText={t('components.transaction.enable-spigot.function-revenue')}
-        inputText={' '}
-        inputError={false}
-        byteCode={settingClaimFunc}
-        onByteCodeChange={handleClaimChange}
-        readOnly={false}
-      />;
+      return (
+        <TxByteInput
+          headerText={t('components.transaction.enable-spigot.function-revenue')}
+          inputText={' '}
+          inputError={false}
+          byteCode={settingClaimFunc}
+          onByteCodeChange={handleClaimChange}
+          readOnly={false}
+        />
+      );
+    }
+  };
+
+  const renderTransferFunc = () => {
+    console.log(selectedContractFunctions);
+    if (revContractABI) {
+      return (
+        <TxDropdown
+          headerText="2. Transfer Contract Funcs"
+          typeOptions={selectedContractFunctions}
+          selectedType={funcType}
+        ></TxDropdown>
+      );
+    } else {
+      return (
+        <TxByteInput
+          headerText={t('components.transaction.enable-spigot.function-transfer')}
+          inputText={' '}
+          inputError={false}
+          byteCode={settingTransferFunc}
+          onByteCodeChange={handleTransferFuncChange}
+          readOnly={false}
+        />
+      );
     }
   };
 
@@ -258,14 +284,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
         onAddressChange={handleChangeRevenue}
       />
       {renderRevFunc()}
-      <TxByteInput
-        headerText={t('components.transaction.enable-spigot.function-transfer')}
-        inputText={' '}
-        inputError={false}
-        byteCode={settingTransferFunc}
-        onByteCodeChange={handleTransferFuncChange}
-        readOnly={false}
-      />
+      {renderTransferFunc()}
 
       <TxActions>
         <TxActionButton

@@ -26,6 +26,7 @@ import {
   Address,
   GetUserPortfolioResponse,
   PositionMap,
+  LENDER_POSITION_ROLE,
 } from '@types';
 
 import { humanize, normalizeAmount, normalize } from './format';
@@ -211,6 +212,7 @@ export const formatSecuredLineData = (
       //   ? [c.id, c.token?.id, c.dRate]
       //   : agg.highestApy;
       return {
+        // lender: agg.lender.id,
         principal: agg.principal.add(price.mul(unnullify(c.principal).toString())),
         deposit: agg.deposit.add(price.mul(unnullify(c.deposit).toString())),
         highestApy,
@@ -256,6 +258,7 @@ export const formatSecuredLineData = (
 
   const positions = positionFrags.reduce((obj: any, c: BasePositionFragResponse): PositionMap => {
     const { dRate, fRate, id, lender, token, ...financials } = c;
+    const lenderAddress = lender.id;
 
     const currentUsdPrice = tokenPrices[c.token?.id];
     return {
@@ -263,7 +266,7 @@ export const formatSecuredLineData = (
       [id]: {
         id,
         line,
-        lender,
+        lender: lenderAddress,
         ...financials,
         // dRate: normalizeAmount(fRate, 2),
         // fRate: normalizeAmount(dRate, 2),
@@ -274,6 +277,8 @@ export const formatSecuredLineData = (
       },
     };
   }, {});
+
+  // console.log('User Portfolio credit positions func: ', positions);
 
   console.log('formatted page positions', positionFrags, positions);
   return {

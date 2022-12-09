@@ -13,7 +13,6 @@ const getABI = createAsyncThunk<{ ABI: []; Functions: [] }, String, ThunkAPI>(
     const userAddress = wallet.selectedAddress;
     if (!userAddress) throw new Error('WALLET NOT CONNECTED');
 
-    //@ts-ignore
     const OnChainMetaDataServiceResponse = await onChainMetaDataService.getContractABI(address);
     const ABI = OnChainMetaDataServiceResponse.data.result;
 

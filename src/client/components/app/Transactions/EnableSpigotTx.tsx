@@ -19,6 +19,7 @@ import {
   CollateralActions,
   selectDepositTokenOptionsByAsset,
   CollateralSelectors,
+  OnChainMetaDataSelector,
 } from '@store';
 //import { Button, Icon, Link } from '@components/common';
 
@@ -29,6 +30,7 @@ import { TxStatus } from './components/TxStatus';
 import { TxAddressInput } from './components/TxAddressInput';
 import { TxNumberInput } from './components/TxNumberInput';
 import { TxByteInput } from './components/TxByteInput';
+import { TxDropdown } from './components/TxDropdown';
 
 const StyledTransaction = styled(TxContainer)`
   min-height: 60vh;
@@ -78,6 +80,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const selectedSpigotAddress = useAppSelector(CollateralSelectors.selectSelectedSpigot);
   const selectedRevenueContractAddress = useAppSelector(CollateralSelectors.selectSelectedRevenueContract);
 
+  const selectedContractFunctions = useAppSelector(OnChainMetaDataSelector.selectFunctions);
   //state for params
   const { header, onClose } = props;
 
@@ -90,6 +93,8 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const [settingClaimFunc, setClaimFunc] = useState('');
   const [settingTransferFunc, setTransferFunc] = useState('');
   const [revenueContractAdd, setRevenueContractAdd] = useState<string>('');
+  const [revContractABI, setRevenueContractABI] = useState(false);
+  const [funcType, setFuncType] = useState({ id: '1', label: 'Repay from:', value: 'Wallet' })
 
   const selectedAssetAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress) || TOKEN_ADDRESSES.DAI;
   // TODO pull colalteralOptions from subgraph instread of default yearn tokens
@@ -105,11 +110,16 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   });
 
   useEffect(() => {
+    console.log('repay type', funcType);
+  }, [funcType]);
+
+  useEffect(() => {
     console.log('made it to revenue call');
     if (revenueContractAdd.length === 42) {
       console.log('making the call');
       console.log(revenueContractAdd);
       dispatch(OnChainMetaDataActions.getABI(revenueContractAdd));
+      setRevenueContractABI(true);
     }
   }, [revenueContractAdd]);
 
@@ -215,13 +225,18 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     );
   }
 
-  return (
-    <StyledTransaction onClose={onClose} header={header}>
-      <TxAddressInput
-        headerText={t('components.transaction.enable-spigot.revenue-contract')}
-        address={revenueContractAdd}
-        onAddressChange={handleChangeRevenue}
-      />
+
+  const renderRevFunc = () => {
+    if (revContractABI) {
+      return (
+        <TxDropdown
+          headerText='Rev Contract Funcs'
+          typeOptions={selectedContractFunctions}
+          selectedType={funcType}
+        >
+        </TxDropdown>
+      )
+    } else {
       <TxByteInput
         headerText={t('components.transaction.enable-spigot.function-revenue')}
         inputText={' '}
@@ -229,7 +244,20 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
         byteCode={settingClaimFunc}
         onByteCodeChange={handleClaimChange}
         readOnly={false}
+      />;
+    }
+  };
+
+  // TODO: Add logic that if a rev contract is verified and ABI is in state, dropdown for available state appears
+
+  return (
+    <StyledTransaction onClose={onClose} header={header}>
+      <TxAddressInput
+        headerText={t('components.transaction.enable-spigot.revenue-contract')}
+        address={revenueContractAdd}
+        onAddressChange={handleChangeRevenue}
       />
+      {renderRevFunc()}
       <TxByteInput
         headerText={t('components.transaction.enable-spigot.function-transfer')}
         inputText={' '}

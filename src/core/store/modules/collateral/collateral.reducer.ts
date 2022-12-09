@@ -75,14 +75,14 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
     })
     .addCase(addCollateral.rejected, (state, { error }) => {
       // _.assignIn(state.statusMap.addCollateral, { [contract]: { [token]: { error: error.message } } });
-    });
+    })
     /* -------------------------------------addSpigot-------------------------------------- */
     .addCase(addSpigot.pending, (state, payload) => {
       console.log('add spigot pending', payload);
-    });
+    })
     .addCase(addSpigot.fulfilled, (state, payload) => {
       console.log('add spigot pending', payload);
-    });
+    })
     .addCase(addSpigot.rejected, (state, payload) => {
       console.log('add spigot pending', payload);
     });

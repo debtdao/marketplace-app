@@ -86,11 +86,16 @@ const selectPositionsForSelectedLine = createSelector(
     if (!line) {
       return {};
     } else {
+      // Create and return PositionMap of only positions for a given line
       const linePositions = _.values(positions).filter((p) => p.line === line);
-      return _.zipObject(
-        _.keys(positions),
-        linePositions // todo checksum address
+      const linePositionsObj = _.transform(
+        linePositions,
+        function (result, position) {
+          result[position.id] = position;
+        },
+        {} as PositionMap
       );
+      return linePositionsObj;
     }
   }
 );

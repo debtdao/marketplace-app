@@ -194,9 +194,11 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       if (linePageData) {
         // overwrite actual positions with referential ids
         const { positions, collateralEvents, creditEvents, ...metadata } = linePageData;
+        // console.log('User Portion Reducer Line Page positions: ', positions);
         state.linesMap = { ...state.linesMap, [linePageData.id]: { ...metadata } };
-        console.log('get line page positions saved to state', positions);
-        state.positionsMap = { ...state.positionsMap, ...positions };
+        // console.log('get line page positions saved to state', positions);
+        // state.positionsMap = { ...state.positionsMap, ...positions };
+        // console.log('User Portfolio Reducer positionsMap', state.positionsMap, positions);
         state.eventsMap = { ...state.eventsMap, [metadata.id]: creditEvents };
         // we also update state.collateral on this action  being fullfilled in collateral.reducer.ts
       }
@@ -227,10 +229,10 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.linesMap = { ...state.linesMap, ...lines };
       let allPositions = {};
       let allEvents = {};
-      let allModules = {};
+      // let allModules = {};
       const linesByRole: LinesByRole = _.entries<SecuredLine>(lines).reduce(
         ({ borrowing, arbiting }: LinesByRole, [addy, line]) => {
-          console.log('FST getUserPort reducer', line.positions);
+          // console.log('FST getUserPort reducer', line.positions);
           allPositions = { ...allPositions, ...line.positions };
 
           if (line.borrower === address) return { arbiting, borrowing: [...borrowing, addy] };
@@ -242,7 +244,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
         { borrowing: [], arbiting: [] }
       );
 
-      console.log('SCN getUserPort reducer', allPositions);
+      // console.log('SCN getUserPort reducer', allPositions);
       state.positionsMap = { ...state.positionsMap, ...allPositions };
       state.eventsMap = { ...state.eventsMap, ...allEvents };
 

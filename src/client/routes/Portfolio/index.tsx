@@ -117,19 +117,12 @@ export const Portfolio = () => {
     }
   }, [currentRole, walletIsConnected, userWallet]);
 
+  const { borrowerLineOfCredits, lenderPositions } = userPortfolio;
+
   // Get an array of borrowerPositions by flattening
   // an array of Position arrays from borrowerLineOfCredits map
   const borrowerPositions: CreditPosition[] = _.flatten(
-    _.merge(userPortfolio.borrowerLineOfCredits.map((loc) => _.values(loc.positions)))
-  );
-
-  const lenderPositions = userPortfolio?.lenderPositions;
-
-  console.log(
-    'zl portfolio page borrower pos',
-    borrowerPositions,
-    userPortfolio.borrowerLineOfCredits,
-    lenderPositions
+    _.merge(borrowerLineOfCredits.map((loc) => _.values(loc.positions)))
   );
 
   useEffect(() => {

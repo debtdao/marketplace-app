@@ -147,8 +147,9 @@ const selectUserPortfolio = createSelector(
     selectCollateralEventsMap,
   ],
   (linesMap, userPortfolio, positions, collaterals, creditEvents, collatEvents) => {
-    console.log('select portfolio data positions', positions);
+    // console.log('User Portfolio selector positions: ', positions);
     const getSecuredLineData = (line: string): SecuredLine => {
+      // console.log('User Portfolio selected positions - secured line data: ', line);
       return {
         ...linesMap[line],
         escrow: _.find(collaterals, (m) => m.type === 'asset' && m.line === line) as AggregatedEscrow,

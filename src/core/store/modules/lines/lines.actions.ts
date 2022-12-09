@@ -124,9 +124,9 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
     const selectedLine = LinesSelectors.selectSelectedLinePage(state);
     const tokenPrices = TokensSelectors.selectTokenPrices(state);
 
-    console.log('get linme page', selectedLine, tokenPrices, state);
+    console.log('get line page', selectedLine, tokenPrices, state);
     // @TODO check if events exist to
-    debugger;
+    // debugger;
     if (selectedLine) {
       console.log('have line page', selectedLine, tokenPrices, state);
       return { linePageData: selectedLine };

@@ -1,4 +1,4 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
+import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { Interface } from '@ethersproject/abi';
 
 import { ThunkAPI } from '@frameworks/redux';
@@ -30,4 +30,6 @@ const getABI = createAsyncThunk<{ ABI: []; Functions: [] }, String, ThunkAPI>(
     };
   }
 );
-export const OnChainMetaDataActions = { getABI };
+
+const clearABI = createAction<void>('etherscan/clearABI');
+export const OnChainMetaDataActions = { getABI, clearABI };

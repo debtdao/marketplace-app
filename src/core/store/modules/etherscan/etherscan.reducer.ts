@@ -4,7 +4,7 @@ import { OnChainMetaDataState } from '@types';
 
 import { OnChainMetaDataActions } from './etherscan.actions';
 
-const { getABI } = OnChainMetaDataActions;
+const { getABI, clearABI } = OnChainMetaDataActions;
 
 export const initialOnChainMetaDataState: OnChainMetaDataState = {
   contractABI: undefined,
@@ -12,10 +12,17 @@ export const initialOnChainMetaDataState: OnChainMetaDataState = {
 };
 
 export const onChainMetaDataReducer = createReducer(initialOnChainMetaDataState, (builder) => {
-  builder.addCase(getABI.fulfilled, (state, { payload: { ABI, Functions } }) => {
-    console.log('Made it here to tthe reducer');
-    state.contractABI = ABI;
-    state.contractFunctions = Functions;
-    console.log(state);
-  });
+  builder
+    .addCase(getABI.fulfilled, (state, { payload: { ABI, Functions } }) => {
+      console.log('Made it here to tthe reducer');
+      state.contractABI = ABI;
+      state.contractFunctions = Functions;
+      console.log(state);
+    })
+
+    .addCase(clearABI, (state) => {
+      state.contractABI = [];
+      state.contractFunctions = [];
+      console.log('Clearing State');
+    });
 });

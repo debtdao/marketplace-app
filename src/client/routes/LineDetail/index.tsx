@@ -131,7 +131,7 @@ export const LineDetail = () => {
           }
         />
       )}
-      {selectedLine && !generalLoading && <LineDetailsDisplay page={selectedPage} line={selectedLine} />}
+      {selectedLine && <LineDetailsDisplay page={selectedPage} line={selectedLine} />}
     </LineDetailView>
   );
 };

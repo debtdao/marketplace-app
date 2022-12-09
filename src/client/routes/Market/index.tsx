@@ -9,7 +9,7 @@ import { ModalsActions, LinesActions, LinesSelectors, WalletActions, WalletSelec
 import { RecommendationsCard, SliderCard, ViewContainer } from '@components/app';
 import { SpinnerLoading, Text, Button } from '@components/common';
 import { SecuredLine, UseCreditLinesParams } from '@src/core/types';
-import { GoblinTown } from '@assets/images';
+import { GoblinTown, DebtDAOBanner, DebtDAOBannerLogo } from '@assets/images';
 import { getEnv } from '@config/env';
 
 const StyledRecommendationsCard = styled(RecommendationsCard)``;
@@ -128,7 +128,7 @@ export const Market = () => {
             </BannerCtaButton>
           </div>
         }
-        background={<img src={GoblinTown} alt={'Goblin town or the Citadel?'} />}
+        background={<img src={DebtDAOBannerLogo} alt={'Debt DAO Banner?'} />}
       />
 
       {getLinesStatus.loading || _.isEmpty(lineCategoriesForDisplay) ? (

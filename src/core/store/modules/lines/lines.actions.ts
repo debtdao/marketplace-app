@@ -129,6 +129,7 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
     // debugger;
     if (selectedLine) {
       console.log('have line page', selectedLine, tokenPrices, state);
+      // console.log('user portfolio')
       return { linePageData: selectedLine };
     } else {
       try {

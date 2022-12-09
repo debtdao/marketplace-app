@@ -75,7 +75,6 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
 
   //state for params
   const { header, onClose } = props;
-
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionApproved, setTransactionApproved] = useState(true);
   const [transactionLoading, setLoading] = useState(false);

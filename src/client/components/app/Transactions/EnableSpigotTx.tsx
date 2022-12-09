@@ -1,9 +1,9 @@
 import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import _ from 'lodash';
+
 import { isValidAddress } from '@src/utils';
 //import { useHistory } from 'react-router-dom';
-
 import {
   useAppTranslation,
   useAppDispatch,
@@ -115,9 +115,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   }, [funcType]);
 
   useEffect(() => {
-    
     if (isValidAddress(revenueContractAdd)) {
-      
       console.log(revenueContractAdd);
       dispatch(OnChainMetaDataActions.getABI(revenueContractAdd));
       setRevenueContractABI(true);

@@ -73,7 +73,7 @@ const CardBackground = styled.div`
     height: 100%;
     top: 0;
     left: 0;
-    object-fit: fill;
+    object-fit: cover;
     object-position: center;
   }
 `;

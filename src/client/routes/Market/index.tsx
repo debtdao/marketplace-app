@@ -128,7 +128,7 @@ export const Market = () => {
             </BannerCtaButton>
           </div>
         }
-        background={<img src={DebtDAOBannerLogo} alt={'Debt DAO Banner?'} />}
+        background={<img src={DebtDAOBanner} alt={'Debt DAO Banner?'} />}
       />
 
       {getLinesStatus.loading || _.isEmpty(lineCategoriesForDisplay) ? (

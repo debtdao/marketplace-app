@@ -182,6 +182,13 @@ export const LineMetadata = (props: LineMetadataProps) => {
     );
   };
 
+  const liquidateHandler = () => {
+    if (!walletIsConnected) {
+      connectWallet();
+    }
+    dispatch(ModalsActions.openModal({ modalName: 'liquidateBorrower' }));
+  };
+
   const depositHandler = (token: TokenView) => {
     if (!walletIsConnected) {
       connectWallet();
@@ -255,6 +262,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
           <>
             <Button onClick={depositHandler}>{depositCollateralText} </Button>
             <Button onClick={addSpigotHandler}>{enableSpigotText} </Button>
+            <Button onClick={liquidateHandler}>liquidate</Button>
           </>
         );
       default:

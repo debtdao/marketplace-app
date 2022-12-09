@@ -216,7 +216,7 @@ export class CollateralServiceImpl implements CollateralService {
         )
       );
     } catch (e) {
-      console.log(`An error occured while borrowing credit, error = [${JSON.stringify(e)}]`);
+      console.log(`An error occured while liquidate credit, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
     }
   }
@@ -355,6 +355,9 @@ export class CollateralServiceImpl implements CollateralService {
         abi,
         args: params,
         methodName: methodName,
+        overrides: {
+          gasLimit: 600000,
+        },
       };
 
       const tx = await this.transactionService.execute(props);

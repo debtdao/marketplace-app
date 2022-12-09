@@ -291,6 +291,7 @@ export class CreditLineServiceImpl implements CreditLineService {
         abi: this.abi,
         args: params,
         methodName: methodName,
+        //to do set up gas estimator
         overrides: {
           gasLimit: 600000,
         },

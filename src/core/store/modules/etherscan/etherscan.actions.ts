@@ -20,8 +20,8 @@ const getABI = createAsyncThunk<{ ABI: []; Functions: [] }, String, ThunkAPI>(
     const iface = new Interface(OnChainMetaDataServiceResponse.data.result);
     const Functions = [];
 
-    for (const k in iface.functions) {
-      Functions.push(iface.functions[k].name);
+    for (const key in iface.functions) {
+      Functions.push(iface.functions[key].name);
     }
     console.log(iface.functions);
     return {

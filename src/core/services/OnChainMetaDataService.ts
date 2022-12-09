@@ -5,7 +5,6 @@ export class OnChainMetaDataServiceImpl implements OnChainMetaDataService {
   constructor() {}
 
   public async getContractABI(address: String): Promise<any | undefined> {
-    console.log('Made it to Service');
     return await _getContractABI(address);
   }
 }

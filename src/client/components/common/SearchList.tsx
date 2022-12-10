@@ -93,6 +93,10 @@ export type SearchListItem = {
   value?: string;
 };
 
+export type FunctionNameItem = {
+  functionName: string;
+};
+
 export interface SearchListProps {
   headerText?: string;
   // TODO Check how to remove the any[] and not throw error on searchInput

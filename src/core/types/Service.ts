@@ -456,11 +456,12 @@ export interface CollateralService {
 
 export interface OnChainMetaDataService {
   getContractABI(address: String): Promise<any | undefined>;
+  getAddressEnsName(props: OnChainMetaDataServiceProps): Promise<any | undefined>;
 }
 
-// export interface OnChainMetaDataServiceProps {
-//   address: String;
-// }
+export interface OnChainMetaDataServiceProps {
+  address: string;
+}
 
 // *************** TOKEN ***************
 export interface TokenService {

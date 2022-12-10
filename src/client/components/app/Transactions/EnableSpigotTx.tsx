@@ -31,7 +31,7 @@ import { TxStatus } from './components/TxStatus';
 import { TxAddressInput } from './components/TxAddressInput';
 import { TxNumberInput } from './components/TxNumberInput';
 import { TxByteInput } from './components/TxByteInput';
-import { TxDropdown } from './components/TxDropdown';
+import { TxFuncSelector } from './components/TxFuncSelector';
 
 const StyledTransaction = styled(TxContainer)`
   min-height: 60vh;
@@ -202,6 +202,15 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     setRevenueContractAdd(address);
   };
 
+  const createListItems = (functions: []) => {
+    const functionList: any = [];
+    functions.forEach((func, i) => {
+      const obj = { id: i, label: func, value: func };
+      functionList.push(obj);
+    });
+    return functionList;
+  };
+
   if (!selectedLine) return null;
 
   if (transactionCompleted === 1) {
@@ -231,11 +240,11 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const renderRevFunc = () => {
     if (revContractABI) {
       return (
-        <TxDropdown
+        <TxFuncSelector
           headerText="2. Rev Contract Funcs"
-          typeOptions={selectedContractFunctions}
+          typeOptions={createListItems(selectedContractFunctions!)}
           selectedType={funcType}
-        ></TxDropdown>
+        ></TxFuncSelector>
       );
     } else {
       return (
@@ -255,11 +264,11 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     console.log(selectedContractFunctions);
     if (revContractABI) {
       return (
-        <TxDropdown
+        <TxFuncSelector
           headerText="2. Transfer Contract Funcs"
-          typeOptions={selectedContractFunctions}
+          typeOptions={createListItems(selectedContractFunctions!)}
           selectedType={funcType}
-        ></TxDropdown>
+        ></TxFuncSelector>
       );
     } else {
       return (

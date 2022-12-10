@@ -63,9 +63,9 @@ import collateralReducer, { collateralInitialState } from './collateral/collater
 import { CollateralActions } from './collateral/collateral.actions';
 import { CollateralSelectors } from './collateral/collateral.selectors';
 // OnChain MetaData
-import { onChainMetaDataReducer, initialOnChainMetaDataState } from './etherscan/etherscan.reducer';
-import { OnChainMetaDataActions } from './etherscan/etherscan.actions';
-import { OnChainMetaDataSelector } from './etherscan/etherscan.selector';
+import { onChainMetaDataReducer, initialOnChainMetaDataState } from './metadata/metadata.reducer';
+import { OnChainMetaDataActions } from './metadata/metadata.actions';
+import { OnChainMetaDataSelector } from './metadata/metadata.selector';
 
 const rootReducer: Reducer<RootState> = combineReducers({
   app: appReducer,

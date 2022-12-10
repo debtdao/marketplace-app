@@ -202,7 +202,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
         // linePage object
         state.positionsMap = { ...state.positionsMap, ...positions };
         console.log('User Portfolio Reducer positionsMap: ', state.positionsMap);
-
+        // debugger;
         // console.log('User Portfolio Reducer positionsMap', state.positionsMap, positions);
         state.eventsMap = { ...state.eventsMap, [metadata.id]: creditEvents };
         // we also update state.collateral on this action  being fullfilled in collateral.reducer.ts

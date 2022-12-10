@@ -194,16 +194,11 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       if (linePageData) {
         // overwrite actual positions with referential ids
         const { positions, collateralEvents, creditEvents, ...metadata } = linePageData;
-        console.log('User Portfolio Reducer Line Page positions: ', positions);
+        console.log('user portfolio collateral events', collateralEvents);
+        console.log('user portfolio positions', positions);
+        console.log('user portfolio', linePageData);
         state.linesMap = { ...state.linesMap, [linePageData.id]: { ...metadata } };
-        // console.log('get line page positions saved to state', positions);
-
-        // TODO: Add this back in after fixing the infinite loop in getLinePage action.
-        // linePage object
         state.positionsMap = { ...state.positionsMap, ...positions };
-        console.log('User Portfolio Reducer positionsMap: ', state.positionsMap);
-        // debugger;
-        // console.log('User Portfolio Reducer positionsMap', state.positionsMap, positions);
         state.eventsMap = { ...state.eventsMap, [metadata.id]: creditEvents };
         // we also update state.collateral on this action  being fullfilled in collateral.reducer.ts
       }

@@ -322,7 +322,7 @@ export const formatLinePageData = (
   // position id and APY
 
   //Derive Collateral Events by
-  console.log('User Portfolio', 'escrow', escrow);
+  console.log('User Portfolio actions ', 'escrow', escrow);
   // aggregated revenue in USD by token across all spigots
   //  all recent Spigot and Escrow events
   let collateralEvents: CollateralEvent[] = [];

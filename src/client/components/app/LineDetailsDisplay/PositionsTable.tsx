@@ -129,8 +129,6 @@ export const PositionsTable = (props: PositionsProps) => {
       return;
     }
     dispatch(LinesActions.getLinePage({ id: lineAddress }));
-
-    // TODO: should useEffect at lineAddress or selectedPage
   }, [lineAddress]);
 
   //Action Handlers for positions table

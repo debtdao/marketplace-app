@@ -6,7 +6,7 @@ import { Portfolio } from './Portfolio';
 import { LineDetail } from './LineDetail';
 import { Market } from './Market';
 import { Settings } from './Settings';
-import { Disclaimer } from './Disclaimer';
+// import { Disclaimer } from './Disclaimer';
 import { Health } from './Health';
 
 const routesMap = [
@@ -26,10 +26,10 @@ const routesMap = [
     path: '/settings',
     component: Settings,
   },
-  {
-    path: '/disclaimer',
-    component: Disclaimer,
-  },
+  // {
+  //   path: '/disclaimer',
+  //   component: Disclaimer,
+  // },
 ];
 
 export const Routes = () => {

@@ -40,7 +40,7 @@ export interface LineOfCredit {
   status: LineStatusTypes;
   start: number;
   end: number;
-  // aggregate usd values accross all positions at current time
+  // display data of aggregate usd values accross all positions at current time
   principal: string;
   deposit: string;
   interest: string;
@@ -48,6 +48,11 @@ export interface LineOfCredit {
   totalInterestRepaid: string;
   // id, symbol, APY (4 decimals)
   highestApy: [string, string, string];
+  
+  // metadata to pull in additional data from state
+  spigotId?: string;
+  escrowId?: string;
+  positionIds?: string[]; // referential ids stored in redux state
 }
 
 export type PositionMap = { [id: string]: CreditPosition };

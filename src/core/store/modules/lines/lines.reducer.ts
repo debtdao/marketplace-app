@@ -226,7 +226,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.deploySecuredLine = { error: error.message };
     })
 
-    /* ------------------------- getUserPortfolio ------------------------- */
+    /* ------------------- ------ getUserPortfolio ------------------------- */
     .addCase(getUserPortfolio.pending, (state, { meta }) => {
       state.statusMap.user.getUserPortfolio = { loading: true };
     })
@@ -234,27 +234,28 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.linesMap = { ...state.linesMap, ...lines };
       let allPositions = {};
       let allEvents = {};
-      // let allModules = {};
+      let allModules = {};
       const linesByRole: LinesByRole = _.entries<SecuredLine>(lines).reduce(
         ({ borrowing, arbiting }: LinesByRole, [addy, line]) => {
-          // console.log('FST getUserPort reducer', line.positions);
+          console.log('FST getUserPort reducer', line.positions);
           allPositions = { ...allPositions, ...line.positions };
+          // TODO do from collateral service
+          allModules =  { [line.escrowId ?? '']: line.escrow, [line.spigotId ?? '']: line.spigot }
 
           if (line.borrower === address) return { arbiting, borrowing: [...borrowing, addy] };
           if (line.arbiter === address) return { borrowing, arbiting: [...arbiting, addy] };
           // allEvents = { ...allEvents, ...line.events }; TODO return events from tight
-          // allModules = { ...allModules, ...line.positions }
           return { borrowing, arbiting };
         },
         { borrowing: [], arbiting: [] }
       );
 
-      // console.log('SCN getUserPort reducer', allPositions);
+      console.log('SCN getUserPort reducer', allPositions);
       state.positionsMap = { ...state.positionsMap, ...allPositions };
-      state.eventsMap = { ...state.eventsMap, ...allEvents };
+      // state.positionsMap = { ...state.positionsMap, ...allPositions };
 
       // TODO update in collateral.reducer
-      // state.collateralMap = { ...state.positionsMap, ...allPositions }
+      // state.collateralMap = {  }
 
       state.user.portfolio = {
         borrowerLineOfCredits: linesByRole.borrowing,

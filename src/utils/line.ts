@@ -279,7 +279,7 @@ export const formatSecuredLineData = (
   }, {});
 
   // console.log('User Portfolio credit positions func: ', positions);
-
+e
   console.log('formatted page positions', positionFrags, positions);
   return {
     credit: {

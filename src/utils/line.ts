@@ -1,5 +1,6 @@
 import { isEmpty, zipWith } from 'lodash';
 import { BigNumber, utils } from 'ethers';
+import _ from 'lodash';
 
 import {
   SecuredLineWithEvents,
@@ -27,6 +28,7 @@ import {
   GetUserPortfolioResponse,
   PositionMap,
   LENDER_POSITION_ROLE,
+  EscrowDeposit,
 } from '@types';
 
 import { humanize, normalizeAmount, normalize } from './format';
@@ -312,6 +314,7 @@ export const formatLinePageData = (
     // userLinesMetadataMap,
   } = lineData;
   console.log('User Portfolio Line F', lineData);
+  console.log('User Portfolio actions 1', 'escrow', escrow);
   const {
     credit,
     spigot: spigotData,
@@ -322,10 +325,23 @@ export const formatLinePageData = (
   // position id and APY
 
   //Derive Collateral Events by
-  console.log('User Portfolio actions ', 'escrow', escrow);
+  console.log('User Portfolio actions 2', 'escrow', escrowData);
   // aggregated revenue in USD by token across all spigots
   //  all recent Spigot and Escrow events
-  let collateralEvents: CollateralEvent[] = [];
+  let collateralEvents: CollateralEvent[] = _.map(escrowData.deposits, function (deposit) {
+    return {
+      type: escrowData.type,
+      id: deposit.token.address,
+      // TODO: timestamp should probably be removed from the type given this aggregates
+      // collateral by type and token address
+      timestamp: 0,
+      amount: Number(deposit.amount),
+      // TODO: replace with correct USD value when we have it
+      value: 0,
+    } as CollateralEvent;
+  });
+  console.log('User Portfolio actions collateral events: ', collateralEvents);
+  // let collateralEvents: CollateralEvent[] = escrow?
   //  all recent borrow/lend events
   // const creditEvents: CreditEvent[] = [];
 

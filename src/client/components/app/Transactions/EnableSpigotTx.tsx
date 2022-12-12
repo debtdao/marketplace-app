@@ -1,8 +1,8 @@
 import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import _ from 'lodash';
-import { Interface } from '@ethersproject/abi';
 
+import { generateSig } from '@src/utils';
 import { isValidAddress } from '@src/utils';
 //import { useHistory } from 'react-router-dom';
 import {
@@ -99,7 +99,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const [revContractABI, setRevenueContractABI] = useState(false);
   const [funcType, setFuncType] = useState({ id: '', label: '', value: '' });
 
-  const selectedAssetAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress) || TOKEN_ADDRESSES.DAI;
+  //const selectedAssetAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress) || TOKEN_ADDRESSES.DAI;
   // TODO pull colalteralOptions from subgraph instread of default yearn tokens
   const collateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
   //const selectedAsset  _.find(collateralOptions, (t) => t.address === selectedAssetAddress);
@@ -128,28 +128,19 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     }
   }, [revenueContractAdd]);
 
-  // util func to generate bytecode
-  function generateSig(funcName: string) {
-    const iface = new Interface(contractABI!);
-    let funcSig = '';
-    for (const key in iface.functions) {
-      if (funcName == iface.functions[key].name) {
-        funcSig = key;
-      }
-    }
-    console.log(iface.getSighash(funcSig));
-    return iface.getSighash(funcSig);
-  }
-
   // If contract has ABI, these functions generage the bytecode for the functions
   const onTransferFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
-    const hashedSigFunc = generateSig(newFunc.label);
+    const hashedSigFunc = generateSig(newFunc.label, contractABI!);
+    console.log(hashedSigFunc);
     setTransferFunc(hashedSigFunc);
+    console.log(settingTransferFunc);
   };
 
   const onClaimFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
-    const hashedSigFunc = generateSig(newFunc.label);
+    const hashedSigFunc = generateSig(newFunc.label, contractABI!);
+    console.log(hashedSigFunc);
     setClaimFunc(hashedSigFunc);
+    console.log(settingClaimFunc);
   };
 
   // if no ABI, input bytecode manually
@@ -293,7 +284,6 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   };
 
   const renderTransferFunc = () => {
-    console.log(selectedContractFunctions);
     if (revContractABI) {
       return (
         <TxFuncSelector

@@ -11,3 +11,4 @@ export * from './http';
 export * from './validations';
 export * from './simulateTransactions';
 export * from './etherscanAPI';
+export * from './hashSig';

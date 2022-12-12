@@ -9,7 +9,7 @@ import {
   useAppSelector,
 } from '@hooks';
 import { LinesSelectors, LinesActions, WalletSelectors } from '@store';
-import { withdrawUpdate } from '@src/utils';
+import { withdrawUpdate, normalize, toWei } from '@src/utils';
 
 import { TxContainer } from './components/TxContainer';
 import { TxCreditLineInput } from './components/TxCreditLineInput';
@@ -42,6 +42,28 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
   const positions = useAppSelector(LinesSelectors.selectPositions);
+
+  //Calculate maximum withdraw amount, then humanize for readability
+  const getMaxWithdraw = () => {
+    if (!selectedPosition) {
+      setErrors([...errors, 'no selected position']);
+      return '0';
+    }
+    let maxWithdraw: string = `${Number(selectedPosition.deposit) - Number(selectedPosition.principal)}`;
+    maxWithdraw = normalize('amount', maxWithdraw, selectedPosition.token.decimals);
+    return maxWithdraw;
+  };
+
+  //Used to determine if amount user wants to withdraw is valid
+  const isWithdrawable = () => {
+    if (!selectedPosition) {
+      return;
+    }
+    const maxWithdrawAmount = Number(toWei(getMaxWithdraw()!, selectedPosition.token.decimals));
+    const amountToWithdraw = Number(toWei(targetAmount, selectedPosition.token.decimals));
+
+    return amountToWithdraw > maxWithdrawAmount;
+  };
 
   const _updatePosition = () =>
     onPositionChange({
@@ -98,7 +120,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
 
     dispatch(
       LinesActions.withdrawLine({
-        id: selectedPosition['id'],
+        id: selectedPosition.id,
         lineAddress: selectedCredit.id,
         amount: ethers.utils.parseEther(targetAmount),
         network: walletNetwork,
@@ -113,7 +135,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
         const updatedPosition = withdrawUpdate(selectedPosition, targetAmount);
         dispatch(
           LinesActions.setPositionData({
-            position: selectedPosition['id'],
+            position: selectedPosition.id,
             lineAddress: selectedCredit.id,
             positionObject: updatedPosition,
             positions: positions,
@@ -129,7 +151,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
       label: t('components.transaction.withdraw'),
       onAction: withdrawCredit,
       status: true,
-      disabled: false,
+      disabled: isWithdrawable(),
       contrast: false,
     },
   ];
@@ -179,7 +201,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
         inputError={false}
         amount={targetAmount}
         onAmountChange={onAmountChange}
-        maxAmount={'0'}
+        maxAmount={getMaxWithdraw()}
         maxLabel={'Max'}
         readOnly={false}
         hideAmount={false}

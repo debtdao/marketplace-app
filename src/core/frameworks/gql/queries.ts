@@ -347,3 +347,14 @@ export const GET_BORROWER_POSITIONS_QUERY = gql`
     }
   }
 `;
+
+export const GET_SUPPORTED_ORACLE_TOKENS_QUERY = gql`
+  ${TOKEN_FRAGMENT}
+  query getSupportedOracleTokens {
+    supportedTokens(first: 1000) {
+      token {
+        ...TokenFrag
+      }
+    }
+  }
+`;

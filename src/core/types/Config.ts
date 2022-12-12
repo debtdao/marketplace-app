@@ -17,9 +17,11 @@ export interface Env {
   BLOCKNATIVE_KEY: string | undefined;
   FORTMATIC_KEY: string | undefined;
   PORTIS_KEY: string | undefined;
+  SEGMENT_API_KEY: string | undefined;
   // ZAPPER_API_KEY: string | undefined;
   GRAPH_API_URL: string | undefined;
   GRAPH_TEST_API_URL: string | undefined;
+  GRAPH_CHAINLINK_FEED_REGISTRY_API_URL: string | undefined;
 }
 
 export interface Constants {

@@ -221,7 +221,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
         inputError={false}
         amount={timeToLive}
         onAmountChange={onAmountChange}
-        maxAmount={'360'}
+        maxAmount={'365'}
         maxLabel={'Max'}
         readOnly={false}
         hideAmount={false}

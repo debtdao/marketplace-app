@@ -168,40 +168,39 @@ export const PositionsTable = (props: PositionsProps) => {
     if (!userWallet) {
       connectWallet();
     } else {
-      //@ts-ignore
-      dispatch(LinesActions.setSelectedLinePosition({ position: e.target.value }));
+      const target = e.target! as HTMLInputElement;
+      dispatch(LinesActions.setSelectedLinePosition({ position: target.value! }));
       dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
     }
   };
 
-  // THIS NEEDS REVISITNG
   const liquidateHandler = (e: Event) => {
-    //@ts-ignore
-    dispatch(LinesActions.setSelectedLinePosition({ position: e.target.value }));
+    const target = e.target! as HTMLInputElement;
+    dispatch(LinesActions.setSelectedLinePosition({ position: target.value! }));
     dispatch(ModalsActions.openModal({ modalName: 'liquidateBorrower' }));
   };
 
   const WithdrawHandler = (e: Event) => {
-    //@ts-ignore
-    dispatch(LinesActions.setSelectedLinePosition({ position: e.target.value }));
+    const target = e.target! as HTMLInputElement;
+    dispatch(LinesActions.setSelectedLinePosition({ position: target.value! }));
     dispatch(ModalsActions.openModal({ modalName: 'withdraw' }));
   };
 
   const borrowHandler = (e: Event) => {
-    //@ts-ignore
-    dispatch(LinesActions.setSelectedLinePosition({ position: e.target.value }));
+    const target = e.target! as HTMLInputElement;
+    dispatch(LinesActions.setSelectedLinePosition({ position: target.value! }));
     dispatch(ModalsActions.openModal({ modalName: 'borrow' }));
   };
 
   const depositAndRepayHandler = (e: Event) => {
-    //@ts-ignore
-    dispatch(LinesActions.setSelectedLinePosition({ position: e.target.value }));
+    const target = e.target! as HTMLInputElement;
+    dispatch(LinesActions.setSelectedLinePosition({ position: target.value! }));
     dispatch(ModalsActions.openModal({ modalName: 'depositAndRepay' }));
   };
 
   const acceptProposalHandler = (e: Event) => {
-    //@ts-ignore
-    dispatch(LinesActions.setSelectedLinePosition({ position: e.target.value }));
+    const target = e.target! as HTMLInputElement;
+    dispatch(LinesActions.setSelectedLinePosition({ position: target.value! }));
     dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
   };
 
@@ -320,7 +319,8 @@ export const PositionsTable = (props: PositionsProps) => {
             ),
             token: (
               <a
-                href={`https://etherscan.com/address/${event.token.id}`}
+                //change to etherscan on launch
+                href={`https://etherscan.io/address/${event.token.id}`}
                 target={'_blank'}
                 key={`${event.token.symbol}-${event.id}`}
                 rel={'noreferrer'}

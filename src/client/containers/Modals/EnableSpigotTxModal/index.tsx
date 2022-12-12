@@ -17,7 +17,7 @@ export const EnableSpigotTxModal: FC<EnableSpigotTxModalProps> = ({ onClose, ...
 
   return (
     <StyledEnableSpigotTxModal {...props}>
-      <EnableSpigotTx header={t('components.transaction.enable-collateral-asset.header')} onClose={onClose} />
+      <EnableSpigotTx header={t('components.transaction.enable-spigot.header')} onClose={onClose} />
     </StyledEnableSpigotTxModal>
   );
 };

@@ -22,6 +22,12 @@ export const onChainMetaDataReducer = createReducer(initialOnChainMetaDataState,
       console.log(state);
     })
 
+    .addCase(getABI.rejected, (state, { error }) => {
+      state.contractABI = undefined;
+      state.contractFunctions = undefined;
+      state.functionSignatures = undefined;
+    })
+
     .addCase(clearABI, (state) => {
       state.contractABI = [];
       state.contractFunctions = [];

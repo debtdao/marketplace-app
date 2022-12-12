@@ -203,6 +203,10 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   };
 
   const createListItems = (functions: []) => {
+    if (functions == undefined) {
+      setRevenueContractABI(false);
+      return;
+    }
     const functionList: any = [];
     functions.forEach((func, i) => {
       const obj = { id: i, label: func, value: func };
@@ -241,7 +245,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     if (revContractABI) {
       return (
         <TxFuncSelector
-          headerText="2. Rev Contract Funcs"
+          headerText={t('components.transaction.enable-spigot.function-revenue')}
           typeOptions={createListItems(selectedContractFunctions!)}
           selectedType={funcType}
         ></TxFuncSelector>
@@ -265,7 +269,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     if (revContractABI) {
       return (
         <TxFuncSelector
-          headerText="2. Transfer Contract Funcs"
+          headerText={t('components.transaction.enable-spigot.function-revenue')}
           typeOptions={createListItems(selectedContractFunctions!)}
           selectedType={funcType}
         ></TxFuncSelector>

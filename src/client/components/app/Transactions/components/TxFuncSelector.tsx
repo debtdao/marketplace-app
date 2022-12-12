@@ -208,7 +208,7 @@ export const TxFuncSelector: FC<TxDropdownProps> = ({
       <>
         <CreditLineInfo center={false} onClick={openSearchList}>
           <CreditLineData>
-            <LineTitle ellipsis> Select Revenue Contract Function {selectedType.value} </LineTitle>
+            <LineTitle ellipsis> Select Function </LineTitle>
           </CreditLineData>
         </CreditLineInfo>
       </>

@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 import { AggregatedCreditLine, CreditLinePage, CreditPosition } from '@src/core/types';
 import { useAppTranslation } from '@hooks';
-import { Text } from '@components/common';
+import { RedirectIcon, Text } from '@components/common';
 
 import { LineMetadata } from './LineMetadata';
 import { PositionsTable } from './PositionsTable';
+
+const linkHoverFilter = 'brightness(90%)';
+const linkTransition = 'filter 200ms ease-in-out';
 
 interface LineDetailsProps {
   line?: AggregatedCreditLine;
@@ -20,6 +24,14 @@ const Container = styled.div`
   width: 100%;
 `;
 
+const Redirect = styled(RedirectIcon)`
+  display: inline-block;
+  fill: currentColor;
+  width: 1.2rem;
+  margin-left: 2rem;
+  padding-bottom: 0.2rem;
+`;
+
 const Header = styled.h1`
   ${({ theme }) => `
     margin-bottom: ${theme.spacing.xl};
@@ -28,8 +40,31 @@ const Header = styled.h1`
   `};
 `;
 
+const RouterLink = styled(Link)<{ selected: boolean }>`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  color: inherit;
+  font-size: 3rem;
+  flex: 1;
+  width: 100%;
+
+  &:hover span {
+    filter: ${linkHoverFilter};
+  }
+
+  span {
+    transition: ${linkTransition};
+  }
+  ${(props) =>
+    props.selected &&
+    `
+    color: ${props.theme.colors.titlesVariant};
+  `}
+`;
+
 const BorrowerName = styled(Text)`
-  max-width: 150px;
+  max-width: 100%;
 `;
 
 export const LineDetailsDisplay = (props: LineDetailsProps) => {
@@ -57,8 +92,12 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   const StandardMetadata = (metadataProps: any) => (
     <>
       <Header>
-        <BorrowerName ellipsis>{borrower}</BorrowerName>
-        's Line Of Credit
+        <RouterLink to={`/portfolio/${borrower}`} key={borrower} selected={false}>
+          <BorrowerName>
+            {borrower}'s Line Of Credit
+            <Redirect />
+          </BorrowerName>
+        </RouterLink>
       </Header>
       <LineMetadata {...metadataProps} />
     </>

@@ -93,7 +93,6 @@ export const formatCollateralEvents = (
     if (!timestamp || !amount) return undefined;
 
     const valueNow = unnullify(price.toString(), true).times(unnullify((amount.toString(), true)));
-    console.log('formatCollateralevent ', __typename, amount, token, value, valueNow);
     let collatType;
     switch (type) {
       case SPIGOT_MODULE_NAME:
@@ -260,7 +259,7 @@ export const formatSecuredLineData = (
   }, {});
 
   const positions = positionFrags.reduce((obj: any, c: BasePositionFragResponse): PositionMap => {
-    const { dRate, fRate, id, lender, token, ...financials } = c;
+    const { dRate, fRate, id, lender, line: lineObj, token, ...financials } = c;
     const lenderAddress = lender.id;
 
     const currentUsdPrice = tokenPrices[c.token?.id];
@@ -268,8 +267,8 @@ export const formatSecuredLineData = (
       ...obj,
       [id]: {
         id,
-        line,
         lender: lenderAddress,
+        line,
         ...financials,
         // dRate: normalizeAmount(fRate, 2),
         // fRate: normalizeAmount(dRate, 2),
@@ -281,9 +280,6 @@ export const formatSecuredLineData = (
     };
   }, {});
 
-  // console.log('User Portfolio credit positions func: ', positions);
-
-  console.log('formatted page positions', positionFrags, positions);
   return {
     credit: {
       highestApy,
@@ -314,8 +310,6 @@ export const formatLinePageData = (
     ...metadata
     // userLinesMetadataMap,
   } = lineData;
-  console.log('User Portfolio Line F', lineData);
-  console.log('User Portfolio actions 1', 'escrow', escrow);
   const {
     credit,
     spigot: spigotData,
@@ -326,7 +320,6 @@ export const formatLinePageData = (
   // position id and APY
 
   //Derive Collateral Events by
-  console.log('User Portfolio actions 2', 'escrow', escrowData);
   // aggregated revenue in USD by token across all spigots
   //  all recent Spigot and Escrow events
   let collateralEvents: CollateralEvent[] = _.map(escrowData.deposits, function (deposit) {
@@ -341,7 +334,6 @@ export const formatLinePageData = (
       value: 0,
     } as CollateralEvent;
   });
-  console.log('User Portfolio actions collateral events: ', collateralEvents);
   // let collateralEvents: CollateralEvent[] = escrow?
   //  all recent borrow/lend events
   // const creditEvents: CreditEvent[] = [];
@@ -417,6 +409,7 @@ export const formatUserPortfolioData = (
         [p.id]: {
           ...p,
           lender: p.lender.id,
+          line: p.line.id,
           token: _createTokenView(p.token, unnullify(p.principal, true), tokenPrices[p.token.id]),
         },
       }),

@@ -72,7 +72,6 @@ export const PositionsTable = (props: PositionsProps) => {
   //Initial set up for positions table
 
   useEffect(() => {
-    console.log('user portfolio selected line: ', selectedLine);
     if (!selectedLine) {
       return;
     }
@@ -122,9 +121,6 @@ export const PositionsTable = (props: PositionsProps) => {
   }, [selectedLine, userWallet]);
 
   useEffect(() => {
-    console.log('user portfolio am I repeating myself 1?');
-    console.log('user portfolio selected page', selectedPage);
-    console.log('user portfolio selected page line address', lineAddress);
     if (!lineAddress) {
       return;
     }
@@ -175,7 +171,6 @@ export const PositionsTable = (props: PositionsProps) => {
   };
 
   const isWithdrawable = (deposit: string, borrowed: string, lender: string, interestRepaid: string) => {
-    // console.log('User Portfolio Lender', lender);
     // Withdraw/Accept are not working on Portfolio / Lender
     if (!userWallet) {
       return;
@@ -207,7 +202,6 @@ export const PositionsTable = (props: PositionsProps) => {
     return [];
   };
 
-  // console.log('user portfolio positions table', positions);
   return (
     <>
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
@@ -281,7 +275,6 @@ export const PositionsTable = (props: PositionsProps) => {
             },
           ]}
           data={positions?.map((p) => {
-            console.log('render position', p);
             return {
               // this needs to be humanized to correct amount depending on the token.
               deposit: humanize('amount', p.deposit, p.token.decimals, 2),

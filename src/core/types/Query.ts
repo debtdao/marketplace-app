@@ -115,6 +115,9 @@ export interface BasePositionFragResponse {
   lender: {
     id: string;
   };
+  line: {
+    id: string;
+  };
   principal: string;
   deposit: string;
   interestAccrued: string;

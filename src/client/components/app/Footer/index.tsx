@@ -9,10 +9,10 @@ interface FooterProps {
 }
 
 const footerLinks = [
-  // {
-  //   link: '/disclaimer',
-  //   name: 'disclaimer',
-  // },
+  {
+    link: '/disclaimer',
+    name: 'disclaimer',
+  },
   // {
   //   link: 'https://buyback.yearn.finance',
   //   name: 'buyback',

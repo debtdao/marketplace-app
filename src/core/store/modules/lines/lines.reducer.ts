@@ -182,7 +182,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
           categories[category] = [...(categories[category] || []), l.id];
         })
       );
-      console.log('User Portfolio get line positions: ', positions);
+      // console.log('User Portfolio get line positions: ', positions);
       state.linesMap = { ...state.linesMap, ...lines };
       state.positionsMap = { ...state.positionsMap, ...positions };
       state.categories = { ...state.categories, ...categories };
@@ -195,13 +195,9 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.getLinePage = { loading: true };
     })
     .addCase(getLinePage.fulfilled, (state, { payload: { linePageData } }) => {
-      console.log('get line page positions saved to state', linePageData);
       if (linePageData) {
         // overwrite actual positions with referential ids
         const { positions, collateralEvents, creditEvents, ...metadata } = linePageData;
-        console.log('user portfolio collateral events', collateralEvents);
-        console.log('user portfolio positions', positions);
-        console.log('user portfolio', linePageData);
         state.linesMap = { ...state.linesMap, [linePageData.id]: { ...metadata } };
         state.positionsMap = { ...state.positionsMap, ...positions };
         state.eventsMap = { ...state.eventsMap, [metadata.id]: creditEvents };
@@ -230,13 +226,13 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(getUserPortfolio.pending, (state, { meta }) => {
       state.statusMap.user.getUserPortfolio = { loading: true };
     })
-    .addCase(getUserPortfolio.fulfilled, (state, { meta, payload: { address, lines, positions } }) => {
+    .addCase(getUserPortfolio.fulfilled, (state, { meta, payload: { address, lines, lenderPositions } }) => {
       state.linesMap = { ...state.linesMap, ...lines };
       let allPositions = {};
       let allEvents = {};
       const linesByRole: LinesByRole = _.entries<SecuredLine>(lines).reduce(
         ({ borrowing, arbiting }: LinesByRole, [addy, line]) => {
-          console.log('FST getUserPort reducer', line.positions);
+          // add borrower and arbiter positions to object for state.positionsMap
           allPositions = { ...allPositions, ...(line.positions || {}) };
 
           if (line.borrower === address) return { arbiting, borrowing: [...borrowing, addy] };
@@ -246,17 +242,13 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
         },
         { borrowing: [], arbiting: [] }
       );
-
-      console.log('SCN getUserPort reducer', allPositions);
+      // add lender positions to object for state.positionsMap and update state.positionsMap
+      allPositions = { ...allPositions, ...lenderPositions };
       state.positionsMap = { ...state.positionsMap, ...allPositions };
-      // state.positionsMap = { ...state.positionsMap, ...allPositions };
-
-      // TODO update in collateral.reducer
-      // state.collateralMap = {  }
 
       state.user.portfolio = {
         borrowerLineOfCredits: linesByRole.borrowing,
-        lenderPositions: _.keys(positions),
+        lenderPositions: _.keys(lenderPositions),
         arbiterLineOfCredits: linesByRole.arbiting,
       };
     })

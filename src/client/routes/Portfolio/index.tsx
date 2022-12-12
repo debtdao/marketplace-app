@@ -77,23 +77,14 @@ export const Portfolio = () => {
   const { userAddress } = useParams<userParams>();
   const dispatch = useAppDispatch();
 
-  // TODO: pull all selectors in with single import statement
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
-  // const userTokens = useAppSelector(TokensSelectors.selectUserTokens);
-  // const activeModal = useAppSelector(ModalSelectors.selectActiveModal);
-  // const appStatus = useAppSelector(AppSelectors.selectAppStatus);
-  // const tokensListStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
-  // const generalLoading = (appStatus.loading || tokensListStatus.loading || isMounting) && !activeModal;
   const userPortfolio = useAppSelector(LinesSelectors.selectUserPortfolio);
   const portfolioAddress = userAddress ? userAddress : userWallet;
   const allPositions = useAppSelector(LinesSelectors.selectPositionsMap);
-  // const userTokensLoading = generalLoading && !userTokens.length;
-  // const [portfolioLoaded, setPortfolioLoaded] = useState<boolean>(false);
   const [currentRole, setRole] = useState<string>(BORROWER_POSITION_ROLE);
 
   const setSelectedLine = (address: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress: address }));
-  // const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const availableRoles = [BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE];
 
   const SummaryCardItems = availableRoles.map((role: string) => {
@@ -112,17 +103,10 @@ export const Portfolio = () => {
       dispatch(AlertsActions.openAlert({ message: 'Please connect wallet.', type: 'error' }));
     } else if (portfolioAddress && isValidAddress(portfolioAddress)) {
       dispatch(LinesActions.getUserPortfolio({ user: portfolioAddress.toLocaleLowerCase() }));
-      // @TODO dispatch action to set wallet address == portfolioAddress.
-      // dispatch(WalletActions.addressChange({ address: portfolioAddress }));
-      // Need to say portfolioAddress is lender instead of user wallet
-      // setPortfolioLoaded(true);
     }
   }, [currentRole, walletIsConnected, userWallet]);
 
   const { borrowerLineOfCredits, lenderPositions } = userPortfolio;
-  // setSelectedLine('');
-  // setSelectedLine(borrowerLineOfCredits[0].id);
-
   // Get an array of borrowerPositions by flattening
   // an array of Position arrays from borrowerLineOfCredits map
   const borrowerPositions: CreditPosition[] = _.flatten(
@@ -135,8 +119,6 @@ export const Portfolio = () => {
 
       if (borrowerLineOfCredits && borrowerLineOfCredits[0]) {
         const lineId = borrowerLineOfCredits[0].id;
-        console.log('User Portfolio Borrower LOC', borrowerLineOfCredits);
-        console.log('User Portfolio Borrower lineId: ', lineId);
         setSelectedLine(lineId);
       }
     }

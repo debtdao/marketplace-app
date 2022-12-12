@@ -115,6 +115,7 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
   }
 );
 
+// TODO: Add this back so not always refetching line page data for a given line of credit.
 // const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | undefined }, GetLinePageArgs, ThunkAPI>(
 //   'lines/getLinePage',
 //   async ({ id }, { getState, extra, dispatch }) => {
@@ -182,8 +183,6 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
       return { linePageData: undefined };
     }
     const linePageData = linePageResponse ? formatLinePageData(linePageResponse, tokenPrices) : undefined;
-    console.log('User Portfolio actions linepage response: ', linePageResponse);
-    console.log('User Portfolio actions linepage data: ', linePageData);
     return { linePageData: linePageData };
   }
 );
@@ -209,7 +208,7 @@ const getUserLinePositions = createAsyncThunk<
 // TODO: Return borrowerLineOfCredits and arbiterLineOfCredits within response
 // as SecuredLine[] type to consume in lines.reducer.ts
 const getUserPortfolio = createAsyncThunk<
-  { address: string; lines: { [address: string]: SecuredLineWithEvents }; positions: PositionMap },
+  { address: string; lines: { [address: string]: SecuredLineWithEvents }; lenderPositions: PositionMap },
   { user: string },
   ThunkAPI
 >('lines/getUserPortfolio', async ({ user }, { extra, getState }) => {
@@ -217,12 +216,11 @@ const getUserPortfolio = createAsyncThunk<
   const tokenPrices = TokensSelectors.selectTokenPrices(getState());
 
   const userPortfolio = await creditLineService.getUserPortfolio({ user });
-  if (!userPortfolio) return { address: user, lines: {}, positions: {} };
+  if (!userPortfolio) return { address: user, lines: {}, lenderPositions: {} };
 
-  const { lines, positions } = formatUserPortfolioData(userPortfolio, tokenPrices);
+  const { lines, positions: lenderPositions } = formatUserPortfolioData(userPortfolio, tokenPrices);
 
-  console.log('get user portfolio', lines, positions, userPortfolio);
-  return { address: user, lines, positions };
+  return { address: user, lines, lenderPositions };
 });
 
 export interface GetExpectedTransactionOutcomeProps {

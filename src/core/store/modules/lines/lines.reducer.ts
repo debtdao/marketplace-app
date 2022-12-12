@@ -12,6 +12,7 @@ import {
   BORROWER_POSITION_ROLE,
   Address,
   LinesByRole,
+  PositionMap,
 } from '@types';
 
 import { LinesActions } from './lines.actions';
@@ -166,20 +167,24 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 
       const categories: { [key: string]: string[] } = {};
       const lines: { [key: string]: SecuredLine } = {};
+      let positions: PositionMap = {};
 
       // loop over nested structure of new Lines and update state
       Object.entries(linesData).map(([category, ls]) =>
         ls?.map((l) => {
           lines[l.id] = l;
+          // update positions for each line
+          const linePositionMap = _.zipObject(_.values(l.positionIds), _.values(l.positions));
+          positions = { ...positions, ...linePositionMap };
+
           state.statusMap.user.linesActionsStatusMap[l.id] = initialLineActionsStatusMap;
           // save line id to category for reference
           categories[category] = [...(categories[category] || []), l.id];
         })
       );
-      // merge new lines with old
+      console.log('User Portfolio get line positions: ', positions);
       state.linesMap = { ...state.linesMap, ...lines };
-
-      // merge new categories with old
+      state.positionsMap = { ...state.positionsMap, ...positions };
       state.categories = { ...state.categories, ...categories };
     })
     .addCase(getLines.rejected, (state, { error }) => {
@@ -194,16 +199,11 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       if (linePageData) {
         // overwrite actual positions with referential ids
         const { positions, collateralEvents, creditEvents, ...metadata } = linePageData;
-        console.log('User Portfolio Reducer Line Page positions: ', positions);
+        console.log('user portfolio collateral events', collateralEvents);
+        console.log('user portfolio positions', positions);
+        console.log('user portfolio', linePageData);
         state.linesMap = { ...state.linesMap, [linePageData.id]: { ...metadata } };
-        // console.log('get line page positions saved to state', positions);
-
-        // TODO: Add this back in after fixing the infinite loop in getLinePage action.
-        // TODO: Remove the positions with undefined values from the positions array in
-        // linePage object
-        // state.positionsMap = { ...state.positionsMap, ...positions };
-
-        // console.log('User Portfolio Reducer positionsMap', state.positionsMap, positions);
+        state.positionsMap = { ...state.positionsMap, ...positions };
         state.eventsMap = { ...state.eventsMap, [metadata.id]: creditEvents };
         // we also update state.collateral on this action  being fullfilled in collateral.reducer.ts
       }

@@ -79,7 +79,7 @@ export interface SecuredLineWithEvents extends SecuredLine, LineEvents {}
 
 export interface CreditPosition {
   id: string;
-  line?: string;
+  line: string;
   status: PositionStatusTypes;
   lender: string;
   token: TokenView;

@@ -58,7 +58,6 @@ export const LineDetail = () => {
   const currentNetworkSettings = NETWORK_SETTINGS[currentNetwork];
 
   useEffect(() => {
-    console.log('line address', lineAddress);
     if (!lineAddress || !isValidAddress(lineAddress)) {
       dispatch(AlertsActions.openAlert({ message: 'INVALID_ADDRESS', type: 'error' }));
       history.push('/market');
@@ -67,11 +66,10 @@ export const LineDetail = () => {
 
     dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineAddress }));
     dispatch(LinesActions.getLinePage({ id: lineAddress }));
-
     return () => {
       dispatch(LinesActions.clearSelectedLineAndStatus());
     };
-  }, [selectedLine, selectedPage]);
+  }, []);
 
   const [firstTokensFetch, setFirstTokensFetch] = useState(true);
   const [tokensInitialized, setTokensInitialized] = useState(false);

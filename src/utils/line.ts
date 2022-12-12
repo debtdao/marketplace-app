@@ -1,5 +1,6 @@
 import { isEmpty, zipWith } from 'lodash';
 import { BigNumber, utils } from 'ethers';
+import _ from 'lodash';
 
 import {
   SecuredLineWithEvents,
@@ -28,6 +29,7 @@ import {
   PositionMap,
   LENDER_POSITION_ROLE,
   BaseLineFragResponse,
+  EscrowDeposit,
 } from '@types';
 
 import { humanize, normalizeAmount, normalize } from './format';
@@ -223,18 +225,18 @@ export const formatSecuredLineData = (
   );
 
   const [collateralValue, deposits]: [BigNumber, EscrowDepositList] = collateralDeposits.reduce(
-    (agg, c) => {
-      const price = unnullify(tokenPrices[c.token.id], true);
-      return !c.enabled
+    (agg, collateralDeposit) => {
+      const price = unnullify(tokenPrices[collateralDeposit.token.id], true);
+      return !collateralDeposit.enabled
         ? agg
         : [
-            agg[0].add(parseUnits(unnullify(c.amount).toString(), 'ether').mul(price)),
+            agg[0].add(parseUnits(unnullify(collateralDeposit.amount).toString(), 'ether').mul(price)),
             {
               ...agg[1],
-              [c.token.id]: {
-                ...c,
+              [collateralDeposit.token.id]: {
+                ...collateralDeposit,
                 type: COLLATERAL_TYPE_ASSET,
-                token: _createTokenView(c.token, BigNumber.from(c.amount), price),
+                token: _createTokenView(collateralDeposit.token, BigNumber.from(collateralDeposit.amount), price),
               },
             },
           ];
@@ -253,8 +255,8 @@ export const formatSecuredLineData = (
   };
 
   // aggregated revenue in USD by token across all spigots
-  const tokenRevenue: { [key: string]: string } = revenues.reduce((ggg, r) => {
-    return { ...r, [r.token]: (r.totalVolumeUsd ?? '0').toString() };
+  const tokenRevenue: { [key: string]: string } = revenues.reduce((ggg, revenue) => {
+    return { ...revenue, [revenue.token]: (revenue.totalVolumeUsd ?? '0').toString() };
   }, {});
 
   const positions = positionFrags.reduce((obj: any, c: BasePositionFragResponse): PositionMap => {
@@ -312,6 +314,8 @@ export const formatLinePageData = (
     ...metadata
     // userLinesMetadataMap,
   } = lineData;
+  console.log('User Portfolio Line F', lineData);
+  console.log('User Portfolio actions 1', 'escrow', escrow);
   const {
     credit,
     spigot: spigotData,
@@ -319,12 +323,26 @@ export const formatLinePageData = (
   } = formatSecuredLineData(metadata.id, positions!, escrow?.deposits || [], spigot?.summaries || [], tokenPrices);
 
   // derivative or aggregated data we need to compute and store while mapping position data
-
   // position id and APY
 
+  //Derive Collateral Events by
+  console.log('User Portfolio actions 2', 'escrow', escrowData);
   // aggregated revenue in USD by token across all spigots
   //  all recent Spigot and Escrow events
-  let collateralEvents: CollateralEvent[] = [];
+  let collateralEvents: CollateralEvent[] = _.map(escrowData.deposits, function (deposit) {
+    return {
+      type: escrowData.type,
+      id: deposit.token.address,
+      // TODO: timestamp should probably be removed from the type given this aggregates
+      // collateral by type and token address
+      timestamp: 0,
+      amount: Number(deposit.amount),
+      // TODO: replace with correct USD value when we have it
+      value: 0,
+    } as CollateralEvent;
+  });
+  console.log('User Portfolio actions collateral events: ', collateralEvents);
+  // let collateralEvents: CollateralEvent[] = escrow?
   //  all recent borrow/lend events
   // const creditEvents: CreditEvent[] = [];
 

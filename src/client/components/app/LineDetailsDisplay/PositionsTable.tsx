@@ -1,15 +1,19 @@
 import styled from 'styled-components';
 import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
+import { Link } from 'react-router-dom';
 
 import { ModalsActions, LinesActions, LinesSelectors, WalletSelectors, WalletActions } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { device } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer } from '@components/app';
-import { Input, SearchIcon, Button } from '@components/common';
+import { Input, SearchIcon, Button, RedirectIcon } from '@components/common';
 import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, CreditPosition } from '@src/core/types';
 import { humanize, formatAddress } from '@src/utils';
 import { getEnv } from '@config/env';
+
+const linkHoverFilter = 'brightness(90%)';
+const linkTransition = 'filter 200ms ease-in-out';
 
 const PositionsCard = styled(DetailCard)`
   max-width: ${({ theme }) => theme.globalMaxWidth};
@@ -43,6 +47,38 @@ const TableHeader = styled.h3`
     margin: ${theme.spacing.xl} 0;
     color: ${theme.colors.primary};
   `}
+`;
+
+const RouterLink = styled(Link)<{ selected: boolean }>`
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  color: inherit;
+  font-size: 1.2rem;
+  flex: 1;
+  padding: 0.5rem;
+
+  &:hover span {
+    filter: ${linkHoverFilter};
+  }
+
+  span {
+    transition: ${linkTransition};
+  }
+  ${(props) =>
+    props.selected &&
+    `
+    color: ${props.theme.colors.titlesVariant};
+  `}
+`;
+
+const Redirect = styled(RedirectIcon)`
+  display: inline-block;
+  fill: currentColor;
+  width: 1.2rem;
+  margin-left: 1rem;
+  padding-bottom: 0.2rem;
 `;
 
 interface PositionsProps {
@@ -276,8 +312,23 @@ export const PositionsTable = (props: PositionsProps) => {
             status: event.status,
             principal: humanize('amount', event.principal, event.token.decimals, 2),
             interest: humanize('amount', event.interestAccrued, event.token.decimals, 2),
-            lender: formatAddress(event.lender),
-            token: event.token.symbol,
+            lender: (
+              <RouterLink to={`/portfolio/${event.lender}`} key={event.id} selected={false}>
+                {formatAddress(event.lender)}
+                <Redirect />
+              </RouterLink>
+            ),
+            token: (
+              <a
+                href={`https://etherscan.com/address/${event.token.id}`}
+                target={'_blank'}
+                key={`${event.token.symbol}-${event.id}`}
+                rel={'noreferrer'}
+              >
+                {event.token.symbol}
+                <Redirect />
+              </a>
+            ),
             actions: <ActionButtons value={event.id} actions={getUserTransactions(event)} />,
           }))}
           SearchBar={

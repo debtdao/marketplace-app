@@ -17,6 +17,8 @@ export interface TokenView {
   priceUsdc: string;
   categories: string[];
   description: string;
+  //remove this when refactor is merged in.
+  id?: Address;
   website?: string;
   allowancesMap?: { [tokenAddress: string]: string };
 }

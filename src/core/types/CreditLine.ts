@@ -48,7 +48,7 @@ export interface LineOfCredit {
   totalInterestRepaid: string;
   // id, symbol, APY (4 decimals)
   highestApy: [string, string, string];
-  
+
   // metadata to pull in additional data from state
   spigotId?: string;
   escrowId?: string;
@@ -183,6 +183,7 @@ export interface LinePageSpigot extends AggregatedSpigot {
 }
 
 export type CollateralModule = AggregatedEscrow | AggregatedSpigot;
+export type CollateralMap = { [address: string]: CollateralModule };
 
 export interface RevenueContract {
   active: boolean;

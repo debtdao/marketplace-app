@@ -234,13 +234,10 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.linesMap = { ...state.linesMap, ...lines };
       let allPositions = {};
       let allEvents = {};
-      let allModules = {};
       const linesByRole: LinesByRole = _.entries<SecuredLine>(lines).reduce(
         ({ borrowing, arbiting }: LinesByRole, [addy, line]) => {
           console.log('FST getUserPort reducer', line.positions);
-          allPositions = { ...allPositions, ...line.positions };
-          // TODO do from collateral service
-          allModules =  { [line.escrowId ?? '']: line.escrow, [line.spigotId ?? '']: line.spigot }
+          allPositions = { ...allPositions, ...(line.positions || {}) };
 
           if (line.borrower === address) return { arbiting, borrowing: [...borrowing, addy] };
           if (line.arbiter === address) return { borrowing, arbiting: [...arbiting, addy] };
@@ -259,7 +256,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 
       state.user.portfolio = {
         borrowerLineOfCredits: linesByRole.borrowing,
-        lenderPositions: _.values(positions),
+        lenderPositions: _.keys(positions),
         arbiterLineOfCredits: linesByRole.arbiting,
       };
     })

@@ -27,6 +27,7 @@ import {
   GetUserPortfolioResponse,
   PositionMap,
   LENDER_POSITION_ROLE,
+  BaseLineFragResponse,
 } from '@types';
 
 import { humanize, normalizeAmount, normalize } from './format';
@@ -172,7 +173,7 @@ export function formatGetLinesData(
 }
 
 export const formatSecuredLineData = (
-  line: Address,
+  line: Address, // BaseLineFrag
   positionFrags: (BasePositionFragResponse | BasePositionFragResponse)[],
   collateralDeposits: BaseEscrowDepositFragResponse[],
   revenues: SpigotRevenueSummaryFragResponse[],
@@ -279,7 +280,7 @@ export const formatSecuredLineData = (
   }, {});
 
   // console.log('User Portfolio credit positions func: ', positions);
-e
+
   console.log('formatted page positions', positionFrags, positions);
   return {
     credit: {
@@ -347,6 +348,8 @@ export const formatLinePageData = (
     // TODO add creditEvents
     collateralEvents,
     // collateral data
+    spigotId: spigot?.id,
+    escrowId: escrow?.id,
     spigot: formattedSpigot,
     escrow: isEmpty(escrow?.deposits) ? undefined : { ...escrow!, ...escrowData },
   };
@@ -373,6 +376,9 @@ export const formatUserPortfolioData = (
         ...credit,
         borrower: borrower.id,
         status: status.toLowerCase() as LineStatusTypes,
+
+        spigotId: spigot?.id,
+        escrowId: escrow?.id,
         spigot: {
           ...(spigotData ?? {}),
           ...spigot,
@@ -387,7 +393,7 @@ export const formatUserPortfolioData = (
 
   // positions tokenFragResponse -> TokenView
   const positions: PositionMap =
-    lenderPositions.positions?.reduce(
+    lenderPositions?.positions?.reduce(
       (map, p) => ({
         ...map,
         [p.id]: {

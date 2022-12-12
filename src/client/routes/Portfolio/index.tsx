@@ -138,7 +138,7 @@ export const Portfolio = () => {
     }
     if (userPortfolio && currentRole === LENDER_POSITION_ROLE) {
       if (lenderPositions && lenderPositions[0]) {
-        const lineId = lenderPositions[0].id;
+        const lineId = lenderPositions[0];
         setSelectedLine(lineId);
       }
     }
@@ -158,7 +158,7 @@ export const Portfolio = () => {
 
       {currentRole === LENDER_POSITION_ROLE && (
         <StyledBorrowerContainer>
-          <PositionsTable positions={lenderPositions} />
+          <PositionsTable positions={lenderPositions.map((id) => allPositions[id])} />
         </StyledBorrowerContainer>
       )}
 

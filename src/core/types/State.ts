@@ -114,10 +114,8 @@ export interface CreditLineState {
     // portfolio: GetUserPortfolioResponse;
     portfolio: {
       borrowerLineOfCredits: Address[];
-      // borrowerLineOfCreditAddresses: string[];
-      lenderPositions: CreditPosition[]; // @cleanup type: string
+      lenderPositions: string[];
       arbiterLineOfCredits: Address[];
-      // arbiterLineOfCreditAddresses: string[];
     };
   };
   statusMap: {

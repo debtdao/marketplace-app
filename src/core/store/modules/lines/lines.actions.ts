@@ -128,11 +128,6 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
     const tokenPrices = TokensSelectors.selectTokenPrices(state);
 
     // @TODO check if events exist to
-    console.log('User Portfolio actions state: ', state);
-    console.log('User Portfolio actions state: ', state);
-    console.log('User Portfolio actions tokenPrices: ', tokenPrices);
-
-    // debugger;
     if (selectedLine) {
       console.log('User Portfolio actions selectedLine: ', selectedLine);
       // console.log('user portfolio')
@@ -165,28 +160,6 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
     }
   }
 );
-
-// const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | undefined }, GetLinePageArgs, ThunkAPI>(
-//   'lines/getLinePage',
-//   async ({ id }, { getState, extra, dispatch }) => {
-//     const state: RootState = getState();
-//     const { creditLineService } = extra.services;
-//     // gets all primary + aux line data avaliable by defeault
-
-//     // const selectedLine = LinesSelectors.selectSelectedLinePage(state);
-//     const tokenPrices = TokensSelectors.selectTokenPrices(state);
-//     const linePageResponse = await creditLineService.getLinePage({
-//       network: state.network.current,
-//       id,
-//     });
-
-//     if (!linePageResponse) {
-//       return { linePageData: undefined };
-//     }
-//     const linePageData = linePageResponse ? formatLinePageData(linePageResponse, tokenPrices) : undefined;
-//     return { linePageData: linePageData };
-//   }
-// );
 
 const getUserLinePositions = createAsyncThunk<
   { userLinesPositions: CreditPosition[] },

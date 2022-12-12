@@ -28,7 +28,7 @@ export const collateralInitialState: CollateralState = {
   statusMap: initialCollateralActionsStatusMap,
 };
 
-const { getLinePage, getUserPortfolio } = LinesActions;
+const { getLines, getLinePage, getUserPortfolio } = LinesActions;
 
 const {
   setSelectedEscrow,
@@ -93,6 +93,30 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
     })
 
     // State changes from non collateral actions
+
+    /* -------------------------------- getLines ------------------------------- */
+    // .addCase(getLines.fulfilled, (state, { payload: { linesData:  } }) => {
+    //   if (!line) return;
+    //   let map: CollateralMap = {};
+    //   if (line.escrow) map[line.escrowId!] = line.escrow;
+    //   if (line.spigot) map[line.spigotId!] = line.spigot;
+    //   state.collateralMap = { ...state.collateralMap, ...map };
+    // })
+
+    /* -------------------------------- getLines ------------------------------- */
+    .addCase(getLines.fulfilled, (state, { payload: { linesData: lines } }) => {
+      if (!lines) return;
+      let map: CollateralMap = {};
+
+      // loop over array of lines and update collateral state
+      Object.entries(lines).map(([category, ls]) =>
+        ls?.map((line) => {
+          if (line.escrow) map[line.escrowId!] = line.escrow;
+          if (line.spigot) map[line.spigotId!] = line.spigot;
+        })
+      );
+      state.collateralMap = { ...state.collateralMap, ...map };
+    })
 
     /* -------------------------------- getLinePage ------------------------------- */
     .addCase(getLinePage.fulfilled, (state, { payload: { linePageData: line } }) => {

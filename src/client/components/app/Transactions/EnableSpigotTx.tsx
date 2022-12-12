@@ -1,6 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import _ from 'lodash';
+import { Interface } from '@ethersproject/abi';
 
 import { isValidAddress } from '@src/utils';
 //import { useHistory } from 'react-router-dom';
@@ -82,6 +83,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const selectedRevenueContractAddress = useAppSelector(CollateralSelectors.selectSelectedRevenueContract);
 
   const selectedContractFunctions = useAppSelector(OnChainMetaDataSelector.selectFunctions);
+  const contractABI = useAppSelector(OnChainMetaDataSelector.selectABI);
   //state for params
   const { header, onClose } = props;
 
@@ -95,7 +97,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const [settingTransferFunc, setTransferFunc] = useState('');
   const [revenueContractAdd, setRevenueContractAdd] = useState<string>('');
   const [revContractABI, setRevenueContractABI] = useState(false);
-  const [funcType, setFuncType] = useState({ id: '1', label: 'Repay from:', value: 'Wallet' });
+  const [funcType, setFuncType] = useState({ id: '', label: '', value: '' });
 
   const selectedAssetAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress) || TOKEN_ADDRESSES.DAI;
   // TODO pull colalteralOptions from subgraph instread of default yearn tokens
@@ -126,6 +128,33 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     }
   }, [revenueContractAdd]);
 
+  // util func to generate bytecode
+  function generateSig(funcName: string) {
+    const iface = new Interface(contractABI!);
+    let funcSig = '';
+    for (const key in iface.functions) {
+      if (funcName == iface.functions[key].name) {
+        funcSig = key;
+      }
+    }
+    console.log(iface.getSighash(funcSig));
+    return iface.getSighash(funcSig);
+  }
+
+
+  // If contract has ABI, these functions generage the bytecode for the functions
+  const onTransferFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
+    const hashedSigFunc = generateSig(newFunc.label);
+    setTransferFunc(hashedSigFunc);
+  };
+
+  const onClaimFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
+    const hashedSigFunc = generateSig(newFunc.label);
+    setClaimFunc(hashedSigFunc);
+  };
+
+  
+  // if no ABI, input bytecode manually
   const handleClaimChange = (byteCode: string) => {
     setClaimFunc(byteCode);
   };
@@ -248,6 +277,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
           headerText={t('components.transaction.enable-spigot.function-revenue')}
           typeOptions={createListItems(selectedContractFunctions!)}
           selectedType={funcType}
+          onSelectedTypeChange={onClaimFuncSelection}
         ></TxFuncSelector>
       );
     } else {
@@ -269,9 +299,11 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     if (revContractABI) {
       return (
         <TxFuncSelector
-          headerText={t('components.transaction.enable-spigot.function-revenue')}
+          headerText={t('components.transaction.enable-spigot.function-transfer')}
+          inputText={' '}
           typeOptions={createListItems(selectedContractFunctions!)}
           selectedType={funcType}
+          onSelectedTypeChange={onTransferFuncSelection}
         ></TxFuncSelector>
       );
     } else {

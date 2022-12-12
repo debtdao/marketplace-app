@@ -160,23 +160,6 @@ export const RecommendationsCard = ({ header, subHeader, items, ...props }: Reco
                 {t('components.line-card.borrower')}: {formatAddress(item.name)}
               </ItemName>
               <Divider />
-              <ItemName>
-                {' '}
-                {t('components.line-card.line')}: {item.id}
-              </ItemName>
-              <Divider />
-              <ItemName>
-                {' '}
-                <Metric>{t('components.line-card.start')}: </Metric>
-                <MetricsText>{getDate(item.start)}</MetricsText>
-              </ItemName>
-              <Divider />
-              <ItemName>
-                {' '}
-                <Metric>{t('components.line-card.end')}: </Metric>
-                <MetricsText>{getDate(item.end)}</MetricsText>
-              </ItemName>
-              <Divider />
               <Metric>
                 ${prettyNumbers(item.revenue)} / ${prettyNumbers(item.deposit)}
               </Metric>

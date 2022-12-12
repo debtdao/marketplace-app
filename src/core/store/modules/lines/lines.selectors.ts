@@ -30,7 +30,6 @@ const { ZERO_ADDRESS } = getConstants();
 
 /* ---------------------------------- State --------------------------------- */
 const selectUserWallet = (state: RootState) => state.wallet.selectedAddress;
-console.log('selectUserWallet', selectUserWallet);
 const selectLinesState = (state: RootState) => state.lines;
 
 // const selectUserLinesMetadataMap = (state: RootState) => state.lines.user.userLinesMetadataMap;
@@ -135,6 +134,10 @@ const selectEventsForLine = createSelector(
 const selectSelectedLinePage = createSelector(
   [selectSelectedLine, selectPositionsForSelectedLine, selectCollateralForSelectedLine, selectEventsForLine],
   (line, positions, collateral, events): SecuredLineWithEvents | undefined => {
+    // console.log('User Portfolio actions selectedLine line: ', line);
+    // console.log('User Portfolio actions selectedLine line positions: ', positions);
+    // console.log('User Portfolio actions selectedLine line collateral: ', collateral);
+    // console.log('User Portfolio actions selectedLine line events: ', events);
     if (!line) return undefined;
     return { ...line, positions, ...collateral, ...events };
   }
@@ -152,9 +155,7 @@ const selectUserPortfolio = createSelector(
     selectCollateralEventsMap,
   ],
   (linesMap, userPortfolio, positions, collaterals, creditEvents, collatEvents) => {
-    // console.log('User Portfolio selector positions: ', positions);
     const getSecuredLineData = (line: string): SecuredLine => {
-      // console.log('User Portfolio selected positions - secured line data: ', line);
       return {
         ...linesMap[line],
         escrow: _.find(collaterals, (m) => m.type === 'asset' && m.line === line) as AggregatedEscrow,
@@ -258,7 +259,6 @@ const selectUserPositionMetadata = createSelector(
     if (!line || !userAddress) return defaultRole;
 
     const position = selectedPosition || positions[0];
-    console.log('select user position metadata', position);
 
     switch (getAddress(userAddress!)) {
       case getAddress(line.borrower):

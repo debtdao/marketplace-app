@@ -141,7 +141,6 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     return iface.getSighash(funcSig);
   }
 
-
   // If contract has ABI, these functions generage the bytecode for the functions
   const onTransferFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
     const hashedSigFunc = generateSig(newFunc.label);
@@ -153,7 +152,6 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     setClaimFunc(hashedSigFunc);
   };
 
-  
   // if no ABI, input bytecode manually
   const handleClaimChange = (byteCode: string) => {
     setClaimFunc(byteCode);

@@ -11,9 +11,11 @@ const getABI = createAsyncThunk<{ ABI: string; Functions: [] }, String, ThunkAPI
     const { wallet, metadata } = getState();
     const { services } = extra;
     const userAddress = wallet.selectedAddress;
+    const network = wallet.networkVersion;
+
     if (!userAddress) throw new Error('WALLET NOT CONNECTED');
 
-    const OnChainMetaDataServiceResponse = await onChainMetaDataService.getContractABI(address);
+    const OnChainMetaDataServiceResponse = await onChainMetaDataService.getContractABI(address, network!);
     const ABI = OnChainMetaDataServiceResponse.data.result;
 
     // console.log('on chain meta data', OnChainMetaDataServiceResponse);

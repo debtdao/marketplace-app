@@ -1,5 +1,5 @@
 import { _getContractABI } from '@src/utils';
-import { OnChainMetaDataService, GetAddressEnsNameProps, UserService, Web3Provider, Config } from '@types';
+import { OnChainMetaDataService, GetAddressEnsNameProps, UserService, Web3Provider, Config, Network } from '@types';
 import {} from '@ethersproject/address';
 
 export class OnChainMetaDataServiceImpl implements OnChainMetaDataService {
@@ -8,8 +8,8 @@ export class OnChainMetaDataServiceImpl implements OnChainMetaDataService {
     this.web3Provider = web3Provider;
   }
 
-  public async getContractABI(address: String): Promise<any | undefined> {
-    return await _getContractABI(address);
+  public async getContractABI(address: String, network: number): Promise<any | undefined> {
+    return await _getContractABI(address, network);
   }
 
   public async getAddressEnsName(props: GetAddressEnsNameProps) {

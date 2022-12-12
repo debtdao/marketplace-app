@@ -97,6 +97,7 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
 
     // ensure consistent ordering of categories
     const categoryKeys = Object.keys(categories);
+    console.log('User Portfolio linesData - category keys', categoryKeys);
     //@ts-ignore
     const promises = await Promise.all(
       categoryKeys
@@ -110,61 +111,12 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
         !promises[i] ? all : { ...all, [category]: formatGetLinesData(promises[i]!, tokenPrices) },
       {}
     );
-
+    console.log('User Portfolio linesData - action: ', linesData);
     return { linesData };
   }
 );
 
 // TODO: Add this back so not always refetching line page data for a given line of credit.
-// const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | undefined }, GetLinePageArgs, ThunkAPI>(
-//   'lines/getLinePage',
-//   async ({ id }, { getState, extra, dispatch }) => {
-//     const state: RootState = getState();
-//     const { creditLineService } = extra.services;
-//     // gets all primary + aux line data avaliable by defeault
-
-//     const selectedLine = LinesSelectors.selectSelectedLinePage(state);
-//     const tokenPrices = TokensSelectors.selectTokenPrices(state);
-
-//     // @TODO check if events exist to
-//     console.log('User Portfolio actions state: ', state);
-//     console.log('User Portfolio actions state: ', state);
-//     console.log('User Portfolio actions tokenPrices: ', tokenPrices);
-
-//     // debugger;
-//     if (selectedLine) {
-//       console.log('User Portfolio actions selectedLine: ', selectedLine);
-//       // console.log('user portfolio')
-//       return { linePageData: selectedLine };
-//     } else {
-//       try {
-//         const linePageData = formatLinePageData(
-//           await creditLineService.getLinePage({ network: state.network.current, id }),
-//           tokenPrices
-//         );
-
-//         console.log('user portfolio getLinePage data ', linePageData);
-
-//         // @TODO dispatch actions to save collateral and events
-//         // enable collateral or add collateral
-//         // save module to Map
-//         // dispatch(CollateralActions.saveModuleToMap(spigot.id, spigot ));
-//         // function does not exist in this file
-//         // save events to map
-//         // dispatch(LineActions.setCreditEvetntsModule(spigot.id, collateralEvents ));
-//         // save events to map
-//         // dispatch(CollateralActions.saveEventsToMap(spigot.id, collateralEvents ));
-
-//         if (!linePageData) throw new Error();
-//         return { linePageData };
-//       } catch (e) {
-//         console.log('failed getting full line page data', e);
-//         return { linePageData: undefined };
-//       }
-//     }
-//   }
-// );
-
 const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | undefined }, GetLinePageArgs, ThunkAPI>(
   'lines/getLinePage',
   async ({ id }, { getState, extra, dispatch }) => {
@@ -172,20 +124,69 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
     const { creditLineService } = extra.services;
     // gets all primary + aux line data avaliable by defeault
 
-    // const selectedLine = LinesSelectors.selectSelectedLinePage(state);
+    const selectedLine = LinesSelectors.selectSelectedLinePage(state);
     const tokenPrices = TokensSelectors.selectTokenPrices(state);
-    const linePageResponse = await creditLineService.getLinePage({
-      network: state.network.current,
-      id,
-    });
 
-    if (!linePageResponse) {
-      return { linePageData: undefined };
+    // @TODO check if events exist to
+    console.log('User Portfolio actions state: ', state);
+    console.log('User Portfolio actions state: ', state);
+    console.log('User Portfolio actions tokenPrices: ', tokenPrices);
+
+    // debugger;
+    if (selectedLine) {
+      console.log('User Portfolio actions selectedLine: ', selectedLine);
+      // console.log('user portfolio')
+      return { linePageData: selectedLine };
+    } else {
+      try {
+        const linePageData = formatLinePageData(
+          await creditLineService.getLinePage({ network: state.network.current, id }),
+          tokenPrices
+        );
+
+        console.log('user portfolio getLinePage data ', linePageData);
+
+        // @TODO dispatch actions to save collateral and events
+        // enable collateral or add collateral
+        // save module to Map
+        // dispatch(CollateralActions.saveModuleToMap(spigot.id, spigot ));
+        // function does not exist in this file
+        // save events to map
+        // dispatch(LineActions.setCreditEvetntsModule(spigot.id, collateralEvents ));
+        // save events to map
+        // dispatch(CollateralActions.saveEventsToMap(spigot.id, collateralEvents ));
+
+        if (!linePageData) throw new Error();
+        return { linePageData };
+      } catch (e) {
+        console.log('failed getting full line page data', e);
+        return { linePageData: undefined };
+      }
     }
-    const linePageData = linePageResponse ? formatLinePageData(linePageResponse, tokenPrices) : undefined;
-    return { linePageData: linePageData };
   }
 );
+
+// const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | undefined }, GetLinePageArgs, ThunkAPI>(
+//   'lines/getLinePage',
+//   async ({ id }, { getState, extra, dispatch }) => {
+//     const state: RootState = getState();
+//     const { creditLineService } = extra.services;
+//     // gets all primary + aux line data avaliable by defeault
+
+//     // const selectedLine = LinesSelectors.selectSelectedLinePage(state);
+//     const tokenPrices = TokensSelectors.selectTokenPrices(state);
+//     const linePageResponse = await creditLineService.getLinePage({
+//       network: state.network.current,
+//       id,
+//     });
+
+//     if (!linePageResponse) {
+//       return { linePageData: undefined };
+//     }
+//     const linePageData = linePageResponse ? formatLinePageData(linePageResponse, tokenPrices) : undefined;
+//     return { linePageData: linePageData };
+//   }
+// );
 
 const getUserLinePositions = createAsyncThunk<
   { userLinesPositions: CreditPosition[] },

@@ -168,6 +168,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       const categories: { [key: string]: string[] } = {};
       const lines: { [key: string]: SecuredLine } = {};
       let positions: PositionMap = {};
+      console.log('User Portfolio linesData - reducer: ', linesData);
 
       // loop over nested structure of new Lines and update state
       Object.entries(linesData).map(([category, ls]) =>
@@ -176,13 +177,14 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
           // update positions for each line
           const linePositionMap = _.zipObject(_.values(l.positionIds), _.values(l.positions));
           positions = { ...positions, ...linePositionMap };
+          console.log('User Portfolio position map for each line', linePositionMap);
 
           state.statusMap.user.linesActionsStatusMap[l.id] = initialLineActionsStatusMap;
           // save line id to category for reference
           categories[category] = [...(categories[category] || []), l.id];
         })
       );
-      // console.log('User Portfolio get line positions: ', positions);
+      console.log('User Portfolio get line positions: ', positions);
       state.linesMap = { ...state.linesMap, ...lines };
       state.positionsMap = { ...state.positionsMap, ...positions };
       state.categories = { ...state.categories, ...categories };

@@ -144,6 +144,7 @@ export function formatGetLinesData(
       status,
       ...rest
     } = data;
+    console.log('User Portfolio formatGetLinesData positions 1: ', positions);
     const { credit, spigot, escrow } = formatSecuredLineData(
       rest.id,
       positions,
@@ -151,7 +152,7 @@ export function formatGetLinesData(
       spigotRes?.revenues ?? [],
       tokenPrices
     );
-
+    console.log('User Portfolio formatGetLinesData positions 2: ', credit.positions);
     // const deposits = escrowRes?.deposits.map((d: any) => ({ ...d, token: d.token.id }));
     // formatAggData (positions, deposits, summaries);
 
@@ -159,7 +160,6 @@ export function formatGetLinesData(
       ...rest,
       ...credit,
       status: status.toLowerCase() as LineStatusTypes,
-      positions,
       borrower,
       spigot: {
         ...(spigotRes ?? {}),

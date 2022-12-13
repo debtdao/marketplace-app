@@ -81,7 +81,7 @@ export interface TxDropdownProps {
   inputText?: string;
   inputError?: boolean;
   selectedType: { id: string; label: string; value: string };
-  onSelectedTypeChange?: (newRepayType: { id: string; label: string; value: string }) => void;
+  onSelectedTypeChange: (newRepayType: { id: string; label: string; value: string }) => void;
   typeOptions?: { id: string; label: string; value: string }[];
   readOnly?: boolean;
   loading?: boolean;
@@ -106,7 +106,6 @@ export const TxFuncSelector: FC<TxDropdownProps> = ({
   const { t } = useAppTranslation('common');
 
   let listItems: SearchListItem[] = [];
-  //let zappableItems: SearchListItem[] = [];
   let selectedItem: SearchListItem = {
     id: selectedType?.id || '',
     label: selectedType?.label,
@@ -119,8 +118,8 @@ export const TxFuncSelector: FC<TxDropdownProps> = ({
       .map((item) => {
         return {
           id: item!.id,
-          // icon: '',
           label: item!.label,
+          value: item!.value,
         };
       });
   }
@@ -131,8 +130,8 @@ export const TxFuncSelector: FC<TxDropdownProps> = ({
 
   const [openedSearch, setOpenedSearch] = useState(false);
   const searchListHeader = readOnly
-    ? t('components.transaction.deposit-and-repay.select-repay')
-    : t('components.transaction.deposit-and-repay.select-repay');
+    ? t('components.transaction.enable-spigot.select-function')
+    : t('components.transaction.enable-spigot.select-function');
 
   return (
     <StyledTxCreditLineInput {...props}>
@@ -143,8 +142,7 @@ export const TxFuncSelector: FC<TxDropdownProps> = ({
             list={listItems}
             headerText={searchListHeader}
             selected={selectedItem}
-            //@ts-ignore
-            setSelected={(item) => onSelectedTypeChange(item)}
+            setSelected={(item) => onSelectedTypeChange(item!)}
             onCloseList={() => setOpenedSearch(false)}
           />
         </CSSTransition>
@@ -154,7 +152,11 @@ export const TxFuncSelector: FC<TxDropdownProps> = ({
       <>
         <CreditLineInfo center={false} onClick={openSearchList}>
           <CreditLineData>
-            <LineTitle ellipsis> {selectedType?.label !== '' ? selectedType.label : 'Select Function'} </LineTitle>
+            <LineTitle ellipsis>
+              {selectedType?.label !== ''
+                ? t(selectedType.label)
+                : t('components.transaction.enable-spigot.select-function')}
+            </LineTitle>
           </CreditLineData>
         </CreditLineInfo>
       </>

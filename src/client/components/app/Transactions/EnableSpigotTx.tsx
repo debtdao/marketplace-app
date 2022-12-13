@@ -97,7 +97,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     setTransferFunc(byteCode);
   };
 
-  const notArbiter = selectedLine?.status === ACTIVE_STATUS; // TODO
+  const notArbiter = selectedLine?.status === ACTIVE_STATUS;
   if (!notArbiter) {
     return null;
   }
@@ -136,6 +136,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       spigotAddress: selectedSpigot.id,
       revenueContract: selectedRevenueContractAddress,
       setting: {
+        //TO DO: QUERY OWNERSPLIT ON SPIGOTENTITY
         ownerSplit: '100',
         claimFunction: settingClaimFunc,
         transferOwnerFunction: settingTransferFunc,
@@ -159,7 +160,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   };
 
   const createListItems = (functions: string[]) => {
-    if (functions == undefined) {
+    if (!functions) {
       setRevenueContractABI(false);
       return;
     }
@@ -261,7 +262,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
           key={t('components.transaction.enable-spigot.cta') as string}
           data-testid={`modal-action-${t('components.transaction.enable-spigot.cta').toLowerCase()}`}
           onClick={enableSpigot}
-          disabled={notArbiter}
+          disabled={false}
           contrast={true}
           isLoading={transactionLoading}
         >

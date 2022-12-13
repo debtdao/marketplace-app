@@ -79,8 +79,8 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   // need to get call statusMap from state for tx error messages
   //const collateralStatusMap = useAppSelector(CollateralSelectors.selectStatusMap);
-  const selectedSpigotAddress = useAppSelector(CollateralSelectors.selectSelectedSpigot);
-  const selectedRevenueContractAddress = useAppSelector(CollateralSelectors.selectSelectedRevenueContract);
+  const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
+  const selectedRevenueContractAddress = useAppSelector(CollateralSelectors.selectSelectedRevenueContractAddress);
 
   const selectedContractFunctions = useAppSelector(OnChainMetaDataSelector.selectFunctions);
   const contractABI = useAppSelector(OnChainMetaDataSelector.selectABI);
@@ -107,8 +107,8 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
 
   useEffect(() => {
     // if escrow not set yet then correct state
-    if (selectedLine?.spigot && !selectedSpigotAddress) {
-      dispatch(CollateralActions.setSelectedEscrow({ escrowAddress: selectedLine.spigot.id }));
+    if (!selectedSpigot) {
+      console.log('no spigot selected to add revenue contract to', selectedLine);
     }
   });
 
@@ -172,14 +172,14 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
 
     // TODO set error in state to display no line selected
 
-    if (!selectedLine || !selectedSpigotAddress) {
-      console.log('no line/spigot to enable on', selectedLine?.id, selectedSpigotAddress);
+    if (!selectedLine || !selectedSpigot) {
+      console.log('no line/spigot to enable on', selectedLine?.id, selectedSpigot);
       setLoading(false);
       return; // TODO throw error ot UI component
     }
 
     if (!selectedRevenueContractAddress) {
-      console.log('no revenue contract selected to enable', selectedSpigotAddress);
+      console.log('no revenue contract selected to enable', selectedSpigot);
       setLoading(false);
       return; // TODO throw error ot UI component
     }
@@ -193,7 +193,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     const transactionData: AddSpigotProps = {
       network: walletNetwork,
       lineAddress: selectedLine.id,
-      spigotAddress: selectedSpigotAddress,
+      spigotAddress: selectedSpigot.id,
       revenueContract: selectedRevenueContractAddress,
       setting: {
         ownerSplit: settingOwnerSplit,

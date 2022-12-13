@@ -5,7 +5,7 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { TokenIcon } from '@components/app';
 import { useAppTranslation } from '@hooks';
 import { Text, Icon, SearchList, LogoIcon, ZapIcon, SearchListItem } from '@components/common';
-import { AggregatedCreditLine } from '@src/core/types';
+import { SecuredLine } from '@src/core/types';
 
 const LineTitle = styled(Text)`
   color: ${({ theme }) => theme.colors.txModalColors.text};
@@ -129,9 +129,9 @@ export interface TxCreditLineInputProps {
   headerText?: string;
   inputText?: string;
   inputError?: boolean;
-  selectedCredit: AggregatedCreditLine;
+  selectedCredit: SecuredLine;
   onSelectedCreditLineChange?: (address: string) => void;
-  creditOptions?: AggregatedCreditLine[];
+  creditOptions?: SecuredLine[];
   readOnly?: boolean;
   loading?: boolean;
   loadingText?: string;

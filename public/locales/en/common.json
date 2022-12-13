@@ -10,6 +10,10 @@
       "searching-text": "Please search for another asset",
       "text": "No data to display"
     },
+    "no-borrower-positions": {
+      "header": "No User Positions Available",
+      "content": "No User Content"
+    },
     "positions-card": {
       "positions": "Positions",
       "drate": "dRate",
@@ -184,8 +188,8 @@
       },
       "deploy-line": {
         "header": "Deploy Credit Line",
-        "select-borrower": "1. Select a borrower for the line",
-        "select-ttl": "2. Select a deadline for the line",
+        "select-borrower": "1. Insert a borrower for the line",
+        "select-ttl": "2. Insert a deadline for the line",
         "time-to-live": "Time this line will remain active for (in days):",
         "cratio": "3. Select a Collateralization Ratio",
         "cratio-input": "Your Cratio",
@@ -283,6 +287,7 @@
     "market": "Debt DAO Credit Market",
     "lines": "Line Of Credit",
     "portfolio": "Credit Investment Portfolio",
+    "disclaimer": "Disclaimer",
     "settings": "Settings",
     "vault": "Vaults",
     "vaults": "Vaults",

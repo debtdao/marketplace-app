@@ -221,13 +221,12 @@ export const PositionsTable = (props: PositionsProps) => {
     : `${t('components.connect-button.connect')}`;
 
   //Returns a list of transactions to display on positions table
-  const getUserPositionActions = (event: CreditPosition) => {
-    //If proposed and user is borrower, display return action (accept/mutualconsent)
-    if (event.status === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE) {
+  const getUserPositionActions = (position: CreditPosition) => {
+    if (position.status === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE) {
       return [ApproveMutualConsent];
     }
     //If user is lender, and line has amount to withdraw, return withdraw action
-    if (isWithdrawable(event.deposit, event.principal, event.lender, event.interestRepaid)) {
+    if (isWithdrawable(position.deposit, position.principal, position.lender, position.interestRepaid)) {
       return actions;
     }
     //Returns actions for borrower on open line
@@ -309,20 +308,34 @@ export const PositionsTable = (props: PositionsProps) => {
               grow: '1',
             },
           ]}
-          data={positions?.map((p) => {
-            return {
-              // this needs to be humanized to correct amount depending on the token.
-              deposit: humanize('amount', p.deposit, p.token.decimals, 2),
-              drate: `${normalizeAmount(p.dRate, 2)} %`,
-              frate: `${normalizeAmount(p.fRate, 2)} %`,
-              status: p.status,
-              principal: humanize('amount', p.principal, p.token.decimals, 2),
-              interest: humanize('amount', p.interestAccrued, p.token.decimals, 2),
-              lender: formatAddress(p.lender),
-              token: p.token.symbol,
-              actions: <ActionButtons value={p.id} actions={getUserPositionActions(p)} />,
-            };
-          })}
+          data={positions?.map((position) => ({
+            // this needs to be humanized to correct amount depending on the token.
+            deposit: humanize('amount', position.deposit, position.token.decimals, 2),
+            drate: `${position.dRate} %`,
+            frate: `${position.fRate} %`,
+            status: position.status,
+            principal: humanize('amount', position.principal, position.token.decimals, 2),
+            interest: humanize('amount', position.interestAccrued, position.token.decimals, 2),
+            lender: (
+              <RouterLink to={`/portfolio/${position.lender}`} key={position.id} selected={false}>
+                {formatAddress(position.lender)}
+                <Redirect />
+              </RouterLink>
+            ),
+            token: (
+              <a
+                //change to etherscan on launch
+                href={`https://etherscan.io/address/${position.token.id}`}
+                target={'_blank'}
+                key={`${position.token.symbol}-${position.id}`}
+                rel={'noreferrer'}
+              >
+                {position.token.symbol}
+                <Redirect />
+              </a>
+            ),
+            actions: <ActionButtons value={position.id} actions={getUserPositionActions(position)} />,
+          }))}
           SearchBar={
             <>
               <Input

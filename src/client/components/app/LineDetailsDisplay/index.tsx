@@ -2,9 +2,10 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
 
-import { useAppSelector, useAppTranslation } from '@hooks';
+import { SecuredLine, SecuredLineWithEvents, CreditPosition } from '@types';
+import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { RedirectIcon, Text } from '@components/common';
-import { LinesSelectors } from '@store';
+import { LinesActions, LinesSelectors } from '@store';
 
 import { LineMetadata } from './LineMetadata';
 import { PositionsTable } from './PositionsTable';

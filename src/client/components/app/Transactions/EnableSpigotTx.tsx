@@ -166,7 +166,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     }
     const functionList: any = [];
     functions.forEach((func, i) => {
-      const obj = { id: i, label: func, value: func };
+      const obj = { id: i, label: func, value: '' };
       functionList.push(obj);
     });
     return functionList;

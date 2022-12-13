@@ -242,10 +242,6 @@ export interface OnChainMetaDataState {
   ENS: [] | undefined;
 }
 
-interface TokenCollateralMap {
-  [contract: string]: { [token: string]: Status };
-}
-
 export interface UserVaultActionsStatusMap {
   getPosition: Status;
   getMetadata: Status;

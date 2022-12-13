@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import { useAppTranslation } from '@hooks';
-import { Text, Icon, SearchList, ZapIcon, SearchListItem, WalletIcon } from '@components/common';
+import { Text, SearchList, SearchListItem } from '@components/common';
 
 const LineTitle = styled(Text)`
   color: ${({ theme }) => theme.colors.txModalColors.text};
@@ -19,54 +19,6 @@ const CreditLineData = styled.div`
   padding: ${({ theme }) => theme.layoutPadding};
   font-size: 1.7rem;
   flex: 1;
-`;
-
-const StyledIcon = styled(Icon)`
-  width: 6.4rem;
-  padding: 1rem;
-`;
-
-const CreditLineName = styled.div`
-  width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  text-align: center;
-  font-size: 1.3rem;
-  max-height: 3rem;
-`;
-
-const CreditLineListIcon = styled(Icon)`
-  position: absolute;
-  top: 0.8rem;
-  right: 0.4rem;
-  color: ${({ theme }) => theme.colors.txModalColors.onBackgroundVariantColor};
-`;
-
-const CreditLineIconContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-`;
-
-const CreditLineSelector = styled.div<{ onClick?: () => void; center?: boolean }>`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: ${({ center }) => (center ? '100%' : '8.4rem')};
-  height: ${({ center }) => (center ? '12.6rem' : undefined)};
-  border-radius: ${({ theme }) => theme.globalRadius};
-  background: ${({ theme }) => theme.colors.txModalColors.backgroundVariant};
-  color: ${({ theme }) => theme.colors.txModalColors.textContrast};
-  fill: ${({ theme }) => theme.colors.txModalColors.text};
-  flex-shrink: 0;
-  padding: 0 0.7rem;
-  gap: 0.7rem;
-  user-select: none;
-  position: relative;
-  ${({ onClick }) => onClick && 'cursor: pointer;'}
 `;
 
 const CreditLineInfo = styled.div<{ center?: boolean }>`
@@ -124,11 +76,6 @@ const StyledTxCreditLineInput = styled(TransitionGroup)`
   }
 `;
 
-//const amountToNumber = (amount: string) => {
-//  const parsedAmount = amount.replace(/[%,$ ]/g, '');
-//  return parseInt(parsedAmount);
-//};
-
 export interface TxDropdownProps {
   headerText?: string;
   inputText?: string;
@@ -162,7 +109,6 @@ export const TxFuncSelector: FC<TxDropdownProps> = ({
   //let zappableItems: SearchListItem[] = [];
   let selectedItem: SearchListItem = {
     id: selectedType?.id || '',
-    // icon: selectedCredit?.icon,
     label: selectedType?.label,
     value: selectedType?.value,
   };
@@ -198,7 +144,7 @@ export const TxFuncSelector: FC<TxDropdownProps> = ({
             headerText={searchListHeader}
             selected={selectedItem}
             //@ts-ignore
-            setSelected={(item) => (onSelectedTypeChange ? onSelectedTypeChange(item) : undefined)}
+            setSelected={(item) => onSelectedTypeChange(item)}
             onCloseList={() => setOpenedSearch(false)}
           />
         </CSSTransition>
@@ -208,7 +154,7 @@ export const TxFuncSelector: FC<TxDropdownProps> = ({
       <>
         <CreditLineInfo center={false} onClick={openSearchList}>
           <CreditLineData>
-            <LineTitle ellipsis> Select Function </LineTitle>
+            <LineTitle ellipsis> {selectedType?.label !== '' ? selectedType.label : 'Select Function'} </LineTitle>
           </CreditLineData>
         </CreditLineInfo>
       </>

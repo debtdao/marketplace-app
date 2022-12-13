@@ -4,33 +4,22 @@ import _ from 'lodash';
 
 import { generateSig } from '@src/utils';
 import { isValidAddress } from '@src/utils';
-//import { useHistory } from 'react-router-dom';
-import {
-  useAppTranslation,
-  useAppDispatch,
-  // used to dummy token for dev
-  useAppSelector,
-} from '@hooks';
+import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
 import { ACTIVE_STATUS, AddSpigotProps } from '@src/core/types';
-import { TOKEN_ADDRESSES } from '@src/config/constants';
 import {
-  TokensSelectors,
   WalletSelectors,
   LinesSelectors,
   OnChainMetaDataActions,
   CollateralActions,
-  selectDepositTokenOptionsByAsset,
   CollateralSelectors,
   OnChainMetaDataSelector,
 } from '@store';
-//import { Button, Icon, Link } from '@components/common';
 
 import { TxContainer } from './components/TxContainer';
 import { TxActionButton } from './components/TxActions';
 import { TxActions } from './components/TxActions';
 import { TxStatus } from './components/TxStatus';
 import { TxAddressInput } from './components/TxAddressInput';
-import { TxNumberInput } from './components/TxNumberInput';
 import { TxByteInput } from './components/TxByteInput';
 import { TxFuncSelector } from './components/TxFuncSelector';
 
@@ -43,42 +32,13 @@ interface EnableSpigotTxProps {
   onClose: () => void;
 }
 
-//const BadLineErrorContainer = styled.div``;
-
-//const BadLineErrorBody = styled.h3`
-//  ${({ theme }) => `
-//    margin: ${theme.spacing.lg} 0;
-//    font-size: ${theme.fonts.sizes.md};;
-//  `}
-//`;
-
-//const BadLineErrorImageContainer = styled.div``;
-
-//const BadLineErrorImage = styled.img``;
-
-//const StyledTxActionButton = styled(Button)<{ color?: string; contrast?: boolean }>`
-//  height: 4rem;
-//  flex: 1;
-//  font-size: 1.6rem;
-//  font-weight: 700;
-//  gap: 0.5rem;
-//  background-color: ${({ theme }) => theme.colors.txModalColors.primary};
-//  color: ${({ theme }) => theme.colors.txModalColors.onPrimary};
-//`;
-
 export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
-  //const history = useHistory();
-
   // user data
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
-  const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
-  const walletAddresssk = useAppSelector(WalletSelectors.selectSelectedAddress);
-  //const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
+  //Line data
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
-  // need to get call statusMap from state for tx error messages
-  //const collateralStatusMap = useAppSelector(CollateralSelectors.selectStatusMap);
   const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
   const selectedRevenueContractAddress = useAppSelector(CollateralSelectors.selectSelectedRevenueContractAddress);
 
@@ -97,13 +57,8 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const [settingTransferFunc, setTransferFunc] = useState('');
   const [revenueContractAdd, setRevenueContractAdd] = useState<string>('');
   const [revContractABI, setRevenueContractABI] = useState(false);
-  const [funcType, setFuncType] = useState({ id: '', label: '', value: '' });
-
-  //const selectedAssetAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress) || TOKEN_ADDRESSES.DAI;
-  // TODO pull colalteralOptions from subgraph instread of default yearn tokens
-  const collateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
-  //const selectedAsset  _.find(collateralOptions, (t) => t.address === selectedAssetAddress);
-  // TODO get token prices from yearn API and display
+  const [claimFuncType, setClaimFuncType] = useState({ id: '', label: '', value: '' });
+  const [transferFuncType, setTransferFuncType] = useState({ id: '', label: '', value: '' });
 
   useEffect(() => {
     // if escrow not set yet then correct state
@@ -113,34 +68,30 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   });
 
   useEffect(() => {
-    console.log('repay type', funcType);
-  }, [funcType]);
+    console.log('selected Line', selectedLine);
+  }, [selectedLine]);
 
   useEffect(() => {
     if (isValidAddress(revenueContractAdd)) {
-      console.log(revenueContractAdd);
       dispatch(OnChainMetaDataActions.getABI(revenueContractAdd));
       setRevenueContractABI(true);
     } else {
       dispatch(OnChainMetaDataActions.clearABI());
       setRevenueContractABI(false);
-      console.log('ClEAR STATE');
     }
   }, [revenueContractAdd]);
 
   // If contract has ABI, these functions generage the bytecode for the functions
   const onTransferFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
     const hashedSigFunc = generateSig(newFunc.label, contractABI!);
-    console.log(hashedSigFunc);
     setTransferFunc(hashedSigFunc);
-    console.log(settingTransferFunc);
+    setTransferFuncType(newFunc);
   };
 
   const onClaimFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
     const hashedSigFunc = generateSig(newFunc.label, contractABI!);
-    console.log(hashedSigFunc);
     setClaimFunc(hashedSigFunc);
-    console.log(settingClaimFunc);
+    setClaimFuncType(newFunc);
   };
 
   // if no ABI, input bytecode manually
@@ -184,7 +135,6 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       return; // TODO throw error ot UI component
     }
 
-    console.log('wallet network on enable spigy tx', walletNetwork, walletIsConnected, walletAddresssk);
     if (!walletNetwork) {
       setLoading(false);
       return; // TODO throw error ot UI component
@@ -265,7 +215,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
         <TxFuncSelector
           headerText={t('components.transaction.enable-spigot.function-revenue')}
           typeOptions={createListItems(selectedContractFunctions!)}
-          selectedType={funcType}
+          selectedType={claimFuncType}
           onSelectedTypeChange={onClaimFuncSelection}
         ></TxFuncSelector>
       );
@@ -290,7 +240,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
           headerText={t('components.transaction.enable-spigot.function-transfer')}
           inputText={' '}
           typeOptions={createListItems(selectedContractFunctions!)}
-          selectedType={funcType}
+          selectedType={transferFuncType}
           onSelectedTypeChange={onTransferFuncSelection}
         ></TxFuncSelector>
       );

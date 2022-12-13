@@ -119,6 +119,8 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       return;
     }
 
+    console.log('enable-spigot', selectedLine);
+
     if (!revenueContractAdd) {
       console.log('enable-spigot', revenueContractAdd);
       setLoading(false);
@@ -143,6 +145,8 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
         transferOwnerFunction: settingTransferFunc,
       },
     };
+
+    console.log('enable-spigot', transactionData);
 
     dispatch(CollateralActions.addSpigot(transactionData)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {

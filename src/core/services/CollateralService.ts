@@ -161,6 +161,8 @@ export class CollateralServiceImpl implements CollateralService {
       ]
     );
 
+    console.log('line address ', props.lineAddress, 'abi ', this.lineAbi, 'settings ', props.setting);
+
     return await this.executeContractMethod(
       props.lineAddress,
       this.lineAbi,

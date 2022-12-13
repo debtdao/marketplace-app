@@ -152,8 +152,13 @@ export class CollateralServiceImpl implements CollateralService {
     }
 
     const settingsData = ethers.utils.AbiCoder.prototype.encode(
-      ['uint8', 'bytes4', 'bytes4'],
-      [props.setting.ownerSplit, props.setting.claimFunction, props.setting.transferOwnerFunction]
+      ['address', 'uint8', 'bytes4', 'bytes4'],
+      [
+        '0x3730954eC1b5c59246C1fA6a20dD6dE6Ef23aEa6',
+        props.setting.ownerSplit,
+        props.setting.claimFunction,
+        props.setting.transferOwnerFunction,
+      ]
     );
 
     return await this.executeContractMethod(

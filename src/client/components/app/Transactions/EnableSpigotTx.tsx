@@ -40,7 +40,6 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   //Line data
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
-  const selectedRevenueContractAddress = useAppSelector(CollateralSelectors.selectSelectedRevenueContractAddress);
 
   const selectedContractFunctions = useAppSelector(OnChainMetaDataSelector.selectFunctions);
   const contractABI = useAppSelector(OnChainMetaDataSelector.selectABI);
@@ -61,9 +60,9 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   useEffect(() => {
     // if escrow not set yet then correct state
     if (!selectedSpigot) {
-      console.log('no spigot selected to add revenue contract to', selectedLine);
+      dispatch(CollateralActions.setSelectedSpigot({ spigotAddress: selectedLine?.spigotId }));
     }
-  });
+  }, [selectedLine]);
 
   useEffect(() => {
     if (isValidAddress(revenueContractAdd)) {
@@ -115,17 +114,19 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     setLoading(true);
 
     if (!selectedLine || !selectedSpigot) {
-      console.log('no line/spigot to enable on', selectedLine?.id, selectedSpigot);
+      console.log('enable-spigot', selectedLine?.id, selectedSpigot);
       setLoading(false);
       return;
     }
 
-    if (!selectedRevenueContractAddress) {
+    if (!revenueContractAdd) {
+      console.log('enable-spigot', revenueContractAdd);
       setLoading(false);
       return;
     }
 
     if (!walletNetwork) {
+      console.log('enable-spigot', !walletNetwork);
       setLoading(false);
       return;
     }
@@ -134,7 +135,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       network: walletNetwork,
       lineAddress: selectedLine.id,
       spigotAddress: selectedSpigot.id,
-      revenueContract: selectedRevenueContractAddress,
+      revenueContract: revenueContractAdd,
       setting: {
         //TO DO: QUERY OWNERSPLIT ON SPIGOTENTITY
         ownerSplit: '100',

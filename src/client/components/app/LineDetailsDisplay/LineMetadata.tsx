@@ -218,7 +218,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
     }
   };
 
-  const formattedCollataralData = allCollateral.map((c) => ({
+  const formattedCollateralData = allCollateral.map((c) => ({
     ...c,
     key: c.type + c.token.toString(),
     // header: c.type + c.token.toString(),
@@ -347,7 +347,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
               grow: '1',
             },
           ]}
-          data={formattedCollataralData ? formattedCollataralData : []}
+          data={formattedCollateralData ? formattedCollateralData : []}
           SearchBar={getCollateralTableActions()}
           searching={false}
           onAction={undefined}

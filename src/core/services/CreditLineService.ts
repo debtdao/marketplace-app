@@ -32,6 +32,7 @@ import {
   GetUserPortfolioResponse,
   GetLineEventsProps,
   GetLineEventsResponse,
+  LineEventFragResponse,
 } from '@types';
 import { getConfig } from '@config';
 import { LineOfCreditABI } from '@services/contracts';
@@ -401,7 +402,6 @@ export class CreditLineServiceImpl implements CreditLineService {
   public async getLinePage(prop: GetLinePageProps): Promise<GetLinePageResponse | undefined> {
     const response = getLinePage(prop)
       .then((data) => {
-        console.log('User Portfolio selectedLine 1.5: ', data);
         return data;
       })
       .catch((err) => {

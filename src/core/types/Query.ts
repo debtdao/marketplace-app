@@ -197,18 +197,10 @@ export interface GetLinesResponse {
 }
 
 export interface GetLineEventsResponse {
-  // lines: BaseLineFragResponse & {
-  //   positions: BasePositionFragResponse[];
-  //   escrow: BaseEscrowFragResponse;
-  //   spigot: {
-  //     id: Address;
-  //     summaries: {
-  //       totalVolumeUsd: string;
-  //       timeOfFirstIncome: number;
-  //       timeOfLastIncome: number;
-  //     };
-  //   };
-  // };
+  events: LineEventFragResponse[];
+  spigot: {
+    events?: SpigotEventFragResponse[];
+  };
 }
 
 export interface GetLinePageResponse extends BaseLineFragResponse {

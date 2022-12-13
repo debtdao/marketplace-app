@@ -34,6 +34,7 @@ import {
   SupportedOracleTokenResponse,
   GetUserPortfolioResponse,
   GetLineEventsResponse,
+  LineEventFragResponse,
 } from '@types';
 
 // *************** USER ***************

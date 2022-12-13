@@ -27,6 +27,7 @@ import {
 import {
   formatGetLinesData,
   formatLinePageData,
+  formatLineWithEvents,
   formatUserPortfolioData,
   // validateLineDeposit,
   // validateLineWithdraw,
@@ -124,20 +125,17 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
     const selectedLine = LinesSelectors.selectSelectedLinePage(state);
     const tokenPrices = TokensSelectors.selectTokenPrices(state);
 
-    // @TODO check if events exist to
+    // query and add credit and collateral events to pre-existing line
     if (selectedLine) {
-      // console.log('User Portfolio actions selectedLine 1: ', selectedLine);
-      // selectedLineWithEvents = formatToSecuredLineWithEvents(selectedLine);
-      // return { linePageData: selectedLineWithEvents }
-      return { linePageData: selectedLine };
+      const lineEvents = await creditLineService.getLineEvents({ network: state.network.current, id });
+      const selectedLineWithEvents = formatLineWithEvents(selectedLine, lineEvents);
+      return { linePageData: selectedLineWithEvents };
     } else {
       try {
         const linePageData = formatLinePageData(
           await creditLineService.getLinePage({ network: state.network.current, id }),
           tokenPrices
         );
-        console.log('User Portfolio actions selectedLine 2: ', linePageData);
-        // console.log('user portfolio getLinePage data ', linePageData);
 
         // @TODO dispatch actions to save collateral and events
         // enable collateral or add collateral

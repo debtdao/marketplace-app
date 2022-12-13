@@ -50,7 +50,8 @@ const BASE_POSITION_FRAGMENT = gql`
 `;
 
 // TODO: This fragment is broken and needs to be fixed to be used again.
-// I cannot figure out why it does not work in the queries.
+// I cannot figure out why it does not work in the queries. Copying and pasting the
+// properties where the fragment is needed results in the appropriate responses.
 const LINE_EVENT_FRAGMENT = gql`
   ${TOKEN_FRAGMENT}
   fragment LineEventFrag on LineEventWithValue {
@@ -243,6 +244,17 @@ export const GET_LINE_EVENTS_QUERY = gql`
     lineOfCredit(id: $id) {
       events {
         ...LineEventFrag
+        #id
+        #__typename
+        #timestamp
+        #amount
+        #value
+        #position {
+        #  id
+        #  token {
+        #    ...TokenFrag
+        #  }
+        #}
       }
 
       spigot {

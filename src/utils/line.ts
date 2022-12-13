@@ -30,6 +30,8 @@ import {
   LENDER_POSITION_ROLE,
   BaseLineFragResponse,
   EscrowDeposit,
+  GetLineEventsResponse,
+  AggregatedEscrow,
 } from '@types';
 
 import { humanize, normalizeAmount, normalize } from './format';
@@ -312,6 +314,42 @@ export const formatSecuredLineData = (
   };
 };
 
+// TODO: Modify/adjust this to replace mergeCollateralEvents (formatCollateralEvents)
+// given that there are 3 duplicative uses of collateral events in this file!!
+export const formatEscrowToCollateralEvents = (escrow: AggregatedEscrow | undefined): CollateralEvent[] => {
+  const collateralEvents: CollateralEvent[] = escrow!
+    ? _.map(escrow.deposits, function (deposit) {
+        return {
+          type: escrow.type,
+          id: deposit.token.address,
+          // TODO: timestamp should probably be removed from the type given this aggregates
+          // collateral by type and token address
+          timestamp: 0,
+          amount: Number(deposit.amount),
+          // TODO: replace with correct USD value when we have it
+          value: 0,
+        } as CollateralEvent;
+      })
+    : [];
+  return collateralEvents;
+};
+
+export const formatLineWithEvents = (
+  selectedLine: SecuredLineWithEvents,
+  lineEvents: GetLineEventsResponse | undefined
+): SecuredLineWithEvents | undefined => {
+  if (!lineEvents) return undefined;
+  const { creditEvents: oldCreditEvents, collateralEvents: oldCollateralEvents, escrow, ...rest } = selectedLine;
+  const { events: creditEvents, spigot } = lineEvents;
+
+  // Create collateralEvents
+  const collateralEvents = formatEscrowToCollateralEvents(escrow);
+
+  // Add collateralEvents and creditEvents to SecuredLine
+  const selectedLineWithEvents = { creditEvents, collateralEvents, escrow, ...rest } as SecuredLineWithEvents;
+  return selectedLineWithEvents;
+};
+
 export const formatLinePageData = (
   lineData: GetLinePageResponse | undefined,
   tokenPrices: { [token: string]: BigNumber }
@@ -347,6 +385,7 @@ export const formatLinePageData = (
   // position id and APY
 
   // Create array of CollateralEvent[]
+  // const collateralEvents = formatEscrowToCollateralEvents(escrowData);
   const collateralEvents: CollateralEvent[] = _.map(escrowData.deposits, function (deposit) {
     return {
       type: escrowData.type,

@@ -147,7 +147,6 @@ export interface EscrowDeposit extends Collateral {
   amount: string;
   value: string;
   enabled: boolean;
-
   displayIcon?: string; // url to token icon
 }
 

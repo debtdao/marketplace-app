@@ -48,11 +48,9 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const { header, onClose } = props;
 
   const [transactionCompleted, setTransactionCompleted] = useState(0);
-  const [transactionApproved, setTransactionApproved] = useState(true);
   const [transactionLoading, setLoading] = useState(false);
 
   // spigot setting params
-  const [settingOwnerSplit, setOwnerSplit] = useState('100');
   const [settingClaimFunc, setClaimFunc] = useState('');
   const [settingTransferFunc, setTransferFunc] = useState('');
   const [revenueContractAdd, setRevenueContractAdd] = useState<string>('');
@@ -66,10 +64,6 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       console.log('no spigot selected to add revenue contract to', selectedLine);
     }
   });
-
-  useEffect(() => {
-    console.log('selected Line', selectedLine);
-  }, [selectedLine]);
 
   useEffect(() => {
     if (isValidAddress(revenueContractAdd)) {
@@ -105,7 +99,6 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
 
   const notArbiter = selectedLine?.status === ACTIVE_STATUS; // TODO
   if (!notArbiter) {
-    // onClose(); // close modal and exit
     return null;
   }
 
@@ -121,23 +114,20 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const enableSpigot = () => {
     setLoading(true);
 
-    // TODO set error in state to display no line selected
-
     if (!selectedLine || !selectedSpigot) {
       console.log('no line/spigot to enable on', selectedLine?.id, selectedSpigot);
       setLoading(false);
-      return; // TODO throw error ot UI component
+      return;
     }
 
     if (!selectedRevenueContractAddress) {
-      console.log('no revenue contract selected to enable', selectedSpigot);
       setLoading(false);
-      return; // TODO throw error ot UI component
+      return;
     }
 
     if (!walletNetwork) {
       setLoading(false);
-      return; // TODO throw error ot UI component
+      return;
     }
 
     const transactionData: AddSpigotProps = {
@@ -146,7 +136,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       spigotAddress: selectedSpigot.id,
       revenueContract: selectedRevenueContractAddress,
       setting: {
-        ownerSplit: settingOwnerSplit,
+        ownerSplit: '100',
         claimFunction: settingClaimFunc,
         transferOwnerFunction: settingTransferFunc,
       },
@@ -155,12 +145,10 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     dispatch(CollateralActions.addSpigot(transactionData)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionCompleted(2);
-        console.log(transactionCompleted, 'tester');
         setLoading(false);
       }
       if (res.meta.requestStatus === 'fulfilled') {
         setTransactionCompleted(1);
-        console.log(transactionCompleted, 'tester');
         setLoading(false);
       }
     });
@@ -170,7 +158,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     setRevenueContractAdd(address);
   };
 
-  const createListItems = (functions: []) => {
+  const createListItems = (functions: string[]) => {
     if (functions == undefined) {
       setRevenueContractABI(false);
       return;
@@ -258,8 +246,6 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     }
   };
 
-  // TODO: Add logic that if a rev contract is verified and ABI is in state, dropdown for available state appears
-
   return (
     <StyledTransaction onClose={onClose} header={header}>
       <TxAddressInput
@@ -275,7 +261,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
           key={t('components.transaction.enable-spigot.cta') as string}
           data-testid={`modal-action-${t('components.transaction.enable-spigot.cta').toLowerCase()}`}
           onClick={enableSpigot}
-          disabled={!transactionApproved}
+          disabled={notArbiter}
           contrast={true}
           isLoading={transactionLoading}
         >

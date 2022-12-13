@@ -3,13 +3,11 @@ import { Interface } from '@ethersproject/abi';
 
 import { ThunkAPI } from '@frameworks/redux';
 
-const getABI = createAsyncThunk<{ ABI: string; Functions: [] }, String, ThunkAPI>(
+const getABI = createAsyncThunk<{ ABI: string; Functions: string[] }, String, ThunkAPI>(
   'metadata/getABI',
-  //@ts-ignore
   async (address, { extra, getState }) => {
     const { onChainMetaDataService } = extra.services;
-    const { wallet, metadata } = getState();
-    const { services } = extra;
+    const { wallet } = getState();
     const userAddress = wallet.selectedAddress;
     const network = wallet.networkVersion;
 
@@ -18,7 +16,6 @@ const getABI = createAsyncThunk<{ ABI: string; Functions: [] }, String, ThunkAPI
     const OnChainMetaDataServiceResponse = await onChainMetaDataService.getContractABI(address, network!);
     const ABI = OnChainMetaDataServiceResponse.data.result;
 
-    // console.log('on chain meta data', OnChainMetaDataServiceResponse);
     const iface = new Interface(OnChainMetaDataServiceResponse.data.result);
     const Functions = [];
     const Inputs = [];
@@ -31,7 +28,6 @@ const getABI = createAsyncThunk<{ ABI: string; Functions: [] }, String, ThunkAPI
     return {
       ABI,
       Functions,
-      // might add state variables
     };
   }
 );
@@ -39,6 +35,7 @@ const getABI = createAsyncThunk<{ ABI: string; Functions: [] }, String, ThunkAPI
 const clearABI = createAction<void>('metadata/clearABI');
 
 // TODO get ens names of any addresses
-const getENS = createAction;
+//const getENS = createAction;
 
+//Export actions
 export const OnChainMetaDataActions = { getABI, clearABI };

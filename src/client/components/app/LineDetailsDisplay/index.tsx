@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import _ from 'lodash';
 
-import { AggregatedCreditLine, CreditLinePage, CreditPosition } from '@src/core/types';
-import { useAppTranslation } from '@hooks';
+import { useAppSelector, useAppTranslation } from '@hooks';
 import { RedirectIcon, Text } from '@components/common';
+import { LinesSelectors } from '@store';
 
 import { LineMetadata } from './LineMetadata';
 import { PositionsTable } from './PositionsTable';
@@ -13,8 +13,6 @@ const linkHoverFilter = 'brightness(90%)';
 const linkTransition = 'filter 200ms ease-in-out';
 
 interface LineDetailsProps {
-  line?: AggregatedCreditLine;
-  page?: CreditLinePage;
   onAddCollateral?: Function;
 }
 
@@ -69,25 +67,12 @@ const BorrowerName = styled(Text)`
 
 export const LineDetailsDisplay = (props: LineDetailsProps) => {
   const { t } = useAppTranslation('common');
-  const { line, page } = props;
 
-  const [allDataLoaded, setAllDataLoaded] = useState(false);
-  const [lineData, setLineData] = useState<AggregatedCreditLine | CreditLinePage>(line!);
-  const [positions, setPositions] = useState<CreditPosition[]>();
+  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
+  const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
 
-  const { principal, deposit, escrow, spigot, borrower, start, end } = lineData;
-
-  useEffect(() => {
-    if (page && page.positions) {
-      setAllDataLoaded(true);
-      setLineData(page);
-      setPositions(page.positions);
-    }
-    console.log('updating in line details', page);
-    // LineDetails page handles getLinePage query
-  }, [page]);
-
-  if (!line && !page) return <Container>{t('lineDetails:line.no-data')}</Container>;
+  if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
+  const { principal, deposit, escrow, spigot, borrower, start, end } = selectedLine;
 
   const StandardMetadata = (metadataProps: any) => (
     <>
@@ -104,36 +89,20 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   );
 
   // allow passing in core data first if we have it already and let Page data render once returned
-  if (allDataLoaded && positions) {
-    // if we have all data render full UI
-    return (
-      <Container>
-        <StandardMetadata
-          revenue={spigot?.tokenRevenue}
-          deposits={escrow?.deposits}
-          deposit={deposit}
-          principal={principal}
-          totalInterestPaid={'0'}
-          startTime={start}
-          endTime={end}
-        />
-        <PositionsTable events={positions} />
-      </Container>
-    );
-  } else {
-    // render partial UI with core data
-    return (
-      <Container>
-        <StandardMetadata
-          revenue={spigot?.tokenRevenue}
-          deposits={escrow?.deposits}
-          deposit={deposit}
-          principal={principal}
-          totalInterestPaid={'0'}
-          startTime={start}
-          endTime={end}
-        />
-      </Container>
-    );
-  }
+  // if we have all data render full UI
+  return (
+    <Container>
+      <StandardMetadata
+        revenue={spigot?.tokenRevenue}
+        deposits={escrow?.deposits}
+        deposit={deposit}
+        principal={principal}
+        totalInterestPaid={'0'}
+        startTime={start}
+        endTime={end}
+      />
+
+      {positions && <PositionsTable positions={_.values(positions)} />}
+    </Container>
+  );
 };

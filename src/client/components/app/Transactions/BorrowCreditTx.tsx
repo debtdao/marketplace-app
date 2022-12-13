@@ -1,6 +1,7 @@
 import { FC, useState } from 'react';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
+import _ from 'lodash';
 
 import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
 import { LinesSelectors, LinesActions, WalletSelectors } from '@store';
@@ -34,11 +35,11 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionLoading, setLoading] = useState(false);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
-  const selectedPosition = useAppSelector(LinesSelectors.selectPositionData);
+  const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
   const [errors, setErrors] = useState<string[]>(['']);
   const [targetAmount, setTargetAmount] = useState('1');
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
-  const positions = useAppSelector(LinesSelectors.selectPositions);
+  const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
 
   console.log('positions', positions);
 
@@ -112,11 +113,9 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
       if (res.meta.requestStatus === 'fulfilled') {
         const updatedPosition = borrowUpdate(selectedPosition, targetAmount);
         dispatch(
-          LinesActions.setPositionData({
-            position: selectedPosition.id,
-            lineAddress: selectedCredit.id,
-            positionObject: updatedPosition,
-            positions: positions,
+          LinesActions.setPosition({
+            id: selectedPosition.id,
+            position: selectedPosition,
           })
         );
         setTransactionCompleted(1);
@@ -169,7 +168,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
         inputText={t('components.transaction.borrow-credit.select-line')}
         onSelectedPositionChange={onSelectedPositionChange}
         selectedPosition={selectedPosition}
-        positions={positions}
+        positions={_.values(positions)}
         // creditOptions={sourceCreditOptions}
         // inputError={!!sourceStatus.error}
         readOnly={false}
@@ -192,9 +191,9 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
       <TxRateInput
         key={'frate'}
         headerText={t('components.transaction.borrow-credit.your-rates')}
-        frate={selectedPosition.frate}
-        drate={selectedPosition.drate}
-        amount={selectedPosition.frate}
+        frate={selectedPosition.fRate}
+        drate={selectedPosition.dRate}
+        amount={selectedPosition.fRate}
         maxAmount={'100'}
         // setRateChange={onFrateChange}
         setRateChange={() => {}}

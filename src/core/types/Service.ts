@@ -27,11 +27,13 @@ import {
   GetLineArgs,
   GetLinesArgs,
   GetLinePageArgs,
+  GetLineEventsArgs,
   GetLinesResponse,
   GetLinePageResponse,
   SecuredLineWithEvents,
   SupportedOracleTokenResponse,
   GetUserPortfolioResponse,
+  GetLineEventsResponse,
 } from '@types';
 
 // *************** USER ***************
@@ -155,6 +157,7 @@ export interface InterestRateCreditService {
 export interface CreditLineService {
   getLine: (props: GetLineProps) => Promise<SecuredLine | undefined>;
   getLines: (props: GetLinesProps) => Promise<GetLinesResponse[] | undefined>;
+  getLineEvents: (props: GetLineEventsProps) => Promise<GetLineEventsResponse | undefined>;
   getLinePage: (props: GetLinePageProps) => Promise<GetLinePageResponse | undefined>;
   getUserLinePositions: (...args: any) => Promise<any | undefined>;
   getUserPortfolio: (props: GetUserPortfolioProps) => Promise<GetUserPortfolioResponse | undefined>;
@@ -293,6 +296,11 @@ export interface GetLinesProps extends GetLinesArgs {
 
 export interface GetUserLinesProps extends GetLinesArgs {
   walletAddress: Address;
+}
+
+export interface GetLineEventsProps extends GetLineEventsArgs {
+  id: string;
+  network: Network;
 }
 
 export interface GetLinePageProps extends GetLinePageArgs {

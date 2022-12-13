@@ -38,6 +38,14 @@ export interface GetLineArgs {
 }
 
 /**
+ * @typedef {object} GetLineEventsArgs
+ * @property {Address} GetLineEventsArgs.id - address of line contract
+ */
+export interface GetLineEventsArgs {
+  id: Address;
+}
+
+/**
  * @typedef {object} GetLinePageArgs
  * @property {Address} GetLinePageArgs.id - address of line contract
  */
@@ -130,20 +138,19 @@ export interface BasePositionFragResponse {
 }
 
 export interface LineEventFragResponse {
+  id: Address;
   __typename: string;
-  id: string;
   timestamp: number;
   position: {
-    id: string;
+    id: Address;
+    token: TokenFragRepsonse;
   };
   // events with value
-  value?: string;
-  amount?: string;
+  value?: number;
+  amount?: number;
   // events with rates
   dRate?: string;
   fRate?: string;
-
-  token: TokenFragRepsonse;
 }
 
 export interface SpigotRevenueSummaryFragResponse {
@@ -187,6 +194,21 @@ export interface GetLinesResponse {
       };
     };
   };
+}
+
+export interface GetLineEventsResponse {
+  // lines: BaseLineFragResponse & {
+  //   positions: BasePositionFragResponse[];
+  //   escrow: BaseEscrowFragResponse;
+  //   spigot: {
+  //     id: Address;
+  //     summaries: {
+  //       totalVolumeUsd: string;
+  //       timeOfFirstIncome: number;
+  //       timeOfLastIncome: number;
+  //     };
+  //   };
+  // };
 }
 
 export interface GetLinePageResponse extends BaseLineFragResponse {

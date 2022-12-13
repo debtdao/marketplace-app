@@ -213,7 +213,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
         return 'liquidate';
       case BORROWER_POSITION_ROLE:
       default:
-        console.log('add collateral action selected for buuton');
+        // console.log('add collateral action selected for buuton');
         return 'add-collateral';
     }
   };
@@ -239,7 +239,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
     : `${t('components.connect-button.connect')}`;
 
   const getCollateralTableActions = () => {
-    console.log('get collateral table actions', userPositionMetadata.role);
+    // console.log('get collateral table actions', userPositionMetadata.role);
     switch (userPositionMetadata.role) {
       case ARBITER_POSITION_ROLE:
       case LENDER_POSITION_ROLE: // for testing

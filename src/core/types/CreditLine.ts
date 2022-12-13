@@ -69,7 +69,7 @@ export interface SecuredLine extends LineOfCredit, LineCollateral {
 }
 
 // data that isnt included in SecuredLine that we need to fetch for full SecuredLineWithEvents dattype
-// gets merged into existing AggregatedCredit to form LinePageData
+// gets merged into existing SecuredLine to form SecuredLineWithEvents
 export interface LineEvents {
   collateralEvents: CollateralEvent[];
   creditEvents: CreditEvent[];

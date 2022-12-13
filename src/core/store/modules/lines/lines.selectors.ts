@@ -94,9 +94,6 @@ const selectPositionsForSelectedLine = createSelector(
         },
         {} as PositionMap
       );
-      console.log('User Portfolio actions selectedLine - positions Map: ', positionsMap);
-      console.log('User Portfolio actions selectedLine - line: ', line);
-      console.log('User Portfolio actions selectedLine - line positions: ', linePositions);
       return linePositionsObj;
     }
   }
@@ -137,10 +134,6 @@ const selectEventsForLine = createSelector(
 const selectSelectedLinePage = createSelector(
   [selectSelectedLine, selectPositionsForSelectedLine, selectCollateralForSelectedLine, selectEventsForLine],
   (line, positions, collateral, events): SecuredLineWithEvents | undefined => {
-    // console.log('User Portfolio actions selectedLine line: ', line);
-    console.log('User Portfolio actions selectedLine line positions: ', positions);
-    // console.log('User Portfolio actions selectedLine line collateral: ', collateral);
-    // console.log('User Portfolio actions selectedLine line events: ', events);
     if (!line) return undefined;
     return { ...line, positions, ...collateral, ...events };
   }

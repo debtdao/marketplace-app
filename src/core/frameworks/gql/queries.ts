@@ -49,7 +49,8 @@ const BASE_POSITION_FRAGMENT = gql`
   }
 `;
 
-// lewv = line event with value
+// TODO: This fragment is broken and needs to be fixed to be used again.
+// I cannot figure out why it does not work in the queries.
 const LINE_EVENT_FRAGMENT = gql`
   ${TOKEN_FRAGMENT}
   fragment LineEventFrag on LineEventWithValue {
@@ -191,7 +192,18 @@ const LINE_OF_CREDIT_FRAGMENT = gql`
     }
 
     events {
-      ...LineEventFrag
+      #...LineEventFrag
+      id
+      __typename
+      timestamp
+      amount
+      value
+      position {
+        id
+        token {
+          ...TokenFrag
+        }
+      }
     }
 
     spigot {
@@ -223,13 +235,13 @@ export const GET_LINE_PAGE_QUERY = gql`
   }
 `;
 
-export const GET_LINE_PAGE_AUX_QUERY = gql`
+export const GET_LINE_EVENTS_QUERY = gql`
   ${LINE_EVENT_FRAGMENT}
   ${SPIGOT_EVENT_FRAGMENT}
 
-  query getLinePageAux($id: ID) {
+  query getLineEvents($id: ID) {
     lineOfCredit(id: $id) {
-      events(first: 20) {
+      events {
         ...LineEventFrag
       }
 
@@ -311,7 +323,18 @@ const LENDER_POSITIONS_FRAGMENT = gql`
         ...BaseLineFrag
 
         events {
-          ...LineEventFrag
+          #...LineEventFrag
+          id
+          __typename
+          timestamp
+          amount
+          value
+          position {
+            id
+            token {
+              ...TokenFrag
+            }
+          }
         }
 
         spigot {

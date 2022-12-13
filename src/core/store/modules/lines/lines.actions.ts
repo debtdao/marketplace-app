@@ -97,7 +97,6 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
 
     // ensure consistent ordering of categories
     const categoryKeys = Object.keys(categories);
-    console.log('User Portfolio linesData - category keys', categoryKeys);
     //@ts-ignore
     const promises = await Promise.all(
       categoryKeys
@@ -111,12 +110,10 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
         !promises[i] ? all : { ...all, [category]: formatGetLinesData(promises[i]!, tokenPrices) },
       {}
     );
-    console.log('User Portfolio linesData - action: ', linesData);
     return { linesData };
   }
 );
 
-// TODO: Add this back so not always refetching line page data for a given line of credit.
 const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | undefined }, GetLinePageArgs, ThunkAPI>(
   'lines/getLinePage',
   async ({ id }, { getState, extra, dispatch }) => {
@@ -129,8 +126,9 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
 
     // @TODO check if events exist to
     if (selectedLine) {
-      console.log('User Portfolio actions selectedLine: ', selectedLine);
-      // console.log('user portfolio')
+      // console.log('User Portfolio actions selectedLine 1: ', selectedLine);
+      // selectedLineWithEvents = formatToSecuredLineWithEvents(selectedLine);
+      // return { linePageData: selectedLineWithEvents }
       return { linePageData: selectedLine };
     } else {
       try {
@@ -138,8 +136,8 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
           await creditLineService.getLinePage({ network: state.network.current, id }),
           tokenPrices
         );
-
-        console.log('user portfolio getLinePage data ', linePageData);
+        console.log('User Portfolio actions selectedLine 2: ', linePageData);
+        // console.log('user portfolio getLinePage data ', linePageData);
 
         // @TODO dispatch actions to save collateral and events
         // enable collateral or add collateral

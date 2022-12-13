@@ -30,11 +30,13 @@ import {
   Network,
   GetUserPortfolioProps,
   GetUserPortfolioResponse,
+  GetLineEventsProps,
+  GetLineEventsResponse,
 } from '@types';
 import { getConfig } from '@config';
 import { LineOfCreditABI } from '@services/contracts';
 import { getContract } from '@frameworks/ethers';
-import { getLinePage, getLines, getUserPortfolio } from '@frameworks/gql';
+import { getLineEvents, getLinePage, getLines, getUserPortfolio } from '@frameworks/gql';
 
 const { GRAPH_API_URL } = getConfig();
 
@@ -386,14 +388,27 @@ export class CreditLineServiceImpl implements CreditLineService {
     return response;
   }
 
-  // TODO
-  public async getLinePage(prop: GetLinePageProps): Promise<GetLinePageResponse | undefined> {
-    const response = getLinePage(prop)
+  public async getLineEvents(prop: GetLineEventsProps): Promise<GetLineEventsResponse | undefined> {
+    const response = getLineEvents(prop)
       .then((data) => data)
       .catch((err) => {
-        console.log('CreditLineService: error fetching lines', err);
+        console.log('CreditLineService: error fetching line events', err);
         return undefined;
       });
+    return response;
+  }
+
+  public async getLinePage(prop: GetLinePageProps): Promise<GetLinePageResponse | undefined> {
+    const response = getLinePage(prop)
+      .then((data) => {
+        console.log('User Portfolio selectedLine 1.5: ', data);
+        return data;
+      })
+      .catch((err) => {
+        console.log('CreditLineService: error fetching line page data', err);
+        return undefined;
+      });
+
     return response;
   }
 
@@ -411,7 +426,9 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   public async getUserPortfolio(prop: GetUserPortfolioProps): Promise<GetUserPortfolioResponse | undefined> {
     const response = getUserPortfolio(prop)
-      .then((data) => data)
+      .then((data) => {
+        return data;
+      })
       .catch((err) => {
         console.log('CreditLineService error fetching user portfolio', err);
         return undefined;

@@ -42,7 +42,7 @@ export const Link: FC<LinkProps> = ({ to, className, target = '_blank', children
 
   const onNavigate = () => {
     const eventData = { to, wallet, target };
-    console.log('is sub', isSubdomain, to.split('.'));
+    // console.log('is sub', isSubdomain, to.split('.'));
 
     if (isInternal) {
       dispatch(AppActions.logAppAnalytics({ type: 'page', data: { ...eventData } }));

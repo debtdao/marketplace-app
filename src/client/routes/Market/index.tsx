@@ -79,7 +79,7 @@ export const Market = () => {
     expectedCategories.forEach((cat) => (shouldFetch = shouldFetch || !currentCategories.includes(cat)));
 
     if (shouldFetch) fetchMarketData();
-    console.log('search', search);
+    // console.log('search', search);
   }, []);
 
   const onLenderCtaClick = () => {

@@ -168,7 +168,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       const categories: { [key: string]: string[] } = {};
       const lines: { [key: string]: SecuredLine } = {};
       let positions: PositionMap = {};
-      console.log('User Portfolio linesData - reducer: ', linesData);
 
       // loop over nested structure of new Lines and update state
       Object.entries(linesData).map(([category, ls]) =>
@@ -177,14 +176,12 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
           // update positions for each line
           const linePositionMap = _.zipObject(_.values(l.positionIds), _.values(l.positions));
           positions = { ...positions, ...linePositionMap };
-          console.log('User Portfolio position map for each line', linePositionMap);
-
           state.statusMap.user.linesActionsStatusMap[l.id] = initialLineActionsStatusMap;
           // save line id to category for reference
           categories[category] = [...(categories[category] || []), l.id];
         })
       );
-      console.log('User Portfolio get line positions: ', positions);
+      // console.log('Get Lines linesdata: ', lines);
       state.linesMap = { ...state.linesMap, ...lines };
       state.positionsMap = { ...state.positionsMap, ...positions };
       state.categories = { ...state.categories, ...categories };
@@ -199,12 +196,11 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(getLinePage.fulfilled, (state, { payload: { linePageData } }) => {
       if (linePageData) {
         // overwrite actual positions with referential ids
-        console.log('Get Line Page reducer: ', linePageData);
+        console.log('Get Line Page linepagedata: ', linePageData);
         const { positions, collateralEvents, creditEvents, ...metadata } = linePageData;
         state.linesMap = { ...state.linesMap, [linePageData.id]: { ...metadata } };
         state.positionsMap = { ...state.positionsMap, ...positions };
         state.eventsMap = { ...state.eventsMap, [metadata.id]: creditEvents };
-        // we also update state.collateral on this action  being fullfilled in collateral.reducer.ts
       }
 
       state.statusMap.getLinePage = {};

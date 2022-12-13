@@ -8,12 +8,14 @@ import {
   GetLineArgs,
   GetLinePageArgs,
   GetLinesArgs,
+  GetLineEventsArgs,
   GetUserPortfolioArgs,
   GetUserPortfolioResponse,
   QueryResponse,
   QueryCreator,
   GetLinePageResponse,
   GetLinesResponse,
+  GetLineEventsResponse,
   SupportedOracleTokenResponse,
   CreditPosition,
 } from '@src/core/types';
@@ -21,7 +23,7 @@ import {
 import {
   GET_LINE_QUERY,
   GET_LINE_PAGE_QUERY,
-  GET_LINE_PAGE_AUX_QUERY,
+  GET_LINE_EVENTS_QUERY,
   GET_LINES_QUERY,
   GET_SUPPORTED_ORACLE_TOKENS_QUERY,
   GET_USER_PORTFOLIO_QUERY,
@@ -97,6 +99,14 @@ const getLinesQuery = createQuery(GET_LINES_QUERY, 'lineOfCredits');
 export const getLines: QueryCreator<GetLinesArgs, GetLinesResponse[]> = <GetLinesArgs, GetLinesResponse>(
   arg: GetLinesArgs
 ): QueryResponse<GetLinesResponse[]> => getLinesQuery({ ...arg, blacklist });
+
+const getLineEventsQuery = createQuery(GET_LINE_EVENTS_QUERY);
+export const getLineEvents: QueryCreator<GetLineEventsArgs, GetLineEventsResponse[]> = <
+  GetLineEventsArgs,
+  GetLineEventsResponse
+>(
+  arg: GetLineEventsArgs
+): QueryResponse<GetLinesResponse[]> => getLineEventsQuery(arg);
 
 const getSupportedOracleTokensQuery = createQuery(GET_SUPPORTED_ORACLE_TOKENS_QUERY, undefined, true);
 export const getSupportedOracleTokens: QueryCreator<

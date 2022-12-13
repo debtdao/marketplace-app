@@ -29,7 +29,7 @@ export const idUser = (id: string) => getAnalytics()?.identify(id);
 export const trackPage = (page: TrackInternalNavigationEvent = {}) => {
   // TODO get SEO from page for window.path and addd to properties
   const hashPath = window.location.href.includes('/#/') && window.location.href.split('/#')[1]; // account for hash router in path which segment doesnt
-  console.log('hashpath', hashPath);
+  // console.log('hashpath', hashPath);
   return getAnalytics()?.page(page.category, page.name, { path: hashPath, ...page.data });
 };
 

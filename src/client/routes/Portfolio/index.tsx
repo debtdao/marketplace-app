@@ -3,21 +3,12 @@ import { useState, useEffect } from 'react';
 import _ from 'lodash';
 import { useParams } from 'react-router-dom';
 
-import { useAppSelector, useAppTranslation, useIsMounting, useAppDispatch } from '@hooks';
-import {
-  TokensSelectors,
-  WalletSelectors,
-  AppSelectors,
-  ModalSelectors,
-  LinesActions,
-  LinesSelectors,
-  AlertsActions,
-  WalletActions,
-} from '@store';
-import { SummaryCard, ViewContainer, LineDetailsDisplay, NoWalletCard } from '@components/app';
+import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
+import { WalletSelectors, LinesActions, LinesSelectors, AlertsActions } from '@store';
+import { SummaryCard, ViewContainer, NoWalletCard } from '@components/app';
 import { SpinnerLoading } from '@components/common';
 import { isValidAddress, halfWidthCss } from '@utils';
-import { SecuredLineWithEvents, LENDER_POSITION_ROLE, BORROWER_POSITION_ROLE, CreditPosition } from '@src/core/types';
+import { LENDER_POSITION_ROLE, BORROWER_POSITION_ROLE, CreditPosition } from '@src/core/types';
 import { PositionsTable } from '@src/client/components/app/LineDetailsDisplay/PositionsTable';
 
 const StyledViewContainer = styled(ViewContainer)`
@@ -28,12 +19,6 @@ const StyledViewContainer = styled(ViewContainer)`
 
 const HeaderCard = styled(SummaryCard)`
   grid-column: 1 / 3;
-`;
-
-const StyledSpinnerLoading = styled(SpinnerLoading)`
-  grid-column: 1 / 3;
-  flex: 1;
-  margin: 10rem 0;
 `;
 
 const RoleOption = styled.div<{ active?: boolean }>`
@@ -65,11 +50,6 @@ const StyledBorrowerContainer = styled.div`
 type userParams = {
   userAddress: string;
 };
-
-const StyledNoWalletCard = styled(NoWalletCard)`
-  grid-column: 1 / 3;
-  ${halfWidthCss}
-`;
 
 export const Portfolio = () => {
   const { t } = useAppTranslation(['common', 'home']);
@@ -104,7 +84,7 @@ export const Portfolio = () => {
     } else if (portfolioAddress && isValidAddress(portfolioAddress)) {
       dispatch(LinesActions.getUserPortfolio({ user: portfolioAddress.toLocaleLowerCase() }));
     }
-  }, [currentRole, walletIsConnected, userWallet]);
+  }, [currentRole, walletIsConnected, userWallet, userAddress]);
 
   const { borrowerLineOfCredits, lenderPositions } = userPortfolio;
   // Get an array of borrowerPositions by flattening
@@ -133,8 +113,6 @@ export const Portfolio = () => {
   return (
     <StyledViewContainer>
       <HeaderCard items={SummaryCardItems} cardSize="small" />
-
-      {/* {!selectedLine && !lenderPositions && <StyledSpinnerLoading />} */}
 
       {currentRole === BORROWER_POSITION_ROLE && (
         <StyledBorrowerContainer>

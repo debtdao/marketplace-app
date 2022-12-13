@@ -5,9 +5,8 @@ import { useParams } from 'react-router-dom';
 
 import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
 import { WalletSelectors, LinesActions, LinesSelectors, AlertsActions } from '@store';
-import { SummaryCard, ViewContainer, NoWalletCard } from '@components/app';
-import { SpinnerLoading } from '@components/common';
-import { isValidAddress, halfWidthCss } from '@utils';
+import { SummaryCard, ViewContainer } from '@components/app';
+import { isValidAddress } from '@utils';
 import { LENDER_POSITION_ROLE, BORROWER_POSITION_ROLE, CreditPosition } from '@src/core/types';
 import { PositionsTable } from '@src/client/components/app/LineDetailsDisplay/PositionsTable';
 

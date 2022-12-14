@@ -243,18 +243,18 @@ export const GET_LINE_EVENTS_QUERY = gql`
   query getLineEvents($id: ID) {
     lineOfCredit(id: $id) {
       events {
-        ...LineEventFrag
-        #id
-        #__typename
-        #timestamp
-        #amount
-        #value
-        #position {
-        #  id
-        #  token {
-        #    ...TokenFrag
-        #  }
-        #}
+        #...LineEventFrag
+        id
+        __typename
+        timestamp
+        amount
+        value
+        position {
+          id
+          token {
+            ...TokenFrag
+          }
+        }
       }
 
       spigot {

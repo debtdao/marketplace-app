@@ -1,15 +1,15 @@
 import { createReducer } from '@reduxjs/toolkit';
 
-import { OnChainMetaDataState } from '@types';
+import { OnChainMetaDataState, ENSAddressPair } from '@types';
 
 import { OnChainMetaDataActions } from './metadata.actions';
 
-const { getABI, clearABI } = OnChainMetaDataActions;
+const { getABI, clearABI, getENS } = OnChainMetaDataActions;
 
 export const initialOnChainMetaDataState: OnChainMetaDataState = {
   contractABI: undefined,
   contractFunctions: undefined,
-  ENS: undefined,
+  ENS: [],
 };
 
 export const onChainMetaDataReducer = createReducer(initialOnChainMetaDataState, (builder) => {
@@ -28,5 +28,17 @@ export const onChainMetaDataReducer = createReducer(initialOnChainMetaDataState,
     .addCase(clearABI, (state) => {
       state.contractABI = '';
       state.contractFunctions = [];
+    })
+
+    .addCase(getENS.fulfilled, (state, { payload: { address, ENS } }) => {
+      state.ENS = [...state.ENS, { address, ENS }];
+    })
+
+    .addCase(getENS.rejected, (state, { error }) => {
+      console.log('error in getENS reducer: ', error);
+    })
+
+    .addCase(getENS.pending, (state) => {
+      console.log('pending getENS');
     });
 });

@@ -35,7 +35,7 @@ const getABI = createAsyncThunk<{ ABI: string; Functions: string[] }, String, Th
 const clearABI = createAction<void>('metadata/clearABI');
 
 // TODO get ens names of any addresses
-const getENS = createAsyncThunk<{ ENS: string }, string, ThunkAPI>(
+const getENS = createAsyncThunk<{ address: string; ENS: string }, string, ThunkAPI>(
   'metadata/getENS',
   async (address, { extra, getState }) => {
     const { onChainMetaDataService } = extra.services;
@@ -48,6 +48,7 @@ const getENS = createAsyncThunk<{ ENS: string }, string, ThunkAPI>(
     const ENS = OnChainMetaDataResponse;
 
     return {
+      address,
       ENS,
     };
   }

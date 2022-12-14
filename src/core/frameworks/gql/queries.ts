@@ -49,9 +49,6 @@ const BASE_POSITION_FRAGMENT = gql`
   }
 `;
 
-// TODO: This fragment is broken and needs to be fixed to be used again.
-// I cannot figure out why it does not work in the queries. Copying and pasting the
-// properties where the fragment is needed results in the appropriate responses.
 const LINE_EVENT_FRAGMENT = gql`
   ${TOKEN_FRAGMENT}
   fragment LineEventFrag on LineEventWithValue {
@@ -114,21 +111,6 @@ const SPIGOT_EVENT_FRAGMENT = gql`
 
 // Escrow Frags
 
-const ESCROW_FRAGMENT = gql`
-  ${TOKEN_FRAGMENT}
-  fragment EscrowFrag on Escrow {
-    id
-    minCRatio
-    deposits {
-      amount
-      enabled
-      token {
-        ...TokenFrag
-      }
-    }
-  }
-`;
-
 const ESCROW_EVENT_FRAGMENT = gql`
   fragment EscrowEventFrag on EscrowEvent {
     __typename
@@ -140,6 +122,25 @@ const ESCROW_EVENT_FRAGMENT = gql`
     ... on RemoveCollateralEvent {
       amount
       value
+    }
+  }
+`;
+
+const ESCROW_FRAGMENT = gql`
+  ${TOKEN_FRAGMENT}
+  ${ESCROW_EVENT_FRAGMENT}
+  fragment EscrowFrag on Escrow {
+    id
+    minCRatio
+    deposits {
+      amount
+      enabled
+      token {
+        ...TokenFrag
+      }
+      events {
+        ...EscrowEventFrag
+      }
     }
   }
 `;
@@ -193,18 +194,7 @@ const LINE_OF_CREDIT_FRAGMENT = gql`
     }
 
     events {
-      #...LineEventFrag
-      id
-      __typename
-      timestamp
-      amount
-      value
-      position {
-        id
-        token {
-          ...TokenFrag
-        }
-      }
+      ...LineEventFrag
     }
 
     spigot {
@@ -238,27 +228,33 @@ export const GET_LINE_PAGE_QUERY = gql`
 
 export const GET_LINE_EVENTS_QUERY = gql`
   ${LINE_EVENT_FRAGMENT}
+  ${TOKEN_FRAGMENT}
+  ${ESCROW_EVENT_FRAGMENT}
   ${SPIGOT_EVENT_FRAGMENT}
 
   query getLineEvents($id: ID) {
     lineOfCredit(id: $id) {
       events {
-        #...LineEventFrag
+        ...LineEventFrag
+      }
+
+      escrow {
         id
-        __typename
-        timestamp
-        amount
-        value
-        position {
-          id
+        minCRatio
+        deposits {
+          amount
+          enabled
           token {
             ...TokenFrag
+          }
+          events {
+            ...EscrowEventFrag
           }
         }
       }
 
       spigot {
-        events(first: 20) {
+        events {
           ...SpigotEventFrag
         }
       }
@@ -335,18 +331,7 @@ const LENDER_POSITIONS_FRAGMENT = gql`
         ...BaseLineFrag
 
         events {
-          #...LineEventFrag
-          id
-          __typename
-          timestamp
-          amount
-          value
-          position {
-            id
-            token {
-              ...TokenFrag
-            }
-          }
+          ...LineEventFrag
         }
 
         spigot {

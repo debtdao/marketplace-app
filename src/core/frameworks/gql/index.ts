@@ -29,6 +29,7 @@ import {
   GET_SUPPORTED_ORACLE_TOKENS_QUERY,
   GET_USER_PORTFOLIO_QUERY,
 } from './queries';
+import possibleTypes from './possibleTypes.json';
 
 const { GRAPH_API_URL, GRAPH_CHAINLINK_FEED_REGISTRY_API_URL } = getEnv();
 const { BLACKLISTED_LINES: blacklist } = getConstants();
@@ -38,7 +39,37 @@ export const getClient = () => (client ? client : createClient());
 const createClient = (): typeof ApolloClient => {
   client = new ApolloClient({
     uri: GRAPH_API_URL,
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      // TODO: Automatically generate all event types from subgraph instead
+      // of manually adding them!
+      // Documentation: https://www.apollographql.com/docs/react/data/fragments/#using-fragments-with-unions-and-interfaces
+      possibleTypes: {
+        LineEventWithValue: [
+          'AddCreditEvent',
+          'IncreaseCreditEvent',
+          'ClosePositionEvent',
+          'WithdrawProfitEvent',
+          'WithdrawDepositEvent',
+          'BorrowEvent',
+          'InterestAccruedEvent',
+          'RepayInterestEvent',
+          'RepayPrincipalEvent',
+          'LiquidateEvent',
+          'DefaultEvent',
+          'SetRatesEvent',
+        ],
+        EscrowEvent: ['EnableCollateralEvent', 'AddCollateralEvent', 'RemoveCollateralEvent'],
+        SpigotControllerEvent: [
+          'UpdateOwnerEvent',
+          'UpdateOperatorEvent',
+          'UpdateTreasuryEvent',
+          'UpdateWhitelistFunctionEvent',
+          'ClaimEscrowEvent',
+          'ClaimRevenueEvent',
+          'DeploySpigotEvent',
+        ],
+      },
+    }),
   });
   return client;
 };
@@ -75,6 +106,8 @@ export const createQuery =
         .query({ query, variables })
         .then((result: QueryResult) => {
           const { data, error } = result;
+          console.log('Query: ', query);
+          console.log('Query result: ', result);
           const requestedData = path ? at(data, [path])[0] : data;
           if (error) return reject(error);
           else return resolve(requestedData);

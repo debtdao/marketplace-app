@@ -198,6 +198,15 @@ export interface GetLinesResponse {
 
 export interface GetLineEventsResponse {
   events: LineEventFragResponse[];
+  escrow: BaseEscrowFragResponse & {
+    events: {
+      __typename: string;
+      timestamp: number;
+      // only on add/remove collateral
+      amount?: string;
+      value?: string;
+    };
+  };
   spigot: {
     events?: SpigotEventFragResponse[];
   };

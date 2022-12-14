@@ -45,7 +45,6 @@ export const Market = () => {
   // const { isTablet, isMobile, width: DWidth } = useWindowDimensions();
   const [search, setSearch] = useState('');
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
-
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
   // TODO not neeed here

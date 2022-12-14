@@ -107,7 +107,8 @@ export const Market = () => {
     if (!userWallet) {
       return;
     }
-    dispatch(OnChainMetaDataActions.getENS(userWallet));
+    const ENS = dispatch(OnChainMetaDataActions.getENS(userWallet));
+    console.log('ens', ENS);
   }, [userWallet]);
 
   return (

@@ -317,10 +317,12 @@ export const formatSecuredLineData = (
 // TODO: Modify/adjust this to replace mergeCollateralEvents (formatCollateralEvents)
 // given that there are 3 duplicative uses of collateral events in this file!!
 export const formatEscrowToCollateralEvents = (escrow: AggregatedEscrow | undefined): CollateralEvent[] => {
+  // console.log('get line events escrow: ', escrow);
   const collateralEvents: CollateralEvent[] = escrow!
     ? _.map(escrow.deposits, function (deposit) {
+        // console.log('get line individual deposits: ', deposit);
         return {
-          type: escrow.type,
+          type: deposit.type,
           id: deposit.token.address,
           // TODO: timestamp should probably be removed from the type given this aggregates
           // collateral by type and token address
@@ -343,6 +345,8 @@ export const formatLineWithEvents = (
   const { events: creditEvents, spigot } = lineEvents;
 
   // Create collateralEvents
+  // console.log('Get Line Events Escrow: ', escrow);
+  // console.log('Get Line Events Spigot: ', spigot);
   const collateralEvents = formatEscrowToCollateralEvents(escrow);
 
   // Add collateralEvents and creditEvents to SecuredLine
@@ -356,7 +360,7 @@ export const formatLinePageData = (
 ): SecuredLineWithEvents | undefined => {
   if (!lineData) return undefined;
   // add token Prices as arg
-  console.log('User Portfolio actions selectedLine 2: ', lineData);
+  // console.log('User Portfolio actions selectedLine 2: ', lineData);
   const {
     spigot,
     escrow,
@@ -383,12 +387,16 @@ export const formatLinePageData = (
 
   // derivative or aggregated data we need to compute and store while mapping position data
   // position id and APY
-
+  console.log('Get Line Page - LineEventFrag test: ', lineData.events);
+  console.log('Get Line Page - EscrowEventFrag test: ', lineData.escrow);
   // Create array of CollateralEvent[]
   // const collateralEvents = formatEscrowToCollateralEvents(escrowData);
+  console.log('Get Line Page escrow: ', escrow);
+  console.log('Get Line Page escrow data for collateral: ', escrowData);
   const collateralEvents: CollateralEvent[] = _.map(escrowData.deposits, function (deposit) {
+    // console.log('get line page individual deposits: ', deposit);
     return {
-      type: escrowData.type,
+      type: deposit.type,
       id: deposit.token.address,
       // TODO: timestamp should probably be removed from the type given this aggregates
       // collateral by type and token address

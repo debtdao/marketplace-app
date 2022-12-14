@@ -148,6 +148,7 @@ export interface EscrowDeposit extends Collateral {
   value: string;
   enabled: boolean;
   displayIcon?: string; // url to token icon
+  events?: EscrowEvent;
 }
 
 export interface EscrowDepositList {
@@ -243,6 +244,13 @@ export interface SetRateEvent {
   timestamp: number;
   dRate: number;
   fRate: number;
+}
+
+// Escrow Events
+export interface EscrowEvent {
+  __typename: string;
+  id: Address;
+  timestamp: number;
 }
 
 // Collateral Events

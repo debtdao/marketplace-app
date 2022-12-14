@@ -129,6 +129,8 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
     if (selectedLine) {
       const lineEvents = await creditLineService.getLineEvents({ network: state.network.current, id });
       const selectedLineWithEvents = formatLineWithEvents(selectedLine, lineEvents);
+      console.log('get line events: ', lineEvents);
+      // console.log('Get Line Page 1: ', selectedLineWithEvents);
       return { linePageData: selectedLineWithEvents };
     } else {
       try {
@@ -136,16 +138,6 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
           await creditLineService.getLinePage({ network: state.network.current, id }),
           tokenPrices
         );
-
-        // @TODO dispatch actions to save collateral and events
-        // enable collateral or add collateral
-        // save module to Map
-        // dispatch(CollateralActions.saveModuleToMap(spigot.id, spigot ));
-        // function does not exist in this file
-        // save events to map
-        // dispatch(LineActions.setCreditEvetntsModule(spigot.id, collateralEvents ));
-        // save events to map
-        // dispatch(CollateralActions.saveEventsToMap(spigot.id, collateralEvents ));
 
         if (!linePageData) throw new Error();
         return { linePageData };

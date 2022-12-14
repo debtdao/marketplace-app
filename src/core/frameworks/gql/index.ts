@@ -40,35 +40,7 @@ const createClient = (): typeof ApolloClient => {
   client = new ApolloClient({
     uri: GRAPH_API_URL,
     cache: new InMemoryCache({
-      // TODO: Automatically generate all event types from subgraph instead
-      // of manually adding them!
-      // Documentation: https://www.apollographql.com/docs/react/data/fragments/#using-fragments-with-unions-and-interfaces
-      possibleTypes: {
-        LineEventWithValue: [
-          'AddCreditEvent',
-          'IncreaseCreditEvent',
-          'ClosePositionEvent',
-          'WithdrawProfitEvent',
-          'WithdrawDepositEvent',
-          'BorrowEvent',
-          'InterestAccruedEvent',
-          'RepayInterestEvent',
-          'RepayPrincipalEvent',
-          'LiquidateEvent',
-          'DefaultEvent',
-          'SetRatesEvent',
-        ],
-        EscrowEvent: ['EnableCollateralEvent', 'AddCollateralEvent', 'RemoveCollateralEvent'],
-        SpigotControllerEvent: [
-          'UpdateOwnerEvent',
-          'UpdateOperatorEvent',
-          'UpdateTreasuryEvent',
-          'UpdateWhitelistFunctionEvent',
-          'ClaimEscrowEvent',
-          'ClaimRevenueEvent',
-          'DeploySpigotEvent',
-        ],
-      },
+      possibleTypes,
     }),
   });
   return client;

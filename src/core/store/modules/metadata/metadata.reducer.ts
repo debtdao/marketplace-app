@@ -1,6 +1,7 @@
+import { isEqual } from 'lodash';
 import { createReducer } from '@reduxjs/toolkit';
 
-import { OnChainMetaDataState, ENSAddressPair } from '@types';
+import { ENSAddressPair, OnChainMetaDataState } from '@types';
 
 import { OnChainMetaDataActions } from './metadata.actions';
 
@@ -31,7 +32,17 @@ export const onChainMetaDataReducer = createReducer(initialOnChainMetaDataState,
     })
 
     .addCase(getENS.fulfilled, (state, { payload: { address, ENS } }) => {
-      state.ENS = [...state.ENS, { address, ENS }];
+      const newState = [...state.ENS, { address, ENS }];
+
+      const result: ENSAddressPair[] = [];
+
+      for (const item of newState) {
+        const found = result.some((value) => isEqual(value, item));
+        if (found) return;
+        result.push(item);
+      }
+
+      state.ENS = newState;
     })
 
     .addCase(getENS.rejected, (state, { error }) => {

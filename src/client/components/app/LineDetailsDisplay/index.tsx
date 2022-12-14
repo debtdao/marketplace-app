@@ -6,6 +6,7 @@ import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
 import { Text } from '@components/common';
 import { OnChainMetaDataActions, OnChainMetaDataSelector, LinesSelectors } from '@store';
 import { getENS } from '@src/utils';
+import { ENSAddressPair } from '@src/core/types';
 
 import { LineMetadata } from './LineMetadata';
 import { PositionsTable } from './PositionsTable';
@@ -46,20 +47,19 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   }, [selectedLine]);
 
   useEffect(() => {
-    const ENSData: any = getENS(selectedLine?.borrower!, ENSRegistry);
-
-    if (!ENSData[0].ENS) {
+    const ENSData: ENSAddressPair[] = getENS(selectedLine?.borrower!, ENSRegistry);
+    if (ENSData && !ENSData[0]) {
       setBorrowerId(selectedLine?.borrower!);
       return;
-    } else {
-      console.log();
+    }
+    if (ENSData && ENSData[0].ENS) {
       setBorrowerId(ENSData[0].ENS);
       return;
     }
   }, [selectedLine, ENSRegistry]);
 
   if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
-  const { principal, deposit, escrow, spigot, borrower, start, end } = selectedLine;
+  const { principal, deposit, escrow, spigot, start, end } = selectedLine;
 
   const StandardMetadata = (metadataProps: any) => (
     <>

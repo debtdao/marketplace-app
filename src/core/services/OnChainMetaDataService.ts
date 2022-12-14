@@ -1,5 +1,5 @@
 import { _getContractABI } from '@src/utils';
-import { OnChainMetaDataService, GetAddressEnsNameProps, UserService, Web3Provider, Config, Network } from '@types';
+import { OnChainMetaDataService, GetAddressEnsNameProps, Web3Provider } from '@types';
 import {} from '@ethersproject/address';
 
 export class OnChainMetaDataServiceImpl implements OnChainMetaDataService {
@@ -12,10 +12,13 @@ export class OnChainMetaDataServiceImpl implements OnChainMetaDataService {
     return await _getContractABI(address, network);
   }
 
-  public async getAddressEnsName(props: GetAddressEnsNameProps) {
+  public async getAddressEnsName(props: GetAddressEnsNameProps): Promise<any | undefined> {
+    console.log('made it to service', 'ens');
     const { address } = props;
     const provider = this.web3Provider.getInstanceOf('ethereum');
+    console.log('provider', provider, 'ens');
     const addressEnsName = await provider.lookupAddress(address);
+    console.log('ens', addressEnsName);
     return addressEnsName;
   }
 }

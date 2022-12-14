@@ -35,7 +35,26 @@ const getABI = createAsyncThunk<{ ABI: string; Functions: string[] }, String, Th
 const clearABI = createAction<void>('metadata/clearABI');
 
 // TODO get ens names of any addresses
-//const getENS = createAction;
+const getENS = createAsyncThunk<{ ENS: string }, String, ThunkAPI>(
+  'metadata/getENS',
+  async (address, { extra, getState }) => {
+    const { onChainMetaDataService } = extra.services;
+    const { wallet } = getState();
+    const userAddress = wallet.selectedAddress;
+    console.log(address, 'ens');
+
+    if (!userAddress) throw new Error('WALLET NOT CONNECT');
+    console.log(userAddress, 'ens');
+    //@ts-ignore
+    const OnChainMetaDataResponse = await onChainMetaDataService.getAddressEnsName(address);
+    console.log(OnChainMetaDataResponse, 'ens');
+    const ENS = OnChainMetaDataResponse;
+
+    return {
+      ENS,
+    };
+  }
+);
 
 //Export actions
-export const OnChainMetaDataActions = { getABI, clearABI };
+export const OnChainMetaDataActions = { getABI, clearABI, getENS };

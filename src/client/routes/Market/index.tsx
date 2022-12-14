@@ -5,11 +5,18 @@ import { useHistory } from 'react-router-dom';
 import { utils } from 'ethers';
 
 import { useAppSelector, useAppDispatch, useAppTranslation, useQueryParams } from '@hooks';
-import { ModalsActions, LinesActions, LinesSelectors, WalletActions, WalletSelectors } from '@store';
+import {
+  ModalsActions,
+  LinesActions,
+  LinesSelectors,
+  WalletActions,
+  WalletSelectors,
+  OnChainMetaDataActions,
+} from '@store';
 import { RecommendationsCard, SliderCard, ViewContainer } from '@components/app';
 import { SpinnerLoading, Text, Button } from '@components/common';
 import { SecuredLine, UseCreditLinesParams } from '@src/core/types';
-import { GoblinTown, DebtDAOBanner, DebtDAOBannerLogo } from '@assets/images';
+import { DebtDAOBanner } from '@assets/images';
 import { getEnv } from '@config/env';
 
 const StyledRecommendationsCard = styled(RecommendationsCard)``;
@@ -95,6 +102,13 @@ export const Market = () => {
   };
 
   let ctaButtonText = userWallet ? `${t('market:banner.cta-borrower')}` : `${t('components.connect-button.connect')}`;
+
+  useEffect(() => {
+    if (!userWallet) {
+      return;
+    }
+    dispatch(OnChainMetaDataActions.getENS(userWallet));
+  }, [userWallet]);
 
   return (
     <ViewContainer>

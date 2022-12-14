@@ -39,6 +39,7 @@ const {
   enableCollateral,
   saveModuleToMap,
   saveEventsToMap,
+  addSpigot,
 } = CollateralActions;
 
 const collateralReducer = createReducer(collateralInitialState, (builder) => {
@@ -89,6 +90,20 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
       // state.statusMap.addCollateral = {};
     })
     .addCase(addCollateral.rejected, (state, { error }) => {
+      // _.assignIn(state.statusMap.addCollateral, { [contract]: { [token]: { error: error.message } } });
+    })
+
+    /* ---------------------------------- addSpigot ----------------------------------------*/
+
+    .addCase(addSpigot.pending, (state, payload) => {
+      console.log('addspigot action payload', payload);
+    })
+    .addCase(addSpigot.fulfilled, (state, payload) => {
+      console.log('addspigot action payload', payload);
+      // state.statusMap.addCollateral = {};
+    })
+    .addCase(addSpigot.rejected, (state, { error }) => {
+      console.log('addspigot action payload', error);
       // _.assignIn(state.statusMap.addCollateral, { [contract]: { [token]: { error: error.message } } });
     })
 

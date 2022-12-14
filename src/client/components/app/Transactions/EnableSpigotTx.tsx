@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import _ from 'lodash';
 
 import { generateSig } from '@src/utils';
-import { isValidAddress } from '@src/utils';
+import { isValidAddress, toWei } from '@src/utils';
 import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
 import { ACTIVE_STATUS, AddSpigotProps } from '@src/core/types';
 import {
@@ -140,7 +140,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       revenueContract: revenueContractAdd,
       setting: {
         //TO DO: QUERY OWNERSPLIT ON SPIGOTENTITY
-        ownerSplit: '100',
+        ownerSplit: toWei('100', 0),
         claimFunction: settingClaimFunc,
         transferOwnerFunction: settingTransferFunc,
       },

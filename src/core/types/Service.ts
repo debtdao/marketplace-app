@@ -446,12 +446,12 @@ export interface CollateralService {
   maxSplit(): BigNumber; // always 100
 }
 
-export interface OnChainMetaDataService {
+export interface OnchainMetaDataService {
   getContractABI(address: String, network: number): Promise<any | undefined>;
-  getAddressEnsName(props: OnChainMetaDataServiceProps): Promise<any | undefined>;
+  getAddressEnsName(props: OnchainMetaDataServiceProps): Promise<any | undefined>;
 }
 
-export interface OnChainMetaDataServiceProps {
+export interface OnchainMetaDataServiceProps {
   address: string;
 }
 

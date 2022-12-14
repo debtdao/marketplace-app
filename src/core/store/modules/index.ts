@@ -63,9 +63,9 @@ import collateralReducer, { collateralInitialState } from './collateral/collater
 import { CollateralActions } from './collateral/collateral.actions';
 import { CollateralSelectors } from './collateral/collateral.selectors';
 // OnChain MetaData
-import { onChainMetaDataReducer, initialOnChainMetaDataState } from './metadata/metadata.reducer';
-import { OnChainMetaDataActions } from './metadata/metadata.actions';
-import { OnChainMetaDataSelector } from './metadata/metadata.selector';
+import { onchainMetaDataReducer, initialOnchainMetaDataState } from './metadata/metadata.reducer';
+import { OnchainMetaDataActions } from './metadata/metadata.actions';
+import { OnchainMetaDataSelector } from './metadata/metadata.selector';
 
 const rootReducer: Reducer<RootState> = combineReducers({
   app: appReducer,
@@ -81,7 +81,7 @@ const rootReducer: Reducer<RootState> = combineReducers({
   partner: partnerReducer,
   lines: linesReducer,
   collateral: collateralReducer,
-  metadata: onChainMetaDataReducer,
+  metadata: onchainMetaDataReducer,
 });
 
 export default rootReducer;
@@ -103,7 +103,7 @@ export {
   PartnerActions,
   LinesActions,
   CollateralActions,
-  OnChainMetaDataActions,
+  OnchainMetaDataActions,
 };
 
 // Selectors
@@ -122,7 +122,7 @@ export {
   PartnerSelectors,
   LinesSelectors,
   CollateralSelectors,
-  OnChainMetaDataSelector,
+  OnchainMetaDataSelector,
 };
 
 // initialState
@@ -142,5 +142,5 @@ export {
   partnerInitialState,
   linesInitialState,
   collateralInitialState,
-  initialOnChainMetaDataState,
+  initialOnchainMetaDataState,
 };

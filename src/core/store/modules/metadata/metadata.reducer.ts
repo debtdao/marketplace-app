@@ -1,18 +1,18 @@
 import { createReducer } from '@reduxjs/toolkit';
 
-import { OnChainMetaDataState } from '@types';
+import { OnchainMetaDataState } from '@types';
 
-import { OnChainMetaDataActions } from './metadata.actions';
+import { OnchainMetaDataActions } from './metadata.actions';
 
-const { getABI, clearABI } = OnChainMetaDataActions;
+const { getABI, clearABI } = OnchainMetaDataActions;
 
-export const initialOnChainMetaDataState: OnChainMetaDataState = {
+export const initialOnchainMetaDataState: OnchainMetaDataState = {
   contractABI: undefined,
   contractFunctions: undefined,
   ENS: undefined,
 };
 
-export const onChainMetaDataReducer = createReducer(initialOnChainMetaDataState, (builder) => {
+export const onchainMetaDataReducer = createReducer(initialOnchainMetaDataState, (builder) => {
   builder
     .addCase(getABI.fulfilled, (state, { payload: { ABI, Functions } }) => {
       state.contractABI = ABI;

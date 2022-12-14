@@ -13,7 +13,7 @@ import {
   InterestRateCreditServiceImpl,
   LineFactoryServiceImpl,
   CollateralServiceImpl,
-  OnChainMetaDataServiceImpl,
+  OnchainMetaDataServiceImpl,
 } from '@services';
 import { getConfig } from '@config';
 import { DIContainer, ContextContainer, ServiceContainer, ConfigContainer } from '@types';
@@ -50,7 +50,7 @@ export class Container implements DIContainer {
       transactionService: awilix.asClass(TransactionServiceImpl),
       interestRateCreditService: awilix.asClass(InterestRateCreditServiceImpl),
       lineFactoryService: awilix.asClass(LineFactoryServiceImpl),
-      onChainMetaDataService: awilix.asClass(OnChainMetaDataServiceImpl),
+      OnchainMetaDataService: awilix.asClass(OnchainMetaDataServiceImpl),
     });
   }
 
@@ -79,7 +79,7 @@ export class Container implements DIContainer {
       interestRateCreditService: this.container.cradle.interestRateCreditService,
       lineFactoryService: this.container.cradle.lineFactoryService,
       collateralService: this.container.cradle.collateralService,
-      onChainMetaDataService: this.container.cradle.onChainMetaDataService,
+      onchainMetaDataService: this.container.cradle.OnchainMetaDataService,
     };
   }
 

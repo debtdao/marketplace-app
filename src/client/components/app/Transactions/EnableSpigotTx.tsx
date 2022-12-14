@@ -9,10 +9,10 @@ import { ACTIVE_STATUS, AddSpigotProps } from '@src/core/types';
 import {
   WalletSelectors,
   LinesSelectors,
-  OnChainMetaDataActions,
+  OnchainMetaDataActions,
   CollateralActions,
   CollateralSelectors,
-  OnChainMetaDataSelector,
+  OnchainMetaDataSelector,
 } from '@store';
 
 import { TxContainer } from './components/TxContainer';
@@ -42,8 +42,8 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
   const selectedRevenueContractAddress = useAppSelector(CollateralSelectors.selectSelectedRevenueContractAddress);
 
-  const selectedContractFunctions = useAppSelector(OnChainMetaDataSelector.selectFunctions);
-  const contractABI = useAppSelector(OnChainMetaDataSelector.selectABI);
+  const selectedContractFunctions = useAppSelector(OnchainMetaDataSelector.selectFunctions);
+  const contractABI = useAppSelector(OnchainMetaDataSelector.selectABI);
   //state for params
   const { header, onClose } = props;
 
@@ -67,10 +67,10 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
 
   useEffect(() => {
     if (isValidAddress(revenueContractAdd)) {
-      dispatch(OnChainMetaDataActions.getABI(revenueContractAdd));
+      dispatch(OnchainMetaDataActions.getABI(revenueContractAdd));
       setRevenueContractABI(true);
     } else {
-      dispatch(OnChainMetaDataActions.clearABI());
+      dispatch(OnchainMetaDataActions.clearABI());
       setRevenueContractABI(false);
     }
   }, [revenueContractAdd]);

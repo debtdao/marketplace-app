@@ -1,8 +1,8 @@
 import { _getContractABI } from '@src/utils';
-import { OnChainMetaDataService, GetAddressEnsNameProps, UserService, Web3Provider, Config, Network } from '@types';
+import { OnchainMetaDataService, GetAddressEnsNameProps, UserService, Web3Provider, Config, Network } from '@types';
 import {} from '@ethersproject/address';
 
-export class OnChainMetaDataServiceImpl implements OnChainMetaDataService {
+export class OnchainMetaDataServiceImpl implements OnchainMetaDataService {
   private web3Provider: Web3Provider;
   constructor({ web3Provider }: { web3Provider: Web3Provider }) {
     this.web3Provider = web3Provider;

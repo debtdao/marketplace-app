@@ -52,7 +52,7 @@ export interface RootState {
   // debt dao
   lines: CreditLineState;
   collateral: CollateralState;
-  metadata: OnChainMetaDataState;
+  metadata: OnchainMetaDataState;
 }
 
 export interface AppState {
@@ -236,7 +236,7 @@ export interface VaultActionsStatusMap {
   migrate: Status;
 }
 
-export interface OnChainMetaDataState {
+export interface OnchainMetaDataState {
   contractABI: string | undefined;
   contractFunctions: string[] | undefined;
   ENS: [] | undefined;

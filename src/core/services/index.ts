@@ -7,4 +7,4 @@ export * from './CreditLineService';
 export * from './CollateralService';
 export * from './InterestRateCreditService';
 export * from './LineFactoryService';
-export * from './OnChainMetaDataService';
+export * from './OnchainMetaDataService';

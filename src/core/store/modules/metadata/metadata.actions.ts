@@ -6,17 +6,17 @@ import { ThunkAPI } from '@frameworks/redux';
 const getABI = createAsyncThunk<{ ABI: string; Functions: string[] }, String, ThunkAPI>(
   'metadata/getABI',
   async (address, { extra, getState }) => {
-    const { onChainMetaDataService } = extra.services;
+    const { onchainMetaDataService } = extra.services;
     const { wallet } = getState();
     const userAddress = wallet.selectedAddress;
     const network = wallet.networkVersion;
 
     if (!userAddress) throw new Error('WALLET NOT CONNECTED');
 
-    const OnChainMetaDataServiceResponse = await onChainMetaDataService.getContractABI(address, network!);
-    const ABI = OnChainMetaDataServiceResponse.data.result;
+    const OnchainMetaDataServiceResponse = await onchainMetaDataService.getContractABI(address, network!);
+    const ABI = OnchainMetaDataServiceResponse.data.result;
 
-    const iface = new Interface(OnChainMetaDataServiceResponse.data.result);
+    const iface = new Interface(OnchainMetaDataServiceResponse.data.result);
     const Functions = [];
     const Inputs = [];
 
@@ -38,4 +38,4 @@ const clearABI = createAction<void>('metadata/clearABI');
 //const getENS = createAction;
 
 //Export actions
-export const OnChainMetaDataActions = { getABI, clearABI };
+export const OnchainMetaDataActions = { getABI, clearABI };

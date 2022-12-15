@@ -148,7 +148,7 @@ export interface EscrowDeposit extends Collateral {
   value: string;
   enabled: boolean;
   displayIcon?: string; // url to token icon
-  events?: EscrowEvent;
+  events?: EscrowEvent[];
 }
 
 export interface EscrowDepositList {
@@ -163,6 +163,7 @@ export interface AggregatedEscrow extends BaseEscrow, BaseCollateralModule {
   deposits?: EscrowDepositList;
   type: CollateralTypes;
   line: string;
+  events?: CollateralEvent[];
 }
 
 export interface RevenueSummary extends Collateral {
@@ -193,7 +194,6 @@ export interface RevenueContract {
   startTime: number;
   ownerSplit: number;
   token: TokenView;
-
   events?: SpigotEvents[];
 }
 

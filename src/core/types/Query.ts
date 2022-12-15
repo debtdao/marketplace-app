@@ -173,6 +173,15 @@ export interface BaseEscrowDepositFragResponse {
   enabled: boolean;
   amount: string;
   token: TokenFragRepsonse;
+  events?: EscrowEventFragResponse[];
+}
+
+export interface EscrowEventFragResponse {
+  __typename: string;
+  timestamp: number;
+  // only on add/remove collateral
+  amount?: string;
+  value?: string;
 }
 
 export interface BaseEscrowFragResponse {

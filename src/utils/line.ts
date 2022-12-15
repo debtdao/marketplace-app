@@ -19,6 +19,7 @@ import {
   SpigotRevenueSummaryFragResponse,
   BasePositionFragResponse,
   LineEventFragResponse,
+  EscrowEventFragResponse,
   EscrowDepositList,
   TokenFragRepsonse,
   COLLATERAL_TYPE_REVENUE,
@@ -30,9 +31,12 @@ import {
   LENDER_POSITION_ROLE,
   BaseLineFragResponse,
   EscrowDeposit,
+  EscrowEvent,
+  // SpigotEvents,
   GetLineEventsResponse,
   AggregatedEscrow,
   AggregatedSpigot,
+  SpigotEventFragResponse,
 } from '@types';
 
 import { humanize, normalizeAmount, normalize } from './format';
@@ -69,40 +73,123 @@ export const formatCreditEvents = (
   });
 };
 
+// TODO: Modify/adjust this to replace mergeCollateralEvents (formatCollateralEvents)
+// given that there are 3 duplicative uses of collateral events in this file!!
+export const formatEscrowToCollateralEvents = (escrow: AggregatedEscrow | undefined): CollateralEvent[] => {
+  // console.log('get line events escrow: ', escrow);
+  const collateralEvents: CollateralEvent[] = escrow!
+    ? _.map(escrow.deposits, function (deposit) {
+        // console.log('get line individual deposits: ', deposit);
+        return {
+          type: deposit.type,
+          id: deposit.token.address,
+          // TODO: timestamp should probably be removed from the type given this aggregates
+          // collateral by type and token address
+          timestamp: 0,
+          amount: Number(deposit.amount),
+          // TODO: replace with correct USD value when we have it
+          value: 0,
+        } as CollateralEvent;
+      })
+    : [];
+  return collateralEvents;
+};
+
 /**
  * @function
  * @name mergeCollateralEvents
- * @desc - takes all events for a single deposit/spigot and merges them into global list
+ * @desc - takes all events for a single escrow deposit/spigot and merges them into global list
  * @dev  - expects all events to be in the same token
  * @param type - the type of module used as collateral
  * @param symbol - the token in event
- * @param price - current price for escrow and spigot collateral
+ * @param price - current price for escrow deposit/spigot collateral
  * @param events - the events to process
  * @return totalVal, CollateralEvent[] - current total value of all collateral
  */
+// export const formatCollateralEvents = (
+//   type: ModuleNames,
+//   symbol: string,
+//   price: BigNumber = BigNumber.from(0),
+//   // events: EscrowDepositList,
+//   // events: CollateralEvent[],
+//   events: EscrowEventFragResponse[] | undefined,
+//   // events: EscrowDepositList, //| SpigotEvents, //
+//   tokenRevenue?: any
+// ): [number, CollateralEvent[]] => {
+//   let totalVal = 0;
+//   if (!events) return [totalVal, []];
+//   // TODO promise.all token price fetching for better performance
+//   const newEvents: (CollateralEvent | undefined)[] = events?.map((event: any): CollateralEvent | undefined => {
+//     console.log('get line page data - individual event: ', event);
+//     const { __typename, timestamp, amount, token, value = unnullify(0, true) } = event;
+//     if (!timestamp || !amount) return undefined;
+//     console.log('get line page data - individual event 2: ', token);
+//     const valueNow = unnullify(price.toString(), true).times(unnullify((amount.toString(), true)));
+//     let collatType;
+//     switch (type) {
+//       case SPIGOT_MODULE_NAME:
+//         // aggregate token revenue. not needed for escrow bc its already segmented by token
+//         // use price at time of revenue for more accuracy
+//         tokenRevenue[symbol] += parseUnits(unnullify(tokenRevenue[symbol], true), 'ether').add(value).toString();
+//         collatType = COLLATERAL_TYPE_REVENUE;
+//         break;
+//       case ESCROW_MODULE_NAME:
+//         collatType = COLLATERAL_TYPE_ASSET;
+//         break;
+//       default:
+//         break;
+//     }
+
+//     totalVal += valueNow;
+
+//     return {
+//       type: collatType,
+//       __typename,
+//       timestamp,
+//       amount,
+//       value,
+//       valueNow,
+//       id: token?.id,
+//     };
+//   });
+//   const validEvents = newEvents.filter((x) => !!x) as CollateralEvent[];
+//   console.log('line page data - valid events: ', validEvents);
+//   return [totalVal, validEvents];
+// };
+
 export const formatCollateralEvents = (
   type: ModuleNames,
-  symbol: string,
+  token: TokenFragRepsonse,
   price: BigNumber = BigNumber.from(0),
-  events: CollateralEvent[],
+  // events: EscrowDepositList,
+  // events: CollateralEvent[],
+  events: EscrowEventFragResponse[] | undefined,
+  // events: EscrowDepositList, //| SpigotEvents, //
   tokenRevenue?: any
 ): [number, CollateralEvent[]] => {
   let totalVal = 0;
-
   if (!events) return [totalVal, []];
-
   // TODO promise.all token price fetching for better performance
-  const newEvents: (CollateralEvent | undefined)[] = events?.map((e: any): CollateralEvent | undefined => {
-    const { __typename, timestamp, amount, token, value = unnullify(0, true) } = e;
+  const newEvents: (CollateralEvent | undefined)[] = events?.map((event: any): CollateralEvent | undefined => {
+    // console.log('get line page data - individual event: ', event);
+    const { __typename, timestamp, amount, value = unnullify(0, true) } = event;
     if (!timestamp || !amount) return undefined;
-
-    const valueNow = unnullify(price.toString(), true).times(unnullify((amount.toString(), true)));
+    // console.log(
+    //   'get line page data - individual event 2: ',
+    //   unnullify(price.toString(), true),
+    //   unnullify((amount.toString(), true))
+    // );
+    // const valueNow = unnullify(price.toString(), true).times(unnullify((amount.toString(), true)));
+    const valueNow = 0;
+    console.log('get line page data - individual event 3: ', valueNow);
     let collatType;
     switch (type) {
       case SPIGOT_MODULE_NAME:
         // aggregate token revenue. not needed for escrow bc its already segmented by token
         // use price at time of revenue for more accuracy
-        tokenRevenue[symbol] += parseUnits(unnullify(tokenRevenue[symbol], true), 'ether').add(value).toString();
+        tokenRevenue[token.symbol] += parseUnits(unnullify(tokenRevenue[token.symbol], true), 'ether')
+          .add(value)
+          .toString();
         collatType = COLLATERAL_TYPE_REVENUE;
         break;
       case ESCROW_MODULE_NAME:
@@ -124,10 +211,11 @@ export const formatCollateralEvents = (
       id: token?.id,
     };
   });
-
   const validEvents = newEvents.filter((x) => !!x) as CollateralEvent[];
+  // console.log('line page data - valid events: ', validEvents);
   return [totalVal, validEvents];
 };
+
 /** Formatting functions. from GQL structured response to flat data for redux state  */
 
 export const unnullify = (thing: any, toBN?: boolean) => {
@@ -201,8 +289,8 @@ export const formatSecuredLineData = (
   creditEvents: CreditEvent[];
   collateralEvents: CollateralEvent[];
   // spigot: { type: CollateralTypes; line: string; tokenRevenue: { [key: string]: string } };
-  spigot: AggregatedSpigot;
-  escrow: AggregatedEscrow;
+  spigot: AggregatedSpigot; //& CollateralEvent[];
+  escrow: AggregatedEscrow; //& CollateralEvent[];
   // escrow: {
   //   type: CollateralTypes;
   //   line: string;
@@ -257,7 +345,26 @@ export const formatSecuredLineData = (
     [BigNumber.from(0), {}]
   );
 
-  const collateralEvents: CollateralEvent[] = [];
+  // Get escrow collateral events
+  const escrowCollateralEvents: CollateralEvent[] = _.flatten(
+    _.merge(
+      collateralDeposits.map((deposit) => {
+        const [totalDepositValue, depositCollateralEvents] = formatCollateralEvents(
+          'escrow',
+          deposit.token,
+          BigNumber.from(0),
+          deposit.events,
+          {}
+        );
+        // console.log('individual deposit collateral events: ', depositCollateralEvents);
+        return depositCollateralEvents;
+      })
+    )
+  );
+  // console.log('escrow collateral events', escrowCollateralEvents);
+
+  // TODO: get spigot collateral events
+
   const creditEvents = formatCreditEvents('', BigNumber.from(0), eventFrags);
 
   const aggregatedEscrow = {
@@ -312,33 +419,11 @@ export const formatSecuredLineData = (
       positionIds: Object.keys(positions),
       positions,
     },
-    collateralEvents,
+    collateralEvents: escrowCollateralEvents,
     creditEvents,
     escrow: aggregatedEscrow,
     spigot: { id: spigot.id, type: COLLATERAL_TYPE_REVENUE, line, tokenRevenue },
   };
-};
-
-// TODO: Modify/adjust this to replace mergeCollateralEvents (formatCollateralEvents)
-// given that there are 3 duplicative uses of collateral events in this file!!
-export const formatEscrowToCollateralEvents = (escrow: AggregatedEscrow | undefined): CollateralEvent[] => {
-  // console.log('get line events escrow: ', escrow);
-  const collateralEvents: CollateralEvent[] = escrow!
-    ? _.map(escrow.deposits, function (deposit) {
-        // console.log('get line individual deposits: ', deposit);
-        return {
-          type: deposit.type,
-          id: deposit.token.address,
-          // TODO: timestamp should probably be removed from the type given this aggregates
-          // collateral by type and token address
-          timestamp: 0,
-          amount: Number(deposit.amount),
-          // TODO: replace with correct USD value when we have it
-          value: 0,
-        } as CollateralEvent;
-      })
-    : [];
-  return collateralEvents;
 };
 
 export const formatLineWithEvents = (
@@ -350,9 +435,10 @@ export const formatLineWithEvents = (
   const { events: creditEvents, spigot } = lineEvents;
 
   // Create collateralEvents
-  // console.log('Get Line Events Escrow: ', escrow);
-  // console.log('Get Line Events Spigot: ', spigot);
+  console.log('Get Line Events Escrow: ', escrow);
+  console.log('Get Line Events Spigot: ', spigot);
   const collateralEvents = formatEscrowToCollateralEvents(escrow);
+  console.log('get line page data 1: ', collateralEvents);
 
   // Add collateralEvents and creditEvents to SecuredLine
   const selectedLineWithEvents = { creditEvents, collateralEvents, escrow, ...rest } as SecuredLineWithEvents;
@@ -384,6 +470,7 @@ export const formatLinePageData = (
     escrow: escrowData,
   } = formatSecuredLineData(metadata.id, positions!, events!, escrow, spigot, tokenPrices);
 
+  console.log('Get LinePage - collateral events: ', collateralEvents);
   // derivative or aggregated data we need to compute and store while mapping position data
   // position id and APY
   console.log('Get Line Page - LineEventFrag test: ', lineData.events);
@@ -392,7 +479,6 @@ export const formatLinePageData = (
   // const collateralEvents = formatEscrowToCollateralEvents(escrowData);
   console.log('Get Line Page escrow: ', escrow);
   console.log('Get Line Page escrow data for collateral: ', escrowData);
-  // const collateralEvents = formatCollateralEvents('escrow', '', BigNumber.from(0), escrowData.deposits.events, 0);
   const collateralEvents2: CollateralEvent[] = _.map(escrowData.deposits, function (deposit) {
     // console.log('get line page individual deposits: ', deposit);
     return {
@@ -406,8 +492,8 @@ export const formatLinePageData = (
       value: 0,
     } as CollateralEvent;
   });
-  console.log('Get Line Page Data - Collateral Events 1: ', collateralEvents);
-  console.log('Get Line Page Data - Collateral Events 2: ', collateralEvents2);
+  // console.log('Get Line Page Data - Collateral Events 1: ', collateralEvents);
+  // console.log('Get Line Page Data - Collateral Events 2: ', collateralEvents2);
 
   //Derive Collateral Events by
   // aggregated revenue in USD by token across all spigots
@@ -429,7 +515,7 @@ export const formatLinePageData = (
     // debt data
     ...credit,
     creditEvents,
-    collateralEvents: collateralEvents2,
+    collateralEvents: collateralEvents,
     borrower: borrower.id,
     status: status.toLowerCase() as LineStatusTypes,
     // TODO add UsePositionMetada,

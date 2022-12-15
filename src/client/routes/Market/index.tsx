@@ -102,13 +102,6 @@ export const Market = () => {
 
   let ctaButtonText = userWallet ? `${t('market:banner.cta-borrower')}` : `${t('components.connect-button.connect')}`;
 
-  useEffect(() => {
-    if (!userWallet) {
-      return;
-    }
-    dispatch(OnchainMetaDataActions.getENS(userWallet));
-  }, [userWallet]);
-
   return (
     <ViewContainer>
       {addCreditStatus.loading && (

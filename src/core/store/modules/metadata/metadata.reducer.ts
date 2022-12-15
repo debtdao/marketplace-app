@@ -1,7 +1,6 @@
-import { isEqual } from 'lodash';
 import { createReducer } from '@reduxjs/toolkit';
 
-import { ENSAddressPair, OnchainMetaDataState } from '@types';
+import { OnchainMetaDataState } from '@types';
 
 import { OnchainMetaDataActions } from './metadata.actions';
 
@@ -10,7 +9,7 @@ const { getABI, clearABI, getENS } = OnchainMetaDataActions;
 export const initialOnchainMetaDataState: OnchainMetaDataState = {
   contractABI: undefined,
   contractFunctions: undefined,
-  ENS: [],
+  ens: {},
 };
 
 export const onchainMetaDataReducer = createReducer(initialOnchainMetaDataState, (builder) => {
@@ -31,18 +30,9 @@ export const onchainMetaDataReducer = createReducer(initialOnchainMetaDataState,
       state.contractFunctions = [];
     })
 
-    .addCase(getENS.fulfilled, (state, { payload: { address, ENS } }) => {
-      const newState = [...state.ENS, { address, ENS }];
-
-      const result: ENSAddressPair[] = [];
-
-      for (const item of newState) {
-        const found = result.some((value) => isEqual(value, item));
-        if (found) return;
-        result.push(item);
-      }
-
-      state.ENS = newState;
+    .addCase(getENS.fulfilled, (state, { payload: { address, ens } }) => {
+      const newState = { ...state.ens, [address]: ens };
+      state.ens = newState;
     })
 
     .addCase(getENS.rejected, (state, { error }) => {

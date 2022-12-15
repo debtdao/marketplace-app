@@ -8,13 +8,12 @@ export class OnchainMetaDataServiceImpl implements OnchainMetaDataService {
     this.web3Provider = web3Provider;
   }
 
-  public async getContractABI(address: String, network: number): Promise<any | undefined> {
+  public async getContractABI(address: String, network: number): Promise<{} | undefined> {
     return await _getContractABI(address, network);
   }
 
-  public async getAddressEnsName(address: string): Promise<any | undefined> {
-    const provider = this.web3Provider.getInstanceOf('ethereum');
-    const addressEnsName = await provider.lookupAddress(address);
+  public async getAddressEnsName(address: string): Promise<string | null> {
+    const addressEnsName = await this.web3Provider.getInstanceOf('ethereum').lookupAddress(address);
     return addressEnsName;
   }
 }

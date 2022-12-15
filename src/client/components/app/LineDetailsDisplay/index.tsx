@@ -6,7 +6,6 @@ import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
 import { Text } from '@components/common';
 import { OnchainMetaDataActions, OnchainMetaDataSelector, LinesSelectors } from '@store';
 import { getENS } from '@src/utils';
-import { ENSAddressPair } from '@src/core/types';
 
 import { LineMetadata } from './LineMetadata';
 import { PositionsTable } from './PositionsTable';
@@ -39,7 +38,7 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
 
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
-  const ENSRegistry = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
+  const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const [borrowerID, setBorrowerId] = useState('');
 
   useEffect(() => {
@@ -47,16 +46,14 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   }, [selectedLine]);
 
   useEffect(() => {
-    const ENSData: ENSAddressPair[] = getENS(selectedLine?.borrower!, ENSRegistry);
-    if (ENSData && !ENSData[0]) {
+    const ensName = getENS(selectedLine?.borrower!, ensMap);
+
+    if (!ensName) {
       setBorrowerId(selectedLine?.borrower!);
-      return;
+    } else {
+      setBorrowerId(ensName);
     }
-    if (ENSData && ENSData[0].ENS) {
-      setBorrowerId(ENSData[0].ENS);
-      return;
-    }
-  }, [selectedLine, ENSRegistry]);
+  }, [selectedLine, ensMap]);
 
   if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
   const { principal, deposit, escrow, spigot, start, end } = selectedLine;

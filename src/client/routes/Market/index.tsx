@@ -5,14 +5,7 @@ import { useHistory } from 'react-router-dom';
 import { utils } from 'ethers';
 
 import { useAppSelector, useAppDispatch, useAppTranslation, useQueryParams } from '@hooks';
-import {
-  ModalsActions,
-  LinesActions,
-  LinesSelectors,
-  WalletActions,
-  WalletSelectors,
-  OnchainMetaDataActions,
-} from '@store';
+import { ModalsActions, LinesActions, LinesSelectors, WalletActions, WalletSelectors } from '@store';
 import { RecommendationsCard, SliderCard, ViewContainer } from '@components/app';
 import { SpinnerLoading, Text, Button } from '@components/common';
 import { SecuredLine, UseCreditLinesParams } from '@src/core/types';

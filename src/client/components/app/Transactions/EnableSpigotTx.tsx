@@ -50,8 +50,8 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const [transactionLoading, setLoading] = useState(false);
 
   // spigot setting params
-  const [settingClaimFunc, setClaimFunc] = useState('');
-  const [settingTransferFunc, setTransferFunc] = useState('');
+  const [claimFunc, setClaimFunc] = useState('');
+  const [transferFunc, setTransferFunc] = useState('');
   const [revenueContractAdd, setRevenueContractAdd] = useState<string>('');
   const [revContractABI, setRevenueContractABI] = useState(false);
   const [claimFuncType, setClaimFuncType] = useState({ id: '', label: '', value: '' });
@@ -119,8 +119,6 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       return;
     }
 
-    console.log('enable-spigot', selectedLine);
-
     if (!revenueContractAdd) {
       console.log('enable-spigot', revenueContractAdd);
       setLoading(false);
@@ -141,12 +139,10 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       setting: {
         //TO DO: QUERY OWNERSPLIT ON SPIGOTENTITY
         ownerSplit: toWei('100', 0),
-        claimFunction: settingClaimFunc,
-        transferOwnerFunction: settingTransferFunc,
+        claimFunction: claimFunc,
+        transferOwnerFunction: transferFunc,
       },
     };
-
-    console.log('enable-spigot', transactionData);
 
     dispatch(CollateralActions.addSpigot(transactionData)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
@@ -203,54 +199,45 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     );
   }
 
-  const renderRevFunc = () => {
-    if (revContractABI) {
-      return (
-        <TxFuncSelector
-          headerText={t('components.transaction.enable-spigot.function-revenue')}
-          typeOptions={createListItems(selectedContractFunctions!)}
-          selectedType={claimFuncType}
-          onSelectedTypeChange={onClaimFuncSelection}
-        ></TxFuncSelector>
-      );
-    } else {
-      return (
-        <TxByteInput
-          headerText={t('components.transaction.enable-spigot.function-revenue')}
-          inputText={' '}
-          inputError={false}
-          byteCode={settingClaimFunc}
-          onByteCodeChange={handleClaimChange}
-          readOnly={false}
-        />
-      );
-    }
-  };
+  const revFuncDisplayConfigs = [
+    {
+      header: t('components.transaction.enable-spigot.function-transfer'),
+      options: createListItems(selectedContractFunctions!),
+      type: transferFuncType,
+      onchange: onTransferFuncSelection,
+      byteCode: transferFunc,
+      onByteChange: handleTransferFuncChange,
+    },
+    {
+      header: t('components.transaction.enable-spigot.function-revenue'),
+      options: createListItems(selectedContractFunctions!),
+      type: claimFuncType,
+      onchange: onClaimFuncSelection,
+      byteCode: claimFunc,
+      onByteChange: handleClaimChange,
+    },
+  ];
 
-  const renderTransferFunc = () => {
-    if (revContractABI) {
-      return (
+  const renderFuncSelectors = () =>
+    revFuncDisplayConfigs.map((config) =>
+      revContractABI ? (
         <TxFuncSelector
-          headerText={t('components.transaction.enable-spigot.function-transfer')}
-          inputText={' '}
-          typeOptions={createListItems(selectedContractFunctions!)}
-          selectedType={transferFuncType}
-          onSelectedTypeChange={onTransferFuncSelection}
-        ></TxFuncSelector>
-      );
-    } else {
-      return (
+          headerText={config.header}
+          typeOptions={config.options}
+          selectedType={config.type}
+          onSelectedTypeChange={config.onchange}
+        />
+      ) : (
         <TxByteInput
-          headerText={t('components.transaction.enable-spigot.function-transfer')}
+          headerText={config.header}
           inputText={' '}
           inputError={false}
-          byteCode={settingTransferFunc}
-          onByteCodeChange={handleTransferFuncChange}
+          byteCode={config.byteCode}
+          onByteCodeChange={config.onByteChange}
           readOnly={false}
         />
-      );
-    }
-  };
+      )
+    );
 
   return (
     <StyledTransaction onClose={onClose} header={header}>
@@ -259,8 +246,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
         address={revenueContractAdd}
         onAddressChange={handleChangeRevenue}
       />
-      {renderRevFunc()}
-      {renderTransferFunc()}
+      {renderFuncSelectors()}
 
       <TxActions>
         <TxActionButton

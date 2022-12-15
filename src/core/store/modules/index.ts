@@ -63,7 +63,7 @@ import collateralReducer, { collateralInitialState } from './collateral/collater
 import { CollateralActions } from './collateral/collateral.actions';
 import { CollateralSelectors } from './collateral/collateral.selectors';
 // OnChain MetaData
-import { onchainMetaDataReducer, initialOnchainMetaDataState } from './metadata/metadata.reducer';
+import onchainMetaDataReducer, { initialOnchainMetaDataState } from './metadata/metadata.reducer';
 import { OnchainMetaDataActions } from './metadata/metadata.actions';
 import { OnchainMetaDataSelector } from './metadata/metadata.selector';
 

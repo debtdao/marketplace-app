@@ -12,7 +12,7 @@ export const initialOnchainMetaDataState: OnchainMetaDataState = {
   ens: {},
 };
 
-export const onchainMetaDataReducer = createReducer(initialOnchainMetaDataState, (builder) => {
+const onchainMetaDataReducer = createReducer(initialOnchainMetaDataState, (builder) => {
   builder
     .addCase(getABI.fulfilled, (state, { payload: { abi, functions } }) => {
       state.contractABI = abi;
@@ -43,3 +43,5 @@ export const onchainMetaDataReducer = createReducer(initialOnchainMetaDataState,
       console.log('pending getENS');
     });
 });
+
+export default onchainMetaDataReducer;

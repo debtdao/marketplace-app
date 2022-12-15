@@ -64,15 +64,14 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
   };
 
   const onAmountChange = (ttl: string) => {
-    if (Number(ttl) < 0) {
+    if (Number(ttl) <= 0) {
+      setTimeToLive(ttl.toString());
       setTTLWarning('Increase TTL, cannot be 0.');
       return;
     }
     if (Number(ttl) > 0) {
       setTimeToLive(ttl.toString());
       setTTLWarning('');
-    } else {
-      setTimeToLive(ttl.toString());
     }
   };
 
@@ -149,23 +148,16 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
     // BPS IS USED so we must multiply by 10^2
     let BNCratio = toWei(cratio, 2);
 
-    // BPS IS NOT USED so we run through toWei to get BN
-    let BNRevenueSplit = toWei(revenueSplit, 0);
-    console.log(typeof BNCratio);
-
     try {
       // TODO Dynamic var based on network
-
       dispatch(
         LinesActions.deploySecuredLineWithConfig({
           factory: LineFactory_GOERLI,
           borrower,
           ttl: BigNumber.from(ttl.toFixed(0)),
           network: walletNetwork,
-          //@ts-ignore
-          revenueSplit: BNRevenueSplit,
-          //@ts-ignore
-          cratio: BNCratio,
+          revenueSplit: BigNumber.from(revenueSplit),
+          cratio: BigNumber.from(BNCratio),
         })
       ).then((res) => {
         if (res.meta.requestStatus === 'rejected') {

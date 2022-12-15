@@ -52,11 +52,9 @@ type userParams = {
 
 export const Portfolio = () => {
   const { t } = useAppTranslation(['common', 'home']);
-  // const isMounting = useIsMounting();
   const { userAddress } = useParams<userParams>();
   const dispatch = useAppDispatch();
 
-  const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const userPortfolio = useAppSelector(LinesSelectors.selectUserPortfolio);
   const portfolioAddress = userAddress ? userAddress : userWallet;
@@ -83,7 +81,7 @@ export const Portfolio = () => {
     } else if (portfolioAddress && isValidAddress(portfolioAddress)) {
       dispatch(LinesActions.getUserPortfolio({ user: portfolioAddress.toLocaleLowerCase() }));
     }
-  }, [currentRole, walletIsConnected, userWallet, userAddress]);
+  }, [portfolioAddress]);
 
   const { borrowerLineOfCredits, lenderPositions } = userPortfolio;
   // Get an array of borrowerPositions by flattening
@@ -99,12 +97,6 @@ export const Portfolio = () => {
       if (borrowerLineOfCredits && borrowerLineOfCredits[0]) {
         const lineId = borrowerLineOfCredits[0].id;
         setSelectedLine(lineId);
-      }
-    }
-    if (userPortfolio && currentRole === LENDER_POSITION_ROLE) {
-      if (lenderPositions && lenderPositions[0]) {
-        // const lineId = lenderPositions[0];
-        // setSelectedLine(lineId);
       }
     }
   }, [userPortfolio, currentRole]);

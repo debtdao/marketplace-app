@@ -9,11 +9,8 @@ import { device } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer } from '@components/app';
 import { Input, SearchIcon, Button, RedirectIcon } from '@components/common';
 import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, CreditPosition } from '@src/core/types';
-import { humanize, normalizeAmount, formatAddress } from '@src/utils';
+import { humanize, formatAddress } from '@src/utils';
 import { getEnv } from '@config/env';
-
-const linkHoverFilter = 'brightness(90%)';
-const linkTransition = 'filter 200ms ease-in-out';
 
 const PositionsCard = styled(DetailCard)`
   max-width: ${({ theme }) => theme.globalMaxWidth};
@@ -60,11 +57,11 @@ const RouterLink = styled(Link)<{ selected: boolean }>`
   padding: 0.5rem;
 
   &:hover span {
-    filter: ${linkHoverFilter};
+    filter: brightness(90%);
   }
 
   span {
-    transition: ${linkTransition};
+    transition: filter 200ms ease-in-out;
   }
   ${(props) =>
     props.selected &&
@@ -73,7 +70,7 @@ const RouterLink = styled(Link)<{ selected: boolean }>`
   `}
 `;
 
-const Redirect = styled(RedirectIcon)`
+const RedirectLinkIcon = styled(RedirectIcon)`
   display: inline-block;
   fill: currentColor;
   width: 1.2rem;
@@ -98,7 +95,6 @@ export const PositionsTable = (props: PositionsProps) => {
 
   const userRoleMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
-  const selectedPage = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const [actions, setActions] = useState<Transaction[]>([]);
@@ -313,7 +309,7 @@ export const PositionsTable = (props: PositionsProps) => {
             lender: (
               <RouterLink to={`/portfolio/${position.lender}`} key={position.id} selected={false}>
                 {formatAddress(position.lender)}
-                <Redirect />
+                <RedirectLinkIcon />
               </RouterLink>
             ),
             token: (
@@ -325,7 +321,7 @@ export const PositionsTable = (props: PositionsProps) => {
                 rel={'noreferrer'}
               >
                 {position.token.symbol}
-                <Redirect />
+                <RedirectLinkIcon />
               </a>
             ),
             actions: <ActionButtons value={position.id} actions={getUserPositionActions(position)} />,

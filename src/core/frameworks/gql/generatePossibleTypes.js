@@ -4,17 +4,14 @@
 
 // Source Documentation: https://www.apollographql.com/docs/react/data/fragments/#using-fragments-with-unions-and-interfaces
 
-// import { getEnv } from '@config/env';
-
 const fs = require('fs');
 
 const fetch = require('cross-fetch');
 
-const { getEnv } = require('@config/env');
-
-const { GRAPH_API_URL } = getEnv();
-
-// const GRAPH_API_URL = 'https://api.thegraph.com/subgraphs/name/kibagateaux/dd-test';
+// TODO: Fix to autogenerate the schema for GraphQL subgraph API.
+// const { getEnv } = require('@config/env');
+// const { GRAPH_API_URL } = getEnv();
+const GRAPH_API_URL = 'https://api.thegraph.com/subgraphs/name/kibagateaux/dd-test';
 
 fetch(`${GRAPH_API_URL}`, {
   method: 'POST',

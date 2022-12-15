@@ -32,6 +32,7 @@ import {
   EscrowDeposit,
   GetLineEventsResponse,
   AggregatedEscrow,
+  AggregatedSpigot,
 } from '@types';
 
 import { humanize, normalizeAmount, normalize } from './format';
@@ -182,8 +183,10 @@ export const formatSecuredLineData = (
   line: Address, // BaseLineFrag
   positionFrags: (BasePositionFragResponse | BasePositionFragResponse)[],
   eventFrags: LineEventFragResponse[],
-  collateralDeposits: BaseEscrowDepositFragResponse[],
-  revenues: SpigotRevenueSummaryFragResponse[],
+  escrow: any,
+  // collateralDeposits: BaseEscrowDepositFragResponse[],
+  spigot: any,
+  // revenues: SpigotRevenueSummaryFragResponse[],
   tokenPrices: { [token: string]: BigNumber }
 ): {
   credit: {
@@ -196,17 +199,22 @@ export const formatSecuredLineData = (
     positions: PositionMap;
   };
   creditEvents: CreditEvent[];
-  spigot: { type: CollateralTypes; line: string; tokenRevenue: { [key: string]: string } };
-  escrow: {
-    type: CollateralTypes;
-    line: string;
-    collateralValue: string;
-    cratio: string;
-    deposits: EscrowDepositList;
-    // TODO add formated deposits here
-  };
+  collateralEvents: CollateralEvent[];
+  // spigot: { type: CollateralTypes; line: string; tokenRevenue: { [key: string]: string } };
+  spigot: AggregatedSpigot;
+  escrow: AggregatedEscrow;
+  // escrow: {
+  //   type: CollateralTypes;
+  //   line: string;
+  //   collateralValue: string;
+  //   cratio: string;
+  //   deposits: EscrowDepositList;
+  //   // TODO add formated deposits here
+  // };
 } => {
   // derivative or aggregated data we need to compute and store while mapping position data
+  const collateralDeposits: BaseEscrowDepositFragResponse[] = escrow?.deposits || [];
+  const revenues: SpigotRevenueSummaryFragResponse[] = spigot?.summaries || [];
 
   // position id, token address, APY
   const highestApy: [string, string, string] = ['', '', '0'];
@@ -249,14 +257,20 @@ export const formatSecuredLineData = (
     [BigNumber.from(0), {}]
   );
 
+  const collateralEvents: CollateralEvent[] = [];
   const creditEvents = formatCreditEvents('', BigNumber.from(0), eventFrags);
 
-  const escrow = {
+  const aggregatedEscrow = {
+    id: escrow.id,
     type: COLLATERAL_TYPE_ASSET,
     line,
     deposits,
     collateralValue: collateralValue.toString(),
     cratio: parseUnits(unnullify(credit.principal).toString(), 'ether').eq(0)
+      ? '0'
+      : collateralValue.div(unnullify(credit.principal).toString()).toString(),
+    // TODO: fill in with appropriate value, not copied directly from cratio
+    minCRatio: parseUnits(unnullify(credit.principal).toString(), 'ether').eq(0)
       ? '0'
       : collateralValue.div(unnullify(credit.principal).toString()).toString(),
   };
@@ -298,9 +312,10 @@ export const formatSecuredLineData = (
       positionIds: Object.keys(positions),
       positions,
     },
+    collateralEvents,
     creditEvents,
-    escrow,
-    spigot: { type: COLLATERAL_TYPE_REVENUE, line, tokenRevenue },
+    escrow: aggregatedEscrow,
+    spigot: { id: spigot.id, type: COLLATERAL_TYPE_REVENUE, line, tokenRevenue },
   };
 };
 
@@ -364,16 +379,10 @@ export const formatLinePageData = (
   const {
     credit,
     creditEvents,
+    collateralEvents,
     spigot: spigotData,
     escrow: escrowData,
-  } = formatSecuredLineData(
-    metadata.id,
-    positions!,
-    events!,
-    escrow?.deposits || [],
-    spigot?.summaries || [],
-    tokenPrices
-  );
+  } = formatSecuredLineData(metadata.id, positions!, events!, escrow, spigot, tokenPrices);
 
   // derivative or aggregated data we need to compute and store while mapping position data
   // position id and APY
@@ -383,7 +392,8 @@ export const formatLinePageData = (
   // const collateralEvents = formatEscrowToCollateralEvents(escrowData);
   console.log('Get Line Page escrow: ', escrow);
   console.log('Get Line Page escrow data for collateral: ', escrowData);
-  const collateralEvents: CollateralEvent[] = _.map(escrowData.deposits, function (deposit) {
+  // const collateralEvents = formatCollateralEvents('escrow', '', BigNumber.from(0), escrowData.deposits.events, 0);
+  const collateralEvents2: CollateralEvent[] = _.map(escrowData.deposits, function (deposit) {
     // console.log('get line page individual deposits: ', deposit);
     return {
       type: deposit.type,
@@ -396,6 +406,8 @@ export const formatLinePageData = (
       value: 0,
     } as CollateralEvent;
   });
+  console.log('Get Line Page Data - Collateral Events 1: ', collateralEvents);
+  console.log('Get Line Page Data - Collateral Events 2: ', collateralEvents2);
 
   //Derive Collateral Events by
   // aggregated revenue in USD by token across all spigots
@@ -417,14 +429,15 @@ export const formatLinePageData = (
     // debt data
     ...credit,
     creditEvents,
-    collateralEvents,
+    collateralEvents: collateralEvents2,
     borrower: borrower.id,
     status: status.toLowerCase() as LineStatusTypes,
     // TODO add UsePositionMetada,
     spigotId: spigot?.id,
     escrowId: escrow?.id,
     spigot: formattedSpigot,
-    escrow: isEmpty(escrow?.deposits) ? undefined : { ...escrow!, ...escrowData },
+    escrow: escrowData, //formattedEscrow,
+    //escrow: isEmpty(escrow?.deposits) ? undefined : { ...escrow!, ...escrowData },
   };
   return pageData;
 };
@@ -442,14 +455,7 @@ export const formatUserPortfolioData = (
         credit,
         spigot: spigotData,
         escrow: escrowData,
-      } = formatSecuredLineData(
-        rest.id,
-        positions,
-        events,
-        escrow?.deposits || [],
-        spigot?.summaries || [],
-        tokenPrices
-      );
+      } = formatSecuredLineData(rest.id, positions, events, escrow, spigot, tokenPrices);
 
       return {
         ...rest,

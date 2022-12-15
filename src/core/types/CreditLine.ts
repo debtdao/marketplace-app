@@ -155,12 +155,14 @@ export interface EscrowDepositList {
   [token: string]: EscrowDeposit;
 }
 
-export interface AggregatedEscrow extends BaseEscrow {
+export interface AggregatedEscrow extends BaseEscrow, BaseCollateralModule {
   id: Address;
   cratio: string;
   minCRatio: string;
   collateralValue: string;
   deposits?: EscrowDepositList;
+  type: CollateralTypes;
+  line: string;
 }
 
 export interface RevenueSummary extends Collateral {

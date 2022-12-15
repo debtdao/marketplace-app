@@ -169,39 +169,33 @@ export const PositionsTable = (props: PositionsProps) => {
     if (!userWallet) {
       connectWallet();
     } else {
-      const target = e.target! as HTMLInputElement;
-      dispatch(LinesActions.setSelectedLinePosition({ position: target.value! }));
+      dispatch(LinesActions.setSelectedLinePosition({ position: (e.target as HTMLInputElement).value }));
       dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
     }
   };
 
   const liquidateHandler = (e: Event) => {
-    const target = e.target! as HTMLInputElement;
-    dispatch(LinesActions.setSelectedLinePosition({ position: target.value! }));
+    dispatch(LinesActions.setSelectedLinePosition({ position: (e.target as HTMLInputElement).value }));
     dispatch(ModalsActions.openModal({ modalName: 'liquidateBorrower' }));
   };
 
   const WithdrawHandler = (e: Event) => {
-    const target = e.target! as HTMLInputElement;
-    dispatch(LinesActions.setSelectedLinePosition({ position: target.value! }));
+    dispatch(LinesActions.setSelectedLinePosition({ position: (e.target as HTMLInputElement).value }));
     dispatch(ModalsActions.openModal({ modalName: 'withdraw' }));
   };
 
   const borrowHandler = (e: Event) => {
-    const target = e.target! as HTMLInputElement;
-    dispatch(LinesActions.setSelectedLinePosition({ position: target.value! }));
+    dispatch(LinesActions.setSelectedLinePosition({ position: (e.target as HTMLInputElement).value }));
     dispatch(ModalsActions.openModal({ modalName: 'borrow' }));
   };
 
   const depositAndRepayHandler = (e: Event) => {
-    const target = e.target! as HTMLInputElement;
-    dispatch(LinesActions.setSelectedLinePosition({ position: target.value! }));
+    dispatch(LinesActions.setSelectedLinePosition({ position: (e.target as HTMLInputElement).value }));
     dispatch(ModalsActions.openModal({ modalName: 'depositAndRepay' }));
   };
 
   const acceptProposalHandler = (e: Event) => {
-    const target = e.target! as HTMLInputElement;
-    dispatch(LinesActions.setSelectedLinePosition({ position: target.value! }));
+    dispatch(LinesActions.setSelectedLinePosition({ position: (e.target as HTMLInputElement).value }));
     dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
   };
 

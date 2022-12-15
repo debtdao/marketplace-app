@@ -108,7 +108,7 @@ export const PositionsTable = (props: PositionsProps) => {
         handler: (e: Event) => WithdrawHandler(e),
         disabled: false,
       });
-      console.log('withdraw');
+      // console.log('withdraw');
     }
     if (userRoleMetadata.role === ARBITER_POSITION_ROLE) {
       Transactions.push({

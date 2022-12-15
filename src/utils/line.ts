@@ -30,6 +30,9 @@ import {
   LENDER_POSITION_ROLE,
   BaseLineFragResponse,
   EscrowDeposit,
+  GetLineEventsResponse,
+  AggregatedEscrow,
+  AggregatedSpigot,
 } from '@types';
 
 import { humanize, normalizeAmount, normalize } from './format';
@@ -51,16 +54,17 @@ export const formatCreditEvents = (
   price: BigNumber = BigNumber.from(0),
   events: LineEventFragResponse[]
 ): CreditEvent[] => {
-  return events.map((e: any): CreditEvent => {
-    const { __typename, amount, token, credit, timestamp, value = unnullify(0, true) } = e;
+  return events.map((event: any): CreditEvent => {
+    const { id, timestamp, __typename, amount, value, position } = event;
     return {
-      id: credit?.id,
+      id,
       __typename,
       timestamp,
       amount,
+      // value: unnullify(value, true),
       value,
-      token: token?.id,
-      currentValue: price.mul(value),
+      token: position.token.id,
+      // currentValue: price.mul(value),
     };
   });
 };
@@ -139,6 +143,7 @@ export function formatGetLinesData(
     const {
       borrower: { id: borrower },
       positions,
+      events = [],
       escrow: escrowRes,
       spigot: spigotRes,
       status,
@@ -147,11 +152,11 @@ export function formatGetLinesData(
     const { credit, spigot, escrow } = formatSecuredLineData(
       rest.id,
       positions,
+      events,
       escrowRes?.deposits ?? [],
       spigotRes?.revenues ?? [],
       tokenPrices
     );
-
     // const deposits = escrowRes?.deposits.map((d: any) => ({ ...d, token: d.token.id }));
     // formatAggData (positions, deposits, summaries);
 
@@ -159,8 +164,9 @@ export function formatGetLinesData(
       ...rest,
       ...credit,
       status: status.toLowerCase() as LineStatusTypes,
-      positions,
       borrower,
+      spigotId: spigotRes?.id,
+      escrowId: escrowRes?.id,
       spigot: {
         ...(spigotRes ?? {}),
         ...spigot,
@@ -176,8 +182,11 @@ export function formatGetLinesData(
 export const formatSecuredLineData = (
   line: Address, // BaseLineFrag
   positionFrags: (BasePositionFragResponse | BasePositionFragResponse)[],
-  collateralDeposits: BaseEscrowDepositFragResponse[],
-  revenues: SpigotRevenueSummaryFragResponse[],
+  eventFrags: LineEventFragResponse[],
+  escrow: any,
+  // collateralDeposits: BaseEscrowDepositFragResponse[],
+  spigot: any,
+  // revenues: SpigotRevenueSummaryFragResponse[],
   tokenPrices: { [token: string]: BigNumber }
 ): {
   credit: {
@@ -189,21 +198,26 @@ export const formatSecuredLineData = (
     positionIds: string[];
     positions: PositionMap;
   };
-  spigot: { type: CollateralTypes; line: string; tokenRevenue: { [key: string]: string } };
-  escrow: {
-    type: CollateralTypes;
-    line: string;
-    collateralValue: string;
-    cratio: string;
-    deposits: EscrowDepositList;
-    // TODO add formated deposits here
-  };
+  creditEvents: CreditEvent[];
+  collateralEvents: CollateralEvent[];
+  // spigot: { type: CollateralTypes; line: string; tokenRevenue: { [key: string]: string } };
+  spigot: AggregatedSpigot;
+  escrow: AggregatedEscrow;
+  // escrow: {
+  //   type: CollateralTypes;
+  //   line: string;
+  //   collateralValue: string;
+  //   cratio: string;
+  //   deposits: EscrowDepositList;
+  //   // TODO add formated deposits here
+  // };
 } => {
   // derivative or aggregated data we need to compute and store while mapping position data
+  const collateralDeposits: BaseEscrowDepositFragResponse[] = escrow?.deposits || [];
+  const revenues: SpigotRevenueSummaryFragResponse[] = spigot?.summaries || [];
 
   // position id, token address, APY
   const highestApy: [string, string, string] = ['', '', '0'];
-  const creditEvents: CreditEvent[] = [];
   const principal = BigNumber.from(0);
   const deposit = BigNumber.from(0);
 
@@ -243,12 +257,20 @@ export const formatSecuredLineData = (
     [BigNumber.from(0), {}]
   );
 
-  const escrow = {
+  const collateralEvents: CollateralEvent[] = [];
+  const creditEvents = formatCreditEvents('', BigNumber.from(0), eventFrags);
+
+  const aggregatedEscrow = {
+    id: escrow.id,
     type: COLLATERAL_TYPE_ASSET,
     line,
     deposits,
     collateralValue: collateralValue.toString(),
     cratio: parseUnits(unnullify(credit.principal).toString(), 'ether').eq(0)
+      ? '0'
+      : collateralValue.div(unnullify(credit.principal).toString()).toString(),
+    // TODO: fill in with appropriate value, not copied directly from cratio
+    minCRatio: parseUnits(unnullify(credit.principal).toString(), 'ether').eq(0)
       ? '0'
       : collateralValue.div(unnullify(credit.principal).toString()).toString(),
   };
@@ -290,9 +312,51 @@ export const formatSecuredLineData = (
       positionIds: Object.keys(positions),
       positions,
     },
-    escrow,
-    spigot: { type: COLLATERAL_TYPE_REVENUE, line, tokenRevenue },
+    collateralEvents,
+    creditEvents,
+    escrow: aggregatedEscrow,
+    spigot: { id: spigot.id, type: COLLATERAL_TYPE_REVENUE, line, tokenRevenue },
   };
+};
+
+// TODO: Modify/adjust this to replace mergeCollateralEvents (formatCollateralEvents)
+// given that there are 3 duplicative uses of collateral events in this file!!
+export const formatEscrowToCollateralEvents = (escrow: AggregatedEscrow | undefined): CollateralEvent[] => {
+  // console.log('get line events escrow: ', escrow);
+  const collateralEvents: CollateralEvent[] = escrow!
+    ? _.map(escrow.deposits, function (deposit) {
+        // console.log('get line individual deposits: ', deposit);
+        return {
+          type: deposit.type,
+          id: deposit.token.address,
+          // TODO: timestamp should probably be removed from the type given this aggregates
+          // collateral by type and token address
+          timestamp: 0,
+          amount: Number(deposit.amount),
+          // TODO: replace with correct USD value when we have it
+          value: 0,
+        } as CollateralEvent;
+      })
+    : [];
+  return collateralEvents;
+};
+
+export const formatLineWithEvents = (
+  selectedLine: SecuredLineWithEvents,
+  lineEvents: GetLineEventsResponse | undefined
+): SecuredLineWithEvents | undefined => {
+  if (!lineEvents) return undefined;
+  const { creditEvents: oldCreditEvents, collateralEvents: oldCollateralEvents, escrow, ...rest } = selectedLine;
+  const { events: creditEvents, spigot } = lineEvents;
+
+  // Create collateralEvents
+  // console.log('Get Line Events Escrow: ', escrow);
+  // console.log('Get Line Events Spigot: ', spigot);
+  const collateralEvents = formatEscrowToCollateralEvents(escrow);
+
+  // Add collateralEvents and creditEvents to SecuredLine
+  const selectedLineWithEvents = { creditEvents, collateralEvents, escrow, ...rest } as SecuredLineWithEvents;
+  return selectedLineWithEvents;
 };
 
 export const formatLinePageData = (
@@ -301,30 +365,38 @@ export const formatLinePageData = (
 ): SecuredLineWithEvents | undefined => {
   if (!lineData) return undefined;
   // add token Prices as arg
+  // console.log('User Portfolio actions selectedLine 2: ', lineData);
   const {
     spigot,
     escrow,
     positions,
     borrower,
     status,
+    events,
     ...metadata
     // userLinesMetadataMap,
   } = lineData;
   const {
     credit,
+    creditEvents,
+    collateralEvents,
     spigot: spigotData,
     escrow: escrowData,
-  } = formatSecuredLineData(metadata.id, positions!, escrow?.deposits || [], spigot?.summaries || [], tokenPrices);
+  } = formatSecuredLineData(metadata.id, positions!, events!, escrow, spigot, tokenPrices);
 
   // derivative or aggregated data we need to compute and store while mapping position data
   // position id and APY
-
-  //Derive Collateral Events by
-  // aggregated revenue in USD by token across all spigots
-  //  all recent Spigot and Escrow events
-  let collateralEvents: CollateralEvent[] = _.map(escrowData.deposits, function (deposit) {
+  console.log('Get Line Page - LineEventFrag test: ', lineData.events);
+  console.log('Get Line Page - EscrowEventFrag test: ', lineData.escrow);
+  // Create array of CollateralEvent[]
+  // const collateralEvents = formatEscrowToCollateralEvents(escrowData);
+  console.log('Get Line Page escrow: ', escrow);
+  console.log('Get Line Page escrow data for collateral: ', escrowData);
+  // const collateralEvents = formatCollateralEvents('escrow', '', BigNumber.from(0), escrowData.deposits.events, 0);
+  const collateralEvents2: CollateralEvent[] = _.map(escrowData.deposits, function (deposit) {
+    // console.log('get line page individual deposits: ', deposit);
     return {
-      type: escrowData.type,
+      type: deposit.type,
       id: deposit.token.address,
       // TODO: timestamp should probably be removed from the type given this aggregates
       // collateral by type and token address
@@ -334,6 +406,13 @@ export const formatLinePageData = (
       value: 0,
     } as CollateralEvent;
   });
+  console.log('Get Line Page Data - Collateral Events 1: ', collateralEvents);
+  console.log('Get Line Page Data - Collateral Events 2: ', collateralEvents2);
+
+  //Derive Collateral Events by
+  // aggregated revenue in USD by token across all spigots
+  //  all recent Spigot and Escrow events
+
   // let collateralEvents: CollateralEvent[] = escrow?
   //  all recent borrow/lend events
   // const creditEvents: CreditEvent[] = [];
@@ -349,19 +428,16 @@ export const formatLinePageData = (
     ...metadata,
     // debt data
     ...credit,
-    creditEvents: [], // @ TODO add to formatSecuredLineData
+    creditEvents,
+    collateralEvents: collateralEvents2,
     borrower: borrower.id,
     status: status.toLowerCase() as LineStatusTypes,
     // TODO add UsePositionMetada,
-
-    // all recent events
-    // TODO add creditEvents
-    collateralEvents,
-    // collateral data
     spigotId: spigot?.id,
     escrowId: escrow?.id,
     spigot: formattedSpigot,
-    escrow: isEmpty(escrow?.deposits) ? undefined : { ...escrow!, ...escrowData },
+    escrow: escrowData, //formattedEscrow,
+    //escrow: isEmpty(escrow?.deposits) ? undefined : { ...escrow!, ...escrowData },
   };
   return pageData;
 };
@@ -374,12 +450,12 @@ export const formatUserPortfolioData = (
   // const { spigot, escrow, positions, borrower, status, ...metadata } = lineData;
   const { borrowerLineOfCredits, lenderPositions, arbiterLineOfCredits } = portfolioData;
   const lines = [...borrowerLineOfCredits, ...arbiterLineOfCredits]
-    .map(({ borrower, status, positions = [], escrow, spigot, ...rest }) => {
+    .map(({ borrower, status, positions = [], events = [], escrow, spigot, ...rest }) => {
       const {
         credit,
         spigot: spigotData,
         escrow: escrowData,
-      } = formatSecuredLineData(rest.id, positions, escrow?.deposits || [], spigot?.summaries || [], tokenPrices);
+      } = formatSecuredLineData(rest.id, positions, events, escrow, spigot, tokenPrices);
 
       return {
         ...rest,
@@ -387,8 +463,8 @@ export const formatUserPortfolioData = (
         borrower: borrower.id,
         status: status.toLowerCase() as LineStatusTypes,
 
-        spigotId: spigot?.id,
         escrowId: escrow?.id,
+        spigotId: spigot?.id,
         spigot: {
           ...(spigotData ?? {}),
           ...spigot,

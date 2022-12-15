@@ -176,13 +176,12 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
           // update positions for each line
           const linePositionMap = _.zipObject(_.values(l.positionIds), _.values(l.positions));
           positions = { ...positions, ...linePositionMap };
-
           state.statusMap.user.linesActionsStatusMap[l.id] = initialLineActionsStatusMap;
           // save line id to category for reference
           categories[category] = [...(categories[category] || []), l.id];
         })
       );
-      // console.log('User Portfolio get line positions: ', positions);
+      // console.log('Get Lines linesdata: ', lines);
       state.linesMap = { ...state.linesMap, ...lines };
       state.positionsMap = { ...state.positionsMap, ...positions };
       state.categories = { ...state.categories, ...categories };
@@ -201,7 +200,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
         state.linesMap = { ...state.linesMap, [linePageData.id]: { ...metadata } };
         state.positionsMap = { ...state.positionsMap, ...positions };
         state.eventsMap = { ...state.eventsMap, [metadata.id]: creditEvents };
-        // we also update state.collateral on this action  being fullfilled in collateral.reducer.ts
       }
 
       state.statusMap.getLinePage = {};

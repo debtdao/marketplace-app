@@ -69,7 +69,7 @@ export interface SecuredLine extends LineOfCredit, LineCollateral {
 }
 
 // data that isnt included in SecuredLine that we need to fetch for full SecuredLineWithEvents dattype
-// gets merged into existing AggregatedCredit to form LinePageData
+// gets merged into existing SecuredLine to form SecuredLineWithEvents
 export interface LineEvents {
   collateralEvents: CollateralEvent[];
   creditEvents: CreditEvent[];
@@ -147,20 +147,22 @@ export interface EscrowDeposit extends Collateral {
   amount: string;
   value: string;
   enabled: boolean;
-
   displayIcon?: string; // url to token icon
+  events?: EscrowEvent;
 }
 
 export interface EscrowDepositList {
   [token: string]: EscrowDeposit;
 }
 
-export interface AggregatedEscrow extends BaseEscrow {
+export interface AggregatedEscrow extends BaseEscrow, BaseCollateralModule {
   id: Address;
   cratio: string;
   minCRatio: string;
   collateralValue: string;
   deposits?: EscrowDepositList;
+  type: CollateralTypes;
+  line: string;
 }
 
 export interface RevenueSummary extends Collateral {
@@ -244,6 +246,13 @@ export interface SetRateEvent {
   timestamp: number;
   dRate: number;
   fRate: number;
+}
+
+// Escrow Events
+export interface EscrowEvent {
+  __typename: string;
+  id: Address;
+  timestamp: number;
 }
 
 // Collateral Events

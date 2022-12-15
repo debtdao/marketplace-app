@@ -79,12 +79,12 @@ const selectSelectedPosition = createSelector(
 );
 const selectPositionsForSelectedLine = createSelector(
   [selectPositionsMap, selectSelectedLineAddress],
-  (positions, line): PositionMap => {
+  (positionsMap, line): PositionMap => {
     if (!line) {
       return {};
     } else {
       // Create and return PositionMap of only positions for a given line
-      const linePositions = _.values(positions).filter((p) => p.line === line);
+      const linePositions = _.values(positionsMap).filter((p) => p.line === line);
       const linePositionsObj = _.transform(
         linePositions,
         function (result, position) {
@@ -132,10 +132,6 @@ const selectEventsForLine = createSelector(
 const selectSelectedLinePage = createSelector(
   [selectSelectedLine, selectPositionsForSelectedLine, selectCollateralForSelectedLine, selectEventsForLine],
   (line, positions, collateral, events): SecuredLineWithEvents | undefined => {
-    // console.log('User Portfolio actions selectedLine line: ', line);
-    // console.log('User Portfolio actions selectedLine line positions: ', positions);
-    // console.log('User Portfolio actions selectedLine line collateral: ', collateral);
-    // console.log('User Portfolio actions selectedLine line events: ', events);
     if (!line) return undefined;
     return { ...line, positions, ...collateral, ...events };
   }

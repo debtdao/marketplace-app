@@ -49,14 +49,16 @@ export class BlocknativeWalletImpl implements Wallet {
     const { BLOCKNATIVE_KEY, FORTMATIC_KEY, PORTIS_KEY } = getConfig();
 
     const rpcUrl = getNetworkRpc(network);
-    const appName = 'Yearn Finance';
+    const appName = 'Debt DAO';
 
     const wallets = [
-      { walletName: 'metamask' },
+      {
+        walletName: 'metamask',
+      },
       {
         walletName: 'walletConnect',
         rpc: {
-          [networkId]: rpcUrl,
+          [networkId]: 'https://eth-goerli.public.blastapi.io',
         },
       },
       {
@@ -124,6 +126,7 @@ export class BlocknativeWalletImpl implements Wallet {
       const valid = await this.onboard?.walletCheck();
       return valid ?? false;
     } catch (error) {
+      console.log('error', error);
       return false;
     }
   }
@@ -133,50 +136,6 @@ export class BlocknativeWalletImpl implements Wallet {
     if (this.onboard) {
       this.onboard.config({ darkMode });
     }
-  }
-
-  public async changeNetwork(network: Network): Promise<boolean> {
-    const { NETWORK_SETTINGS } = getConfig();
-    const networkSettings = NETWORK_SETTINGS[network];
-    const networkId = networkSettings.networkId;
-
-    if (this.onboard) {
-      this.onboard.config({ networkId });
-    }
-
-    if (this.onboard && this.isMetaMask()) {
-      try {
-        await this.getState()?.wallet.provider.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: `0x${networkId.toString(16)}` }],
-        });
-        return true;
-      } catch (error: any) {
-        if (error.code === 4902) {
-          try {
-            await this.getState()?.wallet.provider.request({
-              method: 'wallet_addEthereumChain',
-              params: [
-                {
-                  chainId: `0x${networkId.toString(16)}`,
-                  chainName: networkSettings.name,
-                  nativeCurrency: networkSettings.nativeCurrency,
-                  rpcUrls: [networkSettings.rpcUrl],
-                  blockExplorerUrls: [networkSettings.blockExplorerUrl],
-                },
-              ],
-            });
-            return true;
-          } catch (addError) {
-            console.error(addError);
-          }
-        }
-        console.error(error);
-        return false;
-      }
-    }
-
-    return true;
   }
 
   public async addToken(

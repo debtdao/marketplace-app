@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from 'react';
 
-import { useAppSelector, useAppDispatch, useAppDispatchAndUnwrap, useAppTranslation } from '@hooks';
+import { useAppSelector, useAppDispatch, useAppTranslation } from '@hooks';
 import { VaultsSelectors, VaultsActions, TokensActions, NetworkSelectors, WalletSelectors } from '@store';
 import {
   toBN,
@@ -22,7 +22,6 @@ export const MigrateTx: FC<MigrateTxProps> = ({ header, onClose }) => {
   const { t } = useAppTranslation('common');
 
   const dispatch = useAppDispatch();
-  const dispatchAndUnwrap = useAppDispatchAndUnwrap();
   const [txCompleted, setTxCompleted] = useState(false);
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
@@ -121,18 +120,18 @@ export const MigrateTx: FC<MigrateTxProps> = ({ header, onClose }) => {
     );
   };
 
-  const migrate = async () => {
-    try {
-      await dispatchAndUnwrap(
-        VaultsActions.migrateVault({
-          vaultFromAddress: selectedVault.address,
-          vaultToAddress: selectedVault.migrationTargetVault!,
-          migrationContractAddress: selectedVault.migrationContract!,
-        })
-      );
-      setTxCompleted(true);
-    } catch (error) {}
-  };
+  // const migrate = async () => {
+  //   try {
+  //     await dispatchAndUnwrap(
+  //       VaultsActions.migrateVault({
+  //         vaultFromAddress: selectedVault.address,
+  //         vaultToAddress: selectedVault.migrationTargetVault!,
+  //         migrationContractAddress: selectedVault.migrationContract!,
+  //       })
+  //     );
+  //     setTxCompleted(true);
+  //   } catch (error) {}
+  // };
 
   const txActions = [
     {
@@ -141,12 +140,12 @@ export const MigrateTx: FC<MigrateTxProps> = ({ header, onClose }) => {
       status: actionsStatus.approveMigrate,
       disabled: isApproved,
     },
-    {
-      label: t('components.transaction.migrate'),
-      onAction: migrate,
-      status: actionsStatus.migrate,
-      disabled: !isApproved,
-    },
+    // {
+    //   label: t('components.transaction.migrate'),
+    //   onAction: migrate,
+    //   status: actionsStatus.migrate,
+    //   disabled: !isApproved,
+    // },
   ];
 
   return (

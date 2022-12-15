@@ -4,8 +4,8 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import { TokenIcon } from '@components/app';
 import { useAppTranslation } from '@hooks';
-import { Text, Icon, Button, SearchList, ZapIcon, SearchListItem } from '@components/common';
-import { formatUsd, humanize } from '@utils';
+import { Text, Icon, Button, SearchList, ChailinkIcon, ZapIcon, SearchListItem } from '@components/common';
+import { humanize } from '@utils';
 
 const MaxButton = styled(Button)`
   border-radius: ${({ theme }) => theme.globalRadius};
@@ -15,8 +15,6 @@ const MaxButton = styled(Button)`
 `;
 
 const StyledAmountInput = styled.input<{ readOnly?: boolean; error?: boolean }>`
-  font-size: 2.4rem;
-  font-weight: 700;
   background: transparent;
   outline: none;
   border: none;
@@ -52,34 +50,14 @@ const StyledAmountInput = styled.input<{ readOnly?: boolean; error?: boolean }>`
   `}
 `;
 
-const ContrastText = styled.span`
-  color: ${({ theme }) => theme.colors.primary};
-`;
-
-const StyledText = styled(Text)`
-  color: ${({ theme }) => theme.colors.txModalColors.text};
-  max-width: 11rem;
-`;
-
-const TokenExtras = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  margin-top: 0.8rem;
-
-  ${StyledText} {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
-`;
-
 const AmountInputContainer = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
   margin-top: 0.8rem;
+
+  font-size: 2.4rem;
+  font-weight: 700;
 `;
 
 const AmountTitle = styled(Text)`
@@ -120,57 +98,6 @@ const TokenIconContainer = styled.div`
   align-items: center;
   justify-content: center;
   width: 100%;
-`;
-
-const ZappableTokenButton = styled(Button)<{ selected?: boolean; viewAll?: boolean }>`
-  display: block;
-  font-size: 1.2rem;
-  height: 2.4rem;
-  padding: 0 0.8rem;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  width: -webkit-fill-available;
-  // NOTE - hack fallback if fill-available is not supported
-  max-width: 6.6rem;
-  max-width: max-content;
-
-  ${({ selected, theme }) =>
-    selected &&
-    `
-      background-color: ${theme.colors.secondary};
-      color: ${theme.colors.titlesVariant};
-    `}
-  ${({ viewAll }) =>
-    viewAll &&
-    `
-      flex-shrink: 0;
-    `}
-`;
-
-const ZappableTokensList = styled.div`
-  display: flex;
-  // NOTE This will make the list with css grid, an alternative to flexbox wrapping.
-  // We should leave this piece of code here because I think we will need to change the style.
-  // grid-template-columns: repeat(auto-fit, minmax(3rem, max-content));
-  // grid-auto-flow: column;
-  // flex-wrap: wrap;
-  overflow: hidden;
-  margin-top: 0.8rem;
-  grid-gap: 0.8rem;
-  width: 100%;
-`;
-
-const ZapMessageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  border-radius: ${({ theme }) => theme.globalRadius};
-  background: ${({ theme }) => theme.colors.txModalColors.backgroundVariant};
-  padding: 0.8rem;
-  font-size: 1.2rem;
-  width: 100%;
-  overflow: hidden;
 `;
 
 const TokenSelector = styled.div<{ onClick?: () => void; center?: boolean }>`
@@ -254,18 +181,21 @@ const amountToNumber = (amount: string) => {
 interface Token {
   address: string;
   symbol: string;
-  icon?: string;
-  balance: string;
-  balanceUsdc: string;
   decimals: number;
+  icon?: string;
+  balance?: string;
+  balanceUsdc?: string;
   yield?: string;
 }
 
+type TokenInputStyles = 'amount' | 'oracle';
+
 export interface TxTokenInputProps {
+  style?: TokenInputStyles;
   headerText?: string;
   inputText?: string;
   inputError?: boolean;
-  amount: string;
+  amount?: string;
   onAmountChange?: (amount: string) => void;
   amountValue?: string;
   maxAmount?: string;
@@ -282,6 +212,7 @@ export interface TxTokenInputProps {
 }
 
 export const TxTokenInput: FC<TxTokenInputProps> = ({
+  style = 'amount',
   headerText,
   inputText,
   inputError,
@@ -305,7 +236,6 @@ export const TxTokenInput: FC<TxTokenInputProps> = ({
   const { t } = useAppTranslation('common');
 
   let listItems: SearchListItem[] = [];
-  let zappableItems: SearchListItem[] = [];
   let selectedItem: SearchListItem = {
     id: selectedToken.address,
     icon: selectedToken.icon,
@@ -324,7 +254,6 @@ export const TxTokenInput: FC<TxTokenInputProps> = ({
         };
       })
       .sort((a, b) => amountToNumber(b.value) - amountToNumber(a.value));
-    zappableItems = listItems.slice(0, 4);
     listItems.sort((a, b) => (a.id === selectedItem.id ? -1 : 1));
   }
 
@@ -337,6 +266,14 @@ export const TxTokenInput: FC<TxTokenInputProps> = ({
     ? t('components.transaction.token-input.search-select-vault')
     : t('components.transaction.token-input.search-select-token');
 
+  // const getMainInputField = () => {
+  //   if(hideAmount) return null;
+  //   switch(style) {
+  //     case 'amount':
+  //       return
+  // }
+
+  const tokenInfoIcon = style === 'oracle' ? ChailinkIcon : ZapIcon;
   return (
     <StyledTxTokenInput {...props}>
       <>{headerText && <Header>{headerText}</Header>}</>
@@ -358,7 +295,7 @@ export const TxTokenInput: FC<TxTokenInputProps> = ({
           <TokenSelector onClick={listItems?.length > 1 ? openSearchList : undefined} center={hideAmount}>
             <TokenIconContainer>
               <TokenIcon icon={selectedItem.icon} symbol={selectedItem.label} size="big" />
-              {listItems?.length > 1 && <TokenListIcon Component={ZapIcon} />}
+              {listItems?.length > 1 && <TokenListIcon Component={tokenInfoIcon} />}
             </TokenIconContainer>
             <TokenName>{selectedItem.label}</TokenName>
           </TokenSelector>
@@ -368,6 +305,7 @@ export const TxTokenInput: FC<TxTokenInputProps> = ({
               <AmountTitle ellipsis>{inputText || t('components.transaction.token-input.you-have')}</AmountTitle>
 
               <AmountInputContainer>
+                {style === 'oracle' && '$'}
                 <StyledAmountInput
                   value={amount}
                   onChange={onAmountChange ? (e) => onAmountChange(e.target.value) : undefined}
@@ -383,41 +321,9 @@ export const TxTokenInput: FC<TxTokenInputProps> = ({
                   </MaxButton>
                 )}
               </AmountInputContainer>
-
-              <TokenExtras>
-                {amountValue && <StyledText>{formatUsd(!loading && !inputError ? amountValue : '0')}</StyledText>}
-                {yieldPercent && (
-                  <StyledText>
-                    {t('components.transaction.token-input.yield')}
-                    <ContrastText> {yieldPercent} </ContrastText>
-                  </StyledText>
-                )}
-              </TokenExtras>
             </TokenData>
           )}
         </TokenInfo>
-
-        {zappableItems?.length > 1 && displayGuidance && (
-          <ZapMessageContainer>
-            {t('components.transaction.zap-guidance.desc')}
-            <ZappableTokensList>
-              {zappableItems.map((item) => (
-                <ZappableTokenButton
-                  key={item.id}
-                  outline
-                  selected={item.id === selectedItem.id}
-                  onClick={() => (onSelectedTokenChange ? onSelectedTokenChange(item.id) : undefined)}
-                >
-                  {item.label}
-                </ZappableTokenButton>
-              ))}
-
-              <ZappableTokenButton viewAll outline onClick={openSearchList}>
-                {t('components.transaction.zap-guidance.view-all')}
-              </ZappableTokenButton>
-            </ZappableTokensList>
-          </ZapMessageContainer>
-        )}
       </>
     </StyledTxTokenInput>
   );

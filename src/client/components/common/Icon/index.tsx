@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { ReactComponent as AddCircleIcon } from '@assets/icons/add-circle.svg';
 import { ReactComponent as AddIcon } from '@assets/icons/add.svg';
 import { ReactComponent as ArrowDownIcon } from '@assets/icons/arrow-down.svg';
+import { ReactComponent as ChailinkIcon } from '@assets/icons/chainlink-logo-blue.svg';
 import { ReactComponent as CheckRoundIcon } from '@assets/icons/check-round.svg';
 import { ReactComponent as ChevronDownIcon } from '@assets/icons/chevron-down.svg';
 import { ReactComponent as ChevronLeftIcon } from '@assets/icons/chevron-left.svg';
@@ -34,7 +35,6 @@ import { ReactComponent as ErrorIcon } from '@assets/icons/error.svg';
 import { ReactComponent as RedirectIcon } from '@assets/icons/redirect.svg';
 // NOTE NETWORK Icons
 import { ReactComponent as EthereumIcon } from '@assets/icons/networks/ethereum.svg';
-import { ReactComponent as FantomIcon } from '@assets/icons/networks/fantom.svg';
 import { ReactComponent as ArbitrumIcon } from '@assets/icons/networks/arbitrum.svg';
 import { ReactComponent as EtherscanIcon } from '@assets/icons/etherscan.svg';
 import { ReactComponent as FtmscanIcon } from '@assets/icons/ftmscan.svg';
@@ -64,6 +64,7 @@ export const Icon = styled(forwardRef(({ Component, ...props }: IconProps, ref) 
 `;
 
 export {
+  ChailinkIcon,
   DeleteIcon,
   DiscordIcon,
   HamburguerIcon,
@@ -93,7 +94,6 @@ export {
   WalletMissingIcon,
   ConstructionIcon,
   EthereumIcon,
-  FantomIcon,
   ArbitrumIcon,
   AddCircleIcon,
   AddIcon,

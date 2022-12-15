@@ -1,69 +1,92 @@
-import { createSelector } from '@reduxjs/toolkit';
-import { memoize } from 'lodash';
+import { createSelector, current } from '@reduxjs/toolkit';
+import { memoize, sortBy, unionBy } from 'lodash';
 
-import { toBN } from '@utils';
 import { getConfig } from '@config';
-import { Lab, TokenView, Vault } from '@types';
+import { TokenView } from '@types';
+import { testTokens } from '@src/config/constants';
 
 import { VaultsSelectors } from '../modules/vaults/vaults.selectors';
-import { LabsSelectors } from '../modules/labs/labs.selectors';
-import { TokensSelectors } from '../modules/tokens/tokens.selectors';
 import { AppSelectors } from '../modules/app/app.selectors';
-import { createToken } from '../modules/tokens/tokens.selectors';
+import { WalletSelectors } from '../modules/wallet/wallet.selectors';
+import { TokensSelectors, createToken } from '../modules/tokens/tokens.selectors';
 import { NetworkSelectors } from '../modules/network/network.selectors';
-
-type SupportedTokenProps = {
-  assetData: Vault | Lab;
-  token: TokenView;
-  zapType: 'zapInWith' | 'zapOutWith';
-};
+// import { Token } from 'graphql';
 
 const { selectVaultsMap } = VaultsSelectors;
-const { selectLabsMap } = LabsSelectors;
-const { selectTokensMap, selectTokensUser } = TokensSelectors;
+const { selectTokenAddresses, selectSupportedTokens, selectSupportedTokensMap, selectTokensMap, selectTokensUser } =
+  TokensSelectors;
 const { selectServicesEnabled } = AppSelectors;
 const { selectCurrentNetwork } = NetworkSelectors;
+const { selectWalletNetwork } = WalletSelectors;
 
 export const selectDepositTokenOptionsByAsset = createSelector(
-  [selectVaultsMap, selectLabsMap, selectTokensMap, selectTokensUser, selectServicesEnabled, selectCurrentNetwork],
-  (vaultsMap, labsMap, tokensMap, tokensUser, servicesEnabled, currentNetwork) =>
+  [
+    selectSupportedTokens,
+    selectSupportedTokensMap,
+    selectTokenAddresses,
+    selectTokensMap,
+    selectTokensUser,
+    selectServicesEnabled,
+    selectWalletNetwork,
+  ],
+  (supportedTokens, supportedTokensMap, tokenAddresses, tokensMap, tokensUser, servicesEnabled, currentNetwork) =>
     memoize((assetAddress?: string): TokenView[] => {
-      if (!assetAddress) return [];
-
-      const { userTokensAddresses, userTokensMap, userTokensAllowancesMap } = tokensUser;
-      const assetData = vaultsMap[assetAddress] ? vaultsMap[assetAddress] : labsMap[assetAddress];
-      if (!assetData) return [];
-
-      const zapperDisabled =
-        (!servicesEnabled.zapper && assetData.metadata.zapInWith === 'zapperZapIn') || currentNetwork !== 'mainnet';
-      const mainVaultTokenAddress = zapperDisabled ? assetData.token : assetData.metadata.defaultDisplayToken;
-      const depositTokenAddresses = [mainVaultTokenAddress];
-      if (!zapperDisabled) {
-        depositTokenAddresses.push(...userTokensAddresses.filter((address) => address !== mainVaultTokenAddress));
+      console.log('TokenService selectDepositTokenOptionsByAsset', currentNetwork, tokensMap, testTokens);
+      const { userTokensMap, userTokensAllowancesMap } = tokensUser;
+      if (currentNetwork === 'goerli') {
+        // TODO: fill in token values appropriately with values from subgraph
+        // const tokens: TokenView[] = supportedTokens.map((address: string) => {
+        //   return {
+        //     address: address,
+        //     ...supportedTokensMap[address],
+        //     icon: '',
+        //     balance: '0',
+        //     balanceUsdc: '0',
+        //     priceUsdc: '0',
+        //     categories: [],
+        //     description: '',
+        //     website: '',
+        //     allowanceMap: {},
+        //   };
+        // });
+        // const allTestTokens = testTokens.concat(tokens);
+        // return allTestTokens;
+        return testTokens;
+      } else {
+        const { TOKEN_ADDRESSES } = getConfig();
+        const mainTokens = Object.values(TOKEN_ADDRESSES)
+          .filter((address) => !!tokensMap[address])
+          .map((address) => {
+            const tokenData = tokensMap[address];
+            const userTokenData = userTokensMap[address];
+            const allowancesMap = userTokensAllowancesMap[address] ?? {};
+            return createToken({ tokenData, userTokenData, allowancesMap });
+          });
+        const subgraphTokens: TokenView[] = supportedTokens
+          .filter((address) => !!tokensMap[address])
+          .map((address) => {
+            const tokenData = tokensMap[address];
+            const userTokenData = userTokensMap[address];
+            const allowancesMap = userTokensAllowancesMap[address] ?? {};
+            return createToken({ tokenData, userTokenData, allowancesMap });
+          });
+        const sortedSubgraphTokens = sortBy(subgraphTokens, (o) => o.symbol);
+        // Return a list of supported tokens with mainTokens (e.g. ETH, WETH, DAI, etc.)
+        // coming before subgraphTokens (e.g. AAVE, LINK, etc.) with both indepently sorted
+        // from A-Z
+        return unionBy(mainTokens, sortedSubgraphTokens, (o) => o.symbol);
       }
-
-      const tokens = depositTokenAddresses
-        .filter((address) => !!tokensMap[address])
-        .map((address) => {
-          const tokenData = tokensMap[address];
-          const userTokenData = userTokensMap[address];
-          const allowancesMap = userTokensAllowancesMap[address] ?? {};
-          return createToken({ tokenData, userTokenData, allowancesMap });
-        });
-      return tokens.filter(
-        (token) => isZappable({ assetData, token, zapType: 'zapInWith' }) || token.address === mainVaultTokenAddress
-      );
     })
 );
 
 export const selectWithdrawTokenOptionsByAsset = createSelector(
-  [selectVaultsMap, selectLabsMap, selectTokensMap, selectTokensUser, selectServicesEnabled, selectCurrentNetwork],
-  (vaultsMap, labsMap, tokensMap, tokensUser, servicesEnabled, currentNetwork) =>
+  [selectVaultsMap, selectTokensMap, selectTokensUser, selectServicesEnabled, selectCurrentNetwork],
+  (vaultsMap, tokensMap, tokensUser, servicesEnabled, currentNetwork) =>
     memoize((assetAddress?: string): TokenView[] => {
       if (!assetAddress) return [];
 
       const { userTokensMap, userTokensAllowancesMap } = tokensUser;
-      const assetData = vaultsMap[assetAddress] ? vaultsMap[assetAddress] : labsMap[assetAddress];
+      const assetData = vaultsMap[assetAddress] ? vaultsMap[assetAddress] : null;
       if (!assetData) return [];
 
       const zapperDisabled =
@@ -85,21 +108,7 @@ export const selectWithdrawTokenOptionsByAsset = createSelector(
           return createToken({ tokenData, userTokenData, allowancesMap });
         });
       return tokens.filter(
-        (token) =>
-          isZappable({ assetData, token, zapType: 'zapOutWith' }) ||
-          token.address === assetData.token ||
-          token.address === assetData.metadata.defaultDisplayToken
+        (token) => token.address === assetData.token || token.address === assetData.metadata.defaultDisplayToken
       );
     })
 );
-
-const isZappable = ({ assetData, token, zapType }: SupportedTokenProps) => {
-  if (zapType === 'zapInWith' && !toBN(token.balance).gt(0)) {
-    return false;
-  }
-
-  const zap = assetData.metadata[zapType];
-
-  // TODO Need to cast here because VaultMetadata is still coming as string from the SDK
-  return token.supported[zap as keyof TokenView['supported']];
-};

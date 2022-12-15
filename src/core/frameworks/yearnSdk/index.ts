@@ -7,7 +7,7 @@ export class YearnSdkImpl implements YearnSdk {
   private instances: Map<Network, Yearn<SdkNetwork>> = new Map<Network, Yearn<SdkNetwork>>();
 
   constructor({ web3Provider, config }: { web3Provider: Web3Provider; config: Config }) {
-    const { SUPPORTED_NETWORKS, CONTRACT_ADDRESSES, YEARN_SUBGRAPH_KEY, ZAPPER_API_KEY } = config;
+    const { SUPPORTED_NETWORKS, CONTRACT_ADDRESSES, GRAPH_API_URL } = config;
 
     const isLedger = isLedgerLive();
     SUPPORTED_NETWORKS.forEach((network) => {
@@ -16,12 +16,11 @@ export class YearnSdkImpl implements YearnSdk {
       const networkId = getNetworkId(network) as SdkNetwork;
       const sdkInstance = new Yearn(networkId, {
         provider,
-        zapper: ZAPPER_API_KEY,
         partnerId: isLedger && networkId === 1 ? CONTRACT_ADDRESSES.LEDGER_PARTNER_ID : undefined,
-        ...(YEARN_SUBGRAPH_KEY && {
+        ...(GRAPH_API_URL && {
           subgraph: {
             // TODO revert to using official subgraph once its working again
-            // mainnetSubgraphEndpoint: `https://gateway.thegraph.com/api/${YEARN_SUBGRAPH_KEY}/subgraphs/id/${YEARN_SUBGRAPH_ID}`,
+            // mainnetSubgraphEndpoint: `https://gateway.thegraph.com/api/${GRAPH_API_URL}/subgraphs/id/${YEARN_SUBGRAPH_ID}`,
             mainnetSubgraphEndpoint: `https://api.thegraph.com/subgraphs/name/rareweasel/yearn-vaults-v2-subgraph-mainnet`,
           },
         }),

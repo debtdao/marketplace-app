@@ -8,13 +8,16 @@ import { TestModal } from './TestModal';
 import { ComingSoonModal } from './ComingSoonModal';
 import { CommunityThemesModal } from './CommunityThemesModal';
 import { TestTxModal } from './TestTxModal';
-import { DepositTxModal } from './DepositTxModal';
-import { WithdrawTxModal } from './WithdrawTxModal';
+import { AddCreditPositionTxModal } from './AddCreditPositionTxModal';
+import { EnableCollateralAssetTxModal } from './EnableCollateralAssetTxModal';
 import { MigrateTxModal } from './MigrateTxModal';
-import { BackscratcherLockTxModal, BackscratcherClaimTxModal, BackscratcherReinvestTxModal } from './Backscratcher';
-import { LabDepositTxModal } from './LabDepositTxModal';
-import { LabWithdrawTxModal } from './LabWithdrawTxModal';
-import { LabStakeTxModal } from './LabStakeTxModal';
+import { LiquidateBorrowerTxModal } from './LiquidateBorrower';
+import { BorrowTxModal } from './BorrowTxModal';
+import { DeployLineTxModal } from './DeployLineTxModal';
+import { DepositAndRepayTxModal } from './DepositAndRepayTxModal';
+import { WithdrawCreditTxModal } from './WithdrawCreditTxModal';
+import { AddCollateralTxModal } from './AddCollateralTxModal';
+import { EnableSpigotTxModal } from './EnableSpigotTxModal';
 
 const modalTimeout = 300;
 
@@ -125,63 +128,68 @@ export const Modals = () => {
         </CSSTransition>
       )}
 
-      {activeModal === 'depositTx' && (
-        <CSSTransition key={'depositTx'} timeout={modalTimeout} classNames="slideBottom">
-          <DepositTxModal modalProps={modalProps} onClose={closeModal} />
-        </CSSTransition>
-      )}
-
-      {activeModal === 'withdrawTx' && (
-        <CSSTransition key={'withdrawTx'} timeout={modalTimeout} classNames="slideBottom">
-          <WithdrawTxModal onClose={closeModal} />
-        </CSSTransition>
-      )}
-
       {activeModal === 'migrateTx' && (
         <CSSTransition key={'migrateTx'} timeout={modalTimeout} classNames="slideBottom">
           <MigrateTxModal onClose={closeModal} />
         </CSSTransition>
       )}
 
-      {activeModal === 'backscratcherLockTx' && (
-        <CSSTransition key={'backscratcherLockTx'} timeout={modalTimeout} classNames="slideBottom">
-          <BackscratcherLockTxModal onClose={closeModal} />
-        </CSSTransition>
-      )}
-
-      {activeModal === 'backscratcherClaimTx' && (
-        <CSSTransition key={'backscratcherClaimTx'} timeout={modalTimeout} classNames="slideBottom">
-          <BackscratcherClaimTxModal onClose={closeModal} />
-        </CSSTransition>
-      )}
-
-      {activeModal === 'backscratcherReinvestTx' && (
-        <CSSTransition key={'backscratcherReinvestTx'} timeout={modalTimeout} classNames="slideBottom">
-          <BackscratcherReinvestTxModal onClose={closeModal} />
-        </CSSTransition>
-      )}
-
-      {activeModal === 'labDepositTx' && (
-        <CSSTransition key={'labDepositTx'} timeout={modalTimeout} classNames="slideBottom">
-          <LabDepositTxModal onClose={closeModal} />
-        </CSSTransition>
-      )}
-
-      {activeModal === 'labWithdrawTx' && (
-        <CSSTransition key={'labWithdrawTx'} timeout={modalTimeout} classNames="slideBottom">
-          <LabWithdrawTxModal onClose={closeModal} />
-        </CSSTransition>
-      )}
-
-      {activeModal === 'labStakeTx' && (
-        <CSSTransition key={'labStakeTx'} timeout={modalTimeout} classNames="slideBottom">
-          <LabStakeTxModal onClose={closeModal} />
-        </CSSTransition>
-      )}
-
       {activeModal === 'communityThemes' && (
         <CSSTransition key={'communityThemes'} timeout={modalTimeout} classNames="slideBottom">
           <CommunityThemesModal onClose={closeModal} />
+        </CSSTransition>
+      )}
+
+      {activeModal === 'addPosition' && (
+        <CSSTransition key={'addPosition'} timeout={modalTimeout} classNames="slideBottom">
+          <AddCreditPositionTxModal onClose={closeModal} />
+        </CSSTransition>
+      )}
+
+      {activeModal === 'liquidateBorrower' && (
+        <CSSTransition key={'liquidateBorrower'} timeout={modalTimeout} classNames="slideBottom">
+          <LiquidateBorrowerTxModal onClose={closeModal} />
+        </CSSTransition>
+      )}
+      {activeModal === 'createLine' && (
+        <CSSTransition key={'createLine'} timeout={modalTimeout} classNames="slideBottom">
+          <DeployLineTxModal onClose={closeModal} />
+        </CSSTransition>
+      )}
+
+      {activeModal === 'borrow' && (
+        <CSSTransition key={'borrow'} timeout={modalTimeout} classNames="slideBottom">
+          <BorrowTxModal onClose={closeModal} />
+        </CSSTransition>
+      )}
+
+      {activeModal === 'depositAndRepay' && (
+        <CSSTransition key={'depositAndRepay'} timeout={modalTimeout} classNames="slideBottom">
+          <DepositAndRepayTxModal onClose={closeModal} />
+        </CSSTransition>
+      )}
+
+      {activeModal === 'withdraw' && (
+        <CSSTransition key={'withdraw'} timeout={modalTimeout} classNames="slideBottom">
+          <WithdrawCreditTxModal onClose={closeModal} />
+        </CSSTransition>
+      )}
+
+      {activeModal === 'addCollateral' && (
+        <CSSTransition key={'addCollateral'} timeout={modalTimeout} classNames="slideBottom">
+          <AddCollateralTxModal onClose={closeModal} />
+        </CSSTransition>
+      )}
+
+      {activeModal === 'enableCollateral' && (
+        <CSSTransition key={'enableCollateral'} timeout={modalTimeout} classNames="slideBottom">
+          <EnableCollateralAssetTxModal onClose={closeModal} />
+        </CSSTransition>
+      )}
+
+      {activeModal === 'enableSpigot' && (
+        <CSSTransition key={'enableSpigot'} timeout={modalTimeout} classNames="slideBottom">
+          <EnableSpigotTxModal onClose={closeModal} />
         </CSSTransition>
       )}
 

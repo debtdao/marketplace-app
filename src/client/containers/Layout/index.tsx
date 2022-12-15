@@ -13,8 +13,6 @@ import {
   ModalsActions,
   ModalSelectors,
   NetworkActions,
-  AlertsActions,
-  VaultsSelectors,
   PartnerSelectors,
 } from '@store';
 import { useAppTranslation, useAppDispatch, useAppSelector, useWindowDimensions, usePrevious } from '@hooks';
@@ -37,7 +35,7 @@ const contentSeparation = '1.6rem';
 */
 const StyledLayout = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   flex: 1;
   padding: ${({ theme }) => theme.card.padding};
 
@@ -69,7 +67,6 @@ const Content = styled.div<{ collapsedSidebar?: boolean; useTabbar?: boolean }>`
   grid-gap: ${({ theme }) => theme.layoutPadding};
   grid-template-rows: auto 1fr auto;
   width: 100%;
-  max-width: ${({ theme }) => theme.globalMaxWidth};
   min-height: 100%;
   transition: padding-left ${({ theme }) => theme.sideBar.animation};
 
@@ -102,7 +99,6 @@ export const Layout: FC = ({ children }) => {
   const collapsedSidebar = useAppSelector(SettingsSelectors.selectSidebarCollapsed);
   const previousAddress = usePrevious(selectedAddress);
   const previousNetwork = usePrevious(currentNetwork);
-  const selectedVault = useAppSelector(VaultsSelectors.selectSelectedVault);
   // const path = useAppSelector(({ route }) => route.path);
   const path = location.pathname.toLowerCase().split('/')[1] as Route;
   const isLedgerLive = partner.id === 'ledger';
@@ -110,48 +106,40 @@ export const Layout: FC = ({ children }) => {
   const hideControls = isIframe || isLedgerLive;
   const hideOptionalLinks = isLedgerLive;
 
-  let vaultName;
   let titleLink;
   // TODO Add lab details route when its added the view
-  if (path === 'vault') {
-    vaultName = selectedVault?.displayName;
-    titleLink = '/vaults';
-  }
 
   // TODO This is only assetAddress on the vault page
-  const assetAddress: string | undefined = location.pathname.split('/')[2];
+  //const assetAddress: string | undefined = location.pathname.split('/')[2];
 
   // Used to check zapper api
-  const { ZAPPER_AUTH_TOKEN } = getConfig();
+  // const { ZAPPER_AUTH_TOKEN } = getConfig();
 
   useEffect(() => {
     dispatch(AppActions.initApp());
 
     // NOTE Test zapper API
-    fetch('https://api.zapper.fi/v2/prices', {
-      headers: { Authorization: `Basic ${ZAPPER_AUTH_TOKEN}` },
-    }).catch((_error) => {
-      dispatch(
-        AlertsActions.openAlert({
-          message:
-            'Zapper is currently experiencing technical issues and this might impact your experience at Yearn. We are sorry for the inconveniences and the problems should be resolved soon.',
-          type: 'warning',
-          persistent: true,
-        })
-      );
-    });
+    //   fetch('https://api.zapper.fi/v2/prices', {
+    //     headers: { Authorization: `Basic ${ZAPPER_AUTH_TOKEN}` },
+    //   }).catch((_error) => {
+    //     dispatch(
+    //       AlertsActions.openAlert({
+    //         message:
+    //           'Zapper is currently experiencing technical issues and this might impact your experience at Yearn. We are sorry for the inconveniences and the problems should be resolved soon.',
+    //         type: 'warning',
+    //         persistent: true,
+    //       })
+    //     );
+    //   });
   }, []);
 
   useEffect(() => {
     dispatch(RouteActions.changeRoute({ path: location.pathname }));
-    fetchAppData(currentNetwork, path);
-    if (selectedAddress) fetchUserData(currentNetwork, path);
   }, [location]);
 
   useEffect(() => {
     if (previousAddress) dispatch(AppActions.clearUserAppData());
     // if (previousAddress) dispatch(UserActions.clearNftBalance());
-    if (selectedAddress) fetchUserData(currentNetwork, path);
     // if (selectedAddress) dispatch(UserActions.getNftBalance());
   }, [selectedAddress]);
 
@@ -160,29 +148,8 @@ export const Layout: FC = ({ children }) => {
     if (previousNetwork) dispatch(AppActions.clearAppData());
     if (selectedAddress) dispatch(AppActions.clearUserAppData());
     dispatch(TokensActions.getTokens());
-    fetchAppData(currentNetwork, path);
-    if (selectedAddress) fetchUserData(currentNetwork, path);
+    dispatch(TokensActions.getSupportedOracleTokens());
   }, [currentNetwork]);
-
-  function fetchAppData(network: Network, path: Route) {
-    dispatch(
-      AppActions.getAppData({
-        network,
-        route: path,
-        addresses: assetAddress ? [assetAddress] : undefined,
-      })
-    );
-  }
-
-  function fetchUserData(network: Network, path: Route) {
-    dispatch(
-      AppActions.getUserAppData({
-        network,
-        route: path,
-        addresses: assetAddress ? [assetAddress] : undefined,
-      })
-    );
-  }
 
   return (
     <StyledLayout>
@@ -192,9 +159,9 @@ export const Layout: FC = ({ children }) => {
 
       <Content collapsedSidebar={collapsedSidebar} useTabbar={isMobile}>
         <Navbar
-          title={t(`navigation.${path}`)}
+          title={t(`pages.${path}`)}
           titleLink={titleLink}
-          subTitle={vaultName}
+          subTitle={''}
           walletAddress={selectedAddress}
           addressEnsName={addressEnsName}
           onWalletClick={() => dispatch(WalletActions.walletSelect({ network: currentNetwork }))}

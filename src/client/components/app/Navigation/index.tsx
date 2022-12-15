@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import { useAppDispatch, useAppSelector, useWindowDimensions } from '@hooks';
 import { SettingsActions, SettingsSelectors } from '@store';
-import { WalletIcon, VaultIcon, LabsIcon, SettingsIcon, IronBankIcon } from '@components/common';
+import { VaultIcon, SettingsIcon, SearchIcon, DiscordIcon, WalletIcon } from '@components/common';
 
 import { NavSidebar } from './NavSidebar';
 import { NavTabbar } from './NavTabbar';
@@ -19,6 +19,10 @@ export interface NavigationLink {
 
 const StyledNavigation = styled.div``;
 
+interface NavigationProps {
+  hideOptionalLinks?: boolean;
+}
+
 const navLinks: NavigationLink[] = [
   {
     to: '/portfolio',
@@ -26,20 +30,21 @@ const navLinks: NavigationLink[] = [
     icon: WalletIcon,
   },
   {
-    to: '/vaults',
-    text: 'navigation.vaults',
+    to: '/market',
+    text: 'navigation.market',
     icon: VaultIcon,
   },
   {
-    to: '/labs',
-    text: 'navigation.labs',
-    icon: LabsIcon,
+    to: 'https://docs.debtdao.finance',
+    text: 'navigation.docs',
+    icon: SearchIcon,
+    external: true,
     optional: true,
   },
   {
-    to: 'https://app.ib.xyz',
-    text: 'navigation.ironbank',
-    icon: IronBankIcon,
+    to: 'https://discord.gg/F83xx67fyQ',
+    text: 'navigation.discord',
+    icon: DiscordIcon,
     external: true,
     optional: true,
   },
@@ -51,16 +56,14 @@ const navLinks: NavigationLink[] = [
   },
 ];
 
-interface NavigationProps {
-  hideOptionalLinks?: boolean;
-}
-
 export const Navigation = ({ hideOptionalLinks }: NavigationProps) => {
   const { isMobile, isTablet, isDesktop } = useWindowDimensions();
+  const dispatch = useAppDispatch();
+
   const displayLinks = navLinks.filter((link) => !(link.optional && hideOptionalLinks));
 
   // NOTE Auto collapse sidenav on mobile
-  const dispatch = useAppDispatch();
+
   const collapsedSidebar = useAppSelector(SettingsSelectors.selectSidebarCollapsed);
 
   useEffect(() => {

@@ -8,7 +8,22 @@
     },
     "empty-list": {
       "searching-text": "Please search for another asset",
-      "text": "No assets to display"
+      "text": "No data to display"
+    },
+    "no-borrower-positions": {
+      "header": "No User Positions Available",
+      "content": "No User Content"
+    },
+    "positions-card": {
+      "positions": "Positions",
+      "drate": "dRate",
+      "frate": "fRate",
+      "total-deposits": "Supplied",
+      "token": "Token",
+      "status": "Status",
+      "principal": "Borrowed",
+      "interest": "Interest",
+      "lender": "Lender"
     },
     "list-card": {
       "apy": "APY",
@@ -31,11 +46,28 @@
       "tokens": "Tokens",
       "total-assets": "Total assets",
       "value": "Value",
-      "wallet": "Wallet"
+      "wallet": "Wallet",
+      "borrower": "Borrower",
+      "lender": "Lender",
+      "arbiter": "arbiter"
+    },
+    "line-card": {
+      "borrower": "Borrower",
+      "secured-by": "Secured By",
+      "total-debt": "Outstanding Debt",
+      "total-credit": "Total Credit",
+      "collateral": "Collateral",
+      "start": "Start Time",
+      "end": "End Time",
+      "line": "Line Id",
+      "revenue": "Spigoted Revenue"
     },
     "no-wallet": "Wallet not connected",
-    "recommendations": {
-      "header": "Highest APY"
+    "recent-recommendations": {
+      "header": "Recent Offers"
+    },
+    "popular-recommendations": {
+      "header": "Hot Offers"
     },
     "search-input": {
       "search": "Search"
@@ -54,9 +86,15 @@
       "weekly-apy": "Weekly APY"
     },
     "transaction": {
+      "max-input": "Max",
       "approve": "Approve",
+      "accept": "Accept",
       "available-borrow": "Available to borrow",
       "borrow": "Borrow",
+      "deposit-and-repay-header": "Deposit and Repay",
+      "claim-and-repay-header": "Claim and Repay",
+      "deposit-and-close-header": "Deposit and Close",
+      "withdraw": "Withdraw",
       "borrow-limit": {
         "borrow-apy": "Borrow APY",
         "borrowing": "Borrowing",
@@ -64,8 +102,17 @@
         "total-borrow-limit": "Total borrow limit",
         "total-borrow-limit-used": "Total borrow limit used"
       },
+      "enable-collateral-asset": {
+        "header": "As Arbiter you're enabling the Borrow to use this token as collateral",
+        "token-input-header": "Select an asset",
+        "token-input-desc": "",
+        "enable-failed": "Could not add token as collateral",
+        "cta": "Enable Asset"
+      },
+      "oracle-price": "Oracle Price",
       "claim": "Claim",
       "deposit": "Deposit",
+      "liquidate": "Liquidate",
       "from-iron-bank": "From Iron Bank",
       "from-vault": "From vault",
       "from-wallet": "From wallet",
@@ -82,7 +129,8 @@
         "done": "Done",
         "exit": "Exit",
         "simulating": "Simulating...",
-        "transaction-completed": "Transaction completed"
+        "transaction-completed": "Transaction completed",
+        "transaction-failed": "Transaction failed"
       },
       "supply": "Supply",
       "to-gauge": "To gauge",
@@ -93,13 +141,85 @@
         "search-select-token": "Select a token",
         "search-select-vault": "Select a Vault",
         "yield": "APY",
-        "you-have": "You have"
+        "you-have": "Available"
       },
       "wallet-balance": "Wallet Balance",
-      "withdraw": "Withdraw",
       "zap-guidance": {
         "desc": "⚡ Or select a token from your wallet to Zap",
         "view-all": "View all"
+      },
+      "add-credit-input": {
+        "search-accept-credit": "Accepting Deal",
+        "search-select-credit": "Find Deal",
+        "select-an-offer": "Select An Offer"
+      },
+      "add-credit": {
+        "header": "Setup deal terms",
+        "header-accepting": "Agree To Deal Terms",
+        "select-credit": "1. Borrower:",
+        "select-token": "2. The token being lent",
+        "select-lender": "3. Lender:",
+        "select-rates": "4. Set Interest Rates",
+        "lender-address": "Ethereum Address",
+        "back-to-market": "Head back to the Market",
+        "bad-line": {
+          "title": "This line can not be deposited into",
+          "body": "Your chosen line is not in a healthy state. You can find more lines to deposit into back in the marketplace."
+        }
+      },
+      "add-collateral": {
+        "header": "Setup deal terms",
+        "select-credit": "1. You are lending to:",
+        "select-token": "2. Select credit token",
+        "select-rates": "3. Set your interest rates",
+        "back-to-market": "Head back to the Market",
+        "no-assets-enabled": {
+          "title": "No tokens have been enabled as collateral on your line!",
+          "body": "The arbiter is the only one that can enable assets to be deposited as collateral. Find and contact your Arbiter in the Debt DAO discord.",
+          "find-cta": "Go to Discord",
+          "login-cta": "Login as Arbiter",
+          "enable-cta": "Enable token"
+        }
+      },
+      "arbiter-liquidate": {
+        "header": "Liquidate Borrowers",
+        "select-credit": "1. Select a borrower to liquidate",
+        "select-token": "2. Select token and amount"
+      },
+      "deploy-line": {
+        "header": "Deploy Credit Line",
+        "select-borrower": "1. Insert a borrower for the line",
+        "select-ttl": "2. Insert a deadline for the line",
+        "time-to-live": "Time this line will remain active for (in days):",
+        "cratio": "3. Select a Collateralization Ratio",
+        "cratio-input": "Your Cratio",
+        "revenue-split": "4. Select a Revenue Split",
+        "revenue-split-input": "Your revenue split"
+      },
+      "borrow-credit": {
+        "header": "Borrow",
+        "select-line": "1. Select a Position:",
+        "select-amount": "2. Select Token and Amount:",
+        "your-rates": "3. Your Rates:"
+      },
+      "deposit-and-repay": {
+        "header": "Repay",
+        "select-position": "1. Select Position to Repay:",
+        "repay-type": "2. Select Repay Type:",
+        "select-amount": "3. You Owe:",
+        "your-rates": "4. Your Interest Rates:",
+        "select-repay": "Select Repayment Method"
+      },
+      "withdraw-credit": {
+        "header": "Withdraw",
+        "select-line": "1. Selected line to withdraw",
+        "select-amount": "2. Select amount to withdraw"
+      },
+      "enable-spigot": {
+        "revenue-contract": "1. Revenue Contract",
+        "function-revenue": "2. Select function to claim revenue",
+        "function-transfer": "3. Select function to transfer ownership of revenue contract",
+        "cta": "Enable Spigot"
       }
     }
   },
@@ -148,13 +268,25 @@
   },
   "navigation": {
     "copyright": {
-      "big": "© Yearn 2021",
+      "big": "© Debt DAO 2021",
       "small": "©"
     },
     "disclaimer": "Disclaimer",
-    "ironbank": "Iron Bank",
-    "labs": "Labs",
+    "discord": "Discord",
+    "docs": "Docs",
+    "market": "Market",
+    "lines": "Line Of Credit",
     "portfolio": "Portfolio",
+    "settings": "Settings",
+    "vault": "Vaults",
+    "vaults": "Vaults",
+    "wallet": "Wallet"
+  },
+  "pages": {
+    "market": "Debt DAO Credit Market",
+    "lines": "Line Of Credit",
+    "portfolio": "Credit Investment Portfolio",
+    "disclaimer": "Disclaimer",
     "settings": "Settings",
     "vault": "Vaults",
     "vaults": "Vaults",

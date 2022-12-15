@@ -3,12 +3,14 @@ import {
   Config,
   Web3Provider,
   UserService,
+  CreditLineService,
   VaultService,
   TokenService,
-  LabService,
   GasService,
   TransactionService,
-  SubscriptionService,
+  CollateralService,
+  LineFactoryService,
+  InterestRateCreditService,
   YearnSdk,
 } from '@types';
 
@@ -27,10 +29,12 @@ export interface ServiceContainer {
   userService: UserService;
   vaultService: VaultService;
   tokenService: TokenService;
-  labService: LabService;
+  creditLineService: CreditLineService;
   gasService: GasService;
   transactionService: TransactionService;
-  subscriptionService: SubscriptionService;
+  collateralService: CollateralService;
+  interestRateCreditService: InterestRateCreditService;
+  lineFactoryService: LineFactoryService;
 }
 
 export interface ConfigContainer extends Config {}

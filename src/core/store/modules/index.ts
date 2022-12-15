@@ -38,21 +38,30 @@ import tokensReducer, { tokensInitialState } from './tokens/tokens.reducer';
 import { TokensActions } from './tokens/tokens.actions';
 import { TokensSelectors } from './tokens/tokens.selectors';
 // Labs State
-import labsReducer, { labsInitialState } from './labs/labs.reducer';
-import { LabsActions } from './labs/labs.actions';
-import { LabsSelectors } from './labs/labs.selectors';
+// import labsReducer, { labsInitialState } from './labs/labs.reducer';
+// import { LabsActions } from './labs/labs.actions';
+// import { LabsSelectors } from './labs/labs.selectors';
 // Settings State
 import settingsReducer, { settingsInitialState } from './settings/settings.reducer';
 import { SettingsActions } from './settings/settings.actions';
 import { SettingsSelectors } from './settings/settings.selectors';
 // User State
-import userReducer, { userInitialState } from './user/user.reducer';
-import { UserActions } from './user/user.actions';
-import { UserSelectors } from './user/user.selectors';
+// import userReducer, { userInitialState } from './user/user.reducer';
+// import { UserActions } from './user/user.actions';
+// import { UserSelectors } from './user/user.selectors';
 // Partner State
 import partnerReducer, { partnerInitialState } from './partner/partner.reducer';
 import { PartnerActions } from './partner/partner.actions';
 import { PartnerSelectors } from './partner/partner.selectors';
+// Debt DAO custom state
+// Lines State
+import linesReducer, { linesInitialState } from './lines/lines.reducer';
+import { LinesActions } from './lines/lines.actions';
+import { LinesSelectors } from './lines/lines.selectors';
+// Lines State
+import collateralReducer, { collateralInitialState } from './collateral/collateral.reducer';
+import { CollateralActions } from './collateral/collateral.actions';
+import { CollateralSelectors } from './collateral/collateral.selectors';
 
 const rootReducer: Reducer<RootState> = combineReducers({
   app: appReducer,
@@ -64,10 +73,10 @@ const rootReducer: Reducer<RootState> = combineReducers({
   vaults: vaultsReducer,
   wallet: walletReducer,
   tokens: tokensReducer,
-  labs: labsReducer,
   settings: settingsReducer,
-  user: userReducer,
   partner: partnerReducer,
+  lines: linesReducer,
+  collateral: collateralReducer,
 });
 
 export default rootReducer;
@@ -83,10 +92,12 @@ export {
   ThemeActions,
   WalletActions,
   TokensActions,
-  LabsActions,
+  // LabsActions,
   SettingsActions,
-  UserActions,
+  // UserActions,
   PartnerActions,
+  LinesActions,
+  CollateralActions,
 };
 
 // Selectors
@@ -100,9 +111,11 @@ export {
   WalletSelectors,
   TokensSelectors,
   SettingsSelectors,
-  LabsSelectors,
-  UserSelectors,
+  // LabsSelectors,
+  // UserSelectors,
   PartnerSelectors,
+  LinesSelectors,
+  CollateralSelectors,
 };
 
 // initialState
@@ -116,8 +129,10 @@ export {
   vaultsInitialState,
   walletInitialState,
   tokensInitialState,
-  labsInitialState,
+  // labsInitialState,
   settingsInitialState,
-  userInitialState,
+  // userInitialState,
   partnerInitialState,
+  linesInitialState,
+  collateralInitialState,
 };

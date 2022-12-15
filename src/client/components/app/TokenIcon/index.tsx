@@ -10,18 +10,22 @@ const StyledTokenIcon = styled.div`
   justify-content: center;
 `;
 
-type TokenIconSize = 'default' | 'big' | 'xBig' | 'xxBig';
+type TokenIconSize = 'default' | 'small' | 'big' | 'xBig' | 'xxBig';
 
 interface TokenIconProps {
   icon?: string;
+  SVG?: React.FC;
   symbol?: string;
   size?: TokenIconSize;
 }
 
-export const TokenIcon = ({ icon, symbol, size }: TokenIconProps) => {
+export const TokenIcon = ({ SVG, icon, symbol, size }: TokenIconProps) => {
   const src = icon === '' || !icon ? fallbackIcon : icon;
   let height;
   switch (size) {
+    case 'small':
+      height = '2.5rem';
+      break;
     case 'big':
       height = '4.2rem';
       break;
@@ -43,5 +47,7 @@ export const TokenIcon = ({ icon, symbol, size }: TokenIconProps) => {
     height: height,
   };
 
-  return <StyledTokenIcon>{src && <Img alt={symbol ?? 'n/a'} style={style} src={src} />}</StyledTokenIcon>;
+  return (
+    <StyledTokenIcon>{SVG ? <SVG /> : src && <Img alt={symbol ?? 'n/a'} style={style} src={src} />}</StyledTokenIcon>
+  );
 };

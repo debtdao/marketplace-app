@@ -1,7 +1,9 @@
 import styled from 'styled-components';
 
+import { prettyNumbers, formatAddress, getDate } from '@utils';
 import { Card, CardHeader, CardContent, Text, Icon, ChevronRightIcon } from '@components/common';
 import { TokenIcon } from '@components/app';
+import { useAppTranslation } from '@hooks';
 
 const TokenListIconSize = '1rem';
 
@@ -24,7 +26,8 @@ const StyledCardContent = styled(CardContent)`
 const ItemCard = styled(Card)<{ onClick: any }>`
   display: flex;
   align-items: center;
-  min-width: 24rem;
+  min-height: 30rem;
+  min-width: 33%;
   flex: 1;
   padding: ${({ theme }) => theme.layoutPadding};
   padding-right: calc(${({ theme }) => theme.card.padding} + ${TokenListIconSize} * 2.5);
@@ -67,7 +70,7 @@ const ItemInfoLabel = styled(Text)`
 
 const ItemName = styled(Text)`
   color: ${({ theme }) => theme.colors.icons.variant};
-  font-size: 1.6rem;
+  font-size: 3rem;
   width: 100%;
   white-space: nowrap;
   overflow: hidden;
@@ -83,17 +86,43 @@ const TokenListIcon = styled(Icon)`
   transition: color 200ms ease-in-out;
 `;
 
-const CenterIcon = styled.div`
-  display: flex;
-  margin-right: ${({ theme }) => theme.layoutPadding};
+const TopIcon = styled.div`
+  margin-bottom: 10rem;
+  margin-right: 3rem;
   user-select: none;
+`;
+
+const Divider = styled.div`
+  height: ${({ theme }) => theme.spacing.md};
+`;
+
+const MetricsTextContainer = styled.div`
+  display: flex;
+  flex-direction: space-between;
+`;
+
+const Metric = styled.span`
+  font-weight: bold;
+  font-size: 3rem;
+`;
+
+const MetricsText = styled.span`
+  font-size: 1.6rem;
 `;
 
 interface Item {
   header?: string;
+  id: string;
   icon: string;
   name: string;
   info: string;
+  principal: any;
+  deposit: any;
+  collateral: string;
+  revenue: string;
+  tags?: string[];
+  start: number;
+  end: number;
   infoDetail?: string;
   action?: string;
   onAction?: () => void;
@@ -106,10 +135,12 @@ interface RecommendationsProps {
 }
 
 export const RecommendationsCard = ({ header, subHeader, items, ...props }: RecommendationsProps) => {
+  const { t } = useAppTranslation(['common']);
+
   if (items.length === 0) {
     return null;
   }
-
+  // todo handle loading of principal/deposit vals with spinner or something
   return (
     <ContainerCard {...props}>
       <CardHeader header={header} subHeader={subHeader} />
@@ -119,15 +150,38 @@ export const RecommendationsCard = ({ header, subHeader, items, ...props }: Reco
           <ItemCard key={`${i}-${item.name}`} variant="primary" onClick={item.onAction ? item.onAction : undefined}>
             {item.header && <ItemHeader>{item.header}</ItemHeader>}
 
-            <CenterIcon>
-              <TokenIcon symbol={item.name} icon={item.icon} size="xBig" />
-            </CenterIcon>
+            <TopIcon>
+              <TokenIcon symbol={item.name} icon={item.icon} size="xxBig" />
+            </TopIcon>
 
             <ItemInfo>
-              <ItemName>{item.name}</ItemName>
-              <ItemInfoLabel>{item.info}</ItemInfoLabel>
-            </ItemInfo>
+              <ItemName>
+                {' '}
+                {t('components.line-card.borrower')}: {formatAddress(item.name)}
+              </ItemName>
+              <Divider />
+              <Metric>
+                ${prettyNumbers(item.revenue)} / ${prettyNumbers(item.deposit)}
+              </Metric>
+              <MetricsTextContainer>
+                <MetricsText>
+                  {' '}
+                  {t('components.line-card.total-debt')} / {t('components.line-card.total-credit')}{' '}
+                </MetricsText>
+              </MetricsTextContainer>
+              <Divider />
 
+              <ItemInfoLabel>{t('components.line-card.secured-by')}:</ItemInfoLabel>
+              <Metric>
+                ${prettyNumbers(item.collateral)} / ${prettyNumbers(item.revenue)}
+              </Metric>
+              <MetricsTextContainer>
+                <MetricsText>
+                  {' '}
+                  {t('components.line-card.collateral')} / {t('components.line-card.revenue')}{' '}
+                </MetricsText>
+              </MetricsTextContainer>
+            </ItemInfo>
             {item.onAction && <TokenListIcon Component={ChevronRightIcon} />}
           </ItemCard>
         ))}

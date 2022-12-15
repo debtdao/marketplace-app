@@ -21,8 +21,7 @@ import {
   validateNetwork,
   validateVaultDeposit,
   validateVaultWithdraw,
-  validateMigrateVaultAllowance,
-  parseError,
+  // parseError,
 } from '@utils';
 import { getConfig } from '@config';
 
@@ -84,7 +83,7 @@ const getUserVaultsPositions = createAsyncThunk<
   const { services } = extra;
   const userAddress = wallet.selectedAddress;
   if (!userAddress) {
-    throw new Error('WALLET NOT CONNECTED');
+    throw new Error('WALLET NOT ED');
   }
   const userVaultsPositions = await services.vaultService.getUserVaultsPositions({
     network: network.current,
@@ -168,7 +167,7 @@ const getExpectedTransactionOutcome = createAsyncThunk<
     return { txOutcome };
   },
   {
-    serializeError: parseError,
+    // serializeError: parseError,
   }
 );
 
@@ -199,7 +198,7 @@ const approveDeposit = createAsyncThunk<void, { vaultAddress: string; tokenAddre
     await dispatch(getDepositAllowance({ tokenAddress, vaultAddress }));
   },
   {
-    serializeError: parseError,
+    // serializeError: parseError,
   }
 );
 
@@ -226,7 +225,7 @@ const approveZapOut = createAsyncThunk<void, { vaultAddress: string; tokenAddres
     await dispatch(getWithdrawAllowance({ tokenAddress, vaultAddress }));
   },
   {
-    serializeError: parseError,
+    // serializeError: parseError,
   }
 );
 
@@ -256,7 +255,7 @@ const signZapOut = createAsyncThunk<{ signature: string }, { vaultAddress: strin
     return { signature };
   },
   {
-    serializeError: parseError,
+    // serializeError: parseError,
   }
 );
 
@@ -326,7 +325,7 @@ const depositVault = createAsyncThunk<
     dispatch(TokensActions.getUserTokens({ addresses: [tokenAddress, vaultAddress] }));
   },
   {
-    serializeError: parseError,
+    // serializeError: parseError,
   }
 );
 
@@ -396,7 +395,7 @@ const withdrawVault = createAsyncThunk<
     dispatch(TokensActions.getUserTokens({ addresses: [targetTokenAddress, vaultAddress] }));
   },
   {
-    serializeError: parseError,
+    // serializeError: parseError,
   }
 );
 
@@ -406,6 +405,7 @@ const approveMigrate = createAsyncThunk<
   ThunkAPI
 >('vaults/approveMigrate', async ({ vaultFromAddress, migrationContractAddress }, { dispatch }) => {
   const spenderAddress = migrationContractAddress ?? getConfig().CONTRACT_ADDRESSES.trustedVaultMigrator;
+  //@ts-ignore
   const result = await dispatch(TokensActions.approve({ tokenAddress: vaultFromAddress, spenderAddress }));
   unwrapResult(result);
 });
@@ -478,92 +478,92 @@ const getWithdrawAllowance = createAsyncThunk<
   return tokenAllowance;
 });
 
-const migrateVault = createAsyncThunk<
-  void,
-  { vaultFromAddress: string; vaultToAddress: string; migrationContractAddress: string },
-  ThunkAPI
->(
-  'vaults/migrateVault',
-  async ({ vaultFromAddress, vaultToAddress, migrationContractAddress }, { extra, getState, dispatch }) => {
-    const { network, wallet, vaults, tokens, app } = getState();
-    const { services, config } = extra;
-    const { trustedVaultMigrator } = config.CONTRACT_ADDRESSES;
+// const migrateVault = createAsyncThunk<
+//   void,
+//   { vaultFromAddress: string; vaultToAddress: string; migrationContractAddress: string },
+//   ThunkAPI
+// >(
+//   'vaults/migrateVault',
+//   async ({ vaultFromAddress, vaultToAddress, migrationContractAddress }, { extra, getState, dispatch }) => {
+//     const { network, wallet, vaults, tokens, app } = getState();
+//     const { services, config } = extra;
+//     const { trustedVaultMigrator } = config.CONTRACT_ADDRESSES;
 
-    const userAddress = wallet.selectedAddress;
-    if (!userAddress) throw new Error('WALLET NOT CONNECTED');
+//     const userAddress = wallet.selectedAddress;
+//     if (!userAddress) throw new Error('WALLET NOT CONNECTED');
 
-    const { error: networkError } = validateNetwork({
-      currentNetwork: network.current,
-      walletNetwork: wallet.networkVersion ? getNetwork(wallet.networkVersion) : undefined,
-    });
-    if (networkError) throw networkError;
+//     const { error: networkError } = validateNetwork({
+//       currentNetwork: network.current,
+//       walletNetwork: wallet.networkVersion ? getNetwork(wallet.networkVersion) : undefined,
+//     });
+//     if (networkError) throw networkError;
 
-    const vaultData = vaults.vaultsMap[vaultFromAddress];
-    const userDepositPositionData = vaults.user.userVaultsPositionsMap[vaultFromAddress].DEPOSIT;
-    const tokenAllowancesMap = tokens.user.userTokensAllowancesMap[vaultFromAddress] ?? {};
-    const migrationContractAddressToUse = migrationContractAddress ?? trustedVaultMigrator;
+//     const vaultData = vaults.vaultsMap[vaultFromAddress];
+//     const userDepositPositionData = vaults.user.userVaultsPositionsMap[vaultFromAddress].DEPOSIT;
+//     const tokenAllowancesMap = tokens.user.userTokensAllowancesMap[vaultFromAddress] ?? {};
+//     const migrationContractAddressToUse = migrationContractAddress ?? trustedVaultMigrator;
 
-    // TODO: ADD VALIDATION FOR VALID MIGRATABLE VAULTS AND WITH BALANCE
+//     // TODO: ADD VALIDATION FOR VALID MIGRATABLE VAULTS AND WITH BALANCE
 
-    const { error: allowanceError } = validateMigrateVaultAllowance({
-      amount: toBN(userDepositPositionData.balance),
-      vaultAddress: vaultFromAddress,
-      vaultDecimals: vaultData.decimals,
-      vaultAllowancesMap: tokenAllowancesMap,
-      migrationContractAddress: migrationContractAddressToUse,
-    });
+//     const { error: allowanceError } = validateMigrateVaultAllowance({
+//       amount: toBN(userDepositPositionData.balance),
+//       vaultAddress: vaultFromAddress,
+//       vaultDecimals: vaultData.decimals,
+//       vaultAllowancesMap: tokenAllowancesMap,
+//       migrationContractAddress: migrationContractAddressToUse,
+//     });
 
-    const error = allowanceError;
-    if (error) throw new Error(error);
+//     const error = allowanceError;
+//     if (error) throw new Error(error);
 
-    const { vaultService, transactionService } = services;
-    const tx = await vaultService.migrate({
-      network: network.current,
-      accountAddress: userAddress,
-      vaultFromAddress,
-      vaultToAddress,
-      migrationContractAddress: migrationContractAddressToUse,
-    });
+//     const { vaultService, transactionService } = services;
+//     const tx = await vaultService.migrate({
+//       network: network.current,
+//       accountAddress: userAddress,
+//       vaultFromAddress,
+//       vaultToAddress,
+//       migrationContractAddress: migrationContractAddressToUse,
+//     });
 
-    const notifyEnabled = app.servicesEnabled.notify;
-    await transactionService.handleTransaction({ tx, network: network.current, useExternalService: notifyEnabled });
-    dispatch(getVaultsDynamic({ addresses: [vaultFromAddress, vaultToAddress] }));
-    dispatch(getUserVaultsSummary());
-    dispatch(getUserVaultsPositions({ vaultAddresses: [vaultFromAddress, vaultToAddress] }));
-    dispatch(getUserVaultsMetadata({ vaultsAddresses: [vaultFromAddress, vaultToAddress] }));
-    dispatch(TokensActions.getUserTokens({ addresses: [vaultFromAddress, vaultToAddress] }));
-  },
-  {
-    serializeError: parseError,
-  }
-);
+//     const notifyEnabled = app.servicesEnabled.notify;
+//     await transactionService.handleTransaction({ tx, network: network.current, useExternalService: notifyEnabled });
+//     dispatch(getVaultsDynamic({ addresses: [vaultFromAddress, vaultToAddress] }));
+//     dispatch(getUserVaultsSummary());
+//     dispatch(getUserVaultsPositions({ vaultAddresses: [vaultFromAddress, vaultToAddress] }));
+//     dispatch(getUserVaultsMetadata({ vaultsAddresses: [vaultFromAddress, vaultToAddress] }));
+//     dispatch(TokensActions.getUserTokens({ addresses: [vaultFromAddress, vaultToAddress] }));
+//   },
+//   {
+//     // serializeError: parseError,
+//   }
+// );
 
 /* -------------------------------------------------------------------------- */
 /*                                Subscriptions                               */
 /* -------------------------------------------------------------------------- */
 
-const initSubscriptions = createAsyncThunk<void, void, ThunkAPI>(
-  'vaults/initSubscriptions',
-  async (_arg, { extra, dispatch }) => {
-    const { subscriptionService } = extra.services;
-    subscriptionService.subscribe({
-      module: 'vaults',
-      event: 'getDynamic',
-      action: (vaultsAddresses: string[]) => {
-        dispatch(getVaultsDynamic({ addresses: vaultsAddresses }));
-      },
-    });
-    subscriptionService.subscribe({
-      module: 'vaults',
-      event: 'positionsOf',
-      action: (vaultAddresses: string[]) => {
-        dispatch(getUserVaultsSummary());
-        dispatch(getUserVaultsPositions({ vaultAddresses }));
-        dispatch(getUserVaultsMetadata({ vaultsAddresses: vaultAddresses }));
-      },
-    });
-  }
-);
+// const initSubscriptions = createAsyncThunk<void, void, ThunkAPI>(
+//   'vaults/initSubscriptions',
+//   async (_arg, { extra, dispatch }) => {
+//     const { subscriptionService } = extra.services;
+//     subscriptionService.subscribe({
+//       module: 'vaults',
+//       event: 'getDynamic',
+//       action: (vaultsAddresses: string[]) => {
+//         dispatch(getVaultsDynamic({ addresses: vaultsAddresses }));
+//       },
+//     });
+//     subscriptionService.subscribe({
+//       module: 'vaults',
+//       event: 'positionsOf',
+//       action: (vaultAddresses: string[]) => {
+//         dispatch(getUserVaultsSummary());
+//         dispatch(getUserVaultsPositions({ vaultAddresses }));
+//         dispatch(getUserVaultsMetadata({ vaultsAddresses: vaultAddresses }));
+//       },
+//     });
+//   }
+// );
 
 /* -------------------------------------------------------------------------- */
 /*                                   Exports                                  */
@@ -579,10 +579,10 @@ export const VaultsActions = {
   signZapOut,
   withdrawVault,
   approveMigrate,
-  migrateVault,
+  // migrateVault,
   getVaultsDynamic,
   getUserVaultsPositions,
-  initSubscriptions,
+  // initSubscriptions,
   clearVaultsData,
   clearUserData,
   getExpectedTransactionOutcome,

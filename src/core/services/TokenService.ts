@@ -6,9 +6,9 @@ import {
   Web3Provider,
   Balance,
   Token,
+  SupportedOracleTokenResponse,
   Integer,
   Config,
-  Network,
   TransactionResponse,
   TransactionService,
   GetSupportedTokensProps,
@@ -19,6 +19,7 @@ import {
 import { getContract } from '@frameworks/ethers';
 import { get, getUniqueAndCombine, toBN, USDC_DECIMALS } from '@utils';
 import { getConstants } from '@config/constants';
+import { getSupportedOracleTokens } from '@frameworks/gql';
 
 import erc20Abi from './contracts/erc20.json';
 
@@ -51,24 +52,26 @@ export class TokenServiceImpl implements TokenService {
   public async getSupportedTokens({ network }: GetSupportedTokensProps): Promise<Token[]> {
     const { WETH } = this.config.CONTRACT_ADDRESSES;
     const yearn = this.yearnSdk.getInstanceOf(network);
-
     const supportedTokens = await yearn.tokens.supported();
-
-    // We separated this because request is broken outside of this repo so we need to handle it separated
-    // so we get the rest of the tokens.
-    let labsTokens: Token[] = [];
-    try {
-      labsTokens = await this.getLabsTokens({ network });
-    } catch (error) {
-      console.log({ error });
-    }
 
     // TODO: remove fixedSupportedTokens when WETH symbol is fixed on sdk
     const fixedSupportedTokens = supportedTokens.map((token) => ({
       ...token,
       symbol: token.address === WETH ? 'WETH' : token.symbol,
     }));
-    return getUniqueAndCombine(fixedSupportedTokens, labsTokens, 'address');
+    return getUniqueAndCombine(fixedSupportedTokens, [], 'address');
+  }
+
+  public async getSupportedOracleTokens(): Promise<SupportedOracleTokenResponse | undefined> {
+    const response = getSupportedOracleTokens(undefined)
+      .then((data) => {
+        return data;
+      })
+      .catch((err) => {
+        console.log('TokenService: error fetching supported oracle tokens from subgraph', err);
+        return undefined;
+      });
+    return response;
   }
 
   public async getTokensDynamicData({ network, addresses }: GetTokensDynamicDataProps): Promise<TokenDynamicData[]> {
@@ -106,12 +109,6 @@ export class TokenServiceImpl implements TokenService {
     return allowance.toString();
   }
 
-  public async getLabsTokens({ network }: { network: Network }): Promise<Token[]> {
-    const { NETWORK_SETTINGS } = this.config;
-    if (!NETWORK_SETTINGS[network].labsEnabled) return [];
-    return await Promise.all([this.getYvBoostToken(), this.getPSLPyvBoostEthToken()]);
-  }
-
   private async getYvBoostToken(): Promise<Token> {
     const { YVBOOST } = this.config.CONTRACT_ADDRESSES;
     const { ASSETS_ICON_URL } = getConstants();
@@ -130,32 +127,6 @@ export class TokenServiceImpl implements TokenService {
       },
       symbol: 'yvBOOST',
       icon: `${ASSETS_ICON_URL}${YVBOOST}/logo-128.png`,
-    };
-  }
-
-  private async getPSLPyvBoostEthToken(): Promise<Token> {
-    const { ZAPPER_AUTH_TOKEN } = this.config;
-    const { PSLPYVBOOSTETH } = this.config.CONTRACT_ADDRESSES;
-    const { ASSETS_ICON_URL } = getConstants();
-    const pricesResponse = await get(`https://api.zapper.fi/v2/apps/pickle/tokens?groupId=jar`, {
-      headers: { Authorization: `Basic ${ZAPPER_AUTH_TOKEN}` },
-    });
-    const pJarPricePerToken = pricesResponse.data.find(
-      ({ address }: { address: string }) => address === PSLPYVBOOSTETH.toLowerCase()
-    )?.price;
-    return {
-      address: PSLPYVBOOSTETH,
-      decimals: '18',
-      name: 'pSLPyvBOOST-ETH',
-      priceUsdc: toBN(pJarPricePerToken)
-        .multipliedBy(10 ** USDC_DECIMALS)
-        .toString(),
-      dataSource: 'labs',
-      supported: {
-        zapper: false,
-      },
-      symbol: 'pSLPyvBOOST-ETH',
-      icon: `${ASSETS_ICON_URL}${PSLPYVBOOSTETH}/logo-128.png`,
     };
   }
 

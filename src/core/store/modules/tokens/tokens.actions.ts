@@ -1,7 +1,8 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 
 import { ThunkAPI } from '@frameworks/redux';
-import { TokenDynamicData, Token, Balance, Integer } from '@types';
+import { TokenDynamicData, Token, Balance, Integer, SupportedOracleTokenResponse } from '@types';
+import { Network } from '@types';
 
 /* -------------------------------------------------------------------------- */
 /*                                   Setters                                  */
@@ -33,6 +34,15 @@ const getTokens = createAsyncThunk<{ tokensData: Token[] }, string | undefined, 
   }
 );
 
+const getSupportedOracleTokens = createAsyncThunk<{ tokensData: any }, string | undefined, ThunkAPI>(
+  'tokens/getSupportedTokens',
+  async (_arg, { getState, extra }) => {
+    const { tokenService } = extra.services;
+    const tokensData: SupportedOracleTokenResponse | undefined = await tokenService.getSupportedOracleTokens();
+    return { tokensData };
+  }
+);
+
 const getTokensDynamicData = createAsyncThunk<
   { tokensDynamicData: TokenDynamicData[] },
   { addresses: string[] },
@@ -50,7 +60,7 @@ const getUserTokens = createAsyncThunk<{ userTokens: Balance[] }, { addresses?: 
     const { network, wallet } = getState();
     const accountAddress = wallet.selectedAddress;
     if (!accountAddress) throw new Error('WALLET NOT CONNECTED');
-
+    console.log('');
     const { tokenService } = extra.services;
     const userTokens = await tokenService.getUserTokensData({
       network: network.current,
@@ -92,10 +102,10 @@ const getTokenAllowance = createAsyncThunk<
 
 const approve = createAsyncThunk<
   { amount: string },
-  { tokenAddress: string; spenderAddress: string; amountToApprove?: string },
+  { tokenAddress: string; spenderAddress: string; amountToApprove?: string; network: Network },
   ThunkAPI
->('tokens/approve', async ({ tokenAddress, spenderAddress, amountToApprove }, { extra, getState }) => {
-  const { network, wallet, app } = getState();
+>('tokens/approve', async ({ tokenAddress, spenderAddress, amountToApprove, network }, { extra, getState }) => {
+  const { wallet, app } = getState();
   const { tokenService, transactionService } = extra.services;
   const amount = amountToApprove ?? extra.config.MAX_UINT256;
 
@@ -103,14 +113,14 @@ const approve = createAsyncThunk<
   if (!accountAddress) throw new Error('WALLET NOT CONNECTED');
 
   const tx = await tokenService.approve({
-    network: network.current,
+    network: network,
     accountAddress,
     tokenAddress,
     spenderAddress,
     amount,
   });
   const notifyEnabled = app.servicesEnabled.notify;
-  await transactionService.handleTransaction({ tx, network: network.current, useExternalService: notifyEnabled });
+  await transactionService.handleTransaction({ tx, network: network, useExternalService: notifyEnabled });
 
   return { amount };
 });
@@ -119,33 +129,33 @@ const approve = createAsyncThunk<
 /*                                Subscriptions                               */
 /* -------------------------------------------------------------------------- */
 
-const initSubscriptions = createAsyncThunk<void, void, ThunkAPI>(
-  'tokens/initSubscriptions',
-  async (_arg, { extra, dispatch }) => {
-    const { subscriptionService } = extra.services;
-    subscriptionService.subscribe({
-      module: 'tokens',
-      event: 'priceUsdc',
-      action: (tokenAddresses: string[]) => {
-        dispatch(getTokensDynamicData({ addresses: tokenAddresses }));
-      },
-    });
-    subscriptionService.subscribe({
-      module: 'tokens',
-      event: 'balances',
-      action: (tokenAddresses: string[]) => {
-        dispatch(getUserTokens({ addresses: tokenAddresses }));
-      },
-    });
-    subscriptionService.subscribe({
-      module: 'tokens',
-      event: 'getAllowance',
-      action: (tokenAddress: string, spenderAddress: string) => {
-        dispatch(getTokenAllowance({ tokenAddress, spenderAddress }));
-      },
-    });
-  }
-);
+// const initSubscriptions = createAsyncThunk<void, void, ThunkAPI>(
+//   'tokens/initSubscriptions',
+//   async (_arg, { extra, dispatch }) => {
+//     const { subscriptionService } = extra.services;
+//     subscriptionService.subscribe({
+//       module: 'tokens',
+//       event: 'priceUsdc',
+//       action: (tokenAddresses: string[]) => {
+//         dispatch(getTokensDynamicData({ addresses: tokenAddresses }));
+//       },
+//     });
+//     subscriptionService.subscribe({
+//       module: 'tokens',
+//       event: 'balances',
+//       action: (tokenAddresses: string[]) => {
+//         dispatch(getUserTokens({ addresses: tokenAddresses }));
+//       },
+//     });
+//     subscriptionService.subscribe({
+//       module: 'tokens',
+//       event: 'getAllowance',
+//       action: (tokenAddress: string, spenderAddress: string) => {
+//         dispatch(getTokenAllowance({ tokenAddress, spenderAddress }));
+//       },
+//     });
+//   }
+// );
 
 /* -------------------------------------------------------------------------- */
 /*                                   Exports                                  */
@@ -155,11 +165,12 @@ export const TokensActions = {
   setSelectedTokenAddress,
   setTokenAllowance,
   getTokens,
+  getSupportedOracleTokens,
   getTokensDynamicData,
   getUserTokens,
   getTokenAllowance,
   approve,
-  initSubscriptions,
+  // initSubscriptions,
   clearTokensData,
   clearUserTokenState,
 };

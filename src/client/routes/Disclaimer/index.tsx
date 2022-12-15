@@ -65,25 +65,25 @@ export const Disclaimer = () => {
         <p>
           For example, ‘debt’ is a legally enforceable promise from a debtor to a creditor to pay an interest rate and
           eventually repay the principal. Therefore, ‘debt’ cannot exist without legal agreements and cannot be enforced
-          without courts of law.{' '}
+          without courts of law.  {' '}
           <u>
-            By contrast, with the Iron Bank, there are no legal agreements, promises of payment or courts of law, and
-            therefore there are no debts, loans or other traditional finance transactions involved.
+            By contrast, with the Debt DAO marketplace, there are no legal agreements, promises of payment or courts of
+            law, and therefore there are no debts, creditLines or other traditional finance transactions involved.
           </u>
         </p>
         <p>
-          Instead, the Iron Bank consists of software (including embedded game-theoretic incentives and assumptions)
-          through which people can share their tokens with other people or smart contract systems and,{' '}
+          Instead, the Debt DAO marketplace consists of software (including embedded game-theoretic incentives and
+          assumptions) through which people can share their tokens with other people or smart contract systems and,{' '}
           <i>
             under normal and expected conditions and subject to various assumptions regarding the behavioral effects of
             incentives, <u>probably</u> get their tokens back eventually, plus extra tokens, most of the time or in most
-            cases.
+            cases. 
           </i>{' '}
           Unlike in traditional lending, the ‘lender’s’ financial return does not depend primarily on the
           creditworthiness, solvency or financial skill of the ‘borrower’ or on legal nuances such as the perfection of
           liens or the priority of creditor claims in a bankruptcy--it depends primarily on the incentive model assumed
           by the software design and how reliably the software implements that model. Unlike a debtor, people who
-          ‘borrow’ tokens from the Iron Bank smart contract system are not required to and have not promised to pay the
+          ‘borrow’ tokens from the Debt DAO smart contract system are not required to and have not promised to pay the
           tokens back; if the ‘borrowers’ never pay the tokens back, no promise has been broken, no legal agreement has
           been breached and the token ‘lenders’ cannot sue the ‘borrowers’ to get their tokens back. Instead, by not
           repaying the borrowed tokens, the token ‘borrowers’ merely demonstrate either that they lacked sufficient
@@ -95,7 +95,7 @@ export const Disclaimer = () => {
         </p>
         <Header>Deposit</Header>
         <p>
-          When the Iron Bank or Vaults are used to ‘lend’ or ‘deposit’ tokens into a third-party smart-contract system,
+          When the Debt DAO marketplace is used to ‘lend’ or ‘deposit’ tokens into a third-party smart-contract system,
           the situation is even less like traditional debt: the ‘borrowing’ smart contract has not posted ‘collateral’
           and could malfunction or suffer a loss that results in complete or partial failure to return the ‘borrowed’
           tokens. In this case, the token ‘lenders’ do not have a contractual remedy against the smart contract
@@ -120,21 +120,21 @@ export const Disclaimer = () => {
         </p>
         <Header>Risk</Header>
         <p>
-          Thus, the transactions you can effect through the Iron Bank, Vaults and other Yearn decentralized finance
-          systems, while superficially similar to traditional financial transactions in some ways, are in fact very
-          different. DeFi and TradFi each have unique costs and benefits, risks and protection mechanisms.{' '}
+          Thus, the transactions you can effect through the Debt DAO marketplace, while superficially similar to
+          traditional financial transactions in some ways, are in fact very different. DeFi and TradFi each have unique
+          costs and benefits, risks and protection mechanisms.{' '}
           <u>
-            Please bear this fact in mind when using this website, and do not use Yearn, the Yearn vaults, the Iron Bank
-            or any other system described on this website without a sufficient understanding of their unique risks and
-            how they differ from traditional financial transactions.
+            Please bear this fact in mind when using this website, and do not use the Debt DAO marketplace or any other
+            system described on this website without a sufficient understanding of their unique risks and how they
+            differ from traditional financial transactions.
           </u>{' '}
           The only way to fully understand such risks is to have a strong understanding of the relevant technical
-          systems and the incentive design mechanisms they embody--we strongly encourage you to review Yearn’s{' '}
-          <StyledLink href="https://docs.yearn.finance" target="_blank">
+          systems and the incentive design mechanisms they embody--we strongly encourage you to review Debt DAO’s{' '}
+          <StyledLink href="https://docs.debtdao.finance/products/introduction" target="_blank">
             technical documentation
           </StyledLink>{' '}
           and{' '}
-          <StyledLink href="https://github.com/yearn" target="_blank">
+          <StyledLink href="https://github.com/debtdao" target="_blank">
             code
           </StyledLink>{' '}
           before use.

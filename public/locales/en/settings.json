@@ -3,5 +3,8 @@
   "preferences": "Preferences",
   "signed-approvals": "Enable Signed Approvals",
   "slippage-tolerance": "Slippage tolerance",
+  "Borrower": "Borrowing",
+  "Lender": "Lending",
+  "Arbiter": "Arbiting",
   "themes": "Themes"
 }

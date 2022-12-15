@@ -5,13 +5,15 @@
 // Source Documentation: https://www.apollographql.com/docs/react/data/fragments/#using-fragments-with-unions-and-interfaces
 
 const fs = require('fs');
+const path = require('path');
 
 const fetch = require('cross-fetch');
 
-// TODO: Fix to autogenerate the schema for GraphQL subgraph API.
-// const { getEnv } = require('@config/env');
-// const { GRAPH_API_URL } = getEnv();
-const GRAPH_API_URL = 'https://api.thegraph.com/subgraphs/name/kibagateaux/dd-test';
+const GRAPH_API_URL = process.env.GRAPH_API_URL;
+
+const homeDirectory = path.resolve(process.cwd());
+const destinationDirectory = '/src/core/frameworks/gql/possibleTypes.json';
+const destinationPath = path.join(homeDirectory, destinationDirectory);
 
 fetch(`${GRAPH_API_URL}`, {
   method: 'POST',
@@ -43,7 +45,7 @@ fetch(`${GRAPH_API_URL}`, {
       }
     });
 
-    fs.writeFile('./possibleTypes.json', JSON.stringify(possibleTypes), (err) => {
+    fs.writeFile(destinationPath, JSON.stringify(possibleTypes), (err) => {
       if (err) {
         console.error('Error writing possibleTypes.json', err);
       } else {

@@ -11,7 +11,7 @@ import {
   LinesSelectors,
   WalletActions,
   WalletSelectors,
-  OnChainMetaDataActions,
+  OnchainMetaDataActions,
 } from '@store';
 import { RecommendationsCard, SliderCard, ViewContainer } from '@components/app';
 import { SpinnerLoading, Text, Button } from '@components/common';
@@ -106,7 +106,7 @@ export const Market = () => {
     if (!userWallet) {
       return;
     }
-    dispatch(OnChainMetaDataActions.getENS(userWallet));
+    dispatch(OnchainMetaDataActions.getENS(userWallet));
   }, [userWallet]);
 
   return (

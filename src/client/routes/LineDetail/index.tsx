@@ -2,15 +2,7 @@ import { useEffect, useState } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
-import {
-  LinesActions,
-  AlertsActions,
-  AppSelectors,
-  TokensSelectors,
-  LinesSelectors,
-  NetworkSelectors,
-  OnChainMetaDataActions,
-} from '@store';
+import { LinesActions, AlertsActions, AppSelectors, TokensSelectors, LinesSelectors, NetworkSelectors } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation, useIsMounting } from '@hooks';
 import { LineDetailsDisplay, ViewContainer, SliderCard } from '@components/app';
 import { SpinnerLoading, Text } from '@components/common';

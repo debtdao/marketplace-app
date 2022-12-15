@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
 import { Text } from '@components/common';
-import { OnChainMetaDataActions, OnChainMetaDataSelector, LinesSelectors } from '@store';
+import { OnchainMetaDataActions, OnchainMetaDataSelector, LinesSelectors } from '@store';
 import { getENS } from '@src/utils';
 import { ENSAddressPair } from '@src/core/types';
 
@@ -39,11 +39,11 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
 
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
-  const ENSRegistry = useAppSelector(OnChainMetaDataSelector.selectENSPairs);
+  const ENSRegistry = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const [borrowerID, setBorrowerId] = useState('');
 
   useEffect(() => {
-    dispatch(OnChainMetaDataActions.getENS(selectedLine?.borrower!));
+    dispatch(OnchainMetaDataActions.getENS(selectedLine?.borrower!));
   }, [selectedLine]);
 
   useEffect(() => {

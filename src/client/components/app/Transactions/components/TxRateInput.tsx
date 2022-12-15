@@ -193,8 +193,8 @@ export const TxRateInput: FC<TxRateInputProps> = ({
                 </AmountTitle>
                 <InterestRateInputContainer>
                   <StyledAmountInput
-                    value={frate}
-                    onChange={setRateChange ? (e) => setRateChange('f', e.target.value) : undefined}
+                    value={drate}
+                    onChange={setRateChange ? (e) => setRateChange('d', e.target.value) : undefined}
                     placeholder={'15.00'}
                     readOnly={readOnly}
                     error={inputError}
@@ -208,8 +208,8 @@ export const TxRateInput: FC<TxRateInputProps> = ({
                 <AmountTitle ellipsis>{'Facility Rate' || t('components.transaction.deposit.rates-title')}</AmountTitle>
                 <InterestRateInputContainer>
                   <StyledAmountInput
-                    value={drate}
-                    onChange={setRateChange ? (e) => setRateChange('d', e.target.value) : undefined}
+                    value={frate}
+                    onChange={setRateChange ? (e) => setRateChange('f', e.target.value) : undefined}
                     placeholder={'25.00'}
                     readOnly={readOnly}
                     error={inputError}

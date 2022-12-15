@@ -75,7 +75,6 @@ interface NavTabbarProps {
 export const NavTabbar = ({ navLinks, ...props }: NavTabbarProps) => {
   const { t } = useAppTranslation('common');
   const location = useLocation();
-
   const currentPath = '/' + location.pathname.toLowerCase().split('/')[1];
 
   return (

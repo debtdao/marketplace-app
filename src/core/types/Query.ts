@@ -62,19 +62,11 @@ export interface GetLinesArgs {
 }
 
 /**
- * @typedef {object} GetUserLinePositionsArgs
- * @property {Address} GetUserLinePositionsArgs.id - address to look up credit.debit positions for
+ * @typedef {object} GetUserPortfolioArgs
+ * @property {Address} GetUserPortfolioArgs.user - address to fetch borrower, lender, and arbiter portfolio
  */
-export interface GetUserLinePositionsArgs {
-  id: Address;
-}
-
-/**
- * @typedef {object} GetBorrowerPositionsArgs
- * @property {Address} GetBorrowerPositionsArgs.borrower - address to fetch borrower positions for
- */
-export interface GetBorrowerPositionsArgs {
-  borrower: Address;
+export interface GetUserPortfolioArgs {
+  user: Address;
 }
 
 // React hook args wrapping these queries
@@ -88,7 +80,7 @@ export interface UseCreditLineParams {
 
 /**
  * @typedef {object} GetSupportedOracleTokenArgs
- * @property {string} GetBorrowerPositionsArgs.tokenAddress - oracle address to fetch supported tokens
+ * @property {string} GetSupportedOracleTokenArgs.tokenAddress - oracle address to fetch supported tokens
  */
 export interface GetSupportedOracleTokenArgs {
   oracleAddress: string;
@@ -97,7 +89,7 @@ export interface GetSupportedOracleTokenArgs {
 /*
   Query Responses Types
 */
-//type QueryResponseTypes = AggregatedCreditLine | AggregatedCreditLine[] | CreditLinePage;
+//type QueryResponseTypes = SecuredLine | SecuredLine[] | SecuredLineWithEvents;
 
 export interface TokenFragRepsonse {
   id: Address;
@@ -117,29 +109,24 @@ export interface BaseLineFragResponse {
   };
 }
 
-export interface BaseCreditFragResponse {
+export interface BasePositionFragResponse {
   id: Address;
   status: PositionStatusTypes;
-  principal: string;
-  deposit: string;
-  dRate: string;
-  fRate: string;
-  arbiter: string;
-  token: TokenFragRepsonse;
-}
-
-export interface LinePageCreditFragResponse extends BaseCreditFragResponse {
-  status: PositionStatusTypes;
-  interestRepaid: string;
-  interestAccrued: string;
-  dRate: string;
-  fRate: string;
-
   lender: {
     id: string;
   };
-
-  events?: LineEventFragResponse[];
+  line: {
+    id: string;
+  };
+  principal: string;
+  deposit: string;
+  interestAccrued: string;
+  interestRepaid: string;
+  totalInterestRepaid: string;
+  dRate: string;
+  fRate: string;
+  // arbiter: string;
+  token: TokenFragRepsonse;
 }
 
 export interface LineEventFragResponse {
@@ -189,7 +176,7 @@ export interface BaseEscrowFragResponse {
 
 export interface GetLinesResponse {
   lines: BaseLineFragResponse & {
-    positions: BaseCreditFragResponse[];
+    positions: BasePositionFragResponse[];
     escrow: BaseEscrowFragResponse;
     spigot: {
       id: Address;
@@ -202,15 +189,9 @@ export interface GetLinesResponse {
   };
 }
 
-export interface GetLinePageAuxDataResponse {
-  events?: LineEventFragResponse[];
-  spigot?: {
-    events: SpigotEventFragResponse[];
-  };
-}
-
 export interface GetLinePageResponse extends BaseLineFragResponse {
-  positions?: LinePageCreditFragResponse[];
+  positions?: BasePositionFragResponse[];
+  events?: LineEventFragResponse[];
 
   spigot?: {
     id: Address;
@@ -237,8 +218,12 @@ export interface SupportedOracleTokenResponse {
   supportedTokens?: [token: TokenFragRepsonse];
 }
 
-export interface GetBorrowerPositionsResponse extends BaseLineFragResponse {
-  positions?: LinePageCreditFragResponse[];
+export interface LenderPositionsResponse {
+  positions?: BasePositionFragResponse[];
+}
+
+export interface LineOfCreditsResponse extends BaseLineFragResponse {
+  positions?: BasePositionFragResponse[];
 
   events?: LineEventFragResponse[];
 
@@ -257,9 +242,14 @@ export interface GetBorrowerPositionsResponse extends BaseLineFragResponse {
     events: {
       __typename: string;
       timestamp: number;
-      // only on add/remove collateral
       amount?: string;
       value?: string;
     };
   };
+}
+
+export interface GetUserPortfolioResponse extends LineOfCreditsResponse, LenderPositionsResponse {
+  borrowerLineOfCredits: LineOfCreditsResponse[];
+  lenderPositions: LenderPositionsResponse;
+  arbiterLineOfCredits: LineOfCreditsResponse[];
 }

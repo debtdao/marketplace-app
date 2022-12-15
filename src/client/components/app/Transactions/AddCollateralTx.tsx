@@ -80,6 +80,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
   const [transactionLoading, setLoading] = useState(false);
   const [targetTokenAmount, setTargetTokenAmount] = useState('1');
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
+  const selectedEscrow = useAppSelector(CollateralSelectors.selectSelectedEscrow);
 
   // const onSelectedTokenChanged = props.onSelectedTokenChanged
   // const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
@@ -89,14 +90,14 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
     setTargetTokenAmount(amount);
   };
   //main net logic
-  const selectedCollateralAsset = useAppSelector(CollateralSelectors.selectSelectedCollateralToken);
+  const selectedCollateralAsset = useAppSelector(CollateralSelectors.selectSelectedCollateralAsset);
   // const selectedTokenAddress = useAppSelector(TokensSelectors.selectToken);
   const { selectedSellToken, sourceAssetOptions } = useSelectedSellToken({
     selectedSellTokenAddress: selectedCollateralAsset,
     allowTokenSelect: true,
   });
 
-  const enabledCollateralAddressess = _.values(selectedLine?.escrow?.deposits)?.map((d) => d.token.address);
+  const enabledCollateralAddressess = _.values(selectedEscrow?.deposits)?.map((d) => d.token.address);
   const collateralOptions = sourceAssetOptions.filter(({ address }) =>
     _.includes(enabledCollateralAddressess, address)
   );

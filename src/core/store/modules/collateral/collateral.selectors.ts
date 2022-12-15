@@ -1,4 +1,6 @@
-import { RootState } from '@types';
+import { createSelector } from '@reduxjs/toolkit';
+
+import { Address, AggregatedEscrow, AggregatedSpigot, RootState } from '@types';
 
 import {} from './collateral.reducer';
 
@@ -7,15 +9,29 @@ import {} from './collateral.reducer';
 /* ---------------------------------- Main Selector --------------------------------- */
 
 const selectStatusMap = (state: RootState) => state.collateral.statusMap;
-const selectSelectedEscrow = (state: RootState) => state.collateral.selectedEscrow;
-const selectSelectedSpigot = (state: RootState) => state.collateral.selectedSpigot;
-const selectSelectedCollateralToken = (state: RootState) => state.collateral.selectedCollateralAsset;
-const selectSelectedRevenueContract = (state: RootState) => state.collateral.selectedRevenueContract;
+const selectCollateralMap = (state: RootState) => state.collateral.collateralMap;
+const selectCollateralEventsMap = (state: RootState) => state.collateral.eventsMap;
+const selectSelectedEscrowAddress = (state: RootState) => state.collateral.selectedEscrow;
+const selectSelectedSpigotAddress = (state: RootState) => state.collateral.selectedSpigot;
+
+const selectSelectedCollateralAsset = (state: RootState) => state.collateral.selectedCollateralAsset;
+const selectSelectedRevenueContractAddress = (state: RootState) => state.collateral.selectedRevenueContract;
+
+const selectSelectedEscrow = createSelector([selectCollateralMap, selectSelectedEscrowAddress], (cMap, addy) => {
+  return !addy ? undefined : (cMap[addy] as AggregatedEscrow);
+});
+
+const selectSelectedSpigot = createSelector([selectCollateralMap, selectSelectedSpigotAddress], (cMap, addy) => {
+  return !addy ? undefined : (cMap[addy] as AggregatedSpigot);
+});
 
 export const CollateralSelectors = {
   selectStatusMap,
   selectSelectedEscrow,
   selectSelectedSpigot,
-  selectSelectedCollateralToken,
-  selectSelectedRevenueContract,
+  selectSelectedEscrowAddress,
+  selectSelectedSpigotAddress,
+  selectSelectedCollateralAsset,
+  selectSelectedRevenueContractAddress,
+  selectCollateralEventsMap,
 };

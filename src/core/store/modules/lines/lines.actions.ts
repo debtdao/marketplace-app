@@ -4,8 +4,8 @@ import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 
 import { ThunkAPI } from '@frameworks/redux';
 import {
-  AggregatedCreditLine,
-  CreditLinePage,
+  SecuredLine,
+  SecuredLineWithEvents,
   TransactionOutcome,
   Address,
   Wei,
@@ -13,18 +13,21 @@ import {
   GetLineArgs,
   GetLinesArgs,
   GetLinePageArgs,
-  CreditPosition,
   AddCreditProps,
   UseCreditLinesParams,
   BorrowCreditProps,
   Network,
   DeploySecuredLineProps,
   DeploySecuredLineWithConfigProps,
-  GetBorrowerPositionsResponse,
+  GetUserPortfolioResponse,
+  CreditPosition,
+  RootState,
+  PositionMap,
 } from '@types';
 import {
   formatGetLinesData,
   formatLinePageData,
+  formatUserPortfolioData,
   // validateLineDeposit,
   // validateLineWithdraw,
   // validateMigrateLineAllowance,
@@ -33,6 +36,10 @@ import {
 import { unnullify } from '@utils';
 
 import { TokensActions } from '../tokens/tokens.actions';
+import { TokensSelectors } from '../tokens/tokens.selectors';
+import { CollateralActions } from '../collateral/collateral.actions';
+
+import { LinesSelectors } from './lines.selectors';
 
 /* -------------------------------------------------------------------------- */
 /*                                   Setters                                  */
@@ -40,12 +47,7 @@ import { TokensActions } from '../tokens/tokens.actions';
 
 const setSelectedLineAddress = createAction<{ lineAddress?: string }>('lines/setSelectedLineAddress');
 const setSelectedLinePosition = createAction<{ position?: string }>('lines/setSelectedLinePosition');
-const setPositionData = createAction<{
-  positionObject: CreditPosition;
-  lineAddress: string;
-  position: string;
-  positions: CreditPosition[];
-}>('lines/setUpdatedPositionData');
+const setPosition = createAction<{ id: string; position: CreditPosition }>('lines/setPosition');
 
 /* -------------------------------------------------------------------------- */
 /*                                 Clear State                                */
@@ -68,7 +70,7 @@ const clearLineStatus = createAction<{ lineAddress: string }>('lines/clearLineSt
 //   }
 // );
 
-const getLine = createAsyncThunk<{ lineData: AggregatedCreditLine | undefined }, GetLineArgs, ThunkAPI>(
+const getLine = createAsyncThunk<{ lineData: SecuredLine | undefined }, GetLineArgs, ThunkAPI>(
   'lines/getLine',
   async (params, { getState, extra }) => {
     const { network } = getState();
@@ -78,50 +80,14 @@ const getLine = createAsyncThunk<{ lineData: AggregatedCreditLine | undefined },
   }
 );
 
-const getLines = createAsyncThunk<
-  { linesData: { [category: string]: AggregatedCreditLine[] } },
-  UseCreditLinesParams,
-  ThunkAPI
->('lines/getLines', async (categories, { getState, extra }) => {
-  const {
-    network,
-    tokens: { tokensMap },
-  } = getState();
-
-  const { creditLineService } = extra.services;
-
-  const tokenPrices = Object.entries(tokensMap).reduce(
-    (prices, [addy, { priceUsdc }]) => ({ ...prices, [addy]: priceUsdc }),
-    {}
-  );
-
-  // ensure consistent ordering of categories
-  const categoryKeys = Object.keys(categories);
-  //@ts-ignore
-  const promises = await Promise.all(
-    categoryKeys
-      .map((k) => categories[k])
-      .map((params: GetLinesArgs) => creditLineService.getLines({ network: network.current, ...params }))
-  );
-  //@ts-ignore
-  const linesData = categoryKeys.reduce(
-    (all, category, i) =>
-      // @dev assumes `promises` is same order as `categories`
-      !promises[i] ? all : { ...all, [category]: formatGetLinesData(promises[i]!, tokenPrices) },
-    {}
-  );
-
-  return { linesData };
-});
-
-const getLinePage = createAsyncThunk<{ linePageData: CreditLinePage | undefined }, GetLinePageArgs, ThunkAPI>(
-  'lines/getLinePage',
-  async ({ id }, { getState, extra }) => {
+const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine[] } }, UseCreditLinesParams, ThunkAPI>(
+  'lines/getLines',
+  async (categories, { getState, extra }) => {
     const {
       network,
-      lines: { linesMap, pagesMap },
       tokens: { tokensMap },
     } = getState();
+
     const { creditLineService } = extra.services;
 
     const tokenPrices = Object.entries(tokensMap).reduce(
@@ -129,20 +95,95 @@ const getLinePage = createAsyncThunk<{ linePageData: CreditLinePage | undefined 
       {}
     );
 
-    const pageData = pagesMap[id];
-    if (pageData) {
-      return { linePageData: pageData };
-    }
+    // ensure consistent ordering of categories
+    const categoryKeys = Object.keys(categories);
+    //@ts-ignore
+    const promises = await Promise.all(
+      categoryKeys
+        .map((k) => categories[k])
+        .map((params: GetLinesArgs) => creditLineService.getLines({ network: network.current, ...params }))
+    );
+    //@ts-ignore
+    const linesData = categoryKeys.reduce(
+      (all, category, i) =>
+        // @dev assumes `promises` is same order as `categories`
+        !promises[i] ? all : { ...all, [category]: formatGetLinesData(promises[i]!, tokenPrices) },
+      {}
+    );
 
-    const basicData = linesMap[id];
+    return { linesData };
+  }
+);
 
-    // navigated directly to line page, need to fetch basic data
+// TODO: Add this back so not always refetching line page data for a given line of credit.
+// const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | undefined }, GetLinePageArgs, ThunkAPI>(
+//   'lines/getLinePage',
+//   async ({ id }, { getState, extra, dispatch }) => {
+//     const state: RootState = getState();
+//     const { creditLineService } = extra.services;
+//     // gets all primary + aux line data avaliable by defeault
+
+//     const selectedLine = LinesSelectors.selectSelectedLinePage(state);
+//     const tokenPrices = TokensSelectors.selectTokenPrices(state);
+
+//     // @TODO check if events exist to
+//     console.log('User Portfolio actions state: ', state);
+//     console.log('User Portfolio actions state: ', state);
+//     console.log('User Portfolio actions tokenPrices: ', tokenPrices);
+
+//     // debugger;
+//     if (selectedLine) {
+//       console.log('User Portfolio actions selectedLine: ', selectedLine);
+//       // console.log('user portfolio')
+//       return { linePageData: selectedLine };
+//     } else {
+//       try {
+//         const linePageData = formatLinePageData(
+//           await creditLineService.getLinePage({ network: state.network.current, id }),
+//           tokenPrices
+//         );
+
+//         console.log('user portfolio getLinePage data ', linePageData);
+
+//         // @TODO dispatch actions to save collateral and events
+//         // enable collateral or add collateral
+//         // save module to Map
+//         // dispatch(CollateralActions.saveModuleToMap(spigot.id, spigot ));
+//         // function does not exist in this file
+//         // save events to map
+//         // dispatch(LineActions.setCreditEvetntsModule(spigot.id, collateralEvents ));
+//         // save events to map
+//         // dispatch(CollateralActions.saveEventsToMap(spigot.id, collateralEvents ));
+
+//         if (!linePageData) throw new Error();
+//         return { linePageData };
+//       } catch (e) {
+//         console.log('failed getting full line page data', e);
+//         return { linePageData: undefined };
+//       }
+//     }
+//   }
+// );
+
+const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | undefined }, GetLinePageArgs, ThunkAPI>(
+  'lines/getLinePage',
+  async ({ id }, { getState, extra, dispatch }) => {
+    const state: RootState = getState();
+    const { creditLineService } = extra.services;
+    // gets all primary + aux line data avaliable by defeault
+
+    // const selectedLine = LinesSelectors.selectSelectedLinePage(state);
+    const tokenPrices = TokensSelectors.selectTokenPrices(state);
     const linePageResponse = await creditLineService.getLinePage({
-      network: network.current,
+      network: state.network.current,
       id,
     });
+
+    if (!linePageResponse) {
+      return { linePageData: undefined };
+    }
     const linePageData = linePageResponse ? formatLinePageData(linePageResponse, tokenPrices) : undefined;
-    return { linePageData };
+    return { linePageData: linePageData };
   }
 );
 
@@ -164,19 +205,22 @@ const getUserLinePositions = createAsyncThunk<
   return { userLinesPositions };
 });
 
-const getBorrowerPositions = createAsyncThunk<
-  { borrowerPositions: CreditPosition[] | undefined },
-  { borrower: string },
+// TODO: Return borrowerLineOfCredits and arbiterLineOfCredits within response
+// as SecuredLine[] type to consume in lines.reducer.ts
+const getUserPortfolio = createAsyncThunk<
+  { address: string; lines: { [address: string]: SecuredLineWithEvents }; lenderPositions: PositionMap },
+  { user: string },
   ThunkAPI
->('lines/getBorrowerPositions', async ({ borrower }, { extra, getState }) => {
-  const { wallet } = getState();
-  const { services } = extra;
-  const userAddress = wallet.selectedAddress;
-  if (!userAddress) {
-    throw new Error('WALLET NOT CONNECTED');
-  }
-  const borrowerPositions = await services.creditLineService.getBorrowerPositions({ borrower });
-  return { borrowerPositions };
+>('lines/getUserPortfolio', async ({ user }, { extra, getState }) => {
+  const { creditLineService } = extra.services;
+  const tokenPrices = TokensSelectors.selectTokenPrices(getState());
+
+  const userPortfolio = await creditLineService.getUserPortfolio({ user });
+  if (!userPortfolio) return { address: user, lines: {}, lenderPositions: {} };
+
+  const { lines, positions: lenderPositions } = formatUserPortfolioData(userPortfolio, tokenPrices);
+
+  return { address: user, lines, lenderPositions };
 });
 
 export interface GetExpectedTransactionOutcomeProps {
@@ -372,7 +416,6 @@ const depositAndRepay = createAsyncThunk<
     // await transactionService.handleTransaction({ tx, network: network.current, useExternalService: notifyEnabled });
     //dispatch(getLinePage({ id: lineAddress }));
     // dispatch(getUserLinesSummary());
-    //dispatch(getUserLinePositions({ lineAddresses: [lineAddress] }));
     // dispatch(getUserLinesMetadata({ linesAddresses: [lineAddress] }));
     //dispatch(TokensActions.getUserTokens({ addresses: [tokenAddress, lineAddress] }));
   },
@@ -491,7 +534,6 @@ const liquidate = createAsyncThunk<
     // await transactionService.handleTransaction({ tx, network: network.current, useExternalService: notifyEnabled });
     // dispatch(getLinePage({ id: lineAddress }));
     // // dispatch(getUserLinesSummary());
-    // dispatch(getUserLinePositions({ lineAddresses: [lineAddress] }));
     // // dispatch(getUserLinesMetadata({ linesAddresses: [lineAddress] }));
     // dispatch(TokensActions.getUserTokens({ addresses: [tokenAddress, lineAddress] }));
   },
@@ -554,7 +596,6 @@ const withdrawLine = createAsyncThunk<
     // await transactionService.handleTransaction({ tx, network: network.current, useExternalService: notifyEnabled });
     //dispatch(getLinePage({ id: lineAddress }));
     // dispatch(getUserLinesSummary());
-    //dispatch(getUserLinePositions({ lineAddresses: [lineAddress] }));
     // dispatch(getUserLinesMetadata({ linesAddresses: [lineAddress] }));
     //dispatch(TokensActions.getUserTokens({ addresses: [targetTokenAddress, lineAddress] }));
   },
@@ -712,7 +753,6 @@ const getWithdrawAllowance = createAsyncThunk<
 //       event: 'positionsOf',
 //       action: (lineAddresses: string[]) => {
 //         dispatch(getUserLinesSummary());
-//         dispatch(getUserLinePositions({ lineAddresses }));
 //         dispatch(getUserLinesMetadata({ linesAddresses: lineAddresses }));
 //       },
 //     });
@@ -726,13 +766,13 @@ const getWithdrawAllowance = createAsyncThunk<
 export const LinesActions = {
   setSelectedLineAddress,
   setSelectedLinePosition,
-  setPositionData,
+  setPosition,
   // initiateSaveLines,
   getLine,
   getLines,
   getLinePage,
   getUserLinePositions,
-  getBorrowerPositions,
+  getUserPortfolio,
   approveDeposit,
   addCredit,
   depositAndRepay,

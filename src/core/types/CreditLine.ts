@@ -26,91 +26,72 @@ export type LineStatusTypes =
 // Individual lender positoin status types
 type ProposedStatus = 'PROPOSED';
 export const PROPOSED_STATUS: ProposedStatus = 'PROPOSED';
-type OpenedStatus = 'OPENED';
-export const OPENED_STATUS: OpenedStatus = 'OPENED';
+type OpenedStatus = 'OPEN';
+export const OPENED_STATUS: OpenedStatus = 'OPEN';
 type ClosedStatus = 'CLOSED';
 export const CLOSED_STATUS: ClosedStatus = 'CLOSED';
 
 export type PositionStatusTypes = ProposedStatus | OpenedStatus | ClosedStatus;
 
-export interface BaseCreditLine {
+export interface LineOfCredit {
   id: Address;
-  type?: string;
+  borrower: string;
+  arbiter: string;
+  status: LineStatusTypes;
   start: number;
   end: number;
-  status: LineStatusTypes;
-  borrower: Address;
-  arbiter: Address;
-  positions?: CreditPosition[];
-  escrow?: { id: Address };
-  spigot?: { id: Address };
-}
-
-export interface AggregatedCreditLine extends BaseCreditLine {
-  // real-time aggregate usd value across all credits
-  principal: string; // | Promise<string>;
-  deposit: string; // | Promise<string>;
+  // display data of aggregate usd values accross all positions at current time
+  principal: string;
+  deposit: string;
+  interest: string;
+  // lifetime stats
+  totalInterestRepaid: string;
   // id, symbol, APY (4 decimals)
   highestApy: [string, string, string];
 
-  positions?: CreditPosition[];
+  // metadata to pull in additional data from state
+  spigotId?: string;
+  escrowId?: string;
+  positionIds?: string[]; // referential ids stored in redux state
+}
 
+export type PositionMap = { [id: string]: CreditPosition };
+
+export type LineCollateral = {
+  // real-time aggregate usd value across all credits
   escrow?: AggregatedEscrow;
   spigot?: AggregatedSpigot;
+};
+
+export interface SecuredLine extends LineOfCredit, LineCollateral {
+  positionIds?: string[]; // referential ids stored in redux state
+  positions?: PositionMap;
 }
 
-export interface CreditLinePage extends AggregatedCreditLine {
-  // total value of asssets repaid *AT TIME OF REPAYMENT*
-  interest: string; // | Promise<string>;
-  totalInterestRepaid: string; // | Promise<string>;
-
-  positions?: CreditPosition[];
-
-  collateralEvents: CollateralEvent[];
-  creditEvents: CreditEvent[];
-}
-
-// data that isnt included in AggregatedCreditLine that we need to fetch for full CreditLinePage dattype
+// data that isnt included in SecuredLine that we need to fetch for full SecuredLineWithEvents dattype
 // gets merged into existing AggregatedCredit to form LinePageData
-export interface CreditLinePageAuxData {
-  positions: {
-    [id: string]: {
-      dRate: string;
-      token: Address;
-    };
-  }[];
+export interface LineEvents {
   collateralEvents: CollateralEvent[];
   creditEvents: CreditEvent[];
 }
+
+export interface SecuredLineWithEvents extends SecuredLine, LineEvents {}
 
 export interface CreditPosition {
   id: string;
+  line: string;
   status: PositionStatusTypes;
-  deposit: string;
-  principal: string;
-  interestAccrued: string;
-  interestRepaid: string;
-  decimals: string;
-  borrower: Address;
+  lender: string;
   token: TokenView;
-  lender: Address;
-  drate: string;
-  frate: string;
-}
-
-export interface LinePageCreditPosition extends CreditPosition {
-  id: string;
-  status: PositionStatusTypes;
-  lender: Address;
-  arbiter: string;
   deposit: string;
   principal: string;
   interestAccrued: string;
   interestRepaid: string;
   totalInterestRepaid: string;
+  // decimals: string;
+  // borrower: Address;
   dRate: string;
-  token: TokenView;
-  // events?: CreditEvent[];
+  fRate: string;
 }
 
 // bare minimum to display about a user on a position
@@ -128,7 +109,9 @@ export const COLLATERAL_TYPE_ASSET: CollateralTypeAsset = 'asset';
 type CollateralTypeRevenue = 'revenue';
 export const COLLATERAL_TYPE_REVENUE: CollateralTypeRevenue = 'revenue';
 
-type CollateralTypes = CollateralTypeAsset | CollateralTypeRevenue | undefined;
+export type LinesByRole = { borrowing: Address[]; arbiting: Address[] };
+
+export type CollateralTypes = CollateralTypeAsset | CollateralTypeRevenue | undefined;
 
 export interface UserPositionMetadata {
   role: PositionRole; // borrower/lender/arbiter
@@ -136,18 +119,14 @@ export interface UserPositionMetadata {
   available: string; // borrowable/withdrawable/liquidatable
 }
 
-export interface PositionItem {
-  drate: string;
-  frate: string;
-  lender: string;
-  deposit: string;
-  tokenSymbol: string;
-  id: string;
-}
-
 export interface UserPositionSummary extends CreditPosition, UserPositionMetadata {}
 
 // Collateral Module Types
+export interface BaseCollateralModule {
+  type: CollateralTypes;
+  line: string;
+}
+
 export interface Collateral {
   type: CollateralTypes;
   token: TokenView;
@@ -155,7 +134,7 @@ export interface Collateral {
   value: string;
 }
 
-export interface BaseEscrow {
+export interface BaseEscrow extends BaseCollateralModule {
   id: Address;
   cratio: string;
   minCRatio: string;
@@ -192,7 +171,8 @@ export interface RevenueSummary extends Collateral {
   firstRevenueTimestamp: number;
   lastRevenueTimestamp: number;
 }
-export interface AggregatedSpigot {
+
+export interface AggregatedSpigot extends BaseCollateralModule {
   id: Address;
   // aggregated revenue in USD by token across all spigots
   tokenRevenue: { [key: string]: string }; // TODO: RevenueSummary
@@ -201,6 +181,9 @@ export interface AggregatedSpigot {
 export interface LinePageSpigot extends AggregatedSpigot {
   spigots?: { [address: string]: RevenueContract };
 }
+
+export type CollateralModule = AggregatedEscrow | AggregatedSpigot;
+export type CollateralMap = { [address: string]: CollateralModule };
 
 export interface RevenueContract {
   active: boolean;
@@ -290,18 +273,6 @@ export interface LineActionsStatusMap {
 }
 
 export interface UserLineMetadataStatusMap {
-  getUserLinePositions: Status;
-  getBorrowerPositions: Status;
+  getUserPortfolio: Status;
   linesActionsStatusMap: { [lineAddress: string]: LineActionsStatusMap };
-}
-
-// Transaction data
-
-export interface DeploySecuredLineTxData {
-  oracle: Address;
-  arbiter: Address;
-  factoryAddress: Address;
-  swapTarget: Address;
-  borrower: Address;
-  ttl: number;
 }

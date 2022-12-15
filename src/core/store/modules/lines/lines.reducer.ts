@@ -1,12 +1,18 @@
+import _ from 'lodash';
 import { createReducer } from '@reduxjs/toolkit';
+import { ethers } from 'ethers';
 
 import {
   initialStatus,
   CreditLineState,
   UserLineMetadataStatusMap,
   LineActionsStatusMap,
-  AggregatedCreditLine,
+  SecuredLine,
   CreditPosition,
+  BORROWER_POSITION_ROLE,
+  Address,
+  LinesByRole,
+  PositionMap,
 } from '@types';
 
 import { LinesActions } from './lines.actions';
@@ -19,8 +25,7 @@ export const initialLineActionsStatusMap: LineActionsStatusMap = {
 };
 
 export const initialUserMetadataStatusMap: UserLineMetadataStatusMap = {
-  getUserLinePositions: initialStatus,
-  getBorrowerPositions: initialStatus,
+  getUserPortfolio: initialStatus,
   linesActionsStatusMap: {},
 };
 
@@ -28,19 +33,24 @@ export const linesInitialState: CreditLineState = {
   selectedLineAddress: undefined,
   selectedPosition: undefined,
   linesMap: {},
-  pagesMap: {},
+  positionsMap: {},
+  eventsMap: {},
   categories: {},
   user: {
     linePositions: {},
     lineAllowances: {},
-    borrowerPositions: {},
+    portfolio: {
+      borrowerLineOfCredits: [],
+      lenderPositions: [],
+      arbiterLineOfCredits: [],
+    },
   },
   statusMap: {
     getLines: initialStatus,
     getLine: initialStatus,
     getLinePage: initialStatus,
     getAllowances: initialStatus,
-    getBorrowerPositions: initialStatus,
+    getUserPortfolio: initialStatus,
     deploySecuredLine: initialStatus,
     user: initialUserMetadataStatusMap,
   },
@@ -61,9 +71,9 @@ const {
   // initiateSaveLines,
   setSelectedLineAddress,
   setSelectedLinePosition,
-  setPositionData,
+  setPosition,
   getUserLinePositions,
-  getBorrowerPositions,
+  getUserPortfolio,
   clearLinesData,
   clearUserData,
   // getUserLinesMetadata,
@@ -85,15 +95,8 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.selectedPosition = position;
     })
 
-    .addCase(setPositionData, (state, { payload: { position, lineAddress, positionObject, positions } }) => {
-      if (positionObject !== undefined) {
-        const newPositions: CreditPosition[] = positions.filter(
-          (positionObj: CreditPosition) => position !== positionObj.id
-        );
-        newPositions.push({ ...positionObject });
-
-        state.pagesMap[lineAddress].positions = newPositions;
-      }
+    .addCase(setPosition, (state, { payload: { id, position } }) => {
+      state.positionsMap[id] = position;
     })
     /* -------------------------------------------------------------------------- */
     /*                                 Clear State                                */
@@ -104,6 +107,11 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(clearUserData, (state) => {
       state.user.linePositions = {};
       state.user.lineAllowances = {};
+      state.user.portfolio = {
+        borrowerLineOfCredits: [],
+        lenderPositions: [],
+        arbiterLineOfCredits: [],
+      };
     })
 
     // .addCase(clearTransactionData, (state) => {
@@ -158,21 +166,25 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.getLines = {};
 
       const categories: { [key: string]: string[] } = {};
-      const lines: { [key: string]: AggregatedCreditLine } = {};
+      const lines: { [key: string]: SecuredLine } = {};
+      let positions: PositionMap = {};
 
       // loop over nested structure of new Lines and update state
       Object.entries(linesData).map(([category, ls]) =>
         ls?.map((l) => {
           lines[l.id] = l;
+          // update positions for each line
+          const linePositionMap = _.zipObject(_.values(l.positionIds), _.values(l.positions));
+          positions = { ...positions, ...linePositionMap };
+
           state.statusMap.user.linesActionsStatusMap[l.id] = initialLineActionsStatusMap;
           // save line id to category for reference
           categories[category] = [...(categories[category] || []), l.id];
         })
       );
-
-      // merge new lines with old
+      // console.log('User Portfolio get line positions: ', positions);
       state.linesMap = { ...state.linesMap, ...lines };
-      // merge new categories with old
+      state.positionsMap = { ...state.positionsMap, ...positions };
       state.categories = { ...state.categories, ...categories };
     })
     .addCase(getLines.rejected, (state, { error }) => {
@@ -184,8 +196,12 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
     .addCase(getLinePage.fulfilled, (state, { payload: { linePageData } }) => {
       if (linePageData) {
-        state.pagesMap = { ...state.pagesMap, [linePageData.id]: linePageData };
-        state.linesMap = { ...state.linesMap, [linePageData.id]: linePageData as AggregatedCreditLine };
+        // overwrite actual positions with referential ids
+        const { positions, collateralEvents, creditEvents, ...metadata } = linePageData;
+        state.linesMap = { ...state.linesMap, [linePageData.id]: { ...metadata } };
+        state.positionsMap = { ...state.positionsMap, ...positions };
+        state.eventsMap = { ...state.eventsMap, [metadata.id]: creditEvents };
+        // we also update state.collateral on this action  being fullfilled in collateral.reducer.ts
       }
 
       state.statusMap.getLinePage = {};
@@ -205,53 +221,40 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(deploySecuredLine.rejected, (state, { error }) => {
       state.statusMap.deploySecuredLine = { error: error.message };
     })
-    /* ------------------------- getUserLinePositions ------------------------- */
-    .addCase(getUserLinePositions.pending, (state, { meta }) => {
-      const lineAddresses = meta.arg.lineAddresses || [];
-      lineAddresses.forEach((address) => {
-        checkAndInitUserLineStatus(state, address);
-        state.statusMap.user.getUserLinePositions = { loading: true };
-      });
-      state.statusMap.user.getUserLinePositions = { loading: true };
-    })
-    .addCase(getUserLinePositions.fulfilled, (state, { meta, payload: { userLinesPositions } }) => {
-      const linesPositionsMap = userLinesPositions.reduce((obj, a) => ({ ...obj, [a.id]: a }), {});
-      state.user.linePositions = { ...state.user.linePositions, ...linesPositionsMap };
-      state.statusMap.user.getUserLinePositions = {};
-    })
-    .addCase(getUserLinePositions.rejected, (state, { meta, error }) => {
-      const lineAddresses = meta.arg.lineAddresses || [];
-      lineAddresses.forEach((address) => {
-        state.statusMap.user.getUserLinePositions = {};
-      });
-      state.statusMap.user.getUserLinePositions = { error: error.message };
-    })
-    /* ------------------------- getBorrowerPositions ------------------------- */
-    .addCase(getBorrowerPositions.pending, (state, { meta }) => {
-      state.statusMap.user.getBorrowerPositions = { loading: true };
-    })
-    .addCase(getBorrowerPositions.fulfilled, (state, { meta, payload: { borrowerPositions } }) => {
-      if (!borrowerPositions) return;
-      const borrowerPositionsMap = borrowerPositions.reduce((obj, a) => ({ ...obj, [a.id]: a }), {});
-      state.user.borrowerPositions = { ...state.user.borrowerPositions, ...borrowerPositionsMap };
-      state.statusMap.user.getBorrowerPositions = {};
-    })
-    .addCase(getBorrowerPositions.rejected, (state, { meta, error }) => {
-      state.statusMap.user.getBorrowerPositions = { error: error.message };
-    })
 
-    // /* -------------------------- getUserLinePositions -------------------------- */
-    // .addCase(getUserLinePositions.pending, (state) => {
-    //   state.statusMap.user.getUserLinePositions = { loading: true };
-    // })
-    // .addCase(getUserLinePositions.fulfilled, (state, { payload: { userLinesPositions } }) => {
-    //   // TODO fix data missmatch between types PositionSummary and BasicCreditLine
-    //   // state.user.linePositions = userLinesPositions.reduce((map, line) => ({ ...map, [line]: state.linesMap[line]}), {});
-    //   state.statusMap.user.getUserLinePositions = {};
-    // })
-    // .addCase(getUserLinePositions.rejected, (state, { error }) => {
-    //   state.statusMap.user.getUserLinePositions = { error: error.message };
-    // })
+    /* ------------------- ------ getUserPortfolio ------------------------- */
+    .addCase(getUserPortfolio.pending, (state, { meta }) => {
+      state.statusMap.user.getUserPortfolio = { loading: true };
+    })
+    .addCase(getUserPortfolio.fulfilled, (state, { meta, payload: { address, lines, lenderPositions } }) => {
+      state.linesMap = { ...state.linesMap, ...lines };
+      let allPositions = {};
+      let allEvents = {};
+      const linesByRole: LinesByRole = _.entries<SecuredLine>(lines).reduce(
+        ({ borrowing, arbiting }: LinesByRole, [addy, line]) => {
+          // add borrower and arbiter positions to object for state.positionsMap
+          allPositions = { ...allPositions, ...(line.positions || {}) };
+
+          if (line.borrower === address) return { arbiting, borrowing: [...borrowing, addy] };
+          if (line.arbiter === address) return { borrowing, arbiting: [...arbiting, addy] };
+          // allEvents = { ...allEvents, ...line.events }; TODO return events from tight
+          return { borrowing, arbiting };
+        },
+        { borrowing: [], arbiting: [] }
+      );
+      // add lender positions to object for state.positionsMap and update state.positionsMap
+      allPositions = { ...allPositions, ...lenderPositions };
+      state.positionsMap = { ...state.positionsMap, ...allPositions };
+
+      state.user.portfolio = {
+        borrowerLineOfCredits: linesByRole.borrowing,
+        lenderPositions: _.keys(lenderPositions),
+        arbiterLineOfCredits: linesByRole.arbiting,
+      };
+    })
+    .addCase(getUserPortfolio.rejected, (state, { meta, error }) => {
+      state.statusMap.user.getUserPortfolio = { error: error.message };
+    })
 
     /* ---------------------- getExpectedTransactionOutcome --------------------- */
     // .addCase(getExpectedTransactionOutcome.pending, (state) => {

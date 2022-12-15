@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import { useAppDispatch, useAppSelector, useWindowDimensions } from '@hooks';
 import { SettingsActions, SettingsSelectors } from '@store';
-import { WalletIcon, VaultIcon, SettingsIcon, SearchIcon, DiscordIcon } from '@components/common';
+import { VaultIcon, SettingsIcon, SearchIcon, DiscordIcon, WalletIcon } from '@components/common';
 
 import { NavSidebar } from './NavSidebar';
 import { NavTabbar } from './NavTabbar';
@@ -18,6 +18,10 @@ export interface NavigationLink {
 }
 
 const StyledNavigation = styled.div``;
+
+interface NavigationProps {
+  hideOptionalLinks?: boolean;
+}
 
 const navLinks: NavigationLink[] = [
   {
@@ -52,16 +56,14 @@ const navLinks: NavigationLink[] = [
   },
 ];
 
-interface NavigationProps {
-  hideOptionalLinks?: boolean;
-}
-
 export const Navigation = ({ hideOptionalLinks }: NavigationProps) => {
   const { isMobile, isTablet, isDesktop } = useWindowDimensions();
+  const dispatch = useAppDispatch();
+
   const displayLinks = navLinks.filter((link) => !(link.optional && hideOptionalLinks));
 
   // NOTE Auto collapse sidenav on mobile
-  const dispatch = useAppDispatch();
+
   const collapsedSidebar = useAppSelector(SettingsSelectors.selectSidebarCollapsed);
 
   useEffect(() => {

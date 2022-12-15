@@ -1,15 +1,14 @@
 import styled from 'styled-components';
-import { isEmpty } from 'lodash';
 import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 
 import { ModalsActions, LinesActions, LinesSelectors, WalletSelectors, WalletActions } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { device } from '@themes/default';
-import { DetailCard, ActionButtons, ViewContainer, SliderCard } from '@components/app';
-import { Input, SearchIcon, Text, Button } from '@components/common';
+import { DetailCard, ActionButtons, ViewContainer } from '@components/app';
+import { Input, SearchIcon, Button } from '@components/common';
 import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, CreditPosition } from '@src/core/types';
-import { humanize, formatAddress } from '@src/utils';
+import { humanize, normalizeAmount, formatAddress } from '@src/utils';
 import { getEnv } from '@config/env';
 
 const PositionsCard = styled(DetailCard)`
@@ -47,7 +46,7 @@ const TableHeader = styled.h3`
 `;
 
 interface PositionsProps {
-  events: CreditPosition[];
+  positions: CreditPosition[];
 }
 
 interface Transaction {
@@ -56,24 +55,19 @@ interface Transaction {
   disabled: boolean;
 }
 
-const BannerCtaButton = styled(Button)`
-  width: 80%;
-  max-width: 20rem;
-  margin-top: 1em;
-`;
-
 export const PositionsTable = (props: PositionsProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
-  const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
-  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
+  const dispatch = useAppDispatch();
+  const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
+
   const userRoleMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
   const selectedPage = useAppSelector(LinesSelectors.selectSelectedLinePage);
+  const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
+  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const [actions, setActions] = useState<Transaction[]>([]);
-  const { events } = props;
-  const dispatch = useAppDispatch();
+  const { positions } = props;
   const { NETWORK } = getEnv();
-  const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
   //Initial set up for positions table
 
@@ -131,7 +125,7 @@ export const PositionsTable = (props: PositionsProps) => {
       return;
     }
     dispatch(LinesActions.getLinePage({ id: lineAddress }));
-  }, [selectedPage]);
+  }, [lineAddress]);
 
   //Action Handlers for positions table
 
@@ -177,6 +171,7 @@ export const PositionsTable = (props: PositionsProps) => {
   };
 
   const isWithdrawable = (deposit: string, borrowed: string, lender: string, interestRepaid: string) => {
+    // Withdraw/Accept are not working on Portfolio / Lender
     if (!userWallet) {
       return;
     }
@@ -187,16 +182,20 @@ export const PositionsTable = (props: PositionsProps) => {
   };
 
   let ctaButtonText = userWallet
-    ? `${t('lineDetails:positions-events.propose-position')}`
+    ? `${t('lineDetails:positions-table.new-position')}`
     : `${t('components.connect-button.connect')}`;
 
-  const getUserTransactions = (event: CreditPosition) => {
+  //Returns a list of transactions to display on positions table
+  const getUserPositionActions = (event: CreditPosition) => {
+    //If proposed and user is borrower, display return action (accept/mutualconsent)
     if (event.status === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE) {
       return [ApproveMutualConsent];
     }
+    //If user is lender, and line has amount to withdraw, return withdraw action
     if (isWithdrawable(event.deposit, event.principal, event.lender, event.interestRepaid)) {
       return actions;
     }
+    //Returns actions for borrower on open line
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
       return actions;
     }
@@ -206,122 +205,110 @@ export const PositionsTable = (props: PositionsProps) => {
   return (
     <>
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
-      {isEmpty(events) ? (
-        <SliderCard
-          header={t('lineDetails:positions-events.header')}
-          Component={
-            <Text>
-              <p>{t('lineDetails:positions-events.no-data')}</p>
-
-              <BannerCtaButton styling="primary" onClick={depositHandler}>
-                {ctaButtonText}
-              </BannerCtaButton>
-            </Text>
-          }
-        />
-      ) : (
-        <ViewContainer>
-          <PositionsCard
-            header={t('components.positions-card.positions')}
-            data-testid="vaults-opportunities-list"
-            metadata={[
-              /** @TODO add tags e.g. spigot here */
-              {
-                key: 'status',
-                header: t('components.positions-card.status'),
-                sortable: true,
-                width: '14rem',
-                className: 'col-apy',
-              },
-              {
-                key: 'lender',
-                header: t('components.positions-card.lender'),
-                sortable: true,
-                width: '13rem',
-                className: 'col-available',
-              },
-              {
-                key: 'token',
-                header: t('components.positions-card.token'),
-                sortable: true,
-                width: '10rem',
-                className: 'col-available',
-              },
-              {
-                key: 'deposit',
-                header: t('components.positions-card.total-deposits'),
-                sortable: true,
-                width: '10rem',
-                className: 'col-assets',
-              },
-              {
-                key: 'principal',
-                header: t('components.positions-card.principal'),
-                sortable: true,
-                width: '10rem',
-                className: 'col-assets',
-              },
-              {
-                key: 'interest',
-                header: t('components.positions-card.interest'),
-                sortable: true,
-                width: '10rem',
-                className: 'col-assets',
-              },
-              {
-                key: 'drate',
-                header: t('components.positions-card.drate'),
-                sortable: true,
-                width: '7rem',
-                className: 'col-assets',
-              },
-              {
-                key: 'frate',
-                header: t('components.positions-card.frate'),
-                sortable: true,
-                width: '7rem',
-                className: 'col-assets',
-              },
-              {
-                key: 'actions',
-                align: 'flex-end',
-                width: 'auto',
-                grow: '1',
-              },
-            ]}
-            data={events.map((event) => ({
+      <ViewContainer>
+        <PositionsCard
+          header={t('components.positions-card.positions')}
+          data-testid="vaults-opportunities-list"
+          metadata={[
+            /** @TODO add tags e.g. spigot here */
+            {
+              key: 'status',
+              header: t('components.positions-card.status'),
+              sortable: true,
+              width: '14rem',
+              className: 'col-apy',
+            },
+            {
+              key: 'lender',
+              header: t('components.positions-card.lender'),
+              sortable: true,
+              width: '13rem',
+              className: 'col-available',
+            },
+            {
+              key: 'token',
+              header: t('components.positions-card.token'),
+              sortable: true,
+              width: '10rem',
+              className: 'col-available',
+            },
+            {
+              key: 'deposit',
+              header: t('components.positions-card.total-deposits'),
+              sortable: true,
+              width: '10rem',
+              className: 'col-assets',
+            },
+            {
+              key: 'principal',
+              header: t('components.positions-card.principal'),
+              sortable: true,
+              width: '10rem',
+              className: 'col-assets',
+            },
+            {
+              key: 'interest',
+              header: t('components.positions-card.interest'),
+              sortable: true,
+              width: '10rem',
+              className: 'col-assets',
+            },
+            {
+              key: 'drate',
+              header: t('components.positions-card.drate'),
+              sortable: true,
+              width: '7rem',
+              className: 'col-assets',
+            },
+            {
+              key: 'frate',
+              header: t('components.positions-card.frate'),
+              sortable: true,
+              width: '7rem',
+              className: 'col-assets',
+            },
+            {
+              key: 'actions',
+              align: 'flex-end',
+              width: 'auto',
+              grow: '1',
+            },
+          ]}
+          data={positions?.map((p) => {
+            return {
               // this needs to be humanized to correct amount depending on the token.
-              deposit: humanize('amount', event.deposit, event.token.decimals, 2),
-              drate: `${event.drate} %`,
-              frate: `${event.frate} %`,
-              status: event.status,
-              principal: humanize('amount', event.principal, event.token.decimals, 2),
-              interest: humanize('amount', event.interestAccrued, event.token.decimals, 2),
-              lender: formatAddress(event.lender),
-              token: event.token.symbol,
-              actions: <ActionButtons value={event.id} actions={getUserTransactions(event)} />,
-            }))}
-            SearchBar={
-              <>
-                <Input
-                  value={''}
-                  onChange={(e) => console.log(e)}
-                  placeholder={t('components.search-input.search')}
-                  Icon={SearchIcon}
-                />
-                <Button onClick={depositHandler}>{ctaButtonText}</Button>
-              </>
-            }
-            searching={false}
-            filterLabel="Show 0% APY"
-            //@ts-ignore
-            filterBy={''}
-            initialSortBy="deposit"
-            onAction={() => console.log('action')}
-            wrap
-          />
-        </ViewContainer>
-      )}
+              deposit: humanize('amount', p.deposit, p.token.decimals, 2),
+              drate: `${normalizeAmount(p.dRate, 2)} %`,
+              frate: `${normalizeAmount(p.fRate, 2)} %`,
+              status: p.status,
+              principal: humanize('amount', p.principal, p.token.decimals, 2),
+              interest: humanize('amount', p.interestAccrued, p.token.decimals, 2),
+              lender: formatAddress(p.lender),
+              token: p.token.symbol,
+              actions: <ActionButtons value={p.id} actions={getUserPositionActions(p)} />,
+            };
+          })}
+          SearchBar={
+            <>
+              <Input
+                value={''}
+                onChange={(e) => console.log(e)}
+                placeholder={t('components.search-input.search')}
+                Icon={SearchIcon}
+              />
+              {/*Do not render if user is lender*/}
+              <Button onClick={depositHandler}>{ctaButtonText}</Button>
+            </>
+          }
+          searching={false}
+          filterLabel="Show 0% APY"
+          //@ts-ignore
+          filterBy={''}
+          initialSortBy="deposit"
+          onAction={() => console.log('action')}
+          wrap
+        />
+      </ViewContainer>
       <br />
     </>
   );

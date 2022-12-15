@@ -78,8 +78,6 @@ export const createQuery =
         .query({ query, variables })
         .then((result: QueryResult) => {
           const { data, error } = result;
-          console.log('Query: ', query);
-          console.log('Query result: ', result);
           const requestedData = path ? at(data, [path])[0] : data;
           if (error) return reject(error);
           else return resolve(requestedData);

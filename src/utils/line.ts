@@ -53,16 +53,17 @@ export const formatCreditEvents = (
   price: BigNumber = BigNumber.from(0),
   events: LineEventFragResponse[]
 ): CreditEvent[] => {
-  return events.map((e: any): CreditEvent => {
-    const { __typename, amount, token, credit, timestamp, value = unnullify(0, true) } = e;
+  return events.map((event: any): CreditEvent => {
+    const { id, timestamp, __typename, amount, value, position } = event;
     return {
-      id: credit?.id,
+      id,
       __typename,
       timestamp,
       amount,
+      // value: unnullify(value, true),
       value,
-      token: token?.id,
-      currentValue: price.mul(value),
+      token: position.token.id,
+      // currentValue: price.mul(value),
     };
   });
 };
@@ -248,18 +249,7 @@ export const formatSecuredLineData = (
     [BigNumber.from(0), {}]
   );
 
-  // Create array of CreditEvent[]
-  const creditEvents: CreditEvent[] = eventFrags.map((event) => {
-    const { id, timestamp, __typename, amount, value, position } = event;
-    return {
-      __typename,
-      id,
-      token: position.token.id,
-      timestamp,
-      amount,
-      valueAtTime: value,
-    } as CreditEvent;
-  });
+  const creditEvents = formatCreditEvents('', BigNumber.from(0), eventFrags);
 
   const escrow = {
     type: COLLATERAL_TYPE_ASSET,

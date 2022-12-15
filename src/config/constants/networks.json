@@ -1,0 +1,10 @@
+{
+    "networks":{
+        "goerli":{
+            "lineFactory": "0x4851C90F0548A703D2aE23B11cfdab7419A15c77"
+        },
+        "mainnet": {
+            "lineFactory": ""
+        }
+    }
+}

@@ -7,7 +7,7 @@ import { TransactionResponse } from '../types';
 
 import { LineFactoryABI } from './contracts';
 
-const { Arbiter_GOERLI, SwapTarget_GOERLI, LineFactory_GOERLI, KibaSero_oracle } = getConfig();
+const { LINEFACTORY_GOERLI } = getConfig();
 
 export class LineFactoryServiceImpl {
   private graphUrl: string;
@@ -53,19 +53,11 @@ export class LineFactoryServiceImpl {
 
   public async deployEscrow(
     contractAddress: Address,
-    minCRatio: BigNumber,
-    oracle: string,
     owner: string,
     borrower: string,
     dryRun: boolean
   ): Promise<TransactionResponse | PopulatedTransaction> {
-    return await this.executeContractMethod(
-      contractAddress,
-      'deployEscrow',
-      [minCRatio, oracle, owner, borrower],
-      'goerli',
-      dryRun
-    );
+    return await this.executeContractMethod(contractAddress, 'deployEscrow', [owner, borrower], 'goerli', dryRun);
   }
 
   public async deploySecuredLine(props: {
@@ -77,17 +69,14 @@ export class LineFactoryServiceImpl {
     const data = {
       borrower,
       ttl,
-      arbiter: Arbiter_GOERLI,
-      oracle: KibaSero_oracle,
-      factoryAddress: LineFactory_GOERLI,
-      swapTarget: SwapTarget_GOERLI,
+      factoryAddress: LINEFACTORY_GOERLI,
     };
     console.log(data);
     return <TransactionResponse>(
       await this.executeContractMethod(
         data.factoryAddress,
         'deploySecuredLine',
-        [data.oracle, data.arbiter, data.borrower, data.ttl, data.swapTarget],
+        [data.borrower, data.ttl],
         props.network,
         true
       )
@@ -108,15 +97,12 @@ export class LineFactoryServiceImpl {
       cratio,
       revenueSplit,
       network,
-      arbiter: Arbiter_GOERLI,
-      oracle: KibaSero_oracle,
-      factoryAddress: LineFactory_GOERLI,
-      swapTarget: SwapTarget_GOERLI,
+      factoryAddress: LINEFACTORY_GOERLI,
     };
     return await this.executeContractMethod(
       data.factoryAddress,
       'deploySecuredLineWithConfig',
-      [data.oracle, data.arbiter, data.borrower, data.ttl, data.revenueSplit, data.cratio, data.swapTarget],
+      [data.borrower, data.ttl, data.revenueSplit, data.cratio],
       data.network,
       false
     );
@@ -126,15 +112,13 @@ export class LineFactoryServiceImpl {
     contractAddress: Address,
     oldLine: string,
     borrower: string,
-    oracle: string,
-    arbiter: string,
     ttl: BigNumber,
     dryRun: boolean
   ): Promise<TransactionResponse | PopulatedTransaction> {
     return await this.executeContractMethod(
       contractAddress,
       'rolloverSecuredLine',
-      [oldLine, borrower, oracle, arbiter, ttl],
+      [oldLine, borrower, ttl],
       'goerli',
       dryRun
     );

@@ -73,7 +73,7 @@ const clearLineStatus = createAction<{ lineAddress: string }>('lines/clearLineSt
 const getLine = createAsyncThunk<{ lineData: SecuredLine | undefined }, GetLineArgs, ThunkAPI>(
   'lines/getLine',
   async (params, { getState, extra }) => {
-    const { network } = getState();
+    const { wallet, network } = getState();
     const { creditLineService } = extra.services;
     const lineData = await creditLineService.getLine({ network: network.current, ...params });
     return { lineData };

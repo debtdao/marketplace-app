@@ -205,7 +205,6 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
         hideAmount={false}
         loading={false}
         loadingText={''}
-        ttlType={false}
       />
       <TxActions>
         {txActions.map(({ label, onAction, disabled, contrast }) => (

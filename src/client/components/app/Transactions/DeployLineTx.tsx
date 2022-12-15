@@ -64,8 +64,15 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
   };
 
   const onAmountChange = (ttl: string) => {
-    let timeToLive = +ttl * 24 * 60 * 60;
-    setTimeToLive(timeToLive.toString());
+    if (Number(ttl) <= 0) {
+      setTimeToLive(ttl.toString());
+      setTTLWarning('Increase TTL, cannot be 0.');
+      return;
+    }
+    if (Number(ttl) > 0) {
+      setTimeToLive(ttl.toString());
+      setTTLWarning('');
+    }
   };
 
   const onCratioChange = (amount: string) => {
@@ -91,13 +98,14 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
   const deploySecuredLineNoConfig = async () => {
     setLoading(true);
     let checkSumAddress = await isAddress(borrower);
+    let ttl = Number(timeToLive) * 24 * 60 * 60;
 
     if (!checkSumAddress || walletNetwork === undefined) {
       setWarning('Incorrect address, please verify and try again.');
       return;
     }
 
-    if (+timeToLive <= 0) {
+    if (Number(timeToLive) <= 0) {
       setTTLWarning('Increase TTL, cannot be 0.');
       return;
     }
@@ -109,7 +117,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
         LinesActions.deploySecuredLine({
           factory: LINEFACTORY_GOERLI,
           borrower,
-          ttl: BigNumber.from(timeToLive),
+          ttl: BigNumber.from(ttl.toFixed(0)),
           network: walletNetwork,
         })
       ).then((res) => {
@@ -131,36 +139,25 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
     setLoading(true);
     let checkSumAddress = await isAddress(borrower);
 
+    let ttl = Number(timeToLive) * 24 * 60 * 60;
+
     if (!checkSumAddress || walletNetwork === undefined) {
       setWarning('Incorrect address, please verify and try again.');
       return;
     }
-
-    if (+timeToLive <= 0) {
-      setTTLWarning('Increase TTL, cannot be 0.');
-      return;
-    }
-
     // BPS IS USED so we must multiply by 10^2
     let BNCratio = toWei(cratio, 2);
 
-    // BPS IS NOT USED so we run through toWei to get BN
-    let BNRevenueSplit = toWei(revenueSplit, 0);
-    console.log(typeof BNCratio);
-
     try {
       // TODO Dynamic var based on network
-
       dispatch(
         LinesActions.deploySecuredLineWithConfig({
           factory: LINEFACTORY_GOERLI,
           borrower,
-          ttl: BigNumber.from(timeToLive),
+          ttl: BigNumber.from(ttl.toFixed(0)),
           network: walletNetwork,
-          //@ts-ignore
-          revenueSplit: BNRevenueSplit,
-          //@ts-ignore
-          cratio: BNCratio,
+          revenueSplit: BigNumber.from(revenueSplit),
+          cratio: BigNumber.from(BNCratio),
         })
       ).then((res) => {
         if (res.meta.requestStatus === 'rejected') {
@@ -227,7 +224,6 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
         hideAmount={false}
         loading={false}
         loadingText={''}
-        ttlType={true}
       />
       {inputTTLWarning !== '' ? <div style={{ color: '#C3272B' }}>{inputTTLWarning}</div> : ''}
       {advancedMode ? (

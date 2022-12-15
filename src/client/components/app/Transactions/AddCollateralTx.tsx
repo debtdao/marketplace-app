@@ -86,7 +86,9 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
   // const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
 
   const setSelectedTokenAddress = (token: string) => dispatch(TokensActions.setSelectedTokenAddress);
-
+  const handleAmountChange = (amount: string) => {
+    setTargetTokenAmount(amount);
+  };
   //main net logic
   const selectedCollateralAsset = useAppSelector(CollateralSelectors.selectSelectedCollateralAsset);
   // const selectedTokenAddress = useAppSelector(TokensSelectors.selectToken);
@@ -321,6 +323,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
         amount={targetTokenAmount}
         amountValue={String(10000000 * Number(targetTokenAmount))}
         maxAmount={targetBalance}
+        onAmountChange={handleAmountChange}
         selectedToken={selectedSellToken}
         tokenOptions={collateralOptions}
         // inputError={!!sourceStatus.error}

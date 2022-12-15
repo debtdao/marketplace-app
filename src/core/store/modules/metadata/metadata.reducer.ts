@@ -14,9 +14,9 @@ export const initialOnchainMetaDataState: OnchainMetaDataState = {
 
 export const onchainMetaDataReducer = createReducer(initialOnchainMetaDataState, (builder) => {
   builder
-    .addCase(getABI.fulfilled, (state, { payload: { ABI, Functions } }) => {
-      state.contractABI = ABI;
-      state.contractFunctions = Functions;
+    .addCase(getABI.fulfilled, (state, { payload: { abi, functions } }) => {
+      state.contractABI = abi;
+      state.contractFunctions = functions;
       console.log(state);
     })
 

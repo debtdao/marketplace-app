@@ -3,7 +3,7 @@ import { Interface } from '@ethersproject/abi';
 
 import { ThunkAPI } from '@frameworks/redux';
 
-const getABI = createAsyncThunk<{ ABI: string; Functions: string[] }, String, ThunkAPI>(
+const getABI = createAsyncThunk<{ abi: string; functions: string[] }, String, ThunkAPI>(
   'metadata/getABI',
   async (address, { extra, getState }) => {
     const { onchainMetaDataService } = extra.services;
@@ -14,20 +14,20 @@ const getABI = createAsyncThunk<{ ABI: string; Functions: string[] }, String, Th
     if (!userAddress) throw new Error('WALLET NOT CONNECTED');
 
     const OnchainMetaDataServiceResponse = await onchainMetaDataService.getContractABI(address, network!);
-    const ABI = OnchainMetaDataServiceResponse.data.result;
+    const abi = OnchainMetaDataServiceResponse.data.result;
 
-    const iface = new Interface(OnchainMetaDataServiceResponse.data.result);
-    const Functions = [];
-    const Inputs = [];
+    const contract = new Interface(OnchainMetaDataServiceResponse.data.result);
+    const functions = [];
+    const inputs = [];
 
-    for (const key in iface.functions) {
-      Functions.push(iface.functions[key].name);
-      const obj = { funcname: iface.functions[key].name, funcinputs: iface.functions[key].inputs };
-      Inputs.push(obj);
+    for (const key in contract.functions) {
+      functions.push(contract.functions[key].name);
+      const obj = { funcname: contract.functions[key].name, funcinputs: contract.functions[key].inputs };
+      inputs.push(obj);
     }
     return {
-      ABI,
-      Functions,
+      abi,
+      functions,
     };
   }
 );

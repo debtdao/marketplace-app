@@ -19,7 +19,6 @@ import {
   Network,
   DeploySecuredLineProps,
   DeploySecuredLineWithConfigProps,
-  GetUserPortfolioResponse,
   CreditPosition,
   RootState,
   PositionMap,
@@ -33,13 +32,10 @@ import {
   // validateMigrateLineAllowance,
   // parseError,
 } from '@utils';
-import { unnullify } from '@utils';
+import { unnullify, getNetwork } from '@utils';
 
 import { TokensActions } from '../tokens/tokens.actions';
 import { TokensSelectors } from '../tokens/tokens.selectors';
-import { CollateralActions } from '../collateral/collateral.actions';
-
-import { LinesSelectors } from './lines.selectors';
 
 /* -------------------------------------------------------------------------- */
 /*                                   Setters                                  */
@@ -73,9 +69,10 @@ const clearLineStatus = createAction<{ lineAddress: string }>('lines/clearLineSt
 const getLine = createAsyncThunk<{ lineData: SecuredLine | undefined }, GetLineArgs, ThunkAPI>(
   'lines/getLine',
   async (params, { getState, extra }) => {
-    const { wallet, network } = getState();
+    const { wallet } = getState();
+    const network = getNetwork(`${wallet.networkVersion}`);
     const { creditLineService } = extra.services;
-    const lineData = await creditLineService.getLine({ network: network.current, ...params });
+    const lineData = await creditLineService.getLine({ network: network, ...params });
     return { lineData };
   }
 );
@@ -84,12 +81,12 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
   'lines/getLines',
   async (categories, { getState, extra }) => {
     const {
-      network,
+      wallet,
       tokens: { tokensMap },
     } = getState();
 
     const { creditLineService } = extra.services;
-
+    const network = getNetwork(`${wallet.networkVersion}`);
     const tokenPrices = Object.entries(tokensMap).reduce(
       (prices, [addy, { priceUsdc }]) => ({ ...prices, [addy]: priceUsdc }),
       {}
@@ -101,7 +98,7 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
     const promises = await Promise.all(
       categoryKeys
         .map((k) => categories[k])
-        .map((params: GetLinesArgs) => creditLineService.getLines({ network: network.current, ...params }))
+        .map((params: GetLinesArgs) => creditLineService.getLines({ network, ...params }))
     );
     //@ts-ignore
     const linesData = categoryKeys.reduce(
@@ -171,11 +168,11 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
     const state: RootState = getState();
     const { creditLineService } = extra.services;
     // gets all primary + aux line data avaliable by defeault
-
+    const network = getNetwork(`${state.wallet.networkVersion}`);
     // const selectedLine = LinesSelectors.selectSelectedLinePage(state);
     const tokenPrices = TokensSelectors.selectTokenPrices(state);
     const linePageResponse = await creditLineService.getLinePage({
-      network: state.network.current,
+      network,
       id,
     });
 
@@ -192,14 +189,15 @@ const getUserLinePositions = createAsyncThunk<
   { lineAddresses?: string[] },
   ThunkAPI
 >('lines/getUserLinePositions', async ({ lineAddresses }, { extra, getState }) => {
-  const { network, wallet } = getState();
+  const { wallet } = getState();
   const { services } = extra;
   const userAddress = wallet.selectedAddress;
+  const network = getNetwork(`${wallet.networkVersion}`);
   if (!userAddress) {
     throw new Error('WALLET NOT CONNECTED');
   }
   const userLinesPositions = await services.creditLineService.getUserLinePositions({
-    network: network.current,
+    network,
     userAddress,
   });
   return { userLinesPositions };
@@ -237,19 +235,20 @@ const getExpectedTransactionOutcome = createAsyncThunk<
 >(
   'lines/getExpectedTransactionOutcome',
   async (getExpectedTxOutcomeProps, { getState, extra }) => {
-    const { network, app } = getState();
+    const { app, wallet } = getState();
     const { services } = extra;
     const { creditLineService } = services;
     const { transactionType, sourceTokenAddress, sourceTokenAmount, targetTokenAddress } = getExpectedTxOutcomeProps;
 
     const accountAddress = getState().wallet.selectedAddress;
+    const network = getNetwork(`${wallet.networkVersion}`);
     if (!accountAddress) throw new Error('WALLET NOT CONNECTED');
 
     const simulationsEnabled = app.servicesEnabled.tenderly;
     if (!simulationsEnabled) throw new Error('SIMULATIONS DISABLED');
 
     const txOutcome = await creditLineService.getExpectedTransactionOutcome({
-      network: network.current,
+      network,
       transactionType,
       accountAddress,
       sourceTokenAddress,
@@ -437,10 +436,11 @@ const claimAndRepay = createAsyncThunk<
   'lines/claimAndRepay',
 
   async ({ lineAddress, claimToken, calldata }, { extra, getState, dispatch }) => {
-    const { wallet, network } = getState();
+    const { wallet } = getState();
     const { services } = extra;
 
     const userAddress = wallet.selectedAddress;
+    const network = getNetwork(`${wallet.networkVersion}`);
     if (!userAddress) throw new Error('Wallet not connected');
 
     const { collateralService } = services;
@@ -449,7 +449,7 @@ const claimAndRepay = createAsyncThunk<
       lineAddress,
       claimToken,
       zeroExTradeData: calldata,
-      network: network.current,
+      network: network,
       dryRun: false,
     });
     console.log(tx);
@@ -496,10 +496,11 @@ const liquidate = createAsyncThunk<
 >(
   'lines/liquidate',
   async ({ lineAddress, tokenAddress, amount }, { extra, getState }) => {
-    const { wallet, network } = getState();
+    const { wallet } = getState();
     const { services } = extra;
 
     const userAddress = wallet.selectedAddress;
+    const network = getNetwork(`${wallet.networkVersion}`);
     if (!userAddress) throw new Error('WALLET NOT CONNECTED');
 
     const { collateralService } = services;
@@ -525,7 +526,7 @@ const liquidate = createAsyncThunk<
       amount: amount,
       token: tokenAddress,
       to: userAddress,
-      network: network.current,
+      network,
       dryRun: false,
     });
     console.log(tx);
@@ -615,13 +616,13 @@ const getDepositAllowance = createAsyncThunk<
   const {
     services: { creditLineService },
   } = extra;
-  const { network, wallet } = getState();
+  const { wallet } = getState();
   const accountAddress = wallet.selectedAddress;
-
+  const network = getNetwork(`${wallet.networkVersion}`);
   if (!accountAddress) throw new Error('WALLET NOT CONNECTED');
 
   const tokenAllowance = await creditLineService.getDepositAllowance({
-    network: network.current,
+    network,
     lineAddress,
     tokenAddress,
     accountAddress,

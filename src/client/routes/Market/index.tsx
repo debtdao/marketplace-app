@@ -9,7 +9,7 @@ import { ModalsActions, LinesActions, LinesSelectors, WalletActions, WalletSelec
 import { RecommendationsCard, SliderCard, ViewContainer } from '@components/app';
 import { SpinnerLoading, Text, Button } from '@components/common';
 import { SecuredLine, UseCreditLinesParams } from '@src/core/types';
-import { GoblinTown, DebtDAOBanner, DebtDAOBannerLogo } from '@assets/images';
+import { DebtDAOBanner } from '@assets/images';
 import { getEnv } from '@config/env';
 
 const StyledRecommendationsCard = styled(RecommendationsCard)``;
@@ -38,7 +38,6 @@ export const Market = () => {
   // const { isTablet, isMobile, width: DWidth } = useWindowDimensions();
   const [search, setSearch] = useState('');
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
-
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
   // TODO not neeed here

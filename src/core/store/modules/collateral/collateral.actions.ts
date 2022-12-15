@@ -90,9 +90,10 @@ const addSpigot = createAsyncThunk<{ contract: string; asset: string; success: b
     const userAddress = wallet.selectedAddress;
     if (!userAddress) throw new Error('WALLET NOT CONNECTED');
 
-    // TODO chekc that they are arbiter on line that owns Escrowbeforethey send tx
+    // TODO check that they are arbiter on line that owns Escrowbeforethey send tx
 
     const { collateralService } = services;
+    console.log('col service props', props);
     const tx = await collateralService.addSpigot(props);
     console.log('addSpigot tx', tx);
 

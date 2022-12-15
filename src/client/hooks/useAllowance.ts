@@ -30,7 +30,6 @@ const isError = (err: unknown): err is AllowanceError => {
 export function useAllowance({
   tokenAddress,
   vaultAddress,
-  isLab,
 }: useAllowanceProps): [TokenAllowance | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<TokenAllowance | undefined>(undefined);

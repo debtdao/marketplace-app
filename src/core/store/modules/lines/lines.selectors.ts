@@ -8,7 +8,6 @@ import {
   Status,
   LineActionsStatusMap,
   SecuredLine,
-  Address,
   SecuredLineWithEvents,
   UserPositionMetadata,
   PositionMap,
@@ -16,7 +15,6 @@ import {
   BORROWER_POSITION_ROLE,
   LENDER_POSITION_ROLE,
   ARBITER_POSITION_ROLE,
-  GetUserPortfolioResponse,
   LineEvents,
   AggregatedEscrow,
   AggregatedSpigot, // prev. GeneralVaultView, Super indepth data, SecuredLineWithEvents is most similar atm

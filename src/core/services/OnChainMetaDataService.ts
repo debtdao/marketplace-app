@@ -1,5 +1,5 @@
 import { _getContractABI } from '@src/utils';
-import { OnchainMetaDataService, GetAddressEnsNameProps, UserService, Web3Provider, Config, Network } from '@types';
+import { OnchainMetaDataService, Web3Provider } from '@types';
 import {} from '@ethersproject/address';
 
 export class OnchainMetaDataServiceImpl implements OnchainMetaDataService {
@@ -12,8 +12,7 @@ export class OnchainMetaDataServiceImpl implements OnchainMetaDataService {
     return await _getContractABI(address, network);
   }
 
-  public async getAddressEnsName(props: GetAddressEnsNameProps) {
-    const { address } = props;
+  public async getAddressEnsName(address: string): Promise<any | undefined> {
     const provider = this.web3Provider.getInstanceOf('ethereum');
     const addressEnsName = await provider.lookupAddress(address);
     return addressEnsName;

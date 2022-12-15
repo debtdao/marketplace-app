@@ -448,7 +448,7 @@ export interface CollateralService {
 
 export interface OnchainMetaDataService {
   getContractABI(address: String, network: number): Promise<any | undefined>;
-  getAddressEnsName(props: OnchainMetaDataServiceProps): Promise<any | undefined>;
+  getAddressEnsName(address: string): Promise<any | undefined>;
 }
 
 export interface OnchainMetaDataServiceProps {

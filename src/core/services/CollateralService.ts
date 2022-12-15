@@ -130,9 +130,9 @@ export class CollateralServiceImpl implements CollateralService {
   }
 
   public async addSpigot(props: AddSpigotProps): Promise<TransactionResponse | PopulatedTransaction> {
-    if (!(await this.isSpigotOwner(undefined, props.lineAddress))) {
-      throw new Error('Cannot add spigot. Signer is not owner.');
-    }
+    //if (!(await this.isSpigotOwner(undefined, props.lineAddress))) {
+    //  throw new Error('Cannot add spigot. Signer is not owner.');
+    //}
 
     if (props.revenueContract === props.lineAddress) {
       throw new Error('Invalid revenue contract address. `revenueContract` address is same as `spigotedLineAddress`');
@@ -140,20 +140,31 @@ export class CollateralServiceImpl implements CollateralService {
 
     // TODO check that revenueContract isn't spigot
 
-    if (props.setting.transferOwnerFunction.length === 0) {
-      throw new Error('addSpigot: no tranfer owner function');
-    }
+    //if (props.setting.transferOwnerFunction.length === 0) {
+    //  throw new Error('addSpigot: no tranfer owner function');
+    //}
 
-    if (
-      unnullify(props.setting.ownerSplit, true).lt(BigNumber.from(0)) ||
-      unnullify(props.setting.ownerSplit, true).gt(this.maxSplit())
-    ) {
-      throw new Error('addSpigot: bad owner split');
-    }
+    //if (
+    //  unnullify(props.setting.ownerSplit, true).lt(BigNumber.from(0)) ||
+    //  unnullify(props.setting.ownerSplit, true).gt(this.maxSplit())
+    //) {
+    //  throw new Error('addSpigot: bad owner split');
+    //}
 
     const settingsData = ethers.utils.AbiCoder.prototype.encode(
       ['uint8', 'bytes4', 'bytes4'],
       [props.setting.ownerSplit, props.setting.claimFunction, props.setting.transferOwnerFunction]
+    );
+    console.log('settings data', settingsData);
+    console.log(
+      'line address ',
+      props.lineAddress,
+      'abi ',
+      this.lineAbi,
+      'settings ',
+      props.setting,
+      'settings ownersplit',
+      props.setting.ownerSplit
     );
 
     return await this.executeContractMethod(

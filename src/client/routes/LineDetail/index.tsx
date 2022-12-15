@@ -2,7 +2,15 @@ import { useEffect, useState } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { LinesActions, AlertsActions, AppSelectors, TokensSelectors, LinesSelectors, NetworkSelectors } from '@store';
+import {
+  LinesActions,
+  AlertsActions,
+  AppSelectors,
+  TokensSelectors,
+  LinesSelectors,
+  NetworkSelectors,
+  OnChainMetaDataActions,
+} from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation, useIsMounting } from '@hooks';
 import { LineDetailsDisplay, ViewContainer, SliderCard } from '@components/app';
 import { SpinnerLoading, Text } from '@components/common';
@@ -41,13 +49,11 @@ export const LineDetail = () => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const dispatch = useAppDispatch();
   const history = useHistory();
-  const location = useLocation();
   const isMounting = useIsMounting();
   const { NETWORK_SETTINGS } = getConfig();
   const { lineAddress } = useParams<LineDetailRouteParams>();
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
-  const selectedPage = useAppSelector(LinesSelectors.selectSelectedLinePage);
   // const selectedLineCreditEvents = useAppSelector(LinesSelectors.selectSelectedLineCreditEvents);
   const getLinePageStatus = useAppSelector(LinesSelectors.selectGetLinePageStatus);
   // const linesPageData = useAppSelector(LinesSelectors.selectLinePageData);

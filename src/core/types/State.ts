@@ -239,7 +239,12 @@ export interface VaultActionsStatusMap {
 export interface OnchainMetaDataState {
   contractABI: string | undefined;
   contractFunctions: string[] | undefined;
-  ENS: [] | undefined;
+  ENS: ENSAddressPair[] | [];
+}
+
+export interface ENSAddressPair {
+  address: string;
+  ENS: string | undefined;
 }
 
 export interface UserVaultActionsStatusMap {

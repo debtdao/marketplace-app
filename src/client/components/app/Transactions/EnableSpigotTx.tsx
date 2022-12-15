@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import _ from 'lodash';
 
 import { generateSig } from '@src/utils';
-import { isValidAddress } from '@src/utils';
+import { isValidAddress, toWei } from '@src/utils';
 import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
 import { ACTIVE_STATUS, AddSpigotProps } from '@src/core/types';
 import {
@@ -40,7 +40,6 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   //Line data
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
-  const selectedRevenueContractAddress = useAppSelector(CollateralSelectors.selectSelectedRevenueContractAddress);
 
   const selectedContractFunctions = useAppSelector(OnchainMetaDataSelector.selectFunctions);
   const contractABI = useAppSelector(OnchainMetaDataSelector.selectABI);
@@ -61,9 +60,9 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   useEffect(() => {
     // if escrow not set yet then correct state
     if (!selectedSpigot) {
-      console.log('no spigot selected to add revenue contract to', selectedLine);
+      dispatch(CollateralActions.setSelectedSpigot({ spigotAddress: selectedLine?.spigotId }));
     }
-  });
+  }, [selectedLine]);
 
   useEffect(() => {
     if (isValidAddress(revenueContractAdd)) {
@@ -115,17 +114,21 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     setLoading(true);
 
     if (!selectedLine || !selectedSpigot) {
-      console.log('no line/spigot to enable on', selectedLine?.id, selectedSpigot);
+      console.log('enable-spigot', selectedLine?.id, selectedSpigot);
       setLoading(false);
       return;
     }
 
-    if (!selectedRevenueContractAddress) {
+    console.log('enable-spigot', selectedLine);
+
+    if (!revenueContractAdd) {
+      console.log('enable-spigot', revenueContractAdd);
       setLoading(false);
       return;
     }
 
     if (!walletNetwork) {
+      console.log('enable-spigot', !walletNetwork);
       setLoading(false);
       return;
     }
@@ -134,14 +137,16 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       network: walletNetwork,
       lineAddress: selectedLine.id,
       spigotAddress: selectedSpigot.id,
-      revenueContract: selectedRevenueContractAddress,
+      revenueContract: revenueContractAdd,
       setting: {
         //TO DO: QUERY OWNERSPLIT ON SPIGOTENTITY
-        ownerSplit: '100',
+        ownerSplit: toWei('100', 0),
         claimFunction: settingClaimFunc,
         transferOwnerFunction: settingTransferFunc,
       },
     };
+
+    console.log('enable-spigot', transactionData);
 
     dispatch(CollateralActions.addSpigot(transactionData)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
@@ -166,7 +171,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     }
     const functionList: any = [];
     functions.forEach((func, i) => {
-      const obj = { id: i, label: func, value: func };
+      const obj = { id: i, label: func, value: '' };
       functionList.push(obj);
     });
     return functionList;

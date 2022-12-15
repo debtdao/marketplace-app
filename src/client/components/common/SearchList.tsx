@@ -140,6 +140,7 @@ export const SearchList: FC<SearchListProps> = ({ headerText, list, selected, se
             item && (
               <ListItem key={item.id} onClick={() => selectItem(item)} selected={item.id === selected.id}>
                 <TokenIcon icon={item.icon} symbol={item.label} size="big" />
+                <ItemLabel>{item.label}</ItemLabel>
                 {item.value}
               </ListItem>
             )

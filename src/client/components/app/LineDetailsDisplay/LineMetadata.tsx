@@ -55,7 +55,7 @@ const DataSubMetricsContainer = styled.div``;
 
 const DataSubMetric = styled.p``;
 
-const Redirect = styled(RedirectIcon)`
+const RedirectLinkIcon = styled(RedirectIcon)`
   display: inline-block;
   fill: currentColor;
   width: 1.2rem;
@@ -310,7 +310,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
                 <a href={`https://goerli.etherscan.io/address/${address}`} target={'_blank'} rel={'noreferrer'}>
                   {icon && <TokenIcon icon={icon} symbol={symbol} />}
                   <Text>{symbol}</Text>
-                  <Redirect />
+                  <RedirectLinkIcon />
                 </a>
               ),
               width: '15rem',

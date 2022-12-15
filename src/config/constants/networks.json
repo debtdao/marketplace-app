@@ -1,7 +1,7 @@
 {
     "networks":{
         "goerli":{
-            "lineFactory": "0xc23b896F2b4aE3E6362B0D536113Fa2F0C9b8886"
+            "lineFactory": "0x4851C90F0548A703D2aE23B11cfdab7419A15c77"
         },
         "mainnet": {
             "lineFactory": ""

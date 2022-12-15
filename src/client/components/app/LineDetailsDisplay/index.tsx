@@ -1,17 +1,12 @@
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
 import _ from 'lodash';
 
-import { SecuredLine, SecuredLineWithEvents, CreditPosition } from '@types';
-import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
-import { RedirectIcon, Text } from '@components/common';
-import { LinesActions, LinesSelectors } from '@store';
+import { useAppSelector, useAppTranslation } from '@hooks';
+import { RedirectIcon, Text, Link } from '@components/common';
+import { LinesSelectors } from '@store';
 
 import { LineMetadata } from './LineMetadata';
 import { PositionsTable } from './PositionsTable';
-
-const linkHoverFilter = 'brightness(90%)';
-const linkTransition = 'filter 200ms ease-in-out';
 
 interface LineDetailsProps {
   onAddCollateral?: Function;
@@ -49,11 +44,11 @@ const RouterLink = styled(Link)<{ selected: boolean }>`
   width: 100%;
 
   &:hover span {
-    filter: ${linkHoverFilter};
+    filter: brightness(90%);
   }
 
   span {
-    transition: ${linkTransition};
+    transition: filter 200ms ease-in-out;
   }
   ${(props) =>
     props.selected &&

@@ -389,8 +389,8 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
       <TxRateInput
         key={'frate'}
         headerText={t('components.transaction.deposit-and-repay.your-rates')}
-        frate={selectedPosition.fRate}
-        drate={selectedPosition.dRate}
+        frate={normalizeAmount(selectedPosition.fRate, 2)}
+        drate={normalizeAmount(selectedPosition.dRate, 2)}
         amount={selectedPosition.fRate}
         maxAmount={'100'}
         // setRateChange={onFrateChange}

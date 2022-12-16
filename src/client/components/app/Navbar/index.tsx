@@ -213,7 +213,7 @@ export const Navbar = ({
                 Your wallet is connected to an unsupported network.
                 <br></br>
                 <br></br>
-                Please switch to a supported network to use the Debt DAO market.
+                Please connect to one of the supported networks to use the Debt DAO market.
               </BannerWarningText>
               {secondTitleEnabled && <StyledText>{subTitle}</StyledText>}
             </>

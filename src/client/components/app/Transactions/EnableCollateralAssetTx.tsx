@@ -70,6 +70,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedEscrow = useAppSelector(CollateralSelectors.selectSelectedEscrow);
+
   // need to get call statusMap from state for tx error messages
   //const collateralStatusMap = useAppSelector(CollateralSelectors.selectStatusMap);
 
@@ -89,8 +90,9 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
 
   useEffect(() => {
     // if escrow not set yet then correct state
-    if (!selectedEscrow) {
+    if (!selectedEscrow && selectedLine) {
       console.log('no escrow seelcted for enabling collaeral', selectedLine);
+      dispatch(CollateralActions.setSelectedEscrow({ escrowAddress: selectedLine.escrowId }));
     }
   });
 

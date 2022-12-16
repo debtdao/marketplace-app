@@ -98,11 +98,11 @@ const selectPositionsForSelectedLine = createSelector(
 );
 
 const selectCollateralForSelectedLine = createSelector(
-  [selectSelectedLineAddress, selectCollateralMap],
+  [selectSelectedLine, selectCollateralMap],
   (line, allCollateral) => {
     return {
-      escrow: _.find(allCollateral, (m) => m.type === 'asset' && m.line === line) as AggregatedEscrow,
-      spigot: _.find(allCollateral, (m) => m.type === 'revenue' && m.line === line) as AggregatedSpigot,
+      escrow: allCollateral[line?.escrowId ?? ''] as AggregatedEscrow,
+      spigot: allCollateral[line?.spigotId ?? ''] as AggregatedSpigot,
     };
   }
 );

@@ -241,19 +241,14 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const getCollateralTableActions = () => {
     console.log('get collateral table actions', userPositionMetadata.role);
     switch (userPositionMetadata.role) {
+      case BORROWER_POSITION_ROLE:
+        return <Button onClick={depositHandler}>{depositCollateralText} </Button>;
       case ARBITER_POSITION_ROLE:
       case LENDER_POSITION_ROLE: // for testing
         return (
           <>
             <Button onClick={addSpigotHandler}>{enableSpigotText}</Button>
             <Button onClick={enableAssetHandler}>{enableCollateralText}</Button>
-          </>
-        );
-      case BORROWER_POSITION_ROLE:
-        return (
-          <>
-            <Button onClick={depositHandler}>{depositCollateralText} </Button>
-            <Button onClick={addSpigotHandler}>{enableSpigotText} </Button>
           </>
         );
       default:

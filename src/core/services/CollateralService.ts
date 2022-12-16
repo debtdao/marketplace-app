@@ -151,10 +151,10 @@ export class CollateralServiceImpl implements CollateralService {
       throw new Error('addSpigot: bad owner split');
     }
 
-    const settingsData = ethers.utils.AbiCoder.prototype.encode(
-      ['uint8', 'bytes4', 'bytes4'],
-      [props.setting.ownerSplit, props.setting.claimFunction, props.setting.transferOwnerFunction]
-    );
+    const settingsData = ethers.utils.AbiCoder.prototype.encode(['uint8', 'bytes4', 'bytes4'], []);
+    const {
+      setting: { ownerSplit, claimFunction, transferOwnerFunction },
+    } = props;
     console.log('settings data', settingsData);
     console.log(
       'line address ',
@@ -171,7 +171,14 @@ export class CollateralServiceImpl implements CollateralService {
       props.lineAddress,
       this.lineAbi,
       'addSpigot',
-      [props.revenueContract, settingsData],
+      [
+        props.revenueContract,
+        {
+          ownerSplit,
+          claimFunction,
+          transferOwnerFunction,
+        },
+      ],
       props.network
     );
   }

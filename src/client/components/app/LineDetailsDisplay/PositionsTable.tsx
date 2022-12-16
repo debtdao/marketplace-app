@@ -56,28 +56,30 @@ interface Transaction {
 }
 
 export const PositionsTable = (props: PositionsProps) => {
+  console.log('render positions', props);
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const dispatch = useAppDispatch();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
+  const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const userRoleMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
-  const selectedPage = useAppSelector(LinesSelectors.selectSelectedLinePage);
-  const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const [actions, setActions] = useState<Transaction[]>([]);
   const { positions } = props;
   const { NETWORK } = getEnv();
 
   //Initial set up for positions table
-
   useEffect(() => {
-    if (!selectedLine) {
-      return;
+    console.log('p t', selectedLine, lineAddress);
+    if (selectedLine && !lineAddress) {
+      console.log('p t 2', selectedLine, lineAddress);
+      dispatch(LinesActions.setSelectedLineAddress({ lineAddress: selectedLine.id }));
+    } else if (lineAddress && !selectedLine) {
+      console.log('p t 3', selectedLine, lineAddress);
+      dispatch(LinesActions.getLinePage({ id: lineAddress }));
     }
-    let address = selectedLine.id;
-    dispatch(LinesActions.setSelectedLineAddress({ lineAddress: address }));
-  }, [selectedLine]);
+  }, [lineAddress, selectedLine]);
 
   const ApproveMutualConsent = {
     name: t('Accept'),
@@ -118,14 +120,7 @@ export const PositionsTable = (props: PositionsProps) => {
       });
     }
     setActions(Transactions);
-  }, [selectedLine, userWallet]);
-
-  useEffect(() => {
-    if (!lineAddress) {
-      return;
-    }
-    dispatch(LinesActions.getLinePage({ id: lineAddress }));
-  }, [lineAddress]);
+  }, [userWallet]);
 
   //Action Handlers for positions table
 

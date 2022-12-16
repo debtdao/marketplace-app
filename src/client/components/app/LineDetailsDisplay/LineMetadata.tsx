@@ -127,6 +127,7 @@ const MetricDataDisplay = ({ title, data, displaySubmetrics = false, submetrics 
 };
 
 export const LineMetadata = (props: LineMetadataProps) => {
+  console.log('render line metadata', props);
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
@@ -156,11 +157,13 @@ export const LineMetadata = (props: LineMetadataProps) => {
 
   const renderEscrowMetadata = () => {
     if (!deposits) return null;
-    if (!totalCollateral) return;
-    <MetricDataDisplay
-      title={t('lineDetails:metadata.escrow.no-collateral')}
-      data={`$ ${prettyNumbers(totalCollateral)}`}
-    />;
+    if (!totalCollateral)
+      return (
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.escrow.no-collateral')}
+          data={`$ ${prettyNumbers(totalCollateral)}`}
+        />
+      );
     return (
       <MetricDataDisplay title={t('lineDetails:metadata.escrow.total')} data={`$ ${prettyNumbers(totalCollateral)}`} />
     );

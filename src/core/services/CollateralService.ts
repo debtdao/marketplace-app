@@ -35,7 +35,7 @@ import { getConfig } from '@config';
 import { getContract } from '@frameworks/ethers';
 import { unnullify } from '@src/utils';
 
-import { SpigotedLineABI } from './contracts';
+import { SecuredLineABI } from './contracts';
 import { EscrowABI } from './contracts';
 // import { SpigotABI } from './contracts';
 
@@ -66,8 +66,8 @@ export class CollateralServiceImpl implements CollateralService {
     this.config = config;
     const { GRAPH_API_URL } = getConfig();
     this.graphUrl = GRAPH_API_URL || 'https://api.thegraph.com';
-    this.lineAbi = SpigotedLineABI;
-    this.spigotAbi = SpigotedLineABI; // TODO
+    this.lineAbi = SecuredLineABI;
+    this.spigotAbi = SecuredLineABI; // TODO
     this.escrowAbi = EscrowABI;
   }
 

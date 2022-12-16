@@ -1,6 +1,8 @@
 import { getConfig } from '@config';
 import { Network, ProviderType } from '@types';
 
+const { CHAIN_IDS } = getConfig();
+
 export const getNetworkId = (network: Network): number => {
   switch (network) {
     case 'mainnet':
@@ -21,22 +23,13 @@ export const getNetworkId = (network: Network): number => {
 };
 
 export const getNetwork = (networkId: number | string): Network => {
-  switch (networkId.toString()) {
-    case '1':
-      return 'mainnet';
-    case '3':
-      return 'ropsten';
-    case '4':
-      return 'rinkeby';
-    case '42':
-      return 'kovan';
-    case '5':
-      return 'goerli';
-    case '42161':
-      return 'arbitrum';
-    default:
-      console.warn(`Unknown networkId: ${networkId} (as ${typeof networkId})`);
-      return 'other';
+  console.log(networkId);
+  const networkName = CHAIN_IDS[Number(networkId)];
+  if (networkName !== undefined) {
+    return networkName;
+  } else {
+    console.warn(`Unknown networkId: ${networkId} (as ${typeof networkId})`);
+    return 'other';
   }
 };
 

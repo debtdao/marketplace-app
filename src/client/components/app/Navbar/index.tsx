@@ -117,7 +117,7 @@ export const Navbar = ({
   const { isMobile } = useWindowDimensions();
   const { NETWORK_SETTINGS } = getConfig();
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
-  // const supportedNetworkNames = useAppSelector(NetworkSelectors.selectSupportedNetworkNames);
+  const walletNetworkName = useAppSelector(WalletSelectors.selectWalletNetworkName);
 
   const dropdownSelectedNetwork = {
     value: selectedNetwork,
@@ -127,9 +127,12 @@ export const Navbar = ({
 
   const dropdownSelectedWalletNetwork = {
     value: walletNetwork,
-    label: NETWORK_SETTINGS[walletNetwork!]?.name ?? walletNetwork,
+    // label: walletNetwork ?? walletNetwork;
+    // label: NETWORK_SETTINGS[walletNetwork!]?.name ?? walletNetwork,
+    label: walletNetworkName,
     Icon: getNetworkIcon(walletNetwork!),
   };
+  console.log('dropdown: ', walletNetwork);
 
   const secondTitleEnabled = !!subTitle?.length;
 

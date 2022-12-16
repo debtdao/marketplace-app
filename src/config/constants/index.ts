@@ -4,6 +4,7 @@ import { Constants, NetworkSettings, TokenView } from '@types';
 import { getEnv } from '@config/env';
 
 import { networks } from './supportedNetworks.json';
+import CHAIN_IDS from './chainIds';
 // import { encode } from '@src/utils';
 
 export const TOKEN_ADDRESSES = {
@@ -96,7 +97,7 @@ const BLACKLISTED_LINES = ['0x0000000000000000000000000000000000000000'];
 const NETWORK_SETTINGS: NetworkSettings = {
   goerli: {
     id: 'goerli',
-    name: 'Goerli Test Network',
+    name: 'Goerli',
     networkId: 5,
     rpcUrl: 'https://goerli.infura.io/v3/',
     nativeCurrency: {
@@ -155,7 +156,7 @@ export const getConstants = memoize((): Constants => {
     DEBT_DAO_API: 'https://api.yearn.finance/v1/chains/1/vaults/all',
     DEBT_DAO_ALERTS_API: 'http://yearn-alerts-balancer-2019386215.us-east-1.elb.amazonaws.com',
     SUPPORTED_NETWORKS: ['mainnet', 'arbitrum'],
-    // SUPPORTED_NETWORK_NAMES: Object.keys(networks),
+    CHAIN_IDS: CHAIN_IDS,
     NETWORK_SETTINGS,
     WEB3_PROVIDER_HTTPS: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     WEB3_PROVIDER_WSS: `wss://eth-mainnet.ws.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,

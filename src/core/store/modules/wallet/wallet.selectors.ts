@@ -5,8 +5,15 @@ const selectWallet = (state: RootState) => state.wallet;
 const selectWalletIsConnected = (state: RootState) => !!state.wallet.selectedAddress;
 const selectSelectedAddress = (state: RootState) => state.wallet.selectedAddress;
 const selectAddressEnsName = (state: RootState) => state.wallet.addressEnsName;
-const selectWalletNetwork = (state: RootState) =>
-  state.wallet.networkVersion ? getNetwork(state.wallet.networkVersion) : undefined;
+const selectWalletNetwork = (state: RootState) => {
+  return state.wallet.networkVersion ? getNetwork(state.wallet.networkVersion) : undefined;
+};
+const selectWalletNetworkName = (state: RootState) => {
+  const walletNetwork = state.wallet.networkVersion ? getNetwork(state.wallet.networkVersion) : 'other';
+  const walletNetworkName =
+    walletNetwork === 'mainnet' ? 'Ethereum' : walletNetwork[0].toUpperCase() + walletNetwork.substring(1);
+  return walletNetworkName;
+};
 
 export const WalletSelectors = {
   selectWallet,
@@ -14,4 +21,5 @@ export const WalletSelectors = {
   selectSelectedAddress,
   selectAddressEnsName,
   selectWalletNetwork,
+  selectWalletNetworkName,
 };

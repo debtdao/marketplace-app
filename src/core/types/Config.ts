@@ -35,6 +35,9 @@ export interface Constants {
   DEBT_DAO_API: string;
   DEBT_DAO_ALERTS_API: string;
   SUPPORTED_NETWORKS: Network[];
+  CHAIN_IDS: {
+    [KEY: number]: string;
+  };
   NETWORK_SETTINGS: NetworkSettings;
   WEB3_PROVIDER_HTTPS: string;
   WEB3_PROVIDER_WSS: string;

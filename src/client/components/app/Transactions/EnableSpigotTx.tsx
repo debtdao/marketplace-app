@@ -72,8 +72,8 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       setRevenueContractABI(true);
       // }
     } else {
-      // dispatch(OnchainMetaDataActions.clearABI());
       setRevenueContractABI(false);
+      dispatch(OnchainMetaDataActions.clearABI());
     }
   }, [revenueContractAdd]);
 

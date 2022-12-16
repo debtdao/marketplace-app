@@ -1,4 +1,5 @@
 import { BigNumber, ContractFunction, PopulatedTransaction, ethers } from 'ethers';
+import { Interface } from '@ethersproject/abi';
 
 import { TransactionService, Web3Provider, Config, ExecuteTransactionProps, Address, Network } from '@types';
 import { getConfig } from '@config';
@@ -80,21 +81,26 @@ export class LineFactoryServiceImpl {
     revenueSplit: BigNumber;
   }): Promise<TransactionResponse | PopulatedTransaction> {
     const { borrower, ttl, cratio, revenueSplit, network } = props;
-    console.log('deploy line props', [borrower, ttl.toString(), cratio.toString(), revenueSplit.toString()], props);
-    const coreParamStruct = ethers.utils.defaultAbiCoder.encode(
-      ['address', 'uint256', 'uint32', 'uint8'],
-      [borrower, ttl.toNumber(), cratio.toNumber(), revenueSplit.toNumber()]
-    );
-    console.log(
-      'deploy line inputs',
-      [borrower, ttl.toString(), cratio.toString(), revenueSplit.toString()],
-      coreParamStruct
-    );
-
     return await this.executeContractMethod(
       LINEFACTORY_GOERLI,
       'deploySecuredLineWithConfig',
-      [coreParamStruct],
+      [{ borrower, ttl: ttl.toString(), cratio: cratio.toString(), revenueSplit: revenueSplit.toString() }],
+      network,
+      false
+    );
+  }
+
+  public async deploySecuredLineWtihModules(props: {
+    oldLine: string;
+    network: Network;
+    escrow: Address;
+    spigot: Address;
+  }): Promise<TransactionResponse | PopulatedTransaction> {
+    const { oldLine, escrow, spigot, network } = props;
+    return await this.executeContractMethod(
+      LINEFACTORY_GOERLI,
+      'deploySecuredLineWithModules',
+      [{ oldLine: oldLine.toString(), escrow: escrow.toString(), spigot: spigot.toString() }],
       network,
       false
     );

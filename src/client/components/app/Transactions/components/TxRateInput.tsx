@@ -4,7 +4,7 @@ import { TransitionGroup } from 'react-transition-group';
 
 import { useAppTranslation } from '@hooks';
 import { Text } from '@components/common';
-import { normalizeAmount } from '@src/utils';
+import { normalizeAmount, toWei } from '@src/utils';
 
 const RatesContainer = styled.div``;
 
@@ -148,16 +148,6 @@ export const TxRateInput: FC<TxRateInputProps> = ({
   inputError,
   amount,
   setRateChange,
-  // openedTokenSearch,
-  // setOpenedTokenSearch,
-  // selectedToken,
-  // setSelectedToken,
-  // tokenList,
-  // openedCreditSearch,
-  // setOpenedCreditSearch,
-  // selectedCredit,
-  // setSelectedCredit,
-  // creditList,
   maxAmount,
   readOnly,
   hideAmount,
@@ -171,19 +161,6 @@ export const TxRateInput: FC<TxRateInputProps> = ({
       <StyledTxTokenInput {...props}>
         <>{headerText && <Header>{headerText}</Header>}</>
 
-        {/* TODO: put in common rates e.g. LIBOR (avg. COMP,AAVE,etc.) or personal algo */}
-        {/* {openedSearch && (
-          <CSSTransition in={openedSearch} appear={true} timeout={scaleTransitionTime} classNames="scale">
-            <StyledSearchList
-              list={listItems}
-              headerText={searchListHeader}
-              selected={selectedItem}
-              setSelected={(item) => (onSelectedTokenChange ? onSelectedTokenChange(item.id) : undefined)}
-              onCloseList={() => setOpenedSearch(false)}
-            />
-          </CSSTransition>
-        )} */}
-
         {/* NOTE Using fragments here because: https://github.com/yearn/yearn-finance-v3/pull/565 */}
         <>
           <PositionData>
@@ -194,8 +171,9 @@ export const TxRateInput: FC<TxRateInputProps> = ({
                 </AmountTitle>
                 <InterestRateInputContainer>
                   <StyledAmountInput
+                    //format from bps to % to display and back to bps to set value
                     value={normalizeAmount(drate, 2)}
-                    onChange={setRateChange ? (e) => setRateChange('d', e.target.value) : undefined}
+                    onChange={(e) => (setRateChange ? setRateChange('d', toWei(e.target.value, 2)) : '')}
                     placeholder={'15.00'}
                     readOnly={readOnly}
                     error={inputError}
@@ -209,8 +187,9 @@ export const TxRateInput: FC<TxRateInputProps> = ({
                 <AmountTitle ellipsis>{'Facility Rate' || t('components.transaction.deposit.rates-title')}</AmountTitle>
                 <InterestRateInputContainer>
                   <StyledAmountInput
+                    //format from bps to % to display and back to bps to set value
                     value={normalizeAmount(frate, 2)}
-                    onChange={setRateChange ? (e) => setRateChange('f', e.target.value) : undefined}
+                    onChange={(e) => (setRateChange ? setRateChange('f', toWei(e.target.value, 2)) : '')}
                     placeholder={'25.00'}
                     readOnly={readOnly}
                     error={inputError}

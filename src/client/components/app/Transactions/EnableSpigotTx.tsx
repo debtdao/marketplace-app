@@ -51,12 +51,11 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const [transactionLoading, setLoading] = useState(false);
 
   // spigot setting params
-  const [claimFunc, setClaimFunc] = useState('');
-  const [transferFunc, setTransferFunc] = useState('');
-  const [revenueContractAdd, setRevenueContractAdd] = useState<string>('');
-  // TODO select ABI form onchain metadata state
-  const [revContractABI, setRevenueContractABI] = useState(false);
-  const [didFetchAbi, setFetchABI] = useState(false);
+  const [claimFunc, setClaimFunc] = useState<string>('');
+  const [transferFunc, setTransferFunc] = useState<string>('');
+  const [revenueContractAddy, setRevenueContractAdd] = useState<string>('');
+
+  const [didFetchAbi, setDidFetchABI] = useState<boolean>(false);
   const [claimFuncType, setClaimFuncType] = useState({ id: '', label: '', value: '' });
   const [transferFuncType, setTransferFuncType] = useState({ id: '', label: '', value: '' });
 
@@ -68,22 +67,11 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   }, [selectedSpigot, selectedLine]);
 
   useEffect(() => {
-    if (!selectedContractFunctions && isValidAddress(revenueContractAdd) && !didFetchAbi) {
-      setFetchABI(true);
-      dispatch(OnchainMetaDataActions.getABI(revenueContractAdd))
-        .then((res) => {
-          setRevenueContractABI(true);
-        })
-        .catch(() => {
-          setRevenueContractABI(false);
-        });
-
-      // }
-    } else if (isValidAddress(revenueContractAdd)) {
-      setRevenueContractABI(true);
-      dispatch(OnchainMetaDataActions.clearABI());
+    if (!selectedContractFunctions && isValidAddress(revenueContractAddy) && !didFetchAbi) {
+      setDidFetchABI(true);
+      dispatch(OnchainMetaDataActions.getABI(revenueContractAddy));
     }
-  }, [revenueContractAdd, didFetchAbi]);
+  }, [revenueContractAddy, didFetchAbi]);
 
   // // If contract has ABI, these functions generage the bytecode for the functions
   const onTransferFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
@@ -115,7 +103,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       return;
     }
 
-    if (!revenueContractAdd) {
+    if (!revenueContractAddy) {
       setLoading(false);
       return;
     }
@@ -129,7 +117,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       network: walletNetwork,
       lineAddress: selectedLine.id,
       spigotAddress: selectedSpigot.id,
-      revenueContract: revenueContractAdd,
+      revenueContract: revenueContractAddy,
       setting: {
         // TODO: QUERY OWNERSPLIT ON SPIGOTENTITY
         ownerSplit: toWei('100', 0),
@@ -222,13 +210,13 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       )
     );
 
-  console.log('render enable spigot', transactionLoading, revenueContractAdd);
+  console.log('render enable spigot', transactionLoading, revenueContractAddy);
   return (
     // <div />
     <StyledTransaction onClose={onClose} header={header}>
       <TxAddressInput
         headerText={t('components.transaction.enable-spigot.revenue-contract')}
-        address={revenueContractAdd}
+        address={revenueContractAddy}
         onAddressChange={setRevenueContractAdd}
       />
       {renderFuncSelectors()}

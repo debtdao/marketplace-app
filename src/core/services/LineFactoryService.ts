@@ -84,26 +84,29 @@ export class LineFactoryServiceImpl {
   }
 
   public async deploySecuredLineWtihConfig(props: {
-    borrower: string;
+    borrower: Address;
     ttl: number;
     network: Network;
     cratio: number;
     revenueSplit: number;
   }): Promise<TransactionResponse | PopulatedTransaction> {
     const { borrower, ttl, cratio, revenueSplit, network } = props;
-    const data = {
-      borrower,
-      ttl,
-      cratio,
-      revenueSplit,
-      network,
-      factoryAddress: LINEFACTORY_GOERLI,
-    };
+
+    // {"internalType":"address","name":"borrower","type":"address"},
+    // {"internalType":"uint256","name":"ttl","type":"uint256"},
+    // {"internalType":"uint32","name":"cratio","type":"uint32"},
+    // {"internalType":"uint8","name":"revenueSplit","type":"uint8"}
+
+    const coreParams = ethers.utils.defaultAbiCoder.encode(
+      ['tuple(address b,uint256 t,uint32 c,uint8 r)'],
+      [{ b: borrower, t: ttl, c: cratio, r: revenueSplit }]
+    );
+
     return await this.executeContractMethod(
-      data.factoryAddress,
+      LINEFACTORY_GOERLI,
       'deploySecuredLineWithConfig',
-      [data.borrower, data.ttl, data.revenueSplit, data.cratio],
-      data.network,
+      [coreParams],
+      network,
       false
     );
   }

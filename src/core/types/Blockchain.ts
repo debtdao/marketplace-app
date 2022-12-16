@@ -5,12 +5,9 @@ import { getConfig } from '@config';
 const { CHAIN_IDS } = getConfig();
 
 const names = _.values(CHAIN_IDS);
-console.log('ChainId names: ', names);
-// console.log('ChainId names 2: ', typeof names[number]);
 
 // Network can be any network name within CHAIN_IDS
 export type Network = typeof names[number];
-// export type Network = 'mainnet' | 'ropsten' | 'rinkeby' | 'kovan' | 'arbitrum' | 'other' | 'goerli';
 
 export type Symbol = string;
 

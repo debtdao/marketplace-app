@@ -9,6 +9,9 @@ import { useWindowDimensions } from '@hooks';
 import { Network } from '@types';
 import { device } from '@themes/default';
 import { getConfig } from '@config';
+import { getConstants } from '@src/config/constants';
+
+const { SUPPORTED_NETWORKS } = getConstants();
 
 const StyledOptionList = styled(OptionList)`
   width: 15rem;
@@ -43,6 +46,22 @@ const StyledText = styled.h1<{ toneDown?: boolean }>`
   `}
 `;
 
+const BannerWarningText = styled.h2<{ toneDown?: boolean }>`
+  display: inline-flex;
+  font-size: 2.4rem;
+  font-weight: 700;
+  text-align: center;
+  color: ${({ theme }) => theme.colors.titles};
+  margin: 0;
+  padding: 0;
+
+  ${({ toneDown, theme }) =>
+    toneDown &&
+    `
+    color: ${theme.colors.textsSecondary};
+  `}
+`;
+
 const StyledLink = styled(Link)`
   font-size: 2.4rem;
   font-weight: 700;
@@ -55,6 +74,8 @@ const StyledNavbar = styled.header`
   width: 100%;
   display: flex;
   align-items: center;
+  margin-top: 1%;
+  margin-bottom: 1%;
   background-color: ${({ theme }) => theme.colors.surface};
   z-index: ${({ theme }) => theme.zindex.navbar};
   max-width: ${({ theme }) => theme.globalMaxWidth};
@@ -127,48 +148,64 @@ export const Navbar = ({
 
   const dropdownSelectedWalletNetwork = {
     value: walletNetwork,
-    // label: walletNetwork ?? walletNetwork;
-    // label: NETWORK_SETTINGS[walletNetwork!]?.name ?? walletNetwork,
     label: walletNetworkName,
     Icon: getNetworkIcon(walletNetwork!),
   };
-  console.log('dropdown: ', walletNetwork);
 
   const secondTitleEnabled = !!subTitle?.length;
 
   const titleText = secondTitleEnabled ? <>{title}&nbsp;/&nbsp;</> : title;
 
   return (
-    <StyledNavbar className={className}>
-      {title && (
-        <>
-          <StyledText toneDown={secondTitleEnabled}>
-            {titleLink ? <StyledLink to={titleLink}>{titleText}</StyledLink> : titleText}
-          </StyledText>
-          {secondTitleEnabled && <StyledText>{subTitle}</StyledText>}
-        </>
-      )}
-
-      <StyledNavbarActions>
-        {!hideDisabledControls && (
-          /* turn this into not a list because we only support mainnet right now */
-          <StyledOptionList
-            //@ts-ignore
-            selected={walletNetwork !== undefined ? dropdownSelectedWalletNetwork : dropdownSelectedNetwork}
-            setSelected={(option) => onNetworkChange(option.value)}
-            options={[]}
-            hideIcons={isMobile}
-            disabled={disableNetworkChange}
-          />
+    <div>
+      <StyledNavbar className={className}>
+        {title && (
+          <>
+            <StyledText toneDown={secondTitleEnabled}>
+              {titleLink ? <StyledLink to={titleLink}>{titleText}</StyledLink> : titleText}
+            </StyledText>
+            {secondTitleEnabled && <StyledText>{subTitle}</StyledText>}
+          </>
         )}
 
-        <ConnectWalletButton
-          address={walletAddress}
-          ensName={addressEnsName}
-          onClick={() => onWalletClick && onWalletClick()}
-          disabled={disableWalletSelect}
-        />
-      </StyledNavbarActions>
-    </StyledNavbar>
+        <StyledNavbarActions>
+          {!hideDisabledControls && (
+            /* turn this into not a list because we only support mainnet right now */
+            <StyledOptionList
+              //@ts-ignore
+              selected={walletNetwork !== undefined ? dropdownSelectedWalletNetwork : dropdownSelectedNetwork}
+              setSelected={(option) => onNetworkChange(option.value)}
+              options={[]}
+              hideIcons={isMobile}
+              disabled={disableNetworkChange}
+            />
+          )}
+
+          <ConnectWalletButton
+            address={walletAddress}
+            ensName={addressEnsName}
+            onClick={() => onWalletClick && onWalletClick()}
+            disabled={disableWalletSelect}
+          />
+        </StyledNavbarActions>
+      </StyledNavbar>
+
+      {/* Display warning if not connected to supported network! */}
+      {!SUPPORTED_NETWORKS.includes(walletNetwork ?? 'other') && (
+        <StyledNavbar>
+          {title && (
+            <>
+              <BannerWarningText toneDown={secondTitleEnabled}>
+                Your wallet is connected to an unsupported network.
+                <br></br>
+                <br></br>
+                Please switch to a supported network.
+              </BannerWarningText>
+              {secondTitleEnabled && <StyledText>{subTitle}</StyledText>}
+            </>
+          )}
+        </StyledNavbar>
+      )}
+    </div>
   );
 };

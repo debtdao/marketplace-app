@@ -2,12 +2,11 @@ import { BigNumber, ContractFunction, PopulatedTransaction, ethers } from 'ether
 
 import { TransactionService, Web3Provider, Config, ExecuteTransactionProps, Address, Network } from '@types';
 import { getConfig } from '@config';
+import { getLineFactoryforNetwork } from '@src/utils';
 
 import { TransactionResponse } from '../types';
 
 import { LineFactoryABI } from './contracts';
-
-const { LINEFACTORY_GOERLI } = getConfig();
 
 export class LineFactoryServiceImpl {
   private graphUrl: string;
@@ -69,12 +68,12 @@ export class LineFactoryServiceImpl {
     const data = {
       borrower,
       ttl,
-      factoryAddress: LINEFACTORY_GOERLI,
+      factoryAddress: getLineFactoryforNetwork(props.network),
     };
     console.log(data);
     return <TransactionResponse>(
       await this.executeContractMethod(
-        data.factoryAddress,
+        data.factoryAddress!,
         'deploySecuredLine',
         [data.borrower, data.ttl],
         props.network,
@@ -97,10 +96,10 @@ export class LineFactoryServiceImpl {
       cratio,
       revenueSplit,
       network,
-      factoryAddress: LINEFACTORY_GOERLI,
+      factoryAddress: getLineFactoryforNetwork(props.network),
     };
     return await this.executeContractMethod(
-      data.factoryAddress,
+      data.factoryAddress!,
       'deploySecuredLineWithConfig',
       [data.borrower, data.ttl, data.revenueSplit, data.cratio],
       data.network,

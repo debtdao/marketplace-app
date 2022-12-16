@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { ConnectWalletButton } from '@components/app';
 import { OptionList, EthereumIcon, ArbitrumIcon, Link } from '@components/common';
 import { WalletSelectors } from '@src/core/store';
+import { NetworkSelectors } from '@src/core/store';
 import { useAppSelector } from '@hooks';
 import { useWindowDimensions } from '@hooks';
 import { Network } from '@types';
@@ -116,6 +117,7 @@ export const Navbar = ({
   const { isMobile } = useWindowDimensions();
   const { NETWORK_SETTINGS } = getConfig();
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
+  // const supportedNetworkNames = useAppSelector(NetworkSelectors.selectSupportedNetworkNames);
 
   const dropdownSelectedNetwork = {
     value: selectedNetwork,
@@ -125,7 +127,7 @@ export const Navbar = ({
 
   const dropdownSelectedWalletNetwork = {
     value: walletNetwork,
-    label: walletNetwork,
+    label: NETWORK_SETTINGS[walletNetwork!]?.name ?? walletNetwork,
     Icon: getNetworkIcon(walletNetwork!),
   };
 

@@ -56,6 +56,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const [revenueContractAdd, setRevenueContractAdd] = useState<string>('');
   // TODO select ABI form onchain metadata state
   const [revContractABI, setRevenueContractABI] = useState(false);
+  const [didFetchAbi, setFetchABI] = useState(false);
   const [claimFuncType, setClaimFuncType] = useState({ id: '', label: '', value: '' });
   const [transferFuncType, setTransferFuncType] = useState({ id: '', label: '', value: '' });
 
@@ -67,15 +68,22 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   }, [selectedSpigot, selectedLine]);
 
   useEffect(() => {
-    if (isValidAddress(revenueContractAdd)) {
-      dispatch(OnchainMetaDataActions.getABI(revenueContractAdd));
-      setRevenueContractABI(true);
+    if (!selectedContractFunctions && isValidAddress(revenueContractAdd) && !didFetchAbi) {
+      setFetchABI(true);
+      dispatch(OnchainMetaDataActions.getABI(revenueContractAdd))
+        .then((res) => {
+          setRevenueContractABI(true);
+        })
+        .catch(() => {
+          setRevenueContractABI(false);
+        });
+
       // }
-    } else {
-      setRevenueContractABI(false);
+    } else if (isValidAddress(revenueContractAdd)) {
+      setRevenueContractABI(true);
       dispatch(OnchainMetaDataActions.clearABI());
     }
-  }, [revenueContractAdd]);
+  }, [revenueContractAdd, didFetchAbi]);
 
   // // If contract has ABI, these functions generage the bytecode for the functions
   const onTransferFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
@@ -193,7 +201,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const renderFuncSelectors = () =>
     revFuncDisplayConfigs.map(({ header, byteCode, options, type, onChange, onByteChange }) =>
       // if no ABI, input bytecode manually
-      revContractABI ? (
+      selectedContractFunctions ? (
         <TxFuncSelector
           key={header + String(type)}
           headerText={header}

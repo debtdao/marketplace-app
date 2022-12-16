@@ -4,6 +4,7 @@ import { TransitionGroup } from 'react-transition-group';
 
 import { useAppTranslation } from '@hooks';
 import { Text } from '@components/common';
+import { normalizeAmount } from '@src/utils';
 
 const RatesContainer = styled.div``;
 
@@ -193,7 +194,7 @@ export const TxRateInput: FC<TxRateInputProps> = ({
                 </AmountTitle>
                 <InterestRateInputContainer>
                   <StyledAmountInput
-                    value={drate}
+                    value={normalizeAmount(drate, 2)}
                     onChange={setRateChange ? (e) => setRateChange('d', e.target.value) : undefined}
                     placeholder={'15.00'}
                     readOnly={readOnly}
@@ -208,7 +209,7 @@ export const TxRateInput: FC<TxRateInputProps> = ({
                 <AmountTitle ellipsis>{'Facility Rate' || t('components.transaction.deposit.rates-title')}</AmountTitle>
                 <InterestRateInputContainer>
                   <StyledAmountInput
-                    value={frate}
+                    value={normalizeAmount(frate, 2)}
                     onChange={setRateChange ? (e) => setRateChange('f', e.target.value) : undefined}
                     placeholder={'25.00'}
                     readOnly={readOnly}

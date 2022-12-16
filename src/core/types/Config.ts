@@ -41,6 +41,7 @@ export interface Constants {
   NETWORK_SETTINGS: NetworkSettings;
   WEB3_PROVIDER_HTTPS: string;
   WEB3_PROVIDER_WSS: string;
+  GOERLI_PROVIDER_HTTPS: string;
   ARBITRUM_PROVIDER_HTTPS: string;
   BLACKLISTED_LINES: string[];
   CONTRACT_ADDRESSES: {

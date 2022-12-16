@@ -160,7 +160,7 @@ export const getConstants = memoize((): Constants => {
     NETWORK_SETTINGS,
     WEB3_PROVIDER_HTTPS: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     WEB3_PROVIDER_WSS: `wss://eth-mainnet.ws.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
-    // GOERLI_PROVIDER_HTTPS: `FILL THIS IN`,
+    GOERLI_PROVIDER_HTTPS: 'https://goerli.infura.io/v3/',
     // GOERLI_PROVIDER_WSS: `FILL THIS IN`,
     ARBITRUM_PROVIDER_HTTPS: 'https://arb1.arbitrum.io/rpc',
     BLACKLISTED_LINES: BLACKLISTED_LINES,

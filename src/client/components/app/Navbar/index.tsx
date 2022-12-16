@@ -1,17 +1,15 @@
 import styled from 'styled-components';
+import _ from 'lodash';
 
 import { ConnectWalletButton } from '@components/app';
 import { OptionList, EthereumIcon, ArbitrumIcon, Link } from '@components/common';
 import { WalletSelectors } from '@src/core/store';
-import { NetworkSelectors } from '@src/core/store';
 import { useAppSelector } from '@hooks';
 import { useWindowDimensions } from '@hooks';
 import { Network } from '@types';
 import { device } from '@themes/default';
 import { getConfig } from '@config';
 import { getConstants } from '@src/config/constants';
-
-const { SUPPORTED_NETWORKS } = getConstants();
 
 const StyledOptionList = styled(OptionList)`
   width: 15rem;
@@ -50,7 +48,7 @@ const BannerWarningText = styled.h2<{ toneDown?: boolean }>`
   display: inline-flex;
   font-size: 2.4rem;
   font-weight: 700;
-  text-align: center;
+  // text-align: center;
   color: ${({ theme }) => theme.colors.titles};
   margin: 0;
   padding: 0;
@@ -67,7 +65,7 @@ const StyledLink = styled(Link)`
   font-weight: 700;
 `;
 
-const StyledNavbar = styled.header`
+const StyledNavbar = styled.header<{ warning?: boolean }>`
   position: sticky;
   top: 0;
   left: 0;
@@ -77,7 +75,12 @@ const StyledNavbar = styled.header`
   margin-top: 1%;
   margin-bottom: 1%;
   background-color: ${({ theme }) => theme.colors.surface};
-  z-index: ${({ theme }) => theme.zindex.navbar};
+  // z-index: ${({ theme }) => theme.zindex.navbar};
+  ${({ warning, theme }) =>
+    !warning &&
+    `
+    z-index: ${theme.zindex.navbar};
+  `}
   max-width: ${({ theme }) => theme.globalMaxWidth};
   padding: ${({ theme }) => theme.card.padding};
   border-radius: ${({ theme }) => theme.globalRadius};
@@ -140,6 +143,16 @@ export const Navbar = ({
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const walletNetworkName = useAppSelector(WalletSelectors.selectWalletNetworkName);
 
+  const { SUPPORTED_NETWORKS } = getConstants();
+
+  const SUPPORTED_NETWORK_OPTIONS = SUPPORTED_NETWORKS.concat('goerli').map((network) => {
+    return {
+      value: network,
+      label: NETWORK_SETTINGS[network].name ?? 'other',
+    };
+  });
+  console.log('Options: ', SUPPORTED_NETWORK_OPTIONS);
+
   const dropdownSelectedNetwork = {
     value: selectedNetwork,
     label: NETWORK_SETTINGS[selectedNetwork].name,
@@ -175,7 +188,7 @@ export const Navbar = ({
               //@ts-ignore
               selected={walletNetwork !== undefined ? dropdownSelectedWalletNetwork : dropdownSelectedNetwork}
               setSelected={(option) => onNetworkChange(option.value)}
-              options={[]}
+              options={SUPPORTED_NETWORK_OPTIONS}
               hideIcons={isMobile}
               disabled={disableNetworkChange}
             />
@@ -191,15 +204,16 @@ export const Navbar = ({
       </StyledNavbar>
 
       {/* Display warning if not connected to supported network! */}
-      {!SUPPORTED_NETWORKS.includes(walletNetwork ?? 'other') && (
-        <StyledNavbar>
+      {/* TODO: Add goerli to SUPPORTED_NETWORKS. Difficult to do because goerli is not supported by Yearn SDK. */}
+      {!(SUPPORTED_NETWORKS.includes(walletNetwork ?? 'other') || walletNetwork === 'goerli') && (
+        <StyledNavbar warning={true}>
           {title && (
             <>
               <BannerWarningText toneDown={secondTitleEnabled}>
                 Your wallet is connected to an unsupported network.
                 <br></br>
                 <br></br>
-                Please switch to a supported network.
+                Please switch to a supported network to use the Debt DAO market.
               </BannerWarningText>
               {secondTitleEnabled && <StyledText>{subTitle}</StyledText>}
             </>

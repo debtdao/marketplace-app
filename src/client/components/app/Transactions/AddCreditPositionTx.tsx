@@ -99,8 +99,8 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       let deposit = normalizeAmount(selectedPosition.deposit, selectedPosition.token.decimals);
       setTargetTokenAmount(deposit);
       setSelectedTokenAddress(selectedPosition.token.address);
-      setDrate(selectedPosition.dRate);
-      setFrate(selectedPosition.fRate);
+      setDrate(normalizeAmount(selectedPosition.dRate, 2));
+      setFrate(normalizeAmount(selectedPosition.fRate, 2));
       setLenderAddress(selectedPosition.lender);
       setTransactionType('accept');
     }

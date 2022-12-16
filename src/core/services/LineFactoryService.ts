@@ -66,44 +66,36 @@ export class LineFactoryServiceImpl {
     network: Network;
   }): Promise<ethers.providers.TransactionResponse | PopulatedTransaction> {
     const { borrower, ttl } = props;
-    const data = {
-      borrower,
-      ttl,
-      factoryAddress: LINEFACTORY_GOERLI,
-    };
-    console.log(data);
+    console.log(props);
     return <TransactionResponse>(
-      await this.executeContractMethod(
-        data.factoryAddress,
-        'deploySecuredLine',
-        [data.borrower, data.ttl],
-        props.network,
-        true
-      )
+      await this.executeContractMethod(LINEFACTORY_GOERLI, 'deploySecuredLine', [borrower, ttl], props.network, true)
     );
   }
 
   public async deploySecuredLineWtihConfig(props: {
     borrower: string;
-    ttl: number;
+    ttl: BigNumber;
     network: Network;
-    cratio: number;
-    revenueSplit: number;
+    cratio: BigNumber;
+    revenueSplit: BigNumber;
   }): Promise<TransactionResponse | PopulatedTransaction> {
     const { borrower, ttl, cratio, revenueSplit, network } = props;
-    const data = {
-      borrower,
-      ttl,
-      cratio,
-      revenueSplit,
-      network,
-      factoryAddress: LINEFACTORY_GOERLI,
-    };
+    console.log('deploy line props', [borrower, ttl.toString(), cratio.toString(), revenueSplit.toString()], props);
+    const coreParamStruct = ethers.utils.defaultAbiCoder.encode(
+      ['address', 'uint256', 'uint32', 'uint8'],
+      [borrower, ttl.toNumber(), cratio.toNumber(), revenueSplit.toNumber()]
+    );
+    console.log(
+      'deploy line inputs',
+      [borrower, ttl.toString(), cratio.toString(), revenueSplit.toString()],
+      coreParamStruct
+    );
+
     return await this.executeContractMethod(
-      data.factoryAddress,
+      LINEFACTORY_GOERLI,
       'deploySecuredLineWithConfig',
-      [data.borrower, data.ttl, data.revenueSplit, data.cratio],
-      data.network,
+      [coreParamStruct],
+      network,
       false
     );
   }
@@ -113,13 +105,14 @@ export class LineFactoryServiceImpl {
     oldLine: string,
     borrower: string,
     ttl: BigNumber,
-    dryRun: boolean
+    dryRun: boolean,
+    network: Network
   ): Promise<TransactionResponse | PopulatedTransaction> {
     return await this.executeContractMethod(
       contractAddress,
       'rolloverSecuredLine',
       [oldLine, borrower, ttl],
-      'goerli',
+      network,
       dryRun
     );
   }

@@ -94,7 +94,6 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
 
   useEffect(() => {
-<<<<<<< HEAD
     if (selectedPosition?.status === PROPOSED_STATUS && userMetadata.role === BORROWER_POSITION_ROLE) {
       const deposit = normalizeAmount(selectedPosition.deposit, selectedPosition.token.decimals);
       if (!targetTokenAmount) setTargetTokenAmount(deposit);
@@ -103,16 +102,6 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       if (!frate) setFrate(normalizeAmount(selectedPosition.fRate, 0));
       setLenderAddress(selectedPosition.lender);
       setTargetTokenAmount(deposit);
-=======
-    if (selectedPosition && userMetadata.role === BORROWER_POSITION_ROLE) {
-      const deposit = normalizeAmount(selectedPosition.deposit, 0);
-      if (!targetTokenAmount) setTargetTokenAmount(deposit);
-      if (!selectedSellTokenAddress) setSelectedTokenAddress(selectedPosition.token.address);
-      if (!drate) setDrate(normalizeAmount(selectedPosition.dRate, 2));
-      if (!frate) setFrate(normalizeAmount(selectedPosition.fRate, 2));
-      if (!lenderAddress) setLenderAddress(selectedPosition.lender);
-
->>>>>>> b2f8f641 (fix add position rates)
       setTransactionType('accept');
     }
   }, [selectedPosition]);
@@ -208,10 +197,6 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       return;
     }
 
-<<<<<<< HEAD
-    console.log('drate', drate, toWei(drate, 2), toWei(drate, 4));
-=======
->>>>>>> b2f8f641 (fix add position rates)
     const transactionObj = {
       lineAddress: selectedCredit.id,
       drate,

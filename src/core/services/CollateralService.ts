@@ -165,6 +165,17 @@ export class CollateralServiceImpl implements CollateralService {
       'settings ownersplit',
       props.setting.ownerSplit
     );
+    console.log('settings data', settingsData);
+    console.log(
+      'line address ',
+      props.lineAddress,
+      'abi ',
+      this.lineAbi,
+      'settings ',
+      props.setting,
+      'settings ownersplit',
+      props.setting.ownerSplit
+    );
 
     return await this.executeContractMethod(
       props.lineAddress,

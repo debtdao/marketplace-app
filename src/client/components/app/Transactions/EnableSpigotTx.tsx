@@ -35,7 +35,6 @@ interface EnableSpigotTxProps {
 export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
-
   // user data
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   //Line data
@@ -109,6 +108,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     }
 
     if (!walletNetwork) {
+      console.log('enable-spigot', !walletNetwork);
       setLoading(false);
       return;
     }
@@ -218,7 +218,6 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       )
     );
 
-  console.log('render enable spigot', transactionLoading, revenueContractAddy);
   return (
     // <div />
     <StyledTransaction onClose={onClose} header={header}>

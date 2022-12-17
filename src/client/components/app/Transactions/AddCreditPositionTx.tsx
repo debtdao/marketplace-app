@@ -11,7 +11,7 @@ import {
   useAppSelector,
   useSelectedSellToken,
 } from '@hooks';
-import { ACTIVE_STATUS, BORROWER_POSITION_ROLE } from '@src/core/types';
+import { ACTIVE_STATUS, BORROWER_POSITION_ROLE, PROPOSED_STATUS } from '@src/core/types';
 import { getConstants } from '@src/config/constants';
 import { TokensActions, TokensSelectors, WalletSelectors, LinesSelectors, LinesActions } from '@store';
 import { Button } from '@components/common';
@@ -93,10 +93,8 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const [transactionType, setTransactionType] = useState('propose');
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
 
-  //main net logic
-
   useEffect(() => {
-    if (selectedPosition && userMetadata.role === BORROWER_POSITION_ROLE) {
+    if (selectedPosition?.status === PROPOSED_STATUS && userMetadata.role === BORROWER_POSITION_ROLE) {
       const deposit = normalizeAmount(selectedPosition.deposit, 0);
       if (!targetTokenAmount) setTargetTokenAmount(deposit);
       if (!selectedSellTokenAddress) setSelectedTokenAddress(selectedPosition.token.address);
@@ -199,10 +197,11 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       return;
     }
 
+    console.log('drate', drate, toWei(drate, 2), toWei(drate, 4));
     const transactionObj = {
       lineAddress: selectedCredit.id,
-      drate: toWei(drate, 2),
-      frate: toWei(frate, 2),
+      drate,
+      frate,
       amount: toWei(targetTokenAmount, selectedSellToken!.decimals),
       token: selectedSellTokenAddress,
       lender: lenderAddress,

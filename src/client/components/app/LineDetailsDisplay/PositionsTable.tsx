@@ -56,7 +56,6 @@ interface Transaction {
 }
 
 export const PositionsTable = (props: PositionsProps) => {
-  console.log('render positions', props);
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const dispatch = useAppDispatch();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
@@ -71,12 +70,9 @@ export const PositionsTable = (props: PositionsProps) => {
 
   //Initial set up for positions table
   useEffect(() => {
-    console.log('p t', selectedLine, lineAddress);
     if (selectedLine && !lineAddress) {
-      console.log('p t 2', selectedLine, lineAddress);
       dispatch(LinesActions.setSelectedLineAddress({ lineAddress: selectedLine.id }));
     } else if (lineAddress && !selectedLine) {
-      console.log('p t 3', selectedLine, lineAddress);
       dispatch(LinesActions.getLinePage({ id: lineAddress }));
     }
   }, [lineAddress, selectedLine]);
@@ -88,38 +84,42 @@ export const PositionsTable = (props: PositionsProps) => {
   };
 
   useEffect(() => {
-    let Transactions: Transaction[] = [];
-    if (!userWallet) {
-      Transactions = [];
+    switch (userRoleMetadata.role) {
+      case BORROWER_POSITION_ROLE:
+        setActions([
+          {
+            name: t('components.transaction.borrow'),
+            handler: (e: Event) => borrowHandler(e),
+            disabled: false,
+          },
+          {
+            name: t('components.transaction.deposit-and-repay.header'),
+            handler: (e: Event) => depositAndRepayHandler(e),
+            disabled: false,
+          },
+        ]);
+        break;
+      case LENDER_POSITION_ROLE:
+        setActions([
+          {
+            name: t('components.transaction.withdraw'),
+            handler: (e: Event) => WithdrawHandler(e),
+            disabled: false,
+          },
+        ]);
+        break;
+      case ARBITER_POSITION_ROLE:
+        setActions([
+          {
+            name: t('components.transaction.liquidate'),
+            handler: (e: Event) => liquidateHandler(e),
+            disabled: false,
+          },
+        ]);
+        break;
+      default:
+        setActions([]);
     }
-    if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
-      Transactions.push({
-        name: t('components.transaction.borrow'),
-        handler: (e: Event) => borrowHandler(e),
-        disabled: false,
-      });
-      Transactions.push({
-        name: t('components.transaction.deposit-and-repay.header'),
-        handler: (e: Event) => depositAndRepayHandler(e),
-        disabled: false,
-      });
-    }
-    if (userRoleMetadata.role === LENDER_POSITION_ROLE) {
-      Transactions.push({
-        name: t('components.transaction.withdraw'),
-        handler: (e: Event) => WithdrawHandler(e),
-        disabled: false,
-      });
-      console.log('withdraw');
-    }
-    if (userRoleMetadata.role === ARBITER_POSITION_ROLE) {
-      Transactions.push({
-        name: t('components.transaction.liquidate'),
-        handler: (e: Event) => liquidateHandler(e),
-        disabled: false,
-      });
-    }
-    setActions(Transactions);
   }, [userWallet]);
 
   //Action Handlers for positions table

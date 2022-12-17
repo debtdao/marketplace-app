@@ -95,13 +95,13 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
 
   useEffect(() => {
     if (selectedPosition?.status === PROPOSED_STATUS && userMetadata.role === BORROWER_POSITION_ROLE) {
-      const deposit = normalizeAmount(selectedPosition.deposit, 0);
+      const deposit = normalizeAmount(selectedPosition.deposit, selectedPosition.token.decimals);
       if (!targetTokenAmount) setTargetTokenAmount(deposit);
       if (!selectedSellTokenAddress) setSelectedTokenAddress(selectedPosition.token.address);
-      if (!drate) setDrate(normalizeAmount(selectedPosition.dRate, 2));
-      if (!frate) setFrate(normalizeAmount(selectedPosition.fRate, 2));
-      if (!lenderAddress) setLenderAddress(selectedPosition.lender);
-
+      if (!drate) setDrate(normalizeAmount(selectedPosition.dRate, 0));
+      if (!frate) setFrate(normalizeAmount(selectedPosition.fRate, 0));
+      setLenderAddress(selectedPosition.lender);
+      setTargetTokenAmount(deposit);
       setTransactionType('accept');
     }
   }, [selectedPosition]);

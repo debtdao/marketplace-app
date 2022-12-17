@@ -1,4 +1,5 @@
 import { BigNumber, ContractFunction, PopulatedTransaction, ethers } from 'ethers';
+import { Interface } from '@ethersproject/abi';
 
 import { TransactionService, Web3Provider, Config, ExecuteTransactionProps, Address, Network } from '@types';
 import { getConfig } from '@config';

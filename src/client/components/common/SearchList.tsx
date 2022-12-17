@@ -90,7 +90,11 @@ export type SearchListItem = {
   id: string;
   icon?: string;
   label: string;
-  value?: string;
+  value: string;
+};
+
+export type FunctionNameItem = {
+  functionName: string;
 };
 
 export interface SearchListProps {

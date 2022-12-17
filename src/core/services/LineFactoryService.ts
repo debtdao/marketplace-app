@@ -1,4 +1,5 @@
 import { BigNumber, ContractFunction, PopulatedTransaction, ethers } from 'ethers';
+import { Interface } from '@ethersproject/abi';
 
 import { TransactionService, Web3Provider, Config, ExecuteTransactionProps, Address, Network } from '@types';
 import { getConfig } from '@config';
@@ -7,7 +8,7 @@ import { TransactionResponse } from '../types';
 
 import { LineFactoryABI } from './contracts';
 
-const { Arbiter_GOERLI, SwapTarget_GOERLI, LineFactory_GOERLI, KibaSero_oracle } = getConfig();
+const { LINEFACTORY_GOERLI } = getConfig();
 
 export class LineFactoryServiceImpl {
   private graphUrl: string;
@@ -53,19 +54,11 @@ export class LineFactoryServiceImpl {
 
   public async deployEscrow(
     contractAddress: Address,
-    minCRatio: BigNumber,
-    oracle: string,
     owner: string,
     borrower: string,
     dryRun: boolean
   ): Promise<TransactionResponse | PopulatedTransaction> {
-    return await this.executeContractMethod(
-      contractAddress,
-      'deployEscrow',
-      [minCRatio, oracle, owner, borrower],
-      'goerli',
-      dryRun
-    );
+    return await this.executeContractMethod(contractAddress, 'deployEscrow', [owner, borrower], 'goerli', dryRun);
   }
 
   public async deploySecuredLine(props: {
@@ -74,50 +67,41 @@ export class LineFactoryServiceImpl {
     network: Network;
   }): Promise<ethers.providers.TransactionResponse | PopulatedTransaction> {
     const { borrower, ttl } = props;
-    const data = {
-      borrower,
-      ttl,
-      arbiter: Arbiter_GOERLI,
-      oracle: KibaSero_oracle,
-      factoryAddress: LineFactory_GOERLI,
-      swapTarget: SwapTarget_GOERLI,
-    };
-    console.log(data);
+    console.log(props);
     return <TransactionResponse>(
-      await this.executeContractMethod(
-        data.factoryAddress,
-        'deploySecuredLine',
-        [data.oracle, data.arbiter, data.borrower, data.ttl, data.swapTarget],
-        props.network,
-        true
-      )
+      await this.executeContractMethod(LINEFACTORY_GOERLI, 'deploySecuredLine', [borrower, ttl], props.network, true)
     );
   }
 
   public async deploySecuredLineWtihConfig(props: {
     borrower: string;
-    ttl: number;
+    ttl: BigNumber;
     network: Network;
-    cratio: number;
-    revenueSplit: number;
+    cratio: BigNumber;
+    revenueSplit: BigNumber;
   }): Promise<TransactionResponse | PopulatedTransaction> {
     const { borrower, ttl, cratio, revenueSplit, network } = props;
-    const data = {
-      borrower,
-      ttl,
-      cratio,
-      revenueSplit,
-      network,
-      arbiter: Arbiter_GOERLI,
-      oracle: KibaSero_oracle,
-      factoryAddress: LineFactory_GOERLI,
-      swapTarget: SwapTarget_GOERLI,
-    };
     return await this.executeContractMethod(
-      data.factoryAddress,
+      LINEFACTORY_GOERLI,
       'deploySecuredLineWithConfig',
-      [data.oracle, data.arbiter, data.borrower, data.ttl, data.revenueSplit, data.cratio, data.swapTarget],
-      data.network,
+      [{ borrower, ttl: ttl.toString(), cratio: cratio.toString(), revenueSplit: revenueSplit.toString() }],
+      network,
+      false
+    );
+  }
+
+  public async deploySecuredLineWtihModules(props: {
+    oldLine: string;
+    network: Network;
+    escrow: Address;
+    spigot: Address;
+  }): Promise<TransactionResponse | PopulatedTransaction> {
+    const { oldLine, escrow, spigot, network } = props;
+    return await this.executeContractMethod(
+      LINEFACTORY_GOERLI,
+      'deploySecuredLineWithModules',
+      [{ oldLine: oldLine.toString(), escrow: escrow.toString(), spigot: spigot.toString() }],
+      network,
       false
     );
   }
@@ -126,16 +110,15 @@ export class LineFactoryServiceImpl {
     contractAddress: Address,
     oldLine: string,
     borrower: string,
-    oracle: string,
-    arbiter: string,
     ttl: BigNumber,
-    dryRun: boolean
+    dryRun: boolean,
+    network: Network
   ): Promise<TransactionResponse | PopulatedTransaction> {
     return await this.executeContractMethod(
       contractAddress,
       'rolloverSecuredLine',
-      [oldLine, borrower, oracle, arbiter, ttl],
-      'goerli',
+      [oldLine, borrower, ttl],
+      network,
       dryRun
     );
   }

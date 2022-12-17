@@ -32,7 +32,7 @@ import {
   GetUserPortfolioResponse,
 } from '@types';
 import { getConfig } from '@config';
-import { LineOfCreditABI } from '@services/contracts';
+import { SecuredLineABI } from '@services/contracts';
 import { getContract } from '@frameworks/ethers';
 import { getLinePage, getLines, getUserPortfolio } from '@frameworks/gql';
 
@@ -60,11 +60,11 @@ export class CreditLineServiceImpl implements CreditLineService {
     this.config = config;
 
     this.graphUrl = GRAPH_API_URL || 'https://api.thegraph.com';
-    this.abi = LineOfCreditABI;
+    this.abi = SecuredLineABI;
   }
 
   private _getContract(contractAddress: string) {
-    return getContract(contractAddress.toString(), LineOfCreditABI, this.web3Provider.getSigner().provider);
+    return getContract(contractAddress.toString(), SecuredLineABI, this.web3Provider.getSigner().provider);
   }
 
   private async getSignerAddress(): Promise<Address> {

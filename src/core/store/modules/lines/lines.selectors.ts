@@ -8,7 +8,6 @@ import {
   Status,
   LineActionsStatusMap,
   SecuredLine,
-  Address,
   SecuredLineWithEvents,
   UserPositionMetadata,
   PositionMap,
@@ -16,7 +15,6 @@ import {
   BORROWER_POSITION_ROLE,
   LENDER_POSITION_ROLE,
   ARBITER_POSITION_ROLE,
-  GetUserPortfolioResponse,
   LineEvents,
   AggregatedEscrow,
   AggregatedSpigot, // prev. GeneralVaultView, Super indepth data, SecuredLineWithEvents is most similar atm
@@ -100,11 +98,11 @@ const selectPositionsForSelectedLine = createSelector(
 );
 
 const selectCollateralForSelectedLine = createSelector(
-  [selectSelectedLineAddress, selectCollateralMap],
+  [selectSelectedLine, selectCollateralMap],
   (line, allCollateral) => {
     return {
-      escrow: _.find(allCollateral, (m) => m.type === 'asset' && m.line === line) as AggregatedEscrow,
-      spigot: _.find(allCollateral, (m) => m.type === 'revenue' && m.line === line) as AggregatedSpigot,
+      escrow: allCollateral[line?.escrowId ?? ''] as AggregatedEscrow,
+      spigot: allCollateral[line?.spigotId ?? ''] as AggregatedSpigot,
     };
   }
 );

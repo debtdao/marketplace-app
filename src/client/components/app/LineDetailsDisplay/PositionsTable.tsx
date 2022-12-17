@@ -93,6 +93,7 @@ export const PositionsTable = (props: PositionsProps) => {
   const dispatch = useAppDispatch();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
+  const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const userRoleMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
@@ -102,14 +103,13 @@ export const PositionsTable = (props: PositionsProps) => {
   const { NETWORK } = getEnv();
 
   //Initial set up for positions table
-
   useEffect(() => {
-    if (!selectedLine) {
-      return;
+    if (selectedLine && !lineAddress) {
+      dispatch(LinesActions.setSelectedLineAddress({ lineAddress: selectedLine.id }));
+    } else if (lineAddress && !selectedLine) {
+      dispatch(LinesActions.getLinePage({ id: lineAddress }));
     }
-    let address = selectedLine.id;
-    dispatch(LinesActions.setSelectedLineAddress({ lineAddress: address }));
-  }, [selectedLine]);
+  }, [lineAddress, selectedLine]);
 
   const ApproveMutualConsent = {
     name: t('Accept'),
@@ -118,46 +118,43 @@ export const PositionsTable = (props: PositionsProps) => {
   };
 
   useEffect(() => {
-    let Transactions: Transaction[] = [];
-    if (!userWallet) {
-      Transactions = [];
+    switch (userRoleMetadata.role) {
+      case BORROWER_POSITION_ROLE:
+        setActions([
+          {
+            name: t('components.transaction.borrow'),
+            handler: (e: Event) => borrowHandler(e),
+            disabled: false,
+          },
+          {
+            name: t('components.transaction.deposit-and-repay.header'),
+            handler: (e: Event) => depositAndRepayHandler(e),
+            disabled: false,
+          },
+        ]);
+        break;
+      case LENDER_POSITION_ROLE:
+        setActions([
+          {
+            name: t('components.transaction.withdraw'),
+            handler: (e: Event) => WithdrawHandler(e),
+            disabled: false,
+          },
+        ]);
+        break;
+      case ARBITER_POSITION_ROLE:
+        setActions([
+          {
+            name: t('components.transaction.liquidate'),
+            handler: (e: Event) => liquidateHandler(e),
+            disabled: false,
+          },
+        ]);
+        break;
+      default:
+        setActions([]);
     }
-    if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
-      Transactions.push({
-        name: t('components.transaction.borrow'),
-        handler: (e: Event) => borrowHandler(e),
-        disabled: false,
-      });
-      Transactions.push({
-        name: t('components.transaction.deposit-and-repay.header'),
-        handler: (e: Event) => depositAndRepayHandler(e),
-        disabled: false,
-      });
-    }
-    if (userRoleMetadata.role === LENDER_POSITION_ROLE) {
-      Transactions.push({
-        name: t('components.transaction.withdraw'),
-        handler: (e: Event) => WithdrawHandler(e),
-        disabled: false,
-      });
-      console.log('withdraw');
-    }
-    if (userRoleMetadata.role === ARBITER_POSITION_ROLE) {
-      Transactions.push({
-        name: t('components.transaction.liquidate'),
-        handler: (e: Event) => liquidateHandler(e),
-        disabled: false,
-      });
-    }
-    setActions(Transactions);
-  }, [selectedLine, userWallet]);
-
-  useEffect(() => {
-    if (!lineAddress) {
-      return;
-    }
-    dispatch(LinesActions.getLinePage({ id: lineAddress }));
-  }, [lineAddress]);
+  }, [userWallet]);
 
   //Action Handlers for positions table
 

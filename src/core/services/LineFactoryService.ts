@@ -68,7 +68,13 @@ export class LineFactoryServiceImpl {
     const { borrower, ttl } = props;
     // console.log(props);
     return <TransactionResponse>(
-      await this.executeContractMethod( getLineFactoryforNetwork(props.network), 'deploySecuredLine', [borrower, ttl], props.network, true)
+      await this.executeContractMethod(
+        getLineFactoryforNetwork(props.network),
+        'deploySecuredLine',
+        [borrower, ttl],
+        props.network,
+        true
+      )
     );
   }
 

@@ -216,6 +216,8 @@
         "select-amount": "2. Select amount to withdraw"
       },
       "enable-spigot": {
+        "header":"Enable Spigot",
+        "select-function": "Select Function",
         "revenue-contract": "1. Revenue Contract",
         "function-revenue": "2. Select function to claim revenue",
         "function-transfer": "3. Select function to transfer ownership of revenue contract",

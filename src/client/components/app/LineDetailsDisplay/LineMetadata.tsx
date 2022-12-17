@@ -129,6 +129,7 @@ const MetricDataDisplay = ({ title, data, displaySubmetrics = false, submetrics 
 };
 
 export const LineMetadata = (props: LineMetadataProps) => {
+  console.log('render line metadata', props);
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
@@ -158,11 +159,13 @@ export const LineMetadata = (props: LineMetadataProps) => {
 
   const renderEscrowMetadata = () => {
     if (!deposits) return null;
-    if (!totalCollateral) return;
-    <MetricDataDisplay
-      title={t('lineDetails:metadata.escrow.no-collateral')}
-      data={`$ ${prettyNumbers(totalCollateral)}`}
-    />;
+    if (!totalCollateral)
+      return (
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.escrow.no-collateral')}
+          data={`$ ${prettyNumbers(totalCollateral)}`}
+        />
+      );
     return (
       <MetricDataDisplay title={t('lineDetails:metadata.escrow.total')} data={`$ ${prettyNumbers(totalCollateral)}`} />
     );
@@ -243,19 +246,14 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const getCollateralTableActions = () => {
     console.log('get collateral table actions', userPositionMetadata.role);
     switch (userPositionMetadata.role) {
+      case BORROWER_POSITION_ROLE:
+        return <Button onClick={depositHandler}>{depositCollateralText} </Button>;
       case ARBITER_POSITION_ROLE:
       case LENDER_POSITION_ROLE: // for testing
         return (
           <>
             <Button onClick={addSpigotHandler}>{enableSpigotText}</Button>
             <Button onClick={enableAssetHandler}>{enableCollateralText}</Button>
-          </>
-        );
-      case BORROWER_POSITION_ROLE:
-        return (
-          <>
-            <Button onClick={depositHandler}>{depositCollateralText} </Button>
-            <Button onClick={addSpigotHandler}>{enableSpigotText} </Button>
           </>
         );
       default:

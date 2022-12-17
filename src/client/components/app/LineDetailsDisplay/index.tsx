@@ -1,9 +1,10 @@
 import styled from 'styled-components';
 import _ from 'lodash';
 
-import { useAppSelector, useAppTranslation } from '@hooks';
+import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
 import { RedirectIcon, Text, Link } from '@components/common';
-import { LinesSelectors } from '@store';
+import { OnchainMetaDataActions, OnchainMetaDataSelector, LinesSelectors } from '@store';
+import { getENS } from '@src/utils';
 
 import { LineMetadata } from './LineMetadata';
 import { PositionsTable } from './PositionsTable';
@@ -63,19 +64,36 @@ const BorrowerName = styled(Text)`
 
 export const LineDetailsDisplay = (props: LineDetailsProps) => {
   const { t } = useAppTranslation('common');
+  const dispatch = useAppDispatch();
 
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
+  const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
+  const [borrowerID, setBorrowerId] = useState('');
+
+  useEffect(() => {
+    dispatch(OnchainMetaDataActions.getENS(selectedLine?.borrower!));
+  }, [selectedLine]);
+
+  useEffect(() => {
+    const ensName = getENS(selectedLine?.borrower!, ensMap);
+
+    if (!ensName) {
+      setBorrowerId(selectedLine?.borrower!);
+    } else {
+      setBorrowerId(ensName);
+    }
+  }, [selectedLine, ensMap]);
 
   if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
-  const { principal, deposit, escrow, spigot, borrower, start, end } = selectedLine;
+  const { principal, deposit, escrow, borrower, spigot, start, end } = selectedLine;
 
   const StandardMetadata = (metadataProps: any) => (
     <>
       <Header>
         <RouterLink to={`/portfolio/${borrower}`} key={borrower} selected={false}>
           <BorrowerName>
-            {borrower}'s Line Of Credit
+            {borrowerID}'s Line Of Credit
             <Redirect />
           </BorrowerName>
         </RouterLink>

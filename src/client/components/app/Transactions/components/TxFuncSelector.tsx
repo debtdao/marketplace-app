@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import { useAppTranslation } from '@hooks';
-import { Text, Icon, SearchList, ZapIcon, SearchListItem, WalletIcon } from '@components/common';
+import { Text, SearchList, SearchListItem } from '@components/common';
 
 const LineTitle = styled(Text)`
   color: ${({ theme }) => theme.colors.txModalColors.text};
@@ -19,54 +19,6 @@ const CreditLineData = styled.div`
   padding: ${({ theme }) => theme.layoutPadding};
   font-size: 1.7rem;
   flex: 1;
-`;
-
-const StyledIcon = styled(Icon)`
-  width: 6.4rem;
-  padding: 1rem;
-`;
-
-const CreditLineName = styled.div`
-  width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  text-align: center;
-  font-size: 1.3rem;
-  max-height: 3rem;
-`;
-
-const CreditLineListIcon = styled(Icon)`
-  position: absolute;
-  top: 0.8rem;
-  right: 0.4rem;
-  color: ${({ theme }) => theme.colors.txModalColors.onBackgroundVariantColor};
-`;
-
-const CreditLineIconContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-`;
-
-const CreditLineSelector = styled.div<{ onClick?: () => void; center?: boolean }>`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: ${({ center }) => (center ? '100%' : '8.4rem')};
-  height: ${({ center }) => (center ? '12.6rem' : undefined)};
-  border-radius: ${({ theme }) => theme.globalRadius};
-  background: ${({ theme }) => theme.colors.txModalColors.backgroundVariant};
-  color: ${({ theme }) => theme.colors.txModalColors.textContrast};
-  fill: ${({ theme }) => theme.colors.txModalColors.text};
-  flex-shrink: 0;
-  padding: 0 0.7rem;
-  gap: 0.7rem;
-  user-select: none;
-  position: relative;
-  ${({ onClick }) => onClick && 'cursor: pointer;'}
 `;
 
 const CreditLineInfo = styled.div<{ center?: boolean }>`
@@ -137,7 +89,7 @@ export interface TxDropdownProps {
   displayGuidance?: boolean;
 }
 
-export const TxDropdown: FC<TxDropdownProps> = ({
+export const TxFuncSelector: FC<TxDropdownProps> = ({
   headerText,
   inputText,
   inputError,
@@ -178,8 +130,8 @@ export const TxDropdown: FC<TxDropdownProps> = ({
 
   const [openedSearch, setOpenedSearch] = useState(false);
   const searchListHeader = readOnly
-    ? t('components.transaction.deposit-and-repay.select-repay')
-    : t('components.transaction.deposit-and-repay.select-repay');
+    ? t('components.transaction.enable-spigot.select-function')
+    : t('components.transaction.enable-spigot.select-function');
 
   return (
     <StyledTxCreditLineInput {...props}>
@@ -199,15 +151,12 @@ export const TxDropdown: FC<TxDropdownProps> = ({
       {/* NOTE Using fragments here because: https://github.com/yearn/yearn-finance-v3/pull/565 */}
       <>
         <CreditLineInfo center={false} onClick={openSearchList}>
-          <CreditLineSelector onClick={listItems?.length > 1 ? openSearchList : undefined} center={false}>
-            <CreditLineIconContainer onClick={openSearchList}>
-              <StyledIcon Component={WalletIcon} />
-              {listItems?.length > 1 && <CreditLineListIcon Component={ZapIcon} />}
-            </CreditLineIconContainer>
-            <CreditLineName>{selectedItem.value}</CreditLineName>
-          </CreditLineSelector>
           <CreditLineData>
-            <LineTitle ellipsis> Repay From: {selectedType.value} </LineTitle>
+            <LineTitle ellipsis>
+              {selectedType?.label !== ''
+                ? t(selectedType.label)
+                : t('components.transaction.enable-spigot.select-function')}
+            </LineTitle>
           </CreditLineData>
         </CreditLineInfo>
       </>

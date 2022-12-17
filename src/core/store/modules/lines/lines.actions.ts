@@ -19,7 +19,6 @@ import {
   Network,
   DeploySecuredLineProps,
   DeploySecuredLineWithConfigProps,
-  GetUserPortfolioResponse,
   CreditPosition,
   RootState,
   PositionMap,
@@ -37,9 +36,6 @@ import { unnullify } from '@utils';
 
 import { TokensActions } from '../tokens/tokens.actions';
 import { TokensSelectors } from '../tokens/tokens.selectors';
-import { CollateralActions } from '../collateral/collateral.actions';
-
-import { LinesSelectors } from './lines.selectors';
 
 /* -------------------------------------------------------------------------- */
 /*                                   Setters                                  */

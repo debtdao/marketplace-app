@@ -1,6 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
+import { BigNumber } from 'ethers';
 
 import { formatAmount, normalizeAmount, isAddress, toWei, addCreditUpdate } from '@utils';
 import {
@@ -10,7 +11,7 @@ import {
   useAppSelector,
   useSelectedSellToken,
 } from '@hooks';
-import { ACTIVE_STATUS, BORROWER_POSITION_ROLE } from '@src/core/types';
+import { ACTIVE_STATUS, BORROWER_POSITION_ROLE, PROPOSED_STATUS } from '@src/core/types';
 import { getConstants } from '@src/config/constants';
 import { TokensActions, TokensSelectors, WalletSelectors, LinesSelectors, LinesActions } from '@store';
 import { Button } from '@components/common';
@@ -84,24 +85,23 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionApproved, setTransactionApproved] = useState(true);
   const [transactionLoading, setLoading] = useState(false);
-  const [targetTokenAmount, setTargetTokenAmount] = useState('1');
-  const [drate, setDrate] = useState('0.00');
-  const [frate, setFrate] = useState('0.00');
+  const [targetTokenAmount, setTargetTokenAmount] = useState('0');
+  const [drate, setDrate] = useState('');
+  const [frate, setFrate] = useState('');
   const [lenderAddress, setLenderAddress] = useState(walletAddress ? walletAddress : '');
   const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
   const [transactionType, setTransactionType] = useState('propose');
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
 
-  //main net logic
-
   useEffect(() => {
-    if (selectedPosition && userMetadata.role === BORROWER_POSITION_ROLE) {
-      let deposit = normalizeAmount(selectedPosition.deposit, selectedPosition.token.decimals);
-      setTargetTokenAmount(deposit);
-      setSelectedTokenAddress(selectedPosition.token.address);
-      setDrate(selectedPosition.dRate);
-      setFrate(selectedPosition.fRate);
-      setLenderAddress(selectedPosition.lender);
+    if (selectedPosition?.status === PROPOSED_STATUS && userMetadata.role === BORROWER_POSITION_ROLE) {
+      const deposit = normalizeAmount(selectedPosition.deposit, 0);
+      if (!targetTokenAmount) setTargetTokenAmount(deposit);
+      if (!selectedSellTokenAddress) setSelectedTokenAddress(selectedPosition.token.address);
+      if (!drate) setDrate(normalizeAmount(selectedPosition.dRate, 2));
+      if (!frate) setFrate(normalizeAmount(selectedPosition.fRate, 2));
+      if (!lenderAddress) setLenderAddress(selectedPosition.lender);
+
       setTransactionType('accept');
     }
   }, [selectedPosition]);
@@ -192,10 +192,16 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
     if (!checkSumAddress) {
       return;
     }
-    let TransactionObj = {
+
+    if (!selectedSellTokenAddress) {
+      return;
+    }
+
+    console.log('drate', drate, toWei(drate, 2), toWei(drate, 4));
+    const transactionObj = {
       lineAddress: selectedCredit.id,
-      drate: toWei(drate, 2),
-      frate: toWei(frate, 2),
+      drate,
+      frate,
       amount: toWei(targetTokenAmount, selectedSellToken!.decimals),
       token: selectedSellTokenAddress,
       lender: lenderAddress,
@@ -203,7 +209,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       dryRun: false,
     };
     //@ts-ignore
-    dispatch(LinesActions.addCredit(TransactionObj)).then((res) => {
+    dispatch(LinesActions.addCredit(transactionObj)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionCompleted(2);
         setLoading(false);
@@ -331,7 +337,9 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
         onAmountChange={onAmountChange}
-        amountValue={String(10000000 * Number(targetTokenAmount))}
+        amountValue={BigNumber.from(targetTokenAmount)
+          .pow(BigNumber.from(10).mul(selectedSellToken.decimals ?? 0))
+          .toString()}
         maxAmount={acceptingOffer ? targetTokenAmount : targetBalance}
         selectedToken={selectedSellToken}
         onSelectedTokenChange={onSelectedSellTokenChange}

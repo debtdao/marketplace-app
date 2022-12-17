@@ -11,13 +11,11 @@ export interface EnableSpigotTxModalProps {
 }
 
 export const EnableSpigotTxModal: FC<EnableSpigotTxModalProps> = ({ onClose, ...props }) => {
-  console.log('deposit modal', props);
   const { t } = useAppTranslation('common');
-  // if (!creditLine) return; // TODO error or creditLine selector input
 
   return (
     <StyledEnableSpigotTxModal {...props}>
-      <EnableSpigotTx header={t('components.transaction.enable-collateral-asset.header')} onClose={onClose} />
+      <EnableSpigotTx header={t('components.transaction.enable-spigot.header')} onClose={onClose} />
     </StyledEnableSpigotTxModal>
   );
 };

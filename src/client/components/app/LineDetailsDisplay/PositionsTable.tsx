@@ -92,7 +92,6 @@ export const PositionsTable = (props: PositionsProps) => {
   const dispatch = useAppDispatch();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
-  const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const userRoleMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);

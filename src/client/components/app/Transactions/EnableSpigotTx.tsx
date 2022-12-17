@@ -138,6 +138,14 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     });
   };
 
+  const handleSetTransferByte = (byte: string) => {
+    setTransferFunc(byte);
+  };
+
+  const handleSetClaimByte = (byte: string) => {
+    setClaimFunc(byte);
+  };
+
   const createListItems = (functions: string[]) =>
     !functions ? [] : functions.map((func, i) => ({ id: i.toString(), label: func, value: '' }));
 
@@ -174,7 +182,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       type: transferFuncType,
       onChange: onTransferFuncSelection,
       byteCode: transferFunc,
-      onByteChange: setTransferFunc,
+      onByteChange: handleSetTransferByte,
     },
     {
       header: t('components.transaction.enable-spigot.function-revenue'),
@@ -182,7 +190,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       type: claimFuncType,
       onChange: onClaimFuncSelection,
       byteCode: claimFunc,
-      onByteChange: setClaimFunc,
+      onByteChange: handleSetClaimByte,
     },
   ];
 

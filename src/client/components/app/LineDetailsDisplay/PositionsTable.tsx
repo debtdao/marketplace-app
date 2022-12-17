@@ -1,13 +1,12 @@
 import styled from 'styled-components';
 import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
-import { Link } from 'react-router-dom';
 
 import { ModalsActions, LinesActions, LinesSelectors, WalletSelectors, WalletActions } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { device } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer } from '@components/app';
-import { Input, SearchIcon, Button, RedirectIcon } from '@components/common';
+import { Input, SearchIcon, Button, RedirectIcon, Link } from '@components/common';
 import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, CreditPosition } from '@src/core/types';
 import { humanize, formatAddress } from '@src/utils';
 import { getEnv } from '@config/env';
@@ -315,7 +314,7 @@ export const PositionsTable = (props: PositionsProps) => {
             token: (
               <a
                 //change to etherscan on launch
-                href={`https://etherscan.io/address/${position.token.id}`}
+                href={`https://etherscan.io/address/${position.token.address}`}
                 target={'_blank'}
                 key={`${position.token.symbol}-${position.id}`}
                 rel={'noreferrer'}

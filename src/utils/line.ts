@@ -358,10 +358,10 @@ export const formatLinePageData = (
     // TODO add creditEvents
     collateralEvents,
     // collateral data
-    spigotId: spigot?.id,
-    escrowId: escrow?.id,
+    spigotId: spigot?.id ?? '',
+    escrowId: escrow?.id ?? '',
     spigot: formattedSpigot,
-    escrow: isEmpty(escrow?.deposits) ? undefined : { ...escrow!, ...escrowData },
+    escrow: { ...escrow!, ...escrowData },
   };
   return pageData;
 };
@@ -387,8 +387,8 @@ export const formatUserPortfolioData = (
         borrower: borrower.id,
         status: status.toLowerCase() as LineStatusTypes,
 
-        spigotId: spigot?.id,
-        escrowId: escrow?.id,
+        spigotId: spigot?.id ?? '',
+        escrowId: escrow?.id ?? '',
         spigot: {
           ...(spigotData ?? {}),
           ...spigot,

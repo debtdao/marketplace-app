@@ -52,6 +52,7 @@ export interface RootState {
   // debt dao
   lines: CreditLineState;
   collateral: CollateralState;
+  metadata: OnchainMetaDataState;
 }
 
 export interface AppState {
@@ -126,6 +127,7 @@ export interface CreditLineState {
     deploySecuredLine: Status;
     user: UserLineMetadataStatusMap;
   };
+  network: number | undefined;
 }
 
 export interface CollateralState {
@@ -233,6 +235,12 @@ export interface VaultActionsStatusMap {
   withdraw: Status;
   approveMigrate: Status;
   migrate: Status;
+}
+
+export interface OnchainMetaDataState {
+  contractABI: string | undefined;
+  contractFunctions: string[] | undefined;
+  ens: { [address: string]: string };
 }
 
 export interface UserVaultActionsStatusMap {

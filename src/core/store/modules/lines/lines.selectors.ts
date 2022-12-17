@@ -8,7 +8,6 @@ import {
   Status,
   LineActionsStatusMap,
   SecuredLine,
-  Address,
   SecuredLineWithEvents,
   UserPositionMetadata,
   PositionMap,
@@ -16,7 +15,6 @@ import {
   BORROWER_POSITION_ROLE,
   LENDER_POSITION_ROLE,
   ARBITER_POSITION_ROLE,
-  GetUserPortfolioResponse,
   LineEvents,
   AggregatedEscrow,
   AggregatedSpigot, // prev. GeneralVaultView, Super indepth data, SecuredLineWithEvents is most similar atm
@@ -58,6 +56,7 @@ const selectLinesActionsStatusMap = (state: RootState) => state.lines.statusMap.
 
 const selectGetLinesStatus = (state: RootState) => state.lines.statusMap.getLines;
 const selectGetLinePageStatus = (state: RootState) => state.lines.statusMap.getLinePage;
+const selectNetwork = (state: RootState) => state.lines.network;
 
 /* ----------------------------- Main Selectors ----------------------------- */
 const selectLines = createSelector([selectLinesMap], (linesMap) => {
@@ -100,11 +99,11 @@ const selectPositionsForSelectedLine = createSelector(
 );
 
 const selectCollateralForSelectedLine = createSelector(
-  [selectSelectedLineAddress, selectCollateralMap],
+  [selectSelectedLine, selectCollateralMap],
   (line, allCollateral) => {
     return {
-      escrow: _.find(allCollateral, (m) => m.type === 'asset' && m.line === line) as AggregatedEscrow,
-      spigot: _.find(allCollateral, (m) => m.type === 'revenue' && m.line === line) as AggregatedSpigot,
+      escrow: allCollateral[line?.escrowId ?? ''] as AggregatedEscrow,
+      spigot: allCollateral[line?.spigotId ?? ''] as AggregatedSpigot,
     };
   }
 );
@@ -314,6 +313,7 @@ const selectUserPositionMetadata = createSelector(
 );
 
 export const LinesSelectors = {
+  selectNetwork,
   selectLinesState,
   selectLinesMap,
   selectLines,

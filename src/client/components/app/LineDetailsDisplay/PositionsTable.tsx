@@ -8,7 +8,7 @@ import { device } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer } from '@components/app';
 import { Input, SearchIcon, Button, RedirectIcon, Link } from '@components/common';
 import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, CreditPosition } from '@src/core/types';
-import { humanize, formatAddress } from '@src/utils';
+import { humanize, formatAddress, normalizeAmount } from '@src/utils';
 import { getEnv } from '@config/env';
 
 const PositionsCard = styled(DetailCard)`
@@ -296,8 +296,8 @@ export const PositionsTable = (props: PositionsProps) => {
           data={positions?.map((position) => ({
             // this needs to be humanized to correct amount depending on the token.
             deposit: humanize('amount', position.deposit, position.token.decimals, 2),
-            drate: `${position.dRate} %`,
-            frate: `${position.fRate} %`,
+            drate: `${normalizeAmount(position.dRate, 2)} %`,
+            frate: `${normalizeAmount(position.fRate, 2)} %`,
             status: position.status,
             principal: humanize('amount', position.principal, position.token.decimals, 2),
             interest: humanize('amount', position.interestAccrued, position.token.decimals, 2),

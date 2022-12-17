@@ -56,6 +56,7 @@ const selectLinesActionsStatusMap = (state: RootState) => state.lines.statusMap.
 
 const selectGetLinesStatus = (state: RootState) => state.lines.statusMap.getLines;
 const selectGetLinePageStatus = (state: RootState) => state.lines.statusMap.getLinePage;
+const selectNetwork = (state: RootState) => state.lines.network;
 
 /* ----------------------------- Main Selectors ----------------------------- */
 const selectLines = createSelector([selectLinesMap], (linesMap) => {
@@ -312,6 +313,7 @@ const selectUserPositionMetadata = createSelector(
 );
 
 export const LinesSelectors = {
+  selectNetwork,
   selectLinesState,
   selectLinesMap,
   selectLines,

@@ -2,6 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import _ from 'lodash';
 import { useHistory } from 'react-router-dom';
+import { utils } from 'ethers';
 
 import { formatAmount, normalizeAmount } from '@utils';
 import {
@@ -13,7 +14,7 @@ import {
 } from '@hooks';
 import { ACTIVE_STATUS, ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE } from '@src/core/types';
 import { getConstants } from '@src/config/constants';
-import { TokensActions, WalletSelectors, LinesSelectors, CollateralSelectors } from '@store';
+import { TokensActions, WalletSelectors, LinesSelectors, CollateralSelectors, TokensSelectors } from '@store';
 import { Button } from '@components/common';
 
 import { TxContainer } from './components/TxContainer';
@@ -81,6 +82,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
   const [targetTokenAmount, setTargetTokenAmount] = useState('1');
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedEscrow = useAppSelector(CollateralSelectors.selectSelectedEscrow);
+  const selectedTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
 
   // const onSelectedTokenChanged = props.onSelectedTokenChanged
   // const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
@@ -97,7 +99,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
     allowTokenSelect: true,
   });
 
-  const enabledCollateralAddressess = _.values(selectedEscrow?.deposits)?.map((d) => d.token.address);
+  const enabledCollateralAddressess = _.values(selectedEscrow?.deposits)?.map((d) => utils.getAddress(d.token.address));
   const collateralOptions = sourceAssetOptions.filter(({ address }) =>
     _.includes(enabledCollateralAddressess, address)
   );
@@ -106,17 +108,11 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
     console.log('add position tx useEffect token/creditLine', selectedSellToken, selectedLine);
     console.log('wallet net', walletNetwork);
     if (collateralOptions.length > 0 && !selectedSellToken) {
-      dispatch(
-        TokensActions.setSelectedTokenAddress({
-          tokenAddress: collateralOptions[0].address,
-        })
-      );
+      setSelectedTokenAddress(collateralOptions[0].address);
     }
-
     if ((!selectedSellToken || selectedSellToken.address === ZERO_ADDRESS) && selectedSellToken) {
       setSelectedTokenAddress(selectedSellToken.address);
     }
-
     if (
       !selectedLine ||
       !selectedSellToken

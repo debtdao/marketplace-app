@@ -1,4 +1,5 @@
 import { BigNumber, ContractFunction, PopulatedTransaction, ethers } from 'ethers';
+import { Interface } from '@ethersproject/abi';
 
 import { TransactionService, Web3Provider, Config, ExecuteTransactionProps, Address, Network } from '@types';
 import { getConfig } from '@config';
@@ -84,12 +85,13 @@ export class LineFactoryServiceImpl {
 
   public async deploySecuredLineWtihConfig(props: {
     borrower: string;
-    ttl: number;
+    ttl: BigNumber;
     network: Network;
-    cratio: number;
-    revenueSplit: number;
+    cratio: BigNumber;
+    revenueSplit: BigNumber;
   }): Promise<TransactionResponse | PopulatedTransaction> {
     const { borrower, ttl, cratio, revenueSplit, network } = props;
+    
     const data = {
       borrower,
       ttl,
@@ -101,8 +103,24 @@ export class LineFactoryServiceImpl {
     return await this.executeContractMethod(
       data.factoryAddress!,
       'deploySecuredLineWithConfig',
-      [data.borrower, data.ttl, data.revenueSplit, data.cratio],
-      data.network,
+      [{ borrower, ttl: ttl.toString(), cratio: cratio.toString(), revenueSplit: revenueSplit.toString() }],
+      network,
+      false
+    );
+  }
+
+  public async deploySecuredLineWtihModules(props: {
+    oldLine: string;
+    network: Network;
+    escrow: Address;
+    spigot: Address;
+  }): Promise<TransactionResponse | PopulatedTransaction> {
+    const { oldLine, escrow, spigot, network } = props;
+    return await this.executeContractMethod(
+      LINEFACTORY_GOERLI,
+      'deploySecuredLineWithModules',
+      [{ oldLine: oldLine.toString(), escrow: escrow.toString(), spigot: spigot.toString() }],
+      network,
       false
     );
   }
@@ -112,13 +130,14 @@ export class LineFactoryServiceImpl {
     oldLine: string,
     borrower: string,
     ttl: BigNumber,
-    dryRun: boolean
+    dryRun: boolean,
+    network: Network
   ): Promise<TransactionResponse | PopulatedTransaction> {
     return await this.executeContractMethod(
       contractAddress,
       'rolloverSecuredLine',
       [oldLine, borrower, ttl],
-      'goerli',
+      network,
       dryRun
     );
   }

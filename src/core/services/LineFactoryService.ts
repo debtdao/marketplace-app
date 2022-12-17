@@ -1,5 +1,4 @@
 import { BigNumber, ContractFunction, PopulatedTransaction, ethers } from 'ethers';
-import { Interface } from '@ethersproject/abi';
 
 import { TransactionService, Web3Provider, Config, ExecuteTransactionProps, Address, Network } from '@types';
 import { getConfig } from '@config';
@@ -72,15 +71,13 @@ export class LineFactoryServiceImpl {
       factoryAddress: getLineFactoryforNetwork(props.network),
     };
     console.log(data);
-    return <TransactionResponse>(
-      await this.executeContractMethod(
-        data.factoryAddress!,
-        'deploySecuredLine',
-        [data.borrower, data.ttl],
-        props.network,
-        true
-      )
-    );
+    return (await this.executeContractMethod(
+      data.factoryAddress!,
+      'deploySecuredLine',
+      [data.borrower, data.ttl],
+      props.network,
+      true
+    )) as TransactionResponse;
   }
 
   public async deploySecuredLineWtihConfig(props: {
@@ -91,7 +88,6 @@ export class LineFactoryServiceImpl {
     revenueSplit: BigNumber;
   }): Promise<TransactionResponse | PopulatedTransaction> {
     const { borrower, ttl, cratio, revenueSplit, network } = props;
-    
     const data = {
       borrower,
       ttl,
@@ -116,8 +112,10 @@ export class LineFactoryServiceImpl {
     spigot: Address;
   }): Promise<TransactionResponse | PopulatedTransaction> {
     const { oldLine, escrow, spigot, network } = props;
+    const contractAddress = getLineFactoryforNetwork(props.network) as string;
+
     return await this.executeContractMethod(
-      LINEFACTORY_GOERLI,
+      contractAddress,
       'deploySecuredLineWithModules',
       [{ oldLine: oldLine.toString(), escrow: escrow.toString(), spigot: spigot.toString() }],
       network,

@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import _ from 'lodash';
+import { useState, useEffect } from 'react';
 
 import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
-import { Text } from '@components/common';
+import { RedirectIcon, Text, Link } from '@components/common';
 import { OnchainMetaDataActions, OnchainMetaDataSelector, LinesSelectors } from '@store';
 import { getENS } from '@src/utils';
 
@@ -20,6 +20,14 @@ const Container = styled.div`
   width: 100%;
 `;
 
+const Redirect = styled(RedirectIcon)`
+  display: inline-block;
+  fill: currentColor;
+  width: 1.2rem;
+  margin-left: 2rem;
+  padding-bottom: 0.2rem;
+`;
+
 const Header = styled.h1`
   ${({ theme }) => `
     margin-bottom: ${theme.spacing.xl};
@@ -28,8 +36,31 @@ const Header = styled.h1`
   `};
 `;
 
+const RouterLink = styled(Link)<{ selected: boolean }>`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  color: inherit;
+  font-size: 3rem;
+  flex: 1;
+  width: 100%;
+
+  &:hover span {
+    filter: brightness(90%);
+  }
+
+  span {
+    transition: filter 200ms ease-in-out;
+  }
+  ${(props) =>
+    props.selected &&
+    `
+    color: ${props.theme.colors.titlesVariant};
+  `}
+`;
+
 const BorrowerName = styled(Text)`
-  max-width: 150px;
+  max-width: 100%;
 `;
 
 export const LineDetailsDisplay = (props: LineDetailsProps) => {
@@ -56,13 +87,17 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   }, [selectedLine, ensMap]);
 
   if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
-  const { principal, deposit, escrow, spigot, start, end } = selectedLine;
+  const { principal, deposit, escrow, borrower, spigot, start, end } = selectedLine;
 
   const StandardMetadata = (metadataProps: any) => (
     <>
       <Header>
-        <BorrowerName ellipsis>{borrowerID}</BorrowerName>
-        's Line Of Credit
+        <RouterLink to={`/portfolio/${borrower}`} key={borrower} selected={false}>
+          <BorrowerName>
+            {borrowerID}'s Line Of Credit
+            <Redirect />
+          </BorrowerName>
+        </RouterLink>
       </Header>
       <LineMetadata {...metadataProps} />
     </>

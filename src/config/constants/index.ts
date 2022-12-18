@@ -189,6 +189,5 @@ export const getConstants = memoize((): Constants => {
     SUPPORTED_LANGS: ['en', 'es', 'ja', 'zh'],
     DUST_AMOUNT_USD: '10000000',
     ASSETS_ICON_URL: 'https://raw.githubusercontent.com/yearn/yearn-assets/master/icons/multichain-tokens/1/',
-    LINEFACTORY_GOERLI: networks.goerli.lineFactory,
   };
 });

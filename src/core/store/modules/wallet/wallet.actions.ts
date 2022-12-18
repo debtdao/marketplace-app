@@ -117,6 +117,7 @@ const changeWalletTheme =
 
 export interface ChangeWalletNetworkResult {
   networkChanged: boolean;
+  network: Network;
 }
 
 const changeWalletNetwork = createAsyncThunk<ChangeWalletNetworkResult, { network: Network }, ThunkAPI>(
@@ -128,8 +129,7 @@ const changeWalletNetwork = createAsyncThunk<ChangeWalletNetworkResult, { networ
     if (wallet.isCreated && wallet.changeNetwork) {
       networkChanged = await wallet.changeNetwork(network);
     }
-
-    return { networkChanged };
+    return { networkChanged, network };
   }
 );
 

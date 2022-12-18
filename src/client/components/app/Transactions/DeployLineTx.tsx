@@ -2,9 +2,10 @@ import { FC, useState } from 'react';
 import { BigNumber } from 'ethers';
 import styled from 'styled-components';
 
+import { getLineFactoryforNetwork } from '@utils';
 import { isAddress, toWei } from '@utils';
 import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
-import { LinesActions, WalletSelectors } from '@store';
+import { LinesActions, LinesSelectors, WalletSelectors } from '@store';
 import { getConstants } from '@src/config/constants';
 
 import { ToggleButton } from '../../common';
@@ -18,8 +19,6 @@ import { TxNumberInput } from './components/TxNumberInput';
 import { TxStatus } from './components/TxStatus';
 
 const StyledTransaction = styled(TxContainer)``;
-
-const { LINEFACTORY_GOERLI } = getConstants();
 
 const SectionContent = styled.div`
   display: flex;
@@ -46,6 +45,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
 
   // Deploy Line base data state
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
+  const LINEFACTORY = useAppSelector(LinesSelectors.selectNetwork);
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const { header, onClose } = props;
   const [borrower, setBorrower] = useState('');
@@ -115,7 +115,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
 
       dispatch(
         LinesActions.deploySecuredLine({
-          factory: LINEFACTORY_GOERLI,
+          factory: getLineFactoryforNetwork(LINEFACTORY!)!,
           borrower,
           ttl: BigNumber.from(ttl.toFixed(0)),
           network: walletNetwork,
@@ -152,7 +152,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       // TODO Dynamic var based on network
       dispatch(
         LinesActions.deploySecuredLineWithConfig({
-          factory: LINEFACTORY_GOERLI,
+          factory: getLineFactoryforNetwork(LINEFACTORY!)!,
           borrower,
           ttl: BigNumber.from(ttl.toFixed(0)),
           network: walletNetwork,

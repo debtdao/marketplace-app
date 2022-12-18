@@ -2,12 +2,11 @@ import { BigNumber, ContractFunction, PopulatedTransaction, ethers } from 'ether
 
 import { TransactionService, Web3Provider, Config, ExecuteTransactionProps, Address, Network } from '@types';
 import { getConfig } from '@config';
+import { getLineFactoryforNetwork } from '@src/utils';
 
 import { TransactionResponse } from '../types';
 
 import { LineFactoryABI } from './contracts';
-
-const { LINEFACTORY_GOERLI } = getConfig();
 
 export class LineFactoryServiceImpl {
   private graphUrl: string;
@@ -69,26 +68,24 @@ export class LineFactoryServiceImpl {
     const data = {
       borrower,
       ttl,
-      factoryAddress: LINEFACTORY_GOERLI,
+      factoryAddress: getLineFactoryforNetwork(props.network),
     };
     console.log(data);
-    return <TransactionResponse>(
-      await this.executeContractMethod(
-        data.factoryAddress,
-        'deploySecuredLine',
-        [data.borrower, data.ttl],
-        props.network,
-        true
-      )
-    );
+    return (await this.executeContractMethod(
+      data.factoryAddress!,
+      'deploySecuredLine',
+      [data.borrower, data.ttl],
+      props.network,
+      true
+    )) as TransactionResponse;
   }
 
   public async deploySecuredLineWtihConfig(props: {
     borrower: string;
-    ttl: number;
+    ttl: BigNumber;
     network: Network;
-    cratio: number;
-    revenueSplit: number;
+    cratio: BigNumber;
+    revenueSplit: BigNumber;
   }): Promise<TransactionResponse | PopulatedTransaction> {
     const { borrower, ttl, cratio, revenueSplit, network } = props;
     const data = {
@@ -97,13 +94,31 @@ export class LineFactoryServiceImpl {
       cratio,
       revenueSplit,
       network,
-      factoryAddress: LINEFACTORY_GOERLI,
+      factoryAddress: getLineFactoryforNetwork(props.network),
     };
     return await this.executeContractMethod(
-      data.factoryAddress,
+      data.factoryAddress!,
       'deploySecuredLineWithConfig',
-      [data.borrower, data.ttl, data.revenueSplit, data.cratio],
-      data.network,
+      [{ borrower, ttl: ttl.toString(), cratio: cratio.toString(), revenueSplit: revenueSplit.toString() }],
+      network,
+      false
+    );
+  }
+
+  public async deploySecuredLineWtihModules(props: {
+    oldLine: string;
+    network: Network;
+    escrow: Address;
+    spigot: Address;
+  }): Promise<TransactionResponse | PopulatedTransaction> {
+    const { oldLine, escrow, spigot, network } = props;
+    const contractAddress = getLineFactoryforNetwork(props.network) as string;
+
+    return await this.executeContractMethod(
+      contractAddress,
+      'deploySecuredLineWithModules',
+      [{ oldLine: oldLine.toString(), escrow: escrow.toString(), spigot: spigot.toString() }],
+      network,
       false
     );
   }
@@ -113,13 +128,14 @@ export class LineFactoryServiceImpl {
     oldLine: string,
     borrower: string,
     ttl: BigNumber,
-    dryRun: boolean
+    dryRun: boolean,
+    network: Network
   ): Promise<TransactionResponse | PopulatedTransaction> {
     return await this.executeContractMethod(
       contractAddress,
       'rolloverSecuredLine',
       [oldLine, borrower, ttl],
-      'goerli',
+      network,
       dryRun
     );
   }

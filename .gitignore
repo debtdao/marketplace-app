@@ -27,3 +27,7 @@ yarn-error.log*
 
 # IDE
 .vscode
+
+# Zone Identifier files (ADS / Windows)
+
+**/*Zone.Identifier

@@ -35,6 +35,7 @@ interface EnableSpigotTxProps {
 export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
+
   // user data
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   //Line data
@@ -50,31 +51,29 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const [transactionLoading, setLoading] = useState(false);
 
   // spigot setting params
-  const [claimFunc, setClaimFunc] = useState('');
-  const [transferFunc, setTransferFunc] = useState('');
-  const [revenueContractAdd, setRevenueContractAdd] = useState<string>('');
-  const [revContractABI, setRevenueContractABI] = useState(false);
+  const [claimFunc, setClaimFunc] = useState<string>('');
+  const [transferFunc, setTransferFunc] = useState<string>('');
+  const [revenueContractAddy, setRevenueContractAdd] = useState<string>('');
+
+  const [didFetchAbi, setDidFetchABI] = useState<boolean>(false);
   const [claimFuncType, setClaimFuncType] = useState({ id: '', label: '', value: '' });
   const [transferFuncType, setTransferFuncType] = useState({ id: '', label: '', value: '' });
 
   useEffect(() => {
     // if escrow not set yet then correct state
-    if (!selectedSpigot) {
-      dispatch(CollateralActions.setSelectedSpigot({ spigotAddress: selectedLine?.spigotId }));
+    if (!selectedSpigot && selectedLine?.spigotId) {
+      dispatch(CollateralActions.setSelectedSpigot({ spigotAddress: selectedLine.spigotId }));
     }
-  }, [selectedLine]);
+  }, [selectedSpigot, selectedLine]);
 
   useEffect(() => {
-    if (isValidAddress(revenueContractAdd)) {
-      dispatch(OnchainMetaDataActions.getABI(revenueContractAdd));
-      setRevenueContractABI(true);
-    } else {
-      dispatch(OnchainMetaDataActions.clearABI());
-      setRevenueContractABI(false);
+    if (!selectedContractFunctions && isValidAddress(revenueContractAddy) && !didFetchAbi) {
+      setDidFetchABI(true);
+      dispatch(OnchainMetaDataActions.getABI(revenueContractAddy));
     }
-  }, [revenueContractAdd]);
+  }, [revenueContractAddy, didFetchAbi]);
 
-  // If contract has ABI, these functions generage the bytecode for the functions
+  // // If contract has ABI, these functions generage the bytecode for the functions
   const onTransferFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
     const hashedSigFunc = generateSig(newFunc.label, contractABI!);
     setTransferFunc(hashedSigFunc);
@@ -86,20 +85,6 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     setClaimFunc(hashedSigFunc);
     setClaimFuncType(newFunc);
   };
-
-  // if no ABI, input bytecode manually
-  const handleClaimChange = (byteCode: string) => {
-    setClaimFunc(byteCode);
-  };
-
-  const handleTransferFuncChange = (byteCode: string) => {
-    setTransferFunc(byteCode);
-  };
-
-  const notArbiter = selectedLine?.status === ACTIVE_STATUS;
-  if (!notArbiter) {
-    return null;
-  }
 
   // Event Handlers
   const onTransactionCompletedDismissed = () => {
@@ -114,19 +99,16 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     setLoading(true);
 
     if (!selectedLine || !selectedSpigot) {
-      console.log('enable-spigot', selectedLine?.id, selectedSpigot);
       setLoading(false);
       return;
     }
 
-    if (!revenueContractAdd) {
-      console.log('enable-spigot', revenueContractAdd);
+    if (!revenueContractAddy) {
       setLoading(false);
       return;
     }
 
     if (!walletNetwork) {
-      console.log('enable-spigot', !walletNetwork);
       setLoading(false);
       return;
     }
@@ -135,9 +117,9 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       network: walletNetwork,
       lineAddress: selectedLine.id,
       spigotAddress: selectedSpigot.id,
-      revenueContract: revenueContractAdd,
+      revenueContract: revenueContractAddy,
       setting: {
-        //TO DO: QUERY OWNERSPLIT ON SPIGOTENTITY
+        // TODO: QUERY OWNERSPLIT ON SPIGOTENTITY
         ownerSplit: toWei('100', 0),
         claimFunction: claimFunc,
         transferOwnerFunction: transferFunc,
@@ -145,33 +127,27 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     };
 
     dispatch(CollateralActions.addSpigot(transactionData)).then((res) => {
-      if (res.meta.requestStatus === 'rejected') {
+      if (res.meta?.requestStatus === 'rejected') {
         setTransactionCompleted(2);
         setLoading(false);
       }
-      if (res.meta.requestStatus === 'fulfilled') {
+      if (res.meta?.requestStatus === 'fulfilled') {
         setTransactionCompleted(1);
         setLoading(false);
       }
     });
   };
 
-  const handleChangeRevenue = (address: string) => {
-    setRevenueContractAdd(address);
+  const handleSetTransferByte = (byte: string) => {
+    setTransferFunc(byte);
   };
 
-  const createListItems = (functions: string[]) => {
-    if (!functions) {
-      setRevenueContractABI(false);
-      return;
-    }
-    const functionList: any = [];
-    functions.forEach((func, i) => {
-      const obj = { id: i, label: func, value: '' };
-      functionList.push(obj);
-    });
-    return functionList;
+  const handleSetClaimByte = (byte: string) => {
+    setClaimFunc(byte);
   };
+
+  const createListItems = (functions: string[]) =>
+    !functions ? [] : functions.map((func, i) => ({ id: i.toString(), label: func, value: '' }));
 
   if (!selectedLine) return null;
 
@@ -204,47 +180,52 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       header: t('components.transaction.enable-spigot.function-transfer'),
       options: createListItems(selectedContractFunctions!),
       type: transferFuncType,
-      onchange: onTransferFuncSelection,
+      onChange: onTransferFuncSelection,
       byteCode: transferFunc,
-      onByteChange: handleTransferFuncChange,
+      onByteChange: handleSetTransferByte,
     },
     {
       header: t('components.transaction.enable-spigot.function-revenue'),
       options: createListItems(selectedContractFunctions!),
       type: claimFuncType,
-      onchange: onClaimFuncSelection,
+      onChange: onClaimFuncSelection,
       byteCode: claimFunc,
-      onByteChange: handleClaimChange,
+      onByteChange: handleSetClaimByte,
     },
   ];
 
   const renderFuncSelectors = () =>
-    revFuncDisplayConfigs.map((config) =>
-      revContractABI ? (
+    revFuncDisplayConfigs.map(({ header, byteCode, options, type, onChange, onByteChange }) =>
+      // if no ABI, input bytecode manually
+      selectedContractFunctions ? (
         <TxFuncSelector
-          headerText={config.header}
-          typeOptions={config.options}
-          selectedType={config.type}
-          onSelectedTypeChange={config.onchange}
+          key={header + String(type)}
+          headerText={header}
+          typeOptions={options}
+          selectedType={type}
+          onSelectedTypeChange={onChange}
         />
       ) : (
         <TxByteInput
-          headerText={config.header}
+          key={header + byteCode}
+          headerText={header}
           inputText={' '}
           inputError={false}
-          byteCode={config.byteCode}
-          onByteCodeChange={config.onByteChange}
+          byteCode={byteCode}
+          onByteCodeChange={onByteChange}
           readOnly={false}
         />
       )
     );
 
+  console.log('render enable spigot', transactionLoading, revenueContractAddy);
   return (
+    // <div />
     <StyledTransaction onClose={onClose} header={header}>
       <TxAddressInput
         headerText={t('components.transaction.enable-spigot.revenue-contract')}
-        address={revenueContractAdd}
-        onAddressChange={handleChangeRevenue}
+        address={revenueContractAddy}
+        onAddressChange={setRevenueContractAdd}
       />
       {renderFuncSelectors()}
 

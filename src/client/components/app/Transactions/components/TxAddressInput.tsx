@@ -76,7 +76,6 @@ const scaleTransitionTime = 300;
 
 const StyledTxTokenInput = styled(TransitionGroup)`
   display: grid;
-  // min-height: 15.6rem;
   width: 100%;
   border-radius: ${({ theme }) => theme.globalRadius};
   grid-gap: 0.8rem;

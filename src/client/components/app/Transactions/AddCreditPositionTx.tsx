@@ -336,7 +336,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
         onAmountChange={onAmountChange}
-        amountValue={BigNumber.from(targetTokenAmount)
+        amountValue={BigNumber.from(targetTokenAmount ?? 0)
           .pow(BigNumber.from(10).mul(selectedSellToken.decimals ?? 0))
           .toString()}
         maxAmount={acceptingOffer ? targetTokenAmount : targetBalance}

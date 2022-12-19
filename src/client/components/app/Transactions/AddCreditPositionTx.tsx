@@ -153,7 +153,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       return;
     }
     let approvalOBj = {
-      tokenAddress: selectedSellTokenAddress!,
+      tokenAddress: selectedSellToken!.address,
       amount: toWei(targetTokenAmount, selectedSellToken!.decimals),
       lineAddress: selectedCredit.id,
       network: walletNetwork!,

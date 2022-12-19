@@ -4,8 +4,7 @@ import _ from 'lodash';
 import { ConnectWalletButton } from '@components/app';
 import { OptionList, EthereumIcon, ArbitrumIcon, Link } from '@components/common';
 import { WalletSelectors } from '@src/core/store';
-import { useAppSelector } from '@hooks';
-import { useWindowDimensions } from '@hooks';
+import { useAppSelector, useWindowDimensions } from '@hooks';
 import { Network } from '@types';
 import { device } from '@themes/default';
 import { getConfig } from '@config';
@@ -99,8 +98,6 @@ const getNetworkIcon = (network: Network) => {
   switch (network) {
     case 'mainnet':
       return EthereumIcon;
-    case 'arbitrum':
-      return ArbitrumIcon;
     case 'goerli':
       return EthereumIcon;
     default:
@@ -145,13 +142,13 @@ export const Navbar = ({
 
   const { SUPPORTED_NETWORKS } = getConstants();
 
+  // TODO: goerli is not included in SUPPORTED_NETWORKS from config/constants because doing so causes issues with the Yearn SDK which does not support Goerli test network.
   const SUPPORTED_NETWORK_OPTIONS = SUPPORTED_NETWORKS.concat('goerli').map((network) => {
     return {
       value: network,
       label: NETWORK_SETTINGS[network].name ?? 'other',
     };
   });
-  console.log('Options: ', SUPPORTED_NETWORK_OPTIONS);
 
   const dropdownSelectedNetwork = {
     value: selectedNetwork,
@@ -188,9 +185,9 @@ export const Navbar = ({
               //@ts-ignore
               selected={walletNetwork !== undefined ? dropdownSelectedWalletNetwork : dropdownSelectedNetwork}
               setSelected={(option) => onNetworkChange(option.value)}
-              options={SUPPORTED_NETWORK_OPTIONS}
               hideIcons={isMobile}
               disabled={disableNetworkChange}
+              options={SUPPORTED_NETWORK_OPTIONS}
             />
           )}
 

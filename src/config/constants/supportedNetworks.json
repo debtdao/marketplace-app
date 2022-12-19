@@ -5,9 +5,6 @@
         },
         "mainnet": {
             "lineFactory": "0xd008d9b4e08DCdaF7F68dAe936EF5cb5FB84F3f4"
-        },
-        "arbitrum": {
-            "lineFactory": ""
         }
     }
 }

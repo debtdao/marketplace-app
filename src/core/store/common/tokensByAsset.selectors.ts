@@ -71,6 +71,7 @@ export const selectDepositTokenOptionsByAsset = createSelector(
             return createToken({ tokenData, userTokenData, allowancesMap });
           });
         const sortedSubgraphTokens = sortBy(subgraphTokens, (o) => o.symbol);
+        console.log('subgraph tokens: ', sortedSubgraphTokens);
         // Return a list of supported tokens with mainTokens (e.g. ETH, WETH, DAI, etc.)
         // coming before subgraphTokens (e.g. AAVE, LINK, etc.) with both indepently sorted
         // from A-Z

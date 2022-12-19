@@ -1,7 +1,6 @@
 import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import _ from 'lodash';
-import { useHistory } from 'react-router-dom';
 
 import {
   useAppTranslation,
@@ -10,7 +9,7 @@ import {
   useAppSelector,
 } from '@hooks';
 import { ACTIVE_STATUS, ARBITER_POSITION_ROLE, EnableCollateralAssetProps } from '@src/core/types';
-import { TOKEN_ADDRESSES, testTokens } from '@src/config/constants';
+import { TOKEN_ADDRESSES } from '@src/config/constants';
 import {
   TokensActions,
   TokensSelectors,

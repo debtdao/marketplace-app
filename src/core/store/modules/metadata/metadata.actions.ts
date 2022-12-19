@@ -5,6 +5,7 @@ import { ThunkAPI } from '@frameworks/redux';
 
 const getABI = createAsyncThunk<{ abi: string; functionSigs: string[] }, String, ThunkAPI>(
   'metadata/getABI',
+  //@ts-ignore
   async (address, { extra, getState }) => {
     const { onchainMetaDataService } = extra.services;
     const { wallet } = getState();
@@ -19,6 +20,7 @@ const getABI = createAsyncThunk<{ abi: string; functionSigs: string[] }, String,
     const contract = new Interface(OnchainMetaDataServiceResponse.data.result);
     const functionSigs = [];
     const inputs = [];
+    console.log(contract);
 
     for (const key in contract.functions) {
       functionSigs.push(contract.functions[key].name);
@@ -26,6 +28,7 @@ const getABI = createAsyncThunk<{ abi: string; functionSigs: string[] }, String,
       inputs.push(obj);
     }
     return {
+      address,
       abi,
       
       functionSigs,

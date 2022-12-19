@@ -295,9 +295,7 @@ const selectUserPositionMetadata = createSelector(
         const foundPosition = find(line.positions, (p) => p.lender === userAddress);
         if (foundPosition) {
           const lenderData = {
-            //@ts-ignore
             amount: foundPosition.deposit,
-            //@ts-ignore
             available: toBN(foundPosition.deposit).minus(toBN(foundPosition.principal)).toString(),
           };
           return {

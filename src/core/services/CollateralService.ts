@@ -221,7 +221,6 @@ export class CollateralServiceImpl implements CollateralService {
         amount: props.amount,
         targetToken: props.token,
       };
-      //@ts-ignore
       return <TransactionResponse>(
         await this.executeContractMethod(
           line,

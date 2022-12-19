@@ -93,13 +93,11 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
 
     // ensure consistent ordering of categories
     const categoryKeys = Object.keys(categories);
-    //@ts-ignore
     const promises = await Promise.all(
       categoryKeys
         .map((k) => categories[k])
         .map((params: GetLinesArgs) => creditLineService.getLines({ network: network.current, ...params }))
     );
-    //@ts-ignore
     const linesData = categoryKeys.reduce(
       (all, category, i) =>
         // @dev assumes `promises` is same order as `categories`
@@ -299,8 +297,7 @@ const approveDeposit = createAsyncThunk<
     network: Network;
   },
   ThunkAPI
-  //@ts-ignore
->('lines/approveDeposit', async ({ amount, spenderAddress, tokenAddress, network }, { getState, dispatch, extra }) => {
+>('lines/approveDeposit', async ({ amount, lineAddress, tokenAddress, network }, { getState, dispatch, extra }) => {
   const { wallet } = getState();
   const { tokenService } = extra.services;
 
@@ -311,7 +308,7 @@ const approveDeposit = createAsyncThunk<
     network,
     tokenAddress,
     accountAddress,
-    spenderAddress: spenderAddress,
+    spenderAddress: lineAddress,
     amount: unnullify(amount, true),
   });
   console.log('this is approval', approveDepositTx);

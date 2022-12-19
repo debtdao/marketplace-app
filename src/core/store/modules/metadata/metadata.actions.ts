@@ -3,7 +3,7 @@ import { Interface } from '@ethersproject/abi';
 
 import { ThunkAPI } from '@frameworks/redux';
 
-const getABI = createAsyncThunk<{ abi: string; functionSigs: string[] }, String, ThunkAPI>(
+const getABI = createAsyncThunk<{ abi: string; functionSigs: string[]; address: string }, String, ThunkAPI>(
   'metadata/getABI',
   //@ts-ignore
   async (address, { extra, getState }) => {
@@ -28,11 +28,9 @@ const getABI = createAsyncThunk<{ abi: string; functionSigs: string[] }, String,
       inputs.push(obj);
     }
     return {
-      address,
       abi,
-      
       functionSigs,
-      address
+      address,
     };
   }
 );

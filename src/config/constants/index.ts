@@ -3,7 +3,8 @@ import { memoize } from 'lodash';
 import { Constants, NetworkSettings, TokenView } from '@types';
 import { getEnv } from '@config/env';
 
-import { networks } from './networks.json';
+import { networks } from './supportedNetworks.json';
+import CHAIN_IDS from './chainIds';
 // import { encode } from '@src/utils';
 
 export const TOKEN_ADDRESSES = {
@@ -96,7 +97,7 @@ const BLACKLISTED_LINES = ['0x0000000000000000000000000000000000000000'];
 const NETWORK_SETTINGS: NetworkSettings = {
   goerli: {
     id: 'goerli',
-    name: 'Goerli Test Network',
+    name: 'Goerli',
     networkId: 5,
     rpcUrl: 'https://goerli.infura.io/v3/',
     nativeCurrency: {
@@ -126,22 +127,23 @@ const NETWORK_SETTINGS: NetworkSettings = {
     blockExplorerUrl: 'https://etherscan.io',
     txConfirmations: 2,
   },
-  arbitrum: {
-    id: 'arbitrum',
-    name: 'Arbitrum',
-    networkId: 42161,
-    rpcUrl: 'https://arb1.arbitrum.io/rpc',
-    nativeCurrency: {
-      name: 'Ethereum',
-      symbol: 'ETH',
-      decimals: 18,
-    },
-    simulationsEnabled: false,
-    earningsEnabled: false,
-    notifyEnabled: false,
-    blockExplorerUrl: 'https://arbiscan.io',
-    txConfirmations: 2,
-  },
+  // NOTE: Arbitrum is not yet supported!
+  // arbitrum: {
+  //   id: 'arbitrum',
+  //   name: 'Arbitrum',
+  //   networkId: 42161,
+  //   rpcUrl: 'https://arb1.arbitrum.io/rpc',
+  //   nativeCurrency: {
+  //     name: 'Ethereum',
+  //     symbol: 'ETH',
+  //     decimals: 18,
+  //   },
+  //   simulationsEnabled: false,
+  //   earningsEnabled: false,
+  //   notifyEnabled: false,
+  //   blockExplorerUrl: 'https://arbiscan.io',
+  //   txConfirmations: 2,
+  // },
 };
 
 export const getConstants = memoize((): Constants => {
@@ -154,10 +156,13 @@ export const getConstants = memoize((): Constants => {
     MAX_UINT256: '115792089237316195423570985008687907853269984665640564039457584007913129639935',
     DEBT_DAO_API: 'https://api.yearn.finance/v1/chains/1/vaults/all',
     DEBT_DAO_ALERTS_API: 'http://yearn-alerts-balancer-2019386215.us-east-1.elb.amazonaws.com',
-    SUPPORTED_NETWORKS: ['mainnet', 'arbitrum'],
+    SUPPORTED_NETWORKS: ['mainnet'],
+    CHAIN_IDS: CHAIN_IDS,
     NETWORK_SETTINGS,
     WEB3_PROVIDER_HTTPS: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     WEB3_PROVIDER_WSS: `wss://eth-mainnet.ws.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+    GOERLI_PROVIDER_HTTPS: 'https://goerli.infura.io/v3/',
+    // GOERLI_PROVIDER_WSS: `FILL THIS IN`,
     ARBITRUM_PROVIDER_HTTPS: 'https://arb1.arbitrum.io/rpc',
     BLACKLISTED_LINES: BLACKLISTED_LINES,
     CONTRACT_ADDRESSES: {

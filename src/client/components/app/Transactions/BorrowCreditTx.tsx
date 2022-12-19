@@ -186,7 +186,6 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
         hideAmount={false}
         loading={false}
         loadingText={''}
-        ttlType={false}
       />
       <TxRateInput
         key={'frate'}

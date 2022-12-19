@@ -50,8 +50,8 @@ export interface LineOfCredit {
   highestApy: [string, string, string];
 
   // metadata to pull in additional data from state
-  spigotId?: string;
-  escrowId?: string;
+  spigotId: string;
+  escrowId: string;
   positionIds?: string[]; // referential ids stored in redux state
 }
 

@@ -519,11 +519,15 @@ export const formatLinePageData = (
     borrower: borrower.id,
     status: status.toLowerCase() as LineStatusTypes,
     // TODO add UsePositionMetada,
-    spigotId: spigot?.id,
-    escrowId: escrow?.id,
+
+    // all recent events
+    // TODO add creditEvents
+    collateralEvents,
+    // collateral data
+    spigotId: spigot?.id ?? '',
+    escrowId: escrow?.id ?? '',
     spigot: formattedSpigot,
-    escrow: escrowData, //formattedEscrow,
-    //escrow: isEmpty(escrow?.deposits) ? undefined : { ...escrow!, ...escrowData },
+    escrow: { ...escrow!, ...escrowData },
   };
   return pageData;
 };
@@ -549,8 +553,8 @@ export const formatUserPortfolioData = (
         borrower: borrower.id,
         status: status.toLowerCase() as LineStatusTypes,
 
-        escrowId: escrow?.id,
-        spigotId: spigot?.id,
+        spigotId: spigot?.id ?? '',
+        escrowId: escrow?.id ?? '',
         spigot: {
           ...(spigotData ?? {}),
           ...spigot,

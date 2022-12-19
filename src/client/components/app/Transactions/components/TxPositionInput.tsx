@@ -139,7 +139,6 @@ export interface TxPositionInputProps {
   displayGuidance?: boolean;
 }
 
-//@ts-ignore
 export const TxPositionInput: FC<TxPositionInputProps> = ({
   headerText,
   inputText,
@@ -190,9 +189,7 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
           <StyledSearchList
             list={listItems}
             headerText={searchListHeader}
-            //@ts-ignore
             selected={position}
-            //@ts-ignore
             setSelected={(item) => (onSelectedPositionChange ? onSelectedPositionChange(item) : undefined)}
             onCloseList={() => setOpenedSearch(false)}
           />

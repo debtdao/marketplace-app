@@ -35,7 +35,7 @@ import { getConfig } from '@config';
 import { getContract } from '@frameworks/ethers';
 import { unnullify } from '@src/utils';
 
-import { SpigotedLineABI } from './contracts';
+import { SecuredLineABI } from './contracts';
 import { EscrowABI } from './contracts';
 // import { SpigotABI } from './contracts';
 
@@ -66,8 +66,8 @@ export class CollateralServiceImpl implements CollateralService {
     this.config = config;
     const { GRAPH_API_URL } = getConfig();
     this.graphUrl = GRAPH_API_URL || 'https://api.thegraph.com';
-    this.lineAbi = SpigotedLineABI;
-    this.spigotAbi = SpigotedLineABI; // TODO
+    this.lineAbi = SecuredLineABI;
+    this.spigotAbi = SecuredLineABI; // TODO
     this.escrowAbi = EscrowABI;
   }
 
@@ -138,7 +138,7 @@ export class CollateralServiceImpl implements CollateralService {
       throw new Error('Invalid revenue contract address. `revenueContract` address is same as `spigotedLineAddress`');
     }
 
-    // TODO check that revenueContract isn't spigot
+    //TODO check that revenueContract isn't spigot
 
     if (props.setting.transferOwnerFunction.length === 0) {
       throw new Error('addSpigot: no tranfer owner function');
@@ -151,16 +151,33 @@ export class CollateralServiceImpl implements CollateralService {
       throw new Error('addSpigot: bad owner split');
     }
 
-    const settingsData = ethers.utils.AbiCoder.prototype.encode(
-      ['uint8', 'bytes4', 'bytes4'],
-      [props.setting.ownerSplit, props.setting.claimFunction, props.setting.transferOwnerFunction]
+    const {
+      setting: { ownerSplit, claimFunction, transferOwnerFunction },
+    } = props;
+
+    console.log(
+      'line address ',
+      props.lineAddress,
+      'abi ',
+      this.lineAbi,
+      'settings ',
+      [{ ownerSplit, claimFunction, transferOwnerFunction }],
+      'settings ownersplit',
+      props.setting.ownerSplit
     );
 
     return await this.executeContractMethod(
       props.lineAddress,
       this.lineAbi,
       'addSpigot',
-      [props.revenueContract, settingsData],
+      [
+        props.revenueContract,
+        {
+          ownerSplit,
+          claimFunction,
+          transferOwnerFunction,
+        },
+      ],
       props.network
     );
   }
@@ -204,7 +221,6 @@ export class CollateralServiceImpl implements CollateralService {
         amount: props.amount,
         targetToken: props.token,
       };
-      //@ts-ignore
       return <TransactionResponse>(
         await this.executeContractMethod(
           line,
@@ -354,6 +370,9 @@ export class CollateralServiceImpl implements CollateralService {
         abi,
         args: params,
         methodName: methodName,
+        overrides: {
+          gasLimit: 600000,
+        },
       };
 
       const tx = await this.transactionService.execute(props);

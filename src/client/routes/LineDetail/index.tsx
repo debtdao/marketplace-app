@@ -41,13 +41,11 @@ export const LineDetail = () => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const dispatch = useAppDispatch();
   const history = useHistory();
-  const location = useLocation();
   const isMounting = useIsMounting();
   const { NETWORK_SETTINGS } = getConfig();
   const { lineAddress } = useParams<LineDetailRouteParams>();
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
-  const selectedPage = useAppSelector(LinesSelectors.selectSelectedLinePage);
   // const selectedLineCreditEvents = useAppSelector(LinesSelectors.selectSelectedLineCreditEvents);
   const getLinePageStatus = useAppSelector(LinesSelectors.selectGetLinePageStatus);
   // const linesPageData = useAppSelector(LinesSelectors.selectLinePageData);

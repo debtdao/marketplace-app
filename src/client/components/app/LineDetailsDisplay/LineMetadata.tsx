@@ -16,7 +16,7 @@ import {
   TokenView,
 } from '@src/core/types';
 import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
-import { Button, Text } from '@components/common';
+import { Button, Text, RedirectIcon } from '@components/common';
 import { LinesSelectors, ModalsActions, WalletSelectors, WalletActions } from '@src/core/store';
 import { humanize } from '@src/utils';
 import { getEnv } from '@config/env';
@@ -34,12 +34,6 @@ const MetricContainer = styled.div`
   ${({ theme }) => `
     margin-bottom: ${theme.spacing.xl};
   `}
-`;
-
-const BannerCtaButton = styled(Button)`
-  width: 100%;
-  max-width: 20rem;
-  margin-top: 1em;
 `;
 
 const MetricName = styled.h3`
@@ -60,6 +54,14 @@ const DataMetric = styled.h5`
 const DataSubMetricsContainer = styled.div``;
 
 const DataSubMetric = styled.p``;
+
+const RedirectLinkIcon = styled(RedirectIcon)`
+  display: inline-block;
+  fill: currentColor;
+  width: 1.2rem;
+  margin-left: 1rem;
+  padding-bottom: 0.2rem;
+`;
 
 const AssetsListCard = styled(DetailCard)`
   max-width: ${({ theme }) => theme.globalMaxWidth};
@@ -127,6 +129,7 @@ const MetricDataDisplay = ({ title, data, displaySubmetrics = false, submetrics 
 };
 
 export const LineMetadata = (props: LineMetadataProps) => {
+  console.log('render line metadata', props);
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
@@ -156,11 +159,13 @@ export const LineMetadata = (props: LineMetadataProps) => {
 
   const renderEscrowMetadata = () => {
     if (!deposits) return null;
-    if (!totalCollateral) return;
-    <MetricDataDisplay
-      title={t('lineDetails:metadata.escrow.no-collateral')}
-      data={`$ ${prettyNumbers(totalCollateral)}`}
-    />;
+    if (!totalCollateral)
+      return (
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.escrow.no-collateral')}
+          data={`$ ${prettyNumbers(totalCollateral)}`}
+        />
+      );
     return (
       <MetricDataDisplay title={t('lineDetails:metadata.escrow.total')} data={`$ ${prettyNumbers(totalCollateral)}`} />
     );
@@ -241,19 +246,14 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const getCollateralTableActions = () => {
     // console.log('get collateral table actions', userPositionMetadata.role);
     switch (userPositionMetadata.role) {
+      case BORROWER_POSITION_ROLE:
+        return <Button onClick={depositHandler}>{depositCollateralText} </Button>;
       case ARBITER_POSITION_ROLE:
       case LENDER_POSITION_ROLE: // for testing
         return (
           <>
             <Button onClick={addSpigotHandler}>{enableSpigotText}</Button>
             <Button onClick={enableAssetHandler}>{enableCollateralText}</Button>
-          </>
-        );
-      case BORROWER_POSITION_ROLE:
-        return (
-          <>
-            <Button onClick={depositHandler}>{depositCollateralText} </Button>
-            <Button onClick={addSpigotHandler}>{enableSpigotText} </Button>
           </>
         );
       default:
@@ -303,11 +303,13 @@ export const LineMetadata = (props: LineMetadataProps) => {
             {
               key: 'token',
               header: t('lineDetails:metadata.escrow.assets-list.symbol'),
-              transform: ({ token: { symbol, icon } }) => (
-                <>
+              transform: ({ token: { symbol, icon, address } }) => (
+                //change to etherscan on launch
+                <a href={`https://goerli.etherscan.io/address/${address}`} target={'_blank'} rel={'noreferrer'}>
                   {icon && <TokenIcon icon={icon} symbol={symbol} />}
                   <Text>{symbol}</Text>
-                </>
+                  <RedirectLinkIcon />
+                </a>
               ),
               width: '15rem',
               sortable: true,

@@ -9,7 +9,7 @@ import { WalletActions, ChangeWalletNetworkResult } from '../wallet/wallet.actio
 
 const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network }, ThunkAPI>(
   'network/changeNetwork',
-  async ({ network }, { dispatch, extra, getState }) => {
+  async ({ network }, { dispatch, extra }) => {
     const { context, config } = extra;
     const { wallet, web3Provider, yearnSdk } = context;
 

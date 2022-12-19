@@ -153,12 +153,11 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       return;
     }
     let approvalOBj = {
-      spenderAddress: selectedCredit.id,
-      tokenAddress: selectedSellTokenAddress,
+      tokenAddress: selectedSellTokenAddress!,
       amount: toWei(targetTokenAmount, selectedSellToken!.decimals),
-      network: walletNetwork,
+      lineAddress: selectedCredit.id,
+      network: walletNetwork!,
     };
-    //@ts-ignore
     dispatch(LinesActions.approveDeposit(approvalOBj)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionApproved(transactionApproved);
@@ -337,6 +336,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
         onAmountChange={onAmountChange}
+        //this breaks app when no number in input field
         amountValue={BigNumber.from(targetTokenAmount)
           .pow(BigNumber.from(10).mul(selectedSellToken.decimals ?? 0))
           .toString()}

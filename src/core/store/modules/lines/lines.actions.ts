@@ -300,7 +300,7 @@ const approveDeposit = createAsyncThunk<
   },
   ThunkAPI
   //@ts-ignore
->('lines/approveDeposit', async ({ amount, spenderAddress, tokenAddress, network }, { getState, dispatch, extra }) => {
+>('lines/approveDeposit', async ({ amount, lineAddress, tokenAddress, network }, { getState, dispatch, extra }) => {
   const { wallet } = getState();
   const { tokenService } = extra.services;
 
@@ -311,7 +311,7 @@ const approveDeposit = createAsyncThunk<
     network,
     tokenAddress,
     accountAddress,
-    spenderAddress: spenderAddress,
+    spenderAddress: lineAddress,
     amount: unnullify(amount, true),
   });
   console.log('this is approval', approveDepositTx);

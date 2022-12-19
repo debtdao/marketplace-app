@@ -31,6 +31,6 @@ export const useSelectedSellToken = ({
     : undefined;
 
   const sourceAssetOptions = selectedSellToken && allowTokenSelect === false ? [selectedSellToken] : sellTokensOptions;
-  console.log('here is selected sell token', selectedSellToken);
+  console.log('here is selected sell token', selectedSellToken, sourceAssetOptions);
   return { selectedSellToken, sourceAssetOptions };
 };

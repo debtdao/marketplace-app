@@ -1,4 +1,4 @@
-import { createSelector, current } from '@reduxjs/toolkit';
+import { createSelector } from '@reduxjs/toolkit';
 import { memoize, sortBy, unionBy } from 'lodash';
 
 import { getConfig } from '@config';
@@ -10,7 +10,6 @@ import { AppSelectors } from '../modules/app/app.selectors';
 import { WalletSelectors } from '../modules/wallet/wallet.selectors';
 import { TokensSelectors, createToken } from '../modules/tokens/tokens.selectors';
 import { NetworkSelectors } from '../modules/network/network.selectors';
-// import { Token } from 'graphql';
 
 const { selectVaultsMap } = VaultsSelectors;
 const { selectTokenAddresses, selectSupportedTokens, selectSupportedTokensMap, selectTokensMap, selectTokensUser } =
@@ -71,6 +70,8 @@ export const selectDepositTokenOptionsByAsset = createSelector(
             return createToken({ tokenData, userTokenData, allowancesMap });
           });
         const sortedSubgraphTokens = sortBy(subgraphTokens, (o) => o.symbol);
+
+        console.log('subgraph tokens', subgraphTokens);
         // Return a list of supported tokens with mainTokens (e.g. ETH, WETH, DAI, etc.)
         // coming before subgraphTokens (e.g. AAVE, LINK, etc.) with both indepently sorted
         // from A-Z

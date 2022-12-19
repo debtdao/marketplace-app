@@ -53,19 +53,25 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
     const { context, config } = extra;
     //Yearn SDK to be removed;
     const { wallet, web3Provider, yearnSdk } = context;
+    console.log('yearn SDK', yearnSdk, 'Web 3 Provider', web3Provider);
     const { NETWORK, ALLOW_DEV_MODE, SUPPORTED_NETWORKS, NETWORK_SETTINGS } = config;
     const { theme, settings } = getState();
+
+    //Wrap this with if statement, if wallet is goerli do not call Yearn SDK
 
     if (!wallet.isCreated) {
       const customSubscriptions: Subscriptions = {
         wallet: (wallet) => {
           web3Provider.register('wallet', getEthersProvider(wallet.provider));
           const providerType = getProviderType(network);
-          const sdkInstance = yearnSdk.getInstanceOf(network);
-          sdkInstance.context.setProvider({
-            read: web3Provider.getInstanceOf(providerType),
-            write: web3Provider.getInstanceOf('wallet'),
-          });
+
+          if (SUPPORTED_NETWORKS.includes(network)) {
+            const sdkInstance = yearnSdk.getInstanceOf(network);
+            sdkInstance.context.setProvider({
+              read: web3Provider.getInstanceOf(providerType),
+              write: web3Provider.getInstanceOf('wallet'),
+            });
+          }
         },
         address: () => {
           if (ALLOW_DEV_MODE && settings.devMode.enabled && isValidAddress(settings.devMode.walletAddressOverride)) {
@@ -81,11 +87,13 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
             web3Provider.register('wallet', getEthersProvider(wallet.provider as ExternalProvider));
             const network = getNetwork(networkId);
             const providerType = getProviderType(network);
-            const sdkInstance = yearnSdk.getInstanceOf(network);
-            sdkInstance.context.setProvider({
-              read: web3Provider.getInstanceOf(providerType),
-              write: web3Provider.getInstanceOf('wallet'),
-            });
+            if (SUPPORTED_NETWORKS.includes(network)) {
+              const sdkInstance = yearnSdk.getInstanceOf(network);
+              sdkInstance.context.setProvider({
+                read: web3Provider.getInstanceOf(providerType),
+                write: web3Provider.getInstanceOf('wallet'),
+              });
+            }
             dispatch(NetworkActions.changeNetwork({ network }));
           }
         },

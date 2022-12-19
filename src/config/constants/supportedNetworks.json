@@ -4,7 +4,7 @@
             "lineFactory": "0x582Da20CE3Eb970467Ac68be1c9Ee0997BC8A7e9"
         },
         "mainnet": {
-            "lineFactory": ""
+            "lineFactory": "0xd008d9b4e08DCdaF7F68dAe936EF5cb5FB84F3f4"
         },
         "arbitrum": {
             "lineFactory": ""

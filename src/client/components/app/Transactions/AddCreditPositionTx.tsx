@@ -1,6 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
+import { BigNumber } from 'ethers';
 
 import { formatAmount, normalizeAmount, isAddress, toWei, addCreditUpdate } from '@utils';
 import {
@@ -10,7 +11,7 @@ import {
   useAppSelector,
   useSelectedSellToken,
 } from '@hooks';
-import { ACTIVE_STATUS, BORROWER_POSITION_ROLE } from '@src/core/types';
+import { ACTIVE_STATUS, AddCreditProps, BORROWER_POSITION_ROLE, PROPOSED_STATUS } from '@src/core/types';
 import { getConstants } from '@src/config/constants';
 import { TokensActions, TokensSelectors, WalletSelectors, LinesSelectors, LinesActions } from '@store';
 import { Button } from '@components/common';
@@ -84,24 +85,23 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionApproved, setTransactionApproved] = useState(true);
   const [transactionLoading, setLoading] = useState(false);
-  const [targetTokenAmount, setTargetTokenAmount] = useState('1');
-  const [drate, setDrate] = useState('0.00');
-  const [frate, setFrate] = useState('0.00');
+  const [targetTokenAmount, setTargetTokenAmount] = useState('0');
+  const [drate, setDrate] = useState('');
+  const [frate, setFrate] = useState('');
   const [lenderAddress, setLenderAddress] = useState(walletAddress ? walletAddress : '');
   const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
   const [transactionType, setTransactionType] = useState('propose');
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
 
-  //main net logic
-
   useEffect(() => {
-    if (selectedPosition && userMetadata.role === BORROWER_POSITION_ROLE) {
-      let deposit = normalizeAmount(selectedPosition.deposit, selectedPosition.token.decimals);
-      setTargetTokenAmount(deposit);
-      setSelectedTokenAddress(selectedPosition.token.address);
-      setDrate(normalizeAmount(selectedPosition.dRate, 2));
-      setFrate(normalizeAmount(selectedPosition.fRate, 2));
+    if (selectedPosition?.status === PROPOSED_STATUS && userMetadata.role === BORROWER_POSITION_ROLE) {
+      const deposit = normalizeAmount(selectedPosition.deposit, selectedPosition.token.decimals);
+      if (!targetTokenAmount) setTargetTokenAmount(deposit);
+      if (!selectedSellTokenAddress) setSelectedTokenAddress(selectedPosition.token.address);
+      if (!drate) setDrate(normalizeAmount(selectedPosition.dRate, 0));
+      if (!frate) setFrate(normalizeAmount(selectedPosition.fRate, 0));
       setLenderAddress(selectedPosition.lender);
+      setTargetTokenAmount(deposit);
       setTransactionType('accept');
     }
   }, [selectedPosition]);
@@ -153,12 +153,11 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       return;
     }
     let approvalOBj = {
-      spenderAddress: selectedCredit.id,
-      tokenAddress: selectedSellTokenAddress,
+      tokenAddress: selectedSellTokenAddress!,
       amount: toWei(targetTokenAmount, selectedSellToken!.decimals),
-      network: walletNetwork,
+      lineAddress: selectedCredit.id,
+      network: walletNetwork!,
     };
-    //@ts-ignore
     dispatch(LinesActions.approveDeposit(approvalOBj)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionApproved(transactionApproved);
@@ -192,18 +191,24 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
     if (!checkSumAddress) {
       return;
     }
-    let TransactionObj = {
+
+    if (!selectedSellTokenAddress) {
+      return;
+    }
+
+    const amountInWei = toWei(targetTokenAmount, selectedSellToken!.decimals);
+
+    const transactionObj: AddCreditProps = {
       lineAddress: selectedCredit.id,
-      drate: toWei(drate, 2),
-      frate: toWei(frate, 2),
-      amount: toWei(targetTokenAmount, selectedSellToken!.decimals),
+      drate: BigNumber.from(drate),
+      frate: BigNumber.from(frate),
+      amount: BigNumber.from(amountInWei),
       token: selectedSellTokenAddress,
       lender: lenderAddress,
-      network: walletNetwork,
+      network: walletNetwork!,
       dryRun: false,
     };
-    //@ts-ignore
-    dispatch(LinesActions.addCredit(TransactionObj)).then((res) => {
+    dispatch(LinesActions.addCredit(transactionObj)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionCompleted(2);
         setLoading(false);
@@ -331,7 +336,10 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
         onAmountChange={onAmountChange}
-        amountValue={String(10000000 * Number(targetTokenAmount))}
+        //Check if target token amount, if not bigNumber from 0
+        amountValue={BigNumber.from(targetTokenAmount ? targetTokenAmount : 0)
+          .pow(BigNumber.from(10).mul(selectedSellToken.decimals ?? 0))
+          .toString()}
         maxAmount={acceptingOffer ? targetTokenAmount : targetBalance}
         selectedToken={selectedSellToken}
         onSelectedTokenChange={onSelectedSellTokenChange}

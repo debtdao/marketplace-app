@@ -4,7 +4,6 @@ import { ThunkAPI } from '@frameworks/redux';
 import { isGnosisApp, isLedgerLive, isCoinbaseApp, get } from '@utils';
 import { ExternalServiceId, EVENT_NAVIGATE_EXTERNAL_1ST_PARTY, EVENT_NAVIGATE_EXTERNAL_3RD_PARTY } from '@types';
 import { idUser, trackPage, trackAnalyticsEvent } from '@frameworks/segment';
-import { getEnv } from '@config/env';
 import { AnalyticsEventNames, LogAppAnalyticsActionProps } from '@src/core/types/ProductAnalytics';
 
 import { WalletActions } from '../wallet/wallet.actions';
@@ -45,7 +44,7 @@ const clearUserAppData = createAsyncThunk<void, void, ThunkAPI>('app/clearUserAp
 
 const initApp = createAsyncThunk<void, void, ThunkAPI>('app/initApp', async (_arg, { dispatch, getState, extra }) => {
   const { CONTRACT_ADDRESSES, NETWORK } = extra.config;
-  const { wallet, network, settings } = getState();
+  const { wallet, settings } = getState();
   if (isLedgerLive()) {
     if (NETWORK !== 'mainnet') await dispatch(NetworkActions.changeNetwork({ network: 'mainnet' }));
     if (settings.signedApprovalsEnabled) await dispatch(SettingsActions.toggleSignedApprovals());

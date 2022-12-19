@@ -51,6 +51,7 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
   'wallet/walletSelect',
   async ({ walletName, network }, { dispatch, getState, extra }) => {
     const { context, config } = extra;
+    //Yearn SDK to be removed;
     const { wallet, web3Provider, yearnSdk } = context;
     const { NETWORK, ALLOW_DEV_MODE, SUPPORTED_NETWORKS, NETWORK_SETTINGS } = config;
     const { theme, settings } = getState();

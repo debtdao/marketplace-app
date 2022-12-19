@@ -5,7 +5,7 @@ import { keccak256 } from 'ethers/lib/utils';
 import {
   BorrowCreditProps,
   CreditLineService,
-  AggregatedCreditLine,
+  SecuredLine,
   TransactionService,
   Web3Provider,
   Config,
@@ -26,18 +26,15 @@ import {
   DepositAndRepayProps,
   DepositAndCloseProps,
   GetLinesResponse,
-  GetLinePageAuxDataProps,
-  GetLinePageAuxDataResponse,
   GetLinePageResponse,
   Network,
-  GetBorrowerPositionsProps,
-  CreditLinePage,
-  GetBorrowerPositionsResponse,
+  GetUserPortfolioProps,
+  GetUserPortfolioResponse,
 } from '@types';
 import { getConfig } from '@config';
-import { LineOfCreditABI } from '@services/contracts';
+import { SecuredLineABI } from '@services/contracts';
 import { getContract } from '@frameworks/ethers';
-import { getLinePage, getLinePageAuxData, getLines, getBorrowerPositions } from '@frameworks/gql';
+import { getLinePage, getLines, getUserPortfolio } from '@frameworks/gql';
 
 const { GRAPH_API_URL } = getConfig();
 
@@ -63,11 +60,11 @@ export class CreditLineServiceImpl implements CreditLineService {
     this.config = config;
 
     this.graphUrl = GRAPH_API_URL || 'https://api.thegraph.com';
-    this.abi = LineOfCreditABI;
+    this.abi = SecuredLineABI;
   }
 
   private _getContract(contractAddress: string) {
-    return getContract(contractAddress.toString(), LineOfCreditABI, this.web3Provider.getSigner().provider);
+    return getContract(contractAddress.toString(), SecuredLineABI, this.web3Provider.getSigner().provider);
   }
 
   private async getSignerAddress(): Promise<Address> {
@@ -375,7 +372,7 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   /* Subgraph Getters */
 
-  public async getLine(props: GetLineProps): Promise<AggregatedCreditLine | undefined> {
+  public async getLine(props: GetLineProps): Promise<SecuredLine | undefined> {
     return;
   }
 
@@ -392,19 +389,12 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   // TODO
   public async getLinePage(prop: GetLinePageProps): Promise<GetLinePageResponse | undefined> {
-    return getLinePage(prop)
+    const response = getLinePage(prop)
       .then((data) => data)
       .catch((err) => {
         console.log('CreditLineService: error fetching lines', err);
         return undefined;
       });
-  }
-
-  public async getLinePageAuxData(prop: GetLinePageAuxDataProps): Promise<GetLinePageAuxDataResponse | undefined> {
-    const response = getLinePageAuxData(prop).catch((err) => {
-      console.log('CreditLineService: error fetching lines', err);
-      return undefined;
-    });
     return response;
   }
 
@@ -420,11 +410,11 @@ export class CreditLineServiceImpl implements CreditLineService {
     return response;
   }
 
-  public async getBorrowerPositions(prop: GetBorrowerPositionsProps): Promise<CreditPosition[] | undefined> {
-    const response = getBorrowerPositions(prop)
+  public async getUserPortfolio(prop: GetUserPortfolioProps): Promise<GetUserPortfolioResponse | undefined> {
+    const response = getUserPortfolio(prop)
       .then((data) => data)
       .catch((err) => {
-        console.log('CreditLineService error fetching borrower positions', err);
+        console.log('CreditLineService error fetching user portfolio', err);
         return undefined;
       });
     return response;

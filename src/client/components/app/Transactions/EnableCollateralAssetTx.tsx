@@ -1,7 +1,6 @@
 import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import _ from 'lodash';
-import { useHistory } from 'react-router-dom';
 
 import {
   useAppTranslation,
@@ -10,7 +9,7 @@ import {
   useAppSelector,
 } from '@hooks';
 import { ACTIVE_STATUS, ARBITER_POSITION_ROLE, EnableCollateralAssetProps } from '@src/core/types';
-import { TOKEN_ADDRESSES, testTokens } from '@src/config/constants';
+import { TOKEN_ADDRESSES } from '@src/config/constants';
 import {
   TokensActions,
   TokensSelectors,
@@ -70,30 +69,31 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedEscrow = useAppSelector(CollateralSelectors.selectSelectedEscrow);
+
   // need to get call statusMap from state for tx error messages
   //const collateralStatusMap = useAppSelector(CollateralSelectors.selectStatusMap);
 
   //state for params
   const { header, onClose } = props;
-
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionApproved, setTransactionApproved] = useState(true);
   const [transactionLoading, setLoading] = useState(false);
 
+  // @cleanup CollateralSelectors.selectedCollateralAsset
   const selectedAssetAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress) || TOKEN_ADDRESSES.DAI;
-  // TODO pull colalteralOptions from subgraph instread of default yearn tokens
-  const collateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
-  const selectedAsset = _.find(collateralOptions, (t) => t.address === selectedAssetAddress);
-  // TODO get token prices from yearn API and display
 
   //const enabledCollateralAddressess = _.values(selectedLine?.escrow?.deposits)?.map((d) => d.token.address);
+  // @cleanup TODO pull colalteralOptions from subgraph instread of default yearn tokens
+  const collateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
+  const selectedAsset = _.find(collateralOptions, (t) => t.address === selectedAssetAddress);
 
   useEffect(() => {
     console.log({ selectedLine });
     console.log(selectedLine?.escrow);
     // if escrow not set yet then correct state
-    if (selectedLine?.escrow && !selectedEscrow) {
-      dispatch(CollateralActions.setSelectedEscrow({ escrowAddress: selectedLine.escrow.id }));
+    if (!selectedEscrow && selectedLine) {
+      console.log('no escrow seelcted for enabling collaeral', selectedLine);
+      dispatch(CollateralActions.setSelectedEscrow({ escrowAddress: selectedLine.escrowId }));
     }
   });
 
@@ -176,7 +176,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
     }
 
     const transactionData: EnableCollateralAssetProps = {
-      escrowAddress: selectedEscrow,
+      escrowAddress: selectedEscrow.id,
       token: selectedAssetAddress,
       network: walletNetwork,
       dryRun: false,

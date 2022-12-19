@@ -36,7 +36,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
   const dispatch = useAppDispatch();
   const { acceptingOffer, header, onClose, onPositionChange } = props;
   const [repayType, setRepayType] = useState({ id: '1', label: 'Repay from:', value: 'Wallet' });
-  const selectedPosition = useAppSelector(LinesSelectors.selectPositionData);
+  const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionLoading, setLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>(['']);
@@ -48,7 +48,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
   //const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
   const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
   const initialToken: string = selectedSellTokenAddress || DAI;
-  const positions = useAppSelector(LinesSelectors.selectPositions);
+  const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
 
   const repaymentOptions = [
     { id: '1', label: 'Repay from:', value: 'Wallet' },
@@ -115,17 +115,16 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
 
   const approveRepay = () => {
     setLoading(true);
-    if (!selectedCredit?.id) {
+    if (!selectedCredit?.id || !selectedPosition) {
       setLoading(false);
       return;
     }
     let approvalOBj = {
-      spenderAddress: selectedCredit.id,
-      tokenAddress: selectedSellTokenAddress,
-      amount: toWei(targetAmount, 18),
-      network: walletNetwork,
+      lineAddress: selectedCredit.id,
+      tokenAddress: selectedSellTokenAddress!,
+      amount: toWei(targetAmount, selectedPosition.token.decimals),
+      network: walletNetwork!,
     };
-    //@ts-ignore
     dispatch(LinesActions.approveDeposit(approvalOBj)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionApproved(transactionApproved);
@@ -172,6 +171,8 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
       return;
     }
 
+    console.log('repayTX', selectedCredit.id);
+
     dispatch(
       LinesActions.depositAndRepay({
         lineAddress: selectedCredit.id,
@@ -187,11 +188,9 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
         setTransactionCompleted(1);
         const updatedPosition = depositAndRepayUpdate(selectedPosition, targetAmount);
         dispatch(
-          LinesActions.setPositionData({
-            position: selectedPosition.id,
-            lineAddress: selectedCredit.id,
-            positionObject: updatedPosition,
-            positions: positions,
+          LinesActions.setPosition({
+            id: selectedPosition.id,
+            position: updatedPosition,
           })
         );
         setLoading(false);
@@ -210,8 +209,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
     dispatch(
       LinesActions.depositAndClose({
         lineAddress: selectedCredit.id,
-        //@ts-ignore
-        id: selectedPosition['id'],
+        id: selectedPosition.id,
         network: walletNetwork,
       })
     ).then((res) => {
@@ -355,7 +353,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
         inputText={t('components.transaction.borrow-credit.select-line')}
         onSelectedPositionChange={onSelectedPositionChange}
         selectedPosition={selectedPosition}
-        positions={positions}
+        positions={Object.values(positions)}
         // creditOptions={sourceCreditOptions}
         // inputError={!!sourceStatus.error}
         readOnly={false}
@@ -390,9 +388,9 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
       <TxRateInput
         key={'frate'}
         headerText={t('components.transaction.deposit-and-repay.your-rates')}
-        frate={selectedPosition.frate}
-        drate={selectedPosition.drate}
-        amount={selectedPosition.frate}
+        frate={selectedPosition.fRate}
+        drate={selectedPosition.dRate}
+        amount={selectedPosition.fRate}
         maxAmount={'100'}
         // setRateChange={onFrateChange}
         setRateChange={() => {}}

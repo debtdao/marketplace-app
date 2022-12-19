@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { PositionItem } from '@src/core/types';
+import { CreditPosition } from '@src/core/types';
 import { normalizeAmount } from '@src/utils';
 
 import { Icon, ChevronLeftIcon } from './Icon';
@@ -91,9 +91,9 @@ const StyledSearchList = styled.div`
 export interface PositionSearchListProps {
   headerText?: string;
   // TODO Check how to remove the any[] and not throw error on searchInput
-  list: any[] | PositionItem[];
-  selected: PositionItem;
-  setSelected: (selected: PositionItem) => void;
+  list: any[] | CreditPosition[];
+  selected: CreditPosition;
+  setSelected: (selected: CreditPosition) => void;
   onCloseList?: () => void;
 }
 
@@ -111,7 +111,7 @@ export const PositionSearchList: FC<PositionSearchListProps> = ({
     setFilteredItems(list);
   }, [list]);
 
-  const selectItem = (item: PositionItem) => {
+  const selectItem = (item: CreditPosition) => {
     setSelected(item);
     if (onCloseList) {
       onCloseList();
@@ -134,7 +134,7 @@ export const PositionSearchList: FC<PositionSearchListProps> = ({
 
       <List>
         {filteredItems.map(
-          (item: PositionItem) =>
+          (item: CreditPosition) =>
             item && (
               <ListItem key={item.id} onClick={() => selectItem(item)} selected={item.id === selected.id}>
                 <ItemLabel>
@@ -142,7 +142,7 @@ export const PositionSearchList: FC<PositionSearchListProps> = ({
                   <br />
                   Deposit: {normalizeAmount(item.deposit, 18)}
                   <br />
-                  Rates: {item.frate} / {item.drate}%
+                  Rates: {item.fRate} / {item.dRate}%
                 </ItemLabel>
               </ListItem>
             )

@@ -22,18 +22,16 @@ import {
   Network,
   Wallet,
   TokenAllowance,
-  AggregatedCreditLine,
+  SecuredLine,
   CreditPosition,
   GetLineArgs,
   GetLinesArgs,
   GetLinePageArgs,
-  GetBorrowerPositionsArgs,
   GetLinesResponse,
   GetLinePageResponse,
-  CreditLinePage,
-  GetLinePageAuxDataResponse,
+  SecuredLineWithEvents,
   SupportedOracleTokenResponse,
-  GetBorrowerPositionsResponse,
+  GetUserPortfolioResponse,
 } from '@types';
 
 // *************** USER ***************
@@ -155,12 +153,11 @@ export interface InterestRateCreditService {
 }
 
 export interface CreditLineService {
-  getLine: (props: GetLineProps) => Promise<AggregatedCreditLine | undefined>;
+  getLine: (props: GetLineProps) => Promise<SecuredLine | undefined>;
   getLines: (props: GetLinesProps) => Promise<GetLinesResponse[] | undefined>;
   getLinePage: (props: GetLinePageProps) => Promise<GetLinePageResponse | undefined>;
-  getLinePageAuxData: (props: GetLinePageProps) => Promise<GetLinePageAuxDataResponse | undefined>;
   getUserLinePositions: (...args: any) => Promise<any | undefined>;
-  getBorrowerPositions: (props: GetBorrowerPositionsProps) => Promise<CreditPosition[] | undefined>; // FIXME: needs type
+  getUserPortfolio: (props: GetUserPortfolioProps) => Promise<GetUserPortfolioResponse | undefined>;
   getExpectedTransactionOutcome: (...args: any) => Promise<any | undefined>;
   depositAndRepay: (
     props: DepositAndRepayProps
@@ -307,13 +304,8 @@ export interface GetUserLineProps {
   id: string;
 }
 
-export interface GetLinePageAuxDataProps extends GetLinePageArgs {
-  id: string;
-  network: Network;
-}
-
-export interface GetBorrowerPositionsProps {
-  borrower: string;
+export interface GetUserPortfolioProps {
+  user: string;
 }
 
 // Colalteral Service Function Props
@@ -452,6 +444,15 @@ export interface CollateralService {
   isSpigotOwner(spigotAddress?: string, lineAddress?: string): Promise<boolean>;
   defaultSplit(lineAddress: string): Promise<BigNumber>;
   maxSplit(): BigNumber; // always 100
+}
+
+export interface OnchainMetaDataService {
+  getContractABI(address: String, network: number): Promise<any | undefined>;
+  getAddressEnsName(address: string): Promise<any | undefined>;
+}
+
+export interface OnchainMetaDataServiceProps {
+  address: string;
 }
 
 // *************** TOKEN ***************

@@ -107,7 +107,7 @@ export interface TxAddressProps {
   inputText?: string;
   inputError?: boolean;
   byteCode: string;
-  onByteCodeChange?: (byteCode: string) => void;
+  onByteCodeChange: (byteCode: string) => void;
   readOnly?: boolean;
 }
 
@@ -134,7 +134,7 @@ export const TxByteInput: FC<TxAddressProps> = ({
           <AmountInputContainer>
             <StyledByteInput
               value={byteCode}
-              onChange={onByteCodeChange ? (e) => onByteCodeChange(e.target.value) : undefined}
+              onChange={(e) => onByteCodeChange(e.target.value)}
               placeholder={'ByteCode'}
               readOnly={readOnly}
               error={inputError}

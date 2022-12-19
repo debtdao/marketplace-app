@@ -8,8 +8,8 @@ import { useAppSelector, useAppDispatch, useAppTranslation, useQueryParams } fro
 import { ModalsActions, LinesActions, LinesSelectors, WalletActions, WalletSelectors } from '@store';
 import { RecommendationsCard, SliderCard, ViewContainer } from '@components/app';
 import { SpinnerLoading, Text, Button } from '@components/common';
-import { AggregatedCreditLine, UseCreditLinesParams } from '@src/core/types';
-import { GoblinTown } from '@assets/images';
+import { SecuredLine, UseCreditLinesParams } from '@src/core/types';
+import { DebtDAOBanner } from '@assets/images';
 import { getEnv } from '@config/env';
 
 const StyledRecommendationsCard = styled(RecommendationsCard)``;
@@ -38,7 +38,6 @@ export const Market = () => {
   // const { isTablet, isMobile, width: DWidth } = useWindowDimensions();
   const [search, setSearch] = useState('');
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
-
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
   // TODO not neeed here
@@ -128,18 +127,18 @@ export const Market = () => {
             </BannerCtaButton>
           </div>
         }
-        background={<img src={GoblinTown} alt={'Goblin town or the Citadel?'} />}
+        background={<img src={DebtDAOBanner} alt={'Debt DAO Banner?'} />}
       />
 
       {getLinesStatus.loading || _.isEmpty(lineCategoriesForDisplay) ? (
         <SpinnerLoading flex="1" width="100%" />
       ) : (
-        Object.entries(lineCategoriesForDisplay!).map(([key, val]: [string, AggregatedCreditLine[]], i: number) => {
+        Object.entries(lineCategoriesForDisplay!).map(([key, val]: [string, SecuredLine[]], i: number) => {
           return (
             <StyledRecommendationsCard
               header={t(key)}
               key={key}
-              items={val.map(({ id, borrower, type, spigot, escrow, principal, deposit, start, end }) => ({
+              items={val.map(({ id, borrower, spigot, escrow, principal, deposit, start, end }) => ({
                 icon: '',
                 name: borrower,
                 start: start,
@@ -154,7 +153,7 @@ export const Market = () => {
                   .reduce((sum, val) => sum.add(val), utils.parseUnits('0', 'ether'))
                   .toString(),
                 tags: [spigot ? 'revenue' : '', escrow ? 'collateral' : ''].filter((x) => !!x),
-                info: type || 'DAO Line of Credit',
+                info: 'DAO Line of Credit',
                 infoDetail: 'EYY',
                 onAction: () => history.push(`/lines/${id}`),
               }))}

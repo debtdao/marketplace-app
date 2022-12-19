@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import _ from 'lodash';
+import { useState, useEffect } from 'react';
 
-import { AggregatedCreditLine, CreditLinePage, CreditPosition } from '@src/core/types';
-import { useAppTranslation } from '@hooks';
-import { Text } from '@components/common';
+import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
+import { RedirectIcon, Text, Link } from '@components/common';
+import { OnchainMetaDataActions, OnchainMetaDataSelector, LinesSelectors } from '@store';
+import { getENS } from '@src/utils';
 
 import { LineMetadata } from './LineMetadata';
 import { PositionsTable } from './PositionsTable';
 
 interface LineDetailsProps {
-  line?: AggregatedCreditLine;
-  page?: CreditLinePage;
   onAddCollateral?: Function;
 }
 
@@ -18,6 +18,14 @@ const Container = styled.div`
   margin: 0;
   padding: 1em;
   width: 100%;
+`;
+
+const Redirect = styled(RedirectIcon)`
+  display: inline-block;
+  fill: currentColor;
+  width: 1.2rem;
+  margin-left: 2rem;
+  padding-bottom: 0.2rem;
 `;
 
 const Header = styled.h1`
@@ -28,73 +36,88 @@ const Header = styled.h1`
   `};
 `;
 
+const RouterLink = styled(Link)<{ selected: boolean }>`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  color: inherit;
+  font-size: 3rem;
+  flex: 1;
+  width: 100%;
+
+  &:hover span {
+    filter: brightness(90%);
+  }
+
+  span {
+    transition: filter 200ms ease-in-out;
+  }
+  ${(props) =>
+    props.selected &&
+    `
+    color: ${props.theme.colors.titlesVariant};
+  `}
+`;
+
 const BorrowerName = styled(Text)`
-  max-width: 150px;
+  max-width: 100%;
 `;
 
 export const LineDetailsDisplay = (props: LineDetailsProps) => {
   const { t } = useAppTranslation('common');
-  const { line, page } = props;
+  const dispatch = useAppDispatch();
 
-  const [allDataLoaded, setAllDataLoaded] = useState(false);
-  const [lineData, setLineData] = useState<AggregatedCreditLine | CreditLinePage>(line!);
-  const [positions, setPositions] = useState<CreditPosition[]>();
-
-  const { principal, deposit, escrow, spigot, borrower, start, end } = lineData;
+  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
+  const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
+  const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
+  const [borrowerID, setBorrowerId] = useState('');
 
   useEffect(() => {
-    if (page && page.positions) {
-      setAllDataLoaded(true);
-      setLineData(page);
-      setPositions(page.positions);
-    }
-    console.log('updating in line details', page);
-    // LineDetails page handles getLinePage query
-  }, [page]);
+    dispatch(OnchainMetaDataActions.getENS(selectedLine?.borrower!));
+  }, [selectedLine]);
 
-  if (!line && !page) return <Container>{t('lineDetails:line.no-data')}</Container>;
+  useEffect(() => {
+    const ensName = getENS(selectedLine?.borrower!, ensMap);
+
+    if (!ensName) {
+      setBorrowerId(selectedLine?.borrower!);
+    } else {
+      setBorrowerId(ensName);
+    }
+  }, [selectedLine, ensMap]);
+
+  if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
+  const { principal, deposit, escrow, borrower, spigot, start, end } = selectedLine;
 
   const StandardMetadata = (metadataProps: any) => (
     <>
       <Header>
-        <BorrowerName ellipsis>{borrower}</BorrowerName>
-        's Line Of Credit
+        <RouterLink to={`/portfolio/${borrower}`} key={borrower} selected={false}>
+          <BorrowerName>
+            {borrowerID}'s Line Of Credit
+            <Redirect />
+          </BorrowerName>
+        </RouterLink>
       </Header>
       <LineMetadata {...metadataProps} />
     </>
   );
 
   // allow passing in core data first if we have it already and let Page data render once returned
-  if (allDataLoaded && positions) {
-    // if we have all data render full UI
-    return (
-      <Container>
-        <StandardMetadata
-          revenue={spigot?.tokenRevenue}
-          deposits={escrow?.deposits}
-          deposit={deposit}
-          principal={principal}
-          totalInterestPaid={'0'}
-          startTime={start}
-          endTime={end}
-        />
-        <PositionsTable events={positions} />
-      </Container>
-    );
-  } else {
-    // render partial UI with core data
-    return (
-      <Container>
-        <StandardMetadata
-          revenue={spigot?.tokenRevenue}
-          deposits={escrow?.deposits}
-          deposit={deposit}
-          principal={principal}
-          totalInterestPaid={'0'}
-          startTime={start}
-          endTime={end}
-        />
-      </Container>
-    );
-  }
+  // if we have all data render full UI
+  return (
+    <Container>
+      <StandardMetadata
+        revenue={spigot?.tokenRevenue}
+        deposits={escrow?.deposits}
+        deposit={deposit}
+        principal={principal}
+        totalInterestPaid={'0'}
+        startTime={start}
+        endTime={end}
+      />
+
+      {positions && <PositionsTable positions={_.values(positions)} />}
+    </Container>
+  );
 };

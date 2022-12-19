@@ -1,8 +1,9 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { memoize } from 'lodash';
+import _, { memoize } from 'lodash';
+import { BigNumber } from 'ethers';
 
 import { AllowancesMap, Balance, RootState, Status, Token, TokenView } from '@types';
-import { toBN } from '@utils';
+import { toBN, unnullify } from '@utils';
 
 /* ---------------------------------- State --------------------------------- */
 const selectTokensState = (state: RootState) => state.tokens;
@@ -63,6 +64,13 @@ const selectToken = createSelector([selectTokensMap, selectTokensUser], (tokensM
   })
 );
 
+const selectTokenPrices = createSelector([selectTokensMap], (tokensMap): { [address: string]: BigNumber } =>
+  Object.entries(tokensMap).reduce(
+    (prices, [addy, { priceUsdc }]) => ({ ...prices, [addy]: unnullify(priceUsdc, true) }),
+    {}
+  )
+);
+
 /* -------------------------------- Statuses -------------------------------- */
 const selectWalletTokensStatus = createSelector(
   [selectGetTokensStatus, selectGetUserTokensStatus],
@@ -114,4 +122,5 @@ export const TokensSelectors = {
   selectSummaryData,
   selectWalletTokensStatus,
   selectToken,
+  selectTokenPrices,
 };

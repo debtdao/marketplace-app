@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { LinesActions, AlertsActions, AppSelectors, TokensSelectors, LinesSelectors, NetworkSelectors } from '@store';
@@ -41,13 +41,11 @@ export const LineDetail = () => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const dispatch = useAppDispatch();
   const history = useHistory();
-  const location = useLocation();
   const isMounting = useIsMounting();
   const { NETWORK_SETTINGS } = getConfig();
-
+  const { lineAddress } = useParams<LineDetailRouteParams>();
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
-  const selectedPage = useAppSelector(LinesSelectors.selectSelectedLinePage);
   // const selectedLineCreditEvents = useAppSelector(LinesSelectors.selectSelectedLineCreditEvents);
   const getLinePageStatus = useAppSelector(LinesSelectors.selectGetLinePageStatus);
   // const linesPageData = useAppSelector(LinesSelectors.selectLinePageData);
@@ -57,42 +55,22 @@ export const LineDetail = () => {
   //const walletName = useAppSelector(WalletSelectors.selectWallet);
   const currentNetworkSettings = NETWORK_SETTINGS[currentNetwork];
 
-  // 1. get line address from url parms
-  // 2. set selected line as current line
-  // 3. fetch line page
-  // 4.
   useEffect(() => {
-    const lineAddress: string | undefined = location.pathname.split('/')[2];
-
-    console.log('line address', lineAddress);
     if (!lineAddress || !isValidAddress(lineAddress)) {
       dispatch(AlertsActions.openAlert({ message: 'INVALID_ADDRESS', type: 'error' }));
       history.push('/market');
       return;
     }
+
     dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineAddress }));
     dispatch(LinesActions.getLinePage({ id: lineAddress }));
     return () => {
       dispatch(LinesActions.clearSelectedLineAndStatus());
     };
-  }, [selectedLine, selectedPage]);
+  }, []);
 
   const [firstTokensFetch, setFirstTokensFetch] = useState(true);
   const [tokensInitialized, setTokensInitialized] = useState(false);
-
-  useEffect(() => {
-    const lineAddress: string | undefined = location.pathname.split('/')[2];
-    if (!lineAddress || !isValidAddress(lineAddress)) {
-      dispatch(AlertsActions.openAlert({ message: 'INVALID_ADDRESS', type: 'error' }));
-      history.push('/market');
-      return;
-    }
-    dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
-
-    return () => {
-      dispatch(LinesActions.clearSelectedLineAndStatus());
-    };
-  }, [currentNetwork]);
 
   useEffect(() => {
     const loading = tokensStatus.loading;
@@ -114,6 +92,7 @@ export const LineDetail = () => {
     getLinePageStatus.loading ||
     tokensStatus.loading ||
     (isMounting && (!tokensInitialized || !linesInitialized));
+  console.log('genewral linedetails loading', generalLoading);
 
   // TODO: 0xframe also supports this
   //const displayAddToken = walletIsConnected && walletName.name === 'MetaMask';
@@ -131,7 +110,7 @@ export const LineDetail = () => {
           }
         />
       )}
-      {selectedLine && <LineDetailsDisplay page={selectedPage} line={selectedLine} />}
+      {selectedLine && <LineDetailsDisplay />}
     </LineDetailView>
   );
 };

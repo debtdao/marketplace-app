@@ -1,7 +1,9 @@
 import { createReducer } from '@reduxjs/toolkit';
 import _ from 'lodash';
 
-import { CollateralState, CollateralActionsStatusMap } from '@types';
+import { CollateralState, CollateralActionsStatusMap, CollateralModule, CollateralMap, SecuredLine } from '@types';
+
+import { LinesActions } from '../lines/lines.actions';
 
 import { CollateralActions } from './collateral.actions';
 
@@ -18,11 +20,15 @@ export const initialCollateralActionsStatusMap: CollateralActionsStatusMap = {
 export const collateralInitialState: CollateralState = {
   selectedEscrow: undefined,
   selectedSpigot: undefined,
+  collateralMap: {},
+  eventsMap: {},
   user: {
     escrowAllowances: {},
   },
   statusMap: initialCollateralActionsStatusMap,
 };
+
+const { getLinePage, getUserPortfolio } = LinesActions;
 
 const {
   setSelectedEscrow,
@@ -31,6 +37,8 @@ const {
   setSelectedCollateralAsset,
   addCollateral,
   enableCollateral,
+  saveModuleToMap,
+  saveEventsToMap,
   addSpigot,
 } = CollateralActions;
 
@@ -51,6 +59,14 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
     .addCase(setSelectedCollateralAsset, (state, { payload: { assetAddress } }) => {
       state.selectedCollateralAsset = assetAddress;
     })
+
+    // .addCase(saveEventsToMap.fulfilled, (state, { payload: { moduleAddress, events } }) => {
+    //   state.eventsMap[moduleAddress] = events;
+    // })
+
+    // .addCase(saveModuleToMap.fulfilled, (state, { payload: { moduleAddress, module } }) => {
+    //   state.collateralMap[moduleAddress] = module;
+    // })
 
     /* -------------------------------- enableCollateral ------------------------------- */
     .addCase(enableCollateral.pending, (state, payload) => {
@@ -76,15 +92,39 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
     .addCase(addCollateral.rejected, (state, { error }) => {
       // _.assignIn(state.statusMap.addCollateral, { [contract]: { [token]: { error: error.message } } });
     })
-    /* -------------------------------------addSpigot-------------------------------------- */
+    /* ---------------------------------- addSpigot ----------------------------------------*/
+
     .addCase(addSpigot.pending, (state, payload) => {
-      console.log('add spigot pending', payload);
+      console.log('addspigot action payload', payload);
     })
     .addCase(addSpigot.fulfilled, (state, payload) => {
-      console.log('add spigot pending', payload);
+      console.log('addspigot action payload', payload);
+      // state.statusMap.addCollateral = {};
     })
-    .addCase(addSpigot.rejected, (state, payload) => {
-      console.log('add spigot pending', payload);
+    .addCase(addSpigot.rejected, (state, { error }) => {
+      console.log('addspigot action payload', error);
+      // _.assignIn(state.statusMap.addCollateral, { [contract]: { [token]: { error: error.message } } });
+    })
+
+    // State changes from non collateral actions
+
+    /* -------------------------------- getLinePage ------------------------------- */
+    .addCase(getLinePage.fulfilled, (state, { payload: { linePageData: line } }) => {
+      if (!line) return;
+      let map: CollateralMap = {};
+      if (line.escrow) map[line.escrowId!] = line.escrow;
+      if (line.spigot) map[line.spigotId!] = line.spigot;
+      state.collateralMap = { ...state.collateralMap, ...map };
+    })
+
+    /* -------------------------------- getUserPortfolio ------------------------------- */
+    .addCase(getUserPortfolio.fulfilled, (state, { payload: { address, lines } }) => {
+      let map: CollateralMap = {};
+      _.values<SecuredLine>(lines).map((line) => {
+        if (line.escrow) map[line.escrowId!] = line.escrow;
+        if (line.spigot) map[line.spigotId!] = line.spigot;
+      });
+      state.collateralMap = { ...state.collateralMap, ...map };
     });
 });
 

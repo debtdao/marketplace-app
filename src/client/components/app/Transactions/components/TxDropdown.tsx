@@ -124,17 +124,12 @@ const StyledTxCreditLineInput = styled(TransitionGroup)`
   }
 `;
 
-//const amountToNumber = (amount: string) => {
-//  const parsedAmount = amount.replace(/[%,$ ]/g, '');
-//  return parseInt(parsedAmount);
-//};
-
 export interface TxDropdownProps {
   headerText?: string;
   inputText?: string;
   inputError?: boolean;
   selectedType: { id: string; label: string; value: string };
-  onSelectedTypeChange?: (newRepayType: { id: string; label: string; value: string }) => void;
+  onSelectedTypeChange: (newRepayType: { id: string; label: string; value: string }) => void;
   typeOptions?: { id: string; label: string; value: string }[];
   readOnly?: boolean;
   loading?: boolean;
@@ -159,10 +154,8 @@ export const TxDropdown: FC<TxDropdownProps> = ({
   const { t } = useAppTranslation('common');
 
   let listItems: SearchListItem[] = [];
-  //let zappableItems: SearchListItem[] = [];
   let selectedItem: SearchListItem = {
     id: selectedType?.id || '',
-    // icon: selectedCredit?.icon,
     label: selectedType?.label,
     value: selectedType?.value,
   };
@@ -173,9 +166,8 @@ export const TxDropdown: FC<TxDropdownProps> = ({
       .map((item) => {
         return {
           id: item!.id,
-          // icon: '',
           label: item!.label,
-          value: item?.value,
+          value: item!.value,
         };
       });
   }
@@ -198,8 +190,7 @@ export const TxDropdown: FC<TxDropdownProps> = ({
             list={listItems}
             headerText={searchListHeader}
             selected={selectedItem}
-            //@ts-ignore
-            setSelected={(item) => (onSelectedTypeChange ? onSelectedTypeChange(item) : undefined)}
+            setSelected={(item) => onSelectedTypeChange(item!)}
             onCloseList={() => setOpenedSearch(false)}
           />
         </CSSTransition>

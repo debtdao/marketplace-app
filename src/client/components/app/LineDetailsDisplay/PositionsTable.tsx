@@ -6,9 +6,9 @@ import { ModalsActions, LinesActions, LinesSelectors, WalletSelectors, WalletAct
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { device } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer } from '@components/app';
-import { Input, SearchIcon, Button } from '@components/common';
+import { Input, SearchIcon, Button, RedirectIcon, Link } from '@components/common';
 import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, CreditPosition } from '@src/core/types';
-import { humanize, formatAddress } from '@src/utils';
+import { humanize, formatAddress, normalizeAmount } from '@src/utils';
 import { getEnv } from '@config/env';
 
 const PositionsCard = styled(DetailCard)`
@@ -45,8 +45,40 @@ const TableHeader = styled.h3`
   `}
 `;
 
+const RouterLink = styled(Link)<{ selected: boolean }>`
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  color: inherit;
+  font-size: 1.2rem;
+  flex: 1;
+  padding: 0.5rem;
+
+  &:hover span {
+    filter: brightness(90%);
+  }
+
+  span {
+    transition: filter 200ms ease-in-out;
+  }
+  ${(props) =>
+    props.selected &&
+    `
+    color: ${props.theme.colors.titlesVariant};
+  `}
+`;
+
+const RedirectLinkIcon = styled(RedirectIcon)`
+  display: inline-block;
+  fill: currentColor;
+  width: 1.2rem;
+  margin-left: 1rem;
+  padding-bottom: 0.2rem;
+`;
+
 interface PositionsProps {
-  events: CreditPosition[];
+  positions: CreditPosition[];
 }
 
 interface Transaction {
@@ -57,26 +89,25 @@ interface Transaction {
 
 export const PositionsTable = (props: PositionsProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
-  const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
-  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
-  const userRoleMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
-  const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
-  const selectedPage = useAppSelector(LinesSelectors.selectSelectedLinePage);
-  const [actions, setActions] = useState<Transaction[]>([]);
-  const { events } = props;
   const dispatch = useAppDispatch();
-  const { NETWORK } = getEnv();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
-  //Initial set up for positions table
+  const userRoleMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
+  const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
+  const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
+  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
+  const [actions, setActions] = useState<Transaction[]>([]);
+  const { positions } = props;
+  const { NETWORK } = getEnv();
 
+  //Initial set up for positions table
   useEffect(() => {
-    if (!selectedLine) {
-      return;
+    if (selectedLine && !lineAddress) {
+      dispatch(LinesActions.setSelectedLineAddress({ lineAddress: selectedLine.id }));
+    } else if (lineAddress && !selectedLine) {
+      dispatch(LinesActions.getLinePage({ id: lineAddress }));
     }
-    let address = selectedLine.id;
-    dispatch(LinesActions.setSelectedLineAddress({ lineAddress: address }));
-  }, [selectedLine]);
+  }, [lineAddress, selectedLine]);
 
   const ApproveMutualConsent = {
     name: t('Accept'),
@@ -85,46 +116,43 @@ export const PositionsTable = (props: PositionsProps) => {
   };
 
   useEffect(() => {
-    let Transactions: Transaction[] = [];
-    if (!userWallet) {
-      Transactions = [];
+    switch (userRoleMetadata.role) {
+      case BORROWER_POSITION_ROLE:
+        setActions([
+          {
+            name: t('components.transaction.borrow'),
+            handler: (e: Event) => borrowHandler(e),
+            disabled: false,
+          },
+          {
+            name: t('components.transaction.deposit-and-repay.header'),
+            handler: (e: Event) => depositAndRepayHandler(e),
+            disabled: false,
+          },
+        ]);
+        break;
+      case LENDER_POSITION_ROLE:
+        setActions([
+          {
+            name: t('components.transaction.withdraw'),
+            handler: (e: Event) => WithdrawHandler(e),
+            disabled: false,
+          },
+        ]);
+        break;
+      case ARBITER_POSITION_ROLE:
+        setActions([
+          {
+            name: t('components.transaction.liquidate'),
+            handler: (e: Event) => liquidateHandler(e),
+            disabled: false,
+          },
+        ]);
+        break;
+      default:
+        setActions([]);
     }
-    if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
-      Transactions.push({
-        name: t('components.transaction.borrow'),
-        handler: (e: Event) => borrowHandler(e),
-        disabled: false,
-      });
-      Transactions.push({
-        name: t('components.transaction.deposit-and-repay.header'),
-        handler: (e: Event) => depositAndRepayHandler(e),
-        disabled: false,
-      });
-    }
-    if (userRoleMetadata.role === LENDER_POSITION_ROLE) {
-      Transactions.push({
-        name: t('components.transaction.withdraw'),
-        handler: (e: Event) => WithdrawHandler(e),
-        disabled: false,
-      });
-      console.log('withdraw');
-    }
-    if (userRoleMetadata.role === ARBITER_POSITION_ROLE) {
-      Transactions.push({
-        name: t('components.transaction.liquidate'),
-        handler: (e: Event) => liquidateHandler(e),
-        disabled: false,
-      });
-    }
-    setActions(Transactions);
-  }, [selectedLine, userWallet]);
-
-  useEffect(() => {
-    if (!lineAddress) {
-      return;
-    }
-    dispatch(LinesActions.getLinePage({ id: lineAddress }));
-  }, [selectedPage]);
+  }, [userWallet]);
 
   //Action Handlers for positions table
 
@@ -132,44 +160,38 @@ export const PositionsTable = (props: PositionsProps) => {
     if (!userWallet) {
       connectWallet();
     } else {
-      //@ts-ignore
-      dispatch(LinesActions.setSelectedLinePosition({ position: e.target.value }));
+      dispatch(LinesActions.setSelectedLinePosition({ position: (e.target as HTMLInputElement).value }));
       dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
     }
   };
 
-  // THIS NEEDS REVISITNG
   const liquidateHandler = (e: Event) => {
-    //@ts-ignore
-    dispatch(LinesActions.setSelectedLinePosition({ position: e.target.value }));
+    dispatch(LinesActions.setSelectedLinePosition({ position: (e.target as HTMLInputElement).value }));
     dispatch(ModalsActions.openModal({ modalName: 'liquidateBorrower' }));
   };
 
   const WithdrawHandler = (e: Event) => {
-    //@ts-ignore
-    dispatch(LinesActions.setSelectedLinePosition({ position: e.target.value }));
+    dispatch(LinesActions.setSelectedLinePosition({ position: (e.target as HTMLInputElement).value }));
     dispatch(ModalsActions.openModal({ modalName: 'withdraw' }));
   };
 
   const borrowHandler = (e: Event) => {
-    //@ts-ignore
-    dispatch(LinesActions.setSelectedLinePosition({ position: e.target.value }));
+    dispatch(LinesActions.setSelectedLinePosition({ position: (e.target as HTMLInputElement).value }));
     dispatch(ModalsActions.openModal({ modalName: 'borrow' }));
   };
 
   const depositAndRepayHandler = (e: Event) => {
-    //@ts-ignore
-    dispatch(LinesActions.setSelectedLinePosition({ position: e.target.value }));
+    dispatch(LinesActions.setSelectedLinePosition({ position: (e.target as HTMLInputElement).value }));
     dispatch(ModalsActions.openModal({ modalName: 'depositAndRepay' }));
   };
 
   const acceptProposalHandler = (e: Event) => {
-    //@ts-ignore
-    dispatch(LinesActions.setSelectedLinePosition({ position: e.target.value }));
+    dispatch(LinesActions.setSelectedLinePosition({ position: (e.target as HTMLInputElement).value }));
     dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
   };
 
   const isWithdrawable = (deposit: string, borrowed: string, lender: string, interestRepaid: string) => {
+    // Withdraw/Accept are not working on Portfolio / Lender
     if (!userWallet) {
       return;
     }
@@ -180,16 +202,19 @@ export const PositionsTable = (props: PositionsProps) => {
   };
 
   let ctaButtonText = userWallet
-    ? `${t('lineDetails:positions-events.propose-position')}`
+    ? `${t('lineDetails:positions-table.new-position')}`
     : `${t('components.connect-button.connect')}`;
 
-  const getUserTransactions = (event: CreditPosition) => {
-    if (event.status === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE) {
+  //Returns a list of transactions to display on positions table
+  const getUserPositionActions = (position: CreditPosition) => {
+    if (position.status === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE) {
       return [ApproveMutualConsent];
     }
-    if (isWithdrawable(event.deposit, event.principal, event.lender, event.interestRepaid)) {
+    //If user is lender, and line has amount to withdraw, return withdraw action
+    if (isWithdrawable(position.deposit, position.principal, position.lender, position.interestRepaid)) {
       return actions;
     }
+    //Returns actions for borrower on open line
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
       return actions;
     }
@@ -268,17 +293,33 @@ export const PositionsTable = (props: PositionsProps) => {
               grow: '1',
             },
           ]}
-          data={events?.map((event) => ({
+          data={positions?.map((position) => ({
             // this needs to be humanized to correct amount depending on the token.
-            deposit: humanize('amount', event.deposit, event.token.decimals, 2),
-            drate: `${event.drate} %`,
-            frate: `${event.frate} %`,
-            status: event.status,
-            principal: humanize('amount', event.principal, event.token.decimals, 2),
-            interest: humanize('amount', event.interestAccrued, event.token.decimals, 2),
-            lender: formatAddress(event.lender),
-            token: event.token.symbol,
-            actions: <ActionButtons value={event.id} actions={getUserTransactions(event)} />,
+            deposit: humanize('amount', position.deposit, position.token.decimals, 2),
+            drate: `${normalizeAmount(position.dRate, 2)} %`,
+            frate: `${normalizeAmount(position.fRate, 2)} %`,
+            status: position.status,
+            principal: humanize('amount', position.principal, position.token.decimals, 2),
+            interest: humanize('amount', position.interestAccrued, position.token.decimals, 2),
+            lender: (
+              <RouterLink to={`/portfolio/${position.lender}`} key={position.id} selected={false}>
+                {formatAddress(position.lender)}
+                <RedirectLinkIcon />
+              </RouterLink>
+            ),
+            token: (
+              <a
+                //change to etherscan on launch
+                href={`https://etherscan.io/address/${position.token.address}`}
+                target={'_blank'}
+                key={`${position.token.symbol}-${position.id}`}
+                rel={'noreferrer'}
+              >
+                {position.token.symbol}
+                <RedirectLinkIcon />
+              </a>
+            ),
+            actions: <ActionButtons value={position.id} actions={getUserPositionActions(position)} />,
           }))}
           SearchBar={
             <>
@@ -288,6 +329,7 @@ export const PositionsTable = (props: PositionsProps) => {
                 placeholder={t('components.search-input.search')}
                 Icon={SearchIcon}
               />
+              {/*Do not render if user is lender*/}
               <Button onClick={depositHandler}>{ctaButtonText}</Button>
             </>
           }

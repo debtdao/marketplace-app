@@ -23,39 +23,26 @@ const BASE_LINE_FRAGMENT = gql`
     start
     status
     arbiter
+    oracle
+    dex
     borrower {
       id
     }
   }
 `;
 
-const BASE_CREDIT_FRAGMENT = gql`
+const BASE_POSITION_FRAGMENT = gql`
   ${TOKEN_FRAGMENT}
-  fragment BaseCreditFrag on Position {
-    id
-    status
-    principal
-    deposit
-    dRate
-    fRate
-    token {
-      ...TokenFrag
-    }
-  }
-`;
-
-const LINE_PAGE_CREDIT_FRAGMENT = gql`
-  ${TOKEN_FRAGMENT}
-  fragment LinePageCreditFrag on Position {
+  fragment BasePositionFrag on Position {
     id
     status
     lender {
       id
     }
-    deposit
     principal
-    interestRepaid
+    deposit
     interestAccrued
+    interestRepaid
     dRate
     fRate
     token {
@@ -158,6 +145,19 @@ const ESCROW_EVENT_FRAGMENT = gql`
 `;
 
 // QUERIES
+
+// get tokens with associated price oracle
+export const GET_SUPPORTED_ORACLE_TOKENS_QUERY = gql`
+  ${TOKEN_FRAGMENT}
+  query getSupportedOracleTokens {
+    supportedTokens(first: 1000) {
+      token {
+        ...TokenFrag
+      }
+    }
+  }
+`;
+
 // ave to add fragment vars before running your query for frags to be available inside
 export const GET_LINE_QUERY = gql`
   ${BASE_LINE_FRAGMENT}
@@ -175,61 +175,52 @@ export const GET_LINE_QUERY = gql`
   }
 `;
 
-// use deposit > 0 for all non-closed positions
-export const GET_USER_POSITIONS_QUERY = gql`
+// create new fragment to get positions for a user
+const LINE_OF_CREDIT_FRAGMENT = gql`
   ${BASE_LINE_FRAGMENT}
-  query getUserPositions($id: ID!) {
-    borrower(id: $id) {
-      debts(where: { deposit_gt: 0 }) {
-        ...BaseLineFrag
-      }
-    }
-    lender(id: $id) {
-      credits(where: { deposit_gt: 0 }) {
-        ...BaseLineFrag
-      }
-    }
-  }
-`;
-
-export const GET_LINE_PAGE_QUERY = gql`
-  ${BASE_LINE_FRAGMENT}
-  ${LINE_PAGE_CREDIT_FRAGMENT}
+  ${BASE_POSITION_FRAGMENT}
   ${LINE_EVENT_FRAGMENT}
-
   ${BASE_SPIGOT_FRAGMENT}
   ${SPIGOT_SUMMARY_FRAGMENT}
   ${SPIGOT_EVENT_FRAGMENT}
   ${ESCROW_FRAGMENT}
 
+  fragment LineOfCreditFrag on LineOfCredit {
+    ...BaseLineFrag
+
+    positions {
+      ...BasePositionFrag
+    }
+
+    events {
+      ...LineEventFrag
+    }
+
+    spigot {
+      id
+      spigots {
+        ...BaseSpigotFrag
+      }
+
+      summaries {
+        ...SpigotSummaryFrag
+      }
+      events {
+        ...SpigotEventFrag
+      }
+    }
+    escrow {
+      ...EscrowFrag
+    }
+  }
+`;
+
+export const GET_LINE_PAGE_QUERY = gql`
+  ${LINE_OF_CREDIT_FRAGMENT}
+
   query getLinePage($id: ID!) {
     lineOfCredit(id: $id) {
-      ...BaseLineFrag
-
-      positions(first: 20) {
-        ...LinePageCreditFrag
-      }
-
-      events(first: 20) {
-        ...LineEventFrag
-      }
-
-      spigot {
-        id
-        spigots {
-          ...BaseSpigotFrag
-        }
-
-        summaries {
-          ...SpigotSummaryFrag
-        }
-        events(first: 20) {
-          ...SpigotEventFrag
-        }
-      }
-      escrow {
-        ...EscrowFrag
-      }
+      ...LineOfCreditFrag
     }
   }
 `;
@@ -255,7 +246,7 @@ export const GET_LINE_PAGE_AUX_QUERY = gql`
 
 export const GET_LINES_QUERY = gql`
   ${BASE_LINE_FRAGMENT}
-  ${BASE_CREDIT_FRAGMENT}
+  ${BASE_POSITION_FRAGMENT}
   ${ESCROW_FRAGMENT}
   ${SPIGOT_SUMMARY_FRAGMENT}
   ${TOKEN_FRAGMENT}
@@ -265,7 +256,7 @@ export const GET_LINES_QUERY = gql`
       ...BaseLineFrag
 
       positions {
-        ...BaseCreditFrag
+        ...BasePositionFrag
       }
 
       escrow {
@@ -285,7 +276,7 @@ export const GET_LINES_QUERY = gql`
 // TODO
 // export const GET_HOMEPAGE_LINES_QUERY = gql`
 //   ${BASE_LINE_FRAGMENT}
-//   ${BASE_CREDIT_FRAGMENT}
+//   ${BASE_POSITION_FRAGMENT}
 
 //   query getHomepageLines() {
 //     newest: lineOfCredits(first: 5, orderBy: start, orderDirection: desc) {
@@ -304,55 +295,63 @@ export const GET_SPIGOT_QUERY = gql`
   }
 `;
 
-// fetches all of a users positions that they borrow from
-export const GET_BORROWER_POSITIONS_QUERY = gql`
+// fetches all of a users positions that they lend to
+const LENDER_POSITIONS_FRAGMENT = gql`
   ${BASE_LINE_FRAGMENT}
-  ${LINE_PAGE_CREDIT_FRAGMENT}
+  ${BASE_POSITION_FRAGMENT}
   ${LINE_EVENT_FRAGMENT}
   ${BASE_SPIGOT_FRAGMENT}
   ${SPIGOT_SUMMARY_FRAGMENT}
   ${SPIGOT_EVENT_FRAGMENT}
   ${ESCROW_FRAGMENT}
 
-  query getBorrowerPositions($borrower: String!) {
-    lineOfCredits(where: { borrower_contains: $borrower }) {
-      ...BaseLineFrag
+  fragment LenderPositionsFrag on Lender {
+    positions: positions {
+      ...BasePositionFrag
 
-      positions(first: 20) {
-        ...LinePageCreditFrag
-      }
+      line {
+        ...BaseLineFrag
 
-      events(first: 20) {
-        ...LineEventFrag
-      }
-
-      spigot {
-        id
-        spigots {
-          ...BaseSpigotFrag
+        events {
+          ...LineEventFrag
         }
 
-        summaries {
-          ...SpigotSummaryFrag
+        spigot {
+          id
+          spigots {
+            ...BaseSpigotFrag
+          }
+
+          summaries {
+            ...SpigotSummaryFrag
+          }
+          events {
+            ...SpigotEventFrag
+          }
         }
-        events(first: 20) {
-          ...SpigotEventFrag
+
+        escrow {
+          ...EscrowFrag
         }
-      }
-      escrow {
-        ...EscrowFrag
       }
     }
   }
 `;
 
-export const GET_SUPPORTED_ORACLE_TOKENS_QUERY = gql`
-  ${TOKEN_FRAGMENT}
-  query getSupportedOracleTokens {
-    supportedTokens(first: 1000) {
-      token {
-        ...TokenFrag
-      }
+// fetches all of a user's positions in their portfolio for which they are a borrower, lender, and/or arbiter
+export const GET_USER_PORTFOLIO_QUERY = gql`
+  ${LINE_OF_CREDIT_FRAGMENT}
+  ${LENDER_POSITIONS_FRAGMENT}
+
+  query getUserPortfolio($user: String!) {
+    borrowerLineOfCredits: lineOfCredits(where: { borrower: $user }) {
+      ...LineOfCreditFrag
+    }
+    lenderPositions: lender(id: $user) {
+      ...LenderPositionsFrag
+    }
+    arbiterLineOfCredits: lineOfCredits(where: { arbiter: $user }) {
+      ...LineOfCreditFrag
     }
   }
 `;

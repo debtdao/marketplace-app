@@ -2,34 +2,27 @@ import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import _ from 'lodash';
 
-//import { useHistory } from 'react-router-dom';
-
+import { generateSig } from '@src/utils';
+import { isValidAddress, toWei } from '@src/utils';
+import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
+import { AddSpigotProps } from '@src/core/types';
 import {
-  useAppTranslation,
-  useAppDispatch,
-  // used to dummy token for dev
-  useAppSelector,
-} from '@hooks';
-import { ACTIVE_STATUS, AddSpigotProps } from '@src/core/types';
-import { TOKEN_ADDRESSES } from '@src/config/constants';
-import {
-  TokensSelectors,
   WalletSelectors,
   LinesSelectors,
+  OnchainMetaDataActions,
   CollateralActions,
-  selectDepositTokenOptionsByAsset,
   CollateralSelectors,
+  OnchainMetaDataSelector,
 } from '@store';
 import { isAddress, isFnSelector } from '@utils';
-//import { Button, Icon, Link } from '@components/common';
 
 import { TxContainer } from './components/TxContainer';
 import { TxActionButton } from './components/TxActions';
 import { TxActions } from './components/TxActions';
 import { TxStatus } from './components/TxStatus';
 import { TxAddressInput } from './components/TxAddressInput';
-import { TxNumberInput } from './components/TxNumberInput';
 import { TxByteInput } from './components/TxByteInput';
+import { TxFuncSelector } from './components/TxFuncSelector';
 
 const StyledTransaction = styled(TxContainer)`
   min-height: 60vh;
@@ -40,88 +33,64 @@ interface EnableSpigotTxProps {
   onClose: () => void;
 }
 
-//const BadLineErrorContainer = styled.div``;
-
-//const BadLineErrorBody = styled.h3`
-//  ${({ theme }) => `
-//    margin: ${theme.spacing.lg} 0;
-//    font-size: ${theme.fonts.sizes.md};;
-//  `}
-//`;
-
-//const BadLineErrorImageContainer = styled.div``;
-
-//const BadLineErrorImage = styled.img``;
-
-//const StyledTxActionButton = styled(Button)<{ color?: string; contrast?: boolean }>`
-//  height: 4rem;
-//  flex: 1;
-//  font-size: 1.6rem;
-//  font-weight: 700;
-//  gap: 0.5rem;
-//  background-color: ${({ theme }) => theme.colors.txModalColors.primary};
-//  color: ${({ theme }) => theme.colors.txModalColors.onPrimary};
-//`;
-
 export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
-  //const history = useHistory();
 
   // user data
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
-  const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
-  const walletAddresssk = useAppSelector(WalletSelectors.selectSelectedAddress);
-  //const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
+  //Line data
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
-  // need to get call statusMap from state for tx error messages
-  //const collateralStatusMap = useAppSelector(CollateralSelectors.selectStatusMap);
-  const selectedSpigotAddress = useAppSelector(CollateralSelectors.selectSelectedSpigot);
-  const selectedRevenueContractAddress = useAppSelector(CollateralSelectors.selectSelectedRevenueContract);
+  const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
 
+  const selectedContractFunctions = useAppSelector(OnchainMetaDataSelector.selectFunctions);
+  const contractABI = useAppSelector(OnchainMetaDataSelector.selectABI);
   //state for params
   const { header, onClose } = props;
 
   const [transactionCompleted, setTransactionCompleted] = useState(0);
-  const [transactionApproved, setTransactionApproved] = useState(true);
   const [transactionLoading, setLoading] = useState(false);
 
   // spigot setting params
   const [settingOwnerSplit, setOwnerSplit] = useState('100');
   const [revenueContractAddress, setRevenueContractAddress] = useState('');
-  const [claimFuncSelector, setClaimFuncSelector] = useState('');
-  const [transferFuncSelector, setTransferFuncSelector] = useState('');
+  const [claimFunc, setClaimFunc] = useState<string>('');
+  const [transferFunc, setTransferFunc] = useState<string>('');
 
-  const selectedAssetAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress) || TOKEN_ADDRESSES.DAI;
-  // TODO pull colalteralOptions from subgraph instread of default yearn tokens
-  const collateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
-  //const selectedAsset = _.find(collateralOptions, (t) => t.address === selectedAssetAddress);
-  // TODO get token prices from yearn API and display
+  const [didFetchAbi, setDidFetchABI] = useState<boolean>(false);
+  const [claimFuncType, setClaimFuncType] = useState({ id: '', label: '', value: '' });
+  const [transferFuncType, setTransferFuncType] = useState({ id: '', label: '', value: '' });
+
+  const handleContractChange = (address: string) => {
+    setRevenueContractAddress(address);
+  };
 
   useEffect(() => {
     // if escrow not set yet then correct state
-    if (selectedLine?.spigot && !selectedSpigotAddress) {
-      dispatch(CollateralActions.setSelectedEscrow({ escrowAddress: selectedLine.spigot.id }));
+    if (!selectedSpigot && selectedLine?.spigotId) {
+      dispatch(CollateralActions.setSelectedSpigot({ spigotAddress: selectedLine.spigotId }));
     }
-  });
+  }, [selectedSpigot, selectedLine]);
 
-  const handleAddressChange = (text: string) => {
-    setRevenueContractAddress(text);
+  useEffect(() => {
+    if (!selectedContractFunctions && isValidAddress(revenueContractAddress) && !didFetchAbi) {
+      setDidFetchABI(true);
+      dispatch(OnchainMetaDataActions.getABI(revenueContractAddress));
+    }
+  }, [revenueContractAddress, didFetchAbi]);
+
+  // // If contract has ABI, these functions generage the bytecode for the functions
+  const onTransferFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
+    const hashedSigFunc = generateSig(newFunc.label, contractABI!);
+    setTransferFunc(hashedSigFunc);
+    setTransferFuncType(newFunc);
   };
 
-  const handleClaimChange = (byteCode: string) => {
-    setClaimFuncSelector(byteCode);
+  const onClaimFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
+    const hashedSigFunc = generateSig(newFunc.label, contractABI!);
+    setClaimFunc(hashedSigFunc);
+    setClaimFuncType(newFunc);
   };
-
-  const handleTransferFuncChange = (byteCode: string) => {
-    setTransferFuncSelector(byteCode);
-  };
-
-  const notArbiter = selectedLine?.status === ACTIVE_STATUS; // TODO
-  if (!notArbiter) {
-    // onClose(); // close modal and exit
-    return null;
-  }
 
   // Event Handlers
   const onTransactionCompletedDismissed = () => {
@@ -133,8 +102,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   };
 
   const canProceed = (): boolean => {
-    if (!isAddress(revenueContractAddress) || !isFnSelector(claimFuncSelector) || !isFnSelector(transferFuncSelector))
-      return false;
+    if (!isAddress(revenueContractAddress) || !isFnSelector(claimFunc) || !isFnSelector(transferFunc)) return false;
     return true;
   };
 
@@ -146,50 +114,57 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     setLoading(true);
 
     // TODO set error in state to display no line selected
-    console.log({ selectedLine, selectedSpigotAddress });
-    if (!selectedLine) {
-      console.log('no line to enable on');
+
+    if (!selectedLine || !selectedSpigot) {
       setLoading(false);
-      return; // TODO throw error ot UI component
+      return;
     }
 
-    if (!selectedLine?.spigot) {
-      console.log('no spigot');
+    if (!revenueContractAddress) {
       setLoading(false);
-      return; // TODO throw error ot UI component
+      return;
     }
 
-    console.log('wallet network on enable spigy tx', walletNetwork, walletIsConnected, walletAddresssk);
     if (!walletNetwork) {
       setLoading(false);
-      return; // TODO throw error ot UI component
+      return;
     }
 
     const transactionData: AddSpigotProps = {
       network: walletNetwork,
       lineAddress: selectedLine.id,
-      spigotAddress: selectedLine?.spigot?.id as string,
+      spigotAddress: selectedSpigot.id,
       revenueContract: revenueContractAddress,
       setting: {
-        ownerSplit: settingOwnerSplit,
-        claimFunction: claimFuncSelector,
-        transferOwnerFunction: transferFuncSelector,
+        // TODO: QUERY OWNERSPLIT ON SPIGOTENTITY
+        ownerSplit: toWei('100', 0),
+        claimFunction: claimFunc,
+        transferOwnerFunction: transferFunc,
       },
     };
 
     dispatch(CollateralActions.addSpigot(transactionData)).then((res) => {
-      if (res.meta.requestStatus === 'rejected') {
+      if (res.meta?.requestStatus === 'rejected') {
         setTransactionCompleted(2);
-        console.log(transactionCompleted, 'tester');
         setLoading(false);
       }
-      if (res.meta.requestStatus === 'fulfilled') {
+      if (res.meta?.requestStatus === 'fulfilled') {
         setTransactionCompleted(1);
-        console.log(transactionCompleted, 'tester');
         setLoading(false);
       }
     });
   };
+
+  const handleSetTransferByte = (byte: string) => {
+    setTransferFunc(byte);
+  };
+
+  const handleSetClaimByte = (byte: string) => {
+    setClaimFunc(byte);
+  };
+
+  const createListItems = (functions: string[]) =>
+    !functions ? [] : functions.map((func, i) => ({ id: i.toString(), label: func, value: '' }));
 
   if (!selectedLine) return null;
 
@@ -217,37 +192,67 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     );
   }
 
+  const revFuncDisplayConfigs = [
+    {
+      header: t('components.transaction.enable-spigot.function-transfer'),
+      options: createListItems(selectedContractFunctions!),
+      type: transferFuncType,
+      onChange: onTransferFuncSelection,
+      byteCode: transferFunc,
+      onByteChange: handleSetTransferByte,
+    },
+    {
+      header: t('components.transaction.enable-spigot.function-revenue'),
+      options: createListItems(selectedContractFunctions!),
+      type: claimFuncType,
+      onChange: onClaimFuncSelection,
+      byteCode: claimFunc,
+      onByteChange: handleSetClaimByte,
+    },
+  ];
+
+  const renderFuncSelectors = () =>
+    revFuncDisplayConfigs.map(({ header, byteCode, options, type, onChange, onByteChange }) =>
+      // if no ABI, input bytecode manually
+      selectedContractFunctions ? (
+        <TxFuncSelector
+          key={header + String(type)}
+          headerText={header}
+          typeOptions={options}
+          selectedType={type}
+          onSelectedTypeChange={onChange}
+        />
+      ) : (
+        <TxByteInput
+          key={header + byteCode}
+          headerText={header}
+          inputText={' '}
+          inputError={false}
+          byteCode={byteCode}
+          onByteCodeChange={onByteChange}
+          readOnly={false}
+        />
+      )
+    );
+
+  console.log('render enable spigot', transactionLoading, revenueContractAddress);
   return (
+    // <div />
     <StyledTransaction onClose={onClose} header={header}>
       <TxAddressInput
         headerText={t('components.transaction.enable-spigot.revenue-contract')}
         address={revenueContractAddress}
-        onAddressChange={handleAddressChange}
+        onAddressChange={handleContractChange}
         inputError={!isAddress(revenueContractAddress)}
       />
-      <TxByteInput
-        headerText={t('components.transaction.enable-spigot.function-revenue')}
-        inputText={' '}
-        inputError={!isFnSelector(claimFuncSelector)}
-        byteCode={claimFuncSelector}
-        onByteCodeChange={handleClaimChange}
-        readOnly={false}
-      />
-      <TxByteInput
-        headerText={t('components.transaction.enable-spigot.function-transfer')}
-        inputText={' '}
-        inputError={!isFnSelector(transferFuncSelector)}
-        byteCode={transferFuncSelector}
-        onByteCodeChange={handleTransferFuncChange}
-        readOnly={false}
-      />
+      {renderFuncSelectors()}
 
       <TxActions>
         <TxActionButton
           key={t('components.transaction.enable-spigot.cta') as string}
           data-testid={`modal-action-${t('components.transaction.enable-spigot.cta').toLowerCase()}`}
           onClick={enableSpigot}
-          disabled={!canProceed() || !transactionApproved}
+          disabled={false}
           contrast={true}
           isLoading={transactionLoading}
         >

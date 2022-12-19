@@ -90,11 +90,14 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
   const [targetTokenAmount, setTargetTokenAmount] = useState('1');
   const [errors, setErrors] = useState<string[]>([]);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
+  const selectedEscrow = useAppSelector(CollateralSelectors.selectSelectedEscrow);
 
   const setSelectedTokenAddress = (token: string) => dispatch(TokensActions.setSelectedTokenAddress);
-
+  const handleAmountChange = (amount: string) => {
+    setTargetTokenAmount(amount);
+  };
   //main net logic
-  const selectedCollateralAsset = useAppSelector(CollateralSelectors.selectSelectedCollateralToken);
+  const selectedCollateralAsset = useAppSelector(CollateralSelectors.selectSelectedCollateralAsset);
   // const selectedTokenAddress = useAppSelector(TokensSelectors.selectToken);
   //const { selectedSellToken, sourceAssetOptions } = useSelectedSellToken({
   //  selectedSellTokenAddress: selectedCollateralAsset,
@@ -116,24 +119,20 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
     // yield: '0',
   };
 
-  console.log('slt', selectedCollateralAsset);
-  console.log('sst', selectedSellToken);
-
-  const enabledCollateralAddressess = _.values(selectedLine?.escrow?.deposits)?.map((d) => d.token.address);
-  console.log(enabledCollateralAddressess, '23333');
-
   //const collateralOptions = sourceAssetOptions.filter(({ address }) =>
   //  _.includes(enabledCollateralAddressess, address)
   //);
   //console.log('col options', collateralOptions);
   console.log('add position tx useEffect token/creditLine', selectedSellToken, selectedLine, selectedCollateralAsset);
 
+  const enabledCollateralAddressess = _.values(selectedEscrow?.deposits)?.map((d) => d.token.address);
+
   useEffect(() => {
     console.log('add position tx useEffect token/creditLine', selectedSellToken, selectedLine);
 
-    if (selectedLine && selectedLine.escrow?.deposits) {
+    if (selectedLine && selectedEscrow?.deposits) {
       console.log('am here');
-      const tokenAddress = Object.keys(selectedLine.escrow.deposits);
+      const tokenAddress = Object.keys(selectedEscrow.deposits);
       console.log(tokenAddress);
       dispatch(CollateralActions.setSelectedCollateralAsset({ assetAddress: tokenAddress[0] }));
     }
@@ -198,14 +197,14 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
   // Event Handlers
   const approveCollateralToken = () => {
     setLoading(true);
-    if (!selectedLine?.escrow) {
+    if (!selectedEscrow) {
       setLoading(false);
       return;
     }
     let approvalOBj = {
       tokenAddress: selectedCollateralAsset,
       amount: `${ethers.utils.parseEther(targetTokenAmount)}`,
-      spenderAddress: selectedLine.escrow.id,
+      spenderAddress: selectedEscrow.id,
       network: walletNetwork,
     };
     console.log('approval obj', approvalOBj);
@@ -233,16 +232,16 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
   const addCollateral = () => {
     setLoading(true);
     //TODO set error in state to display no line selected
-    if (!selectedLine?.escrow || !selectedCollateralAsset || !targetTokenAmount) {
+    if (!selectedEscrow || !selectedCollateralAsset || !targetTokenAmount) {
       console.log('check this', selectedLine?.id, targetTokenAmount, selectedCollateralAsset);
       setLoading(false);
       return;
     }
 
-    console.log('escrow', selectedLine.escrow.id);
+    console.log('escrow', selectedEscrow.id);
 
     const transactionData = {
-      escrowAddress: selectedLine.escrow.id,
+      escrowAddress: selectedEscrow.id,
       amount: ethers.utils.parseEther(targetTokenAmount),
       token: selectedCollateralAsset,
       network: walletNetwork,
@@ -367,6 +366,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
         amount={targetTokenAmount}
         amountValue={String(10000000 * Number(targetTokenAmount))}
         maxAmount={targetBalance}
+        onAmountChange={handleAmountChange}
         selectedToken={selectedSellToken}
         tokenOptions={[selectedSellToken]}
         // inputError={!!sourceStatus.error}

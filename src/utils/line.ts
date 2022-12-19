@@ -522,12 +522,13 @@ export const formatLinePageData = (
 
     // all recent events
     // TODO add creditEvents
-    collateralEvents,
+    // collateralEvents,
     // collateral data
     spigotId: spigot?.id ?? '',
     escrowId: escrow?.id ?? '',
     spigot: formattedSpigot,
-    escrow: { ...escrow!, ...escrowData },
+    // escrow: { ...escrow!, ...escrowData },
+    escrow: escrowData,
   };
   return pageData;
 };

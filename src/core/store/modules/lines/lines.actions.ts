@@ -38,6 +38,8 @@ import { unnullify } from '@utils';
 import { TokensActions } from '../tokens/tokens.actions';
 import { TokensSelectors } from '../tokens/tokens.selectors';
 
+import { LinesSelectors } from './lines.selectors';
+
 /* -------------------------------------------------------------------------- */
 /*                                   Setters                                  */
 /* -------------------------------------------------------------------------- */

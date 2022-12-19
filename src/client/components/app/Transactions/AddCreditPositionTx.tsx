@@ -11,7 +11,7 @@ import {
   useAppSelector,
   useSelectedSellToken,
 } from '@hooks';
-import { ACTIVE_STATUS, BORROWER_POSITION_ROLE, PROPOSED_STATUS } from '@src/core/types';
+import { ACTIVE_STATUS, AddCreditProps, BORROWER_POSITION_ROLE, PROPOSED_STATUS } from '@src/core/types';
 import { getConstants } from '@src/config/constants';
 import { TokensActions, TokensSelectors, WalletSelectors, LinesSelectors, LinesActions } from '@store';
 import { Button } from '@components/common';
@@ -196,18 +196,18 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       return;
     }
 
-    console.log('drate', drate, toWei(drate, 2), toWei(drate, 4));
-    const transactionObj = {
+    const amountInWei = toWei(targetTokenAmount, selectedSellToken!.decimals);
+
+    const transactionObj: AddCreditProps = {
       lineAddress: selectedCredit.id,
-      drate,
-      frate,
-      amount: toWei(targetTokenAmount, selectedSellToken!.decimals),
+      drate: BigNumber.from(drate),
+      frate: BigNumber.from(frate),
+      amount: BigNumber.from(amountInWei),
       token: selectedSellTokenAddress,
       lender: lenderAddress,
-      network: walletNetwork,
+      network: walletNetwork!,
       dryRun: false,
     };
-    //@ts-ignore
     dispatch(LinesActions.addCredit(transactionObj)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionCompleted(2);
@@ -336,8 +336,8 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
         onAmountChange={onAmountChange}
-        //this breaks app when no number in input field
-        amountValue={BigNumber.from(targetTokenAmount)
+        //Check if target token amount, if not bigNumber from 0
+        amountValue={BigNumber.from(targetTokenAmount ? targetTokenAmount : 0)
           .pow(BigNumber.from(10).mul(selectedSellToken.decimals ?? 0))
           .toString()}
         maxAmount={acceptingOffer ? targetTokenAmount : targetBalance}

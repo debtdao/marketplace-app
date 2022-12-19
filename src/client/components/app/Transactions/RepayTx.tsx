@@ -120,12 +120,11 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
       return;
     }
     let approvalOBj = {
-      spenderAddress: selectedCredit.id,
-      tokenAddress: selectedSellTokenAddress,
+      lineAddress: selectedCredit.id,
+      tokenAddress: selectedSellTokenAddress!,
       amount: toWei(targetAmount, selectedPosition.token.decimals),
-      network: walletNetwork,
+      network: walletNetwork!,
     };
-    //@ts-ignore
     dispatch(LinesActions.approveDeposit(approvalOBj)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionApproved(transactionApproved);

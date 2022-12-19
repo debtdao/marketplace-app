@@ -15,6 +15,8 @@ import {
   PositionMap,
 } from '@types';
 
+import { WalletActions } from '../wallet/wallet.actions';
+
 import { LinesActions } from './lines.actions';
 
 export const initialLineActionsStatusMap: LineActionsStatusMap = {
@@ -23,6 +25,8 @@ export const initialLineActionsStatusMap: LineActionsStatusMap = {
   deposit: initialStatus,
   withdraw: initialStatus,
 };
+
+const { networkChange } = WalletActions;
 
 export const initialUserMetadataStatusMap: UserLineMetadataStatusMap = {
   getUserPortfolio: initialStatus,
@@ -54,6 +58,7 @@ export const linesInitialState: CreditLineState = {
     deploySecuredLine: initialStatus,
     user: initialUserMetadataStatusMap,
   },
+  network: undefined,
 };
 
 const {
@@ -98,6 +103,11 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(setPosition, (state, { payload: { id, position } }) => {
       state.positionsMap[id] = position;
     })
+
+    .addCase(networkChange, (state, { payload: { network } }) => {
+      state.network = network;
+    })
+
     /* -------------------------------------------------------------------------- */
     /*                                 Clear State                                */
     /* -------------------------------------------------------------------------- */

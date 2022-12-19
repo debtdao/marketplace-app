@@ -60,7 +60,6 @@ export interface Constants {
   //Arbiter_GOERLI: Address;
   //Oracle_GOERLI: Address;
   //SwapTarget_GOERLI: Address;
-  LINEFACTORY_GOERLI: Address;
   //SecuredLine_GOERLI: Address;
   //KibaSero_oracle: string;
 }

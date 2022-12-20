@@ -207,7 +207,7 @@ export interface TokensState {
   tokensAddresses: string[];
   supportedTokens: string[];
   activeNetworkTokenAddresses: string[];
-  tokensMap: { [address: string]: Token };
+  tokensMap: { [address: string]: Token }; // @cleanup TODO replace with TokenView
   supportedTokensMap: { [address: string]: TokenFragRepsonse };
   selectedTokenAddress: Address | undefined;
   user: {

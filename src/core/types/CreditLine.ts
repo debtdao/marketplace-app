@@ -88,7 +88,6 @@ export interface CreditPosition {
   interestAccrued: string;
   interestRepaid: string;
   totalInterestRepaid: string;
-  // decimals: string;
   // borrower: Address;
   dRate: string;
   fRate: string;

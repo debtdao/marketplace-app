@@ -24,7 +24,7 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
       if (!action.payload.networkChanged) throw new Error('Wallet Network Not Changed');
     }
 
-    if (web3Provider.hasInstanceOf('wallet')) {
+    if (web3Provider.hasInstanceOf('wallet') && config.SUPPORTED_NETWORKS.includes(network)) {
       const providerType = getProviderType(network);
       const provider = web3Provider.getInstanceOf(providerType);
       const yearn = yearnSdk.getInstanceOf(network);

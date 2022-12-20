@@ -78,6 +78,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
     selectedSellTokenAddress: initialToken,
     allowTokenSelect: true,
   });
+
   const acceptingOffer = props.acceptingOffer || (userMetadata.role === BORROWER_POSITION_ROLE && !!selectedPosition);
 
   //state for params
@@ -114,7 +115,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         })
       );
     }
-    if (selectedTokenAddress === '' && selectedSellToken) {
+    if ((selectedTokenAddress === '' || !selectedTokenAddress) && selectedSellToken) {
       setSelectedTokenAddress(selectedSellToken.address);
     }
 
@@ -192,7 +193,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       return;
     }
 
-    if (!selectedSellTokenAddress) {
+    if (!selectedSellToken) {
       return;
     }
 
@@ -203,11 +204,12 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       drate: BigNumber.from(drate),
       frate: BigNumber.from(frate),
       amount: BigNumber.from(amountInWei),
-      token: selectedSellTokenAddress,
+      token: selectedSellToken.address,
       lender: lenderAddress,
       network: walletNetwork!,
       dryRun: false,
     };
+
     dispatch(LinesActions.addCredit(transactionObj)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionCompleted(2);
@@ -337,6 +339,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         amount={targetTokenAmount}
         onAmountChange={onAmountChange}
         //Check if target token amount, if not bigNumber from 0
+        // TODO: enable lending/borrowing fractions of tokens
         amountValue={BigNumber.from(targetTokenAmount ? targetTokenAmount : 0)
           .pow(BigNumber.from(10).mul(selectedSellToken.decimals ?? 0))
           .toString()}

@@ -74,9 +74,12 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
           }
         },
         network: (networkId) => {
+          // console.log('subgraph wallet select: ', network);
           const supportedNetworkSettings = SUPPORTED_NETWORKS.find(
             (network) => NETWORK_SETTINGS[network].networkId === networkId
           );
+          // console.log('subgraph supportedNetworkSettings: ', supportedNetworkSettings);
+          // console.log('subgraph wallet connected: ', wallet.isConnected);
           if (wallet.isConnected && supportedNetworkSettings) {
             web3Provider.register('wallet', getEthersProvider(wallet.provider as ExternalProvider));
             const network = getNetwork(networkId);
@@ -86,6 +89,7 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
               read: web3Provider.getInstanceOf(providerType),
               write: web3Provider.getInstanceOf('wallet'),
             });
+            // console.log('subgraph do I get here? ', network);
             dispatch(NetworkActions.changeNetwork({ network }));
           }
         },
@@ -118,19 +122,21 @@ const changeWalletTheme =
 
 export interface ChangeWalletNetworkResult {
   networkChanged: boolean;
-  network: Network;
+  networkId: number;
 }
 
 const changeWalletNetwork = createAsyncThunk<ChangeWalletNetworkResult, { network: Network }, ThunkAPI>(
   'wallet/changeWalletNetwork',
   async ({ network }, { extra }) => {
     const { wallet } = extra.context;
-
+    console.log('subgraph changeWalletNetwork network: ', network);
+    console.log('subgraph changeWalletNetwork wallet: ', wallet);
     let networkChanged = false;
     if (wallet.isCreated && wallet.changeNetwork) {
       networkChanged = await wallet.changeNetwork(network);
     }
-    return { networkChanged, network };
+    const networkId = 1;
+    return { networkChanged, networkId };
   }
 );
 

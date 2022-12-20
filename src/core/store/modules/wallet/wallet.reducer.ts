@@ -16,7 +16,15 @@ export const walletInitialState: WalletState = {
   error: undefined,
 };
 
-const { addressChange, balanceChange, networkChange, walletChange, walletSelect, getAddressEnsName } = WalletActions;
+const {
+  addressChange,
+  balanceChange,
+  networkChange,
+  walletChange,
+  walletSelect,
+  getAddressEnsName,
+  changeWalletNetwork,
+} = WalletActions;
 
 const walletReducer = createReducer(walletInitialState, (builder) => {
   builder
@@ -28,7 +36,14 @@ const walletReducer = createReducer(walletInitialState, (builder) => {
       state.selectedAddress = address ? getAddress(address) : undefined;
     })
     .addCase(networkChange, (state, { payload: { network } }) => {
+      console.log('subgraph wallet networkChange reducer: ', network);
       state.networkVersion = network;
+    })
+    // Use networkId to set the state
+    .addCase(changeWalletNetwork.fulfilled, (state, { payload: { networkChanged, networkId } }) => {
+      console.log('subgraph wallet reducer networkId: ', networkId);
+      state.networkVersion = networkId;
+      console.log('subgraph wallet reducer state: ', state.networkVersion);
     })
     .addCase(balanceChange, (state, { payload: { balance } }) => {
       state.balance = balance;

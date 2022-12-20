@@ -147,6 +147,7 @@ export const Layout: FC = ({ children }) => {
     if (activeModal) dispatch(ModalsActions.closeModal());
     if (previousNetwork) dispatch(AppActions.clearAppData());
     if (selectedAddress) dispatch(AppActions.clearUserAppData());
+
     dispatch(TokensActions.getTokens());
     dispatch(TokensActions.getSupportedOracleTokens());
   }, [currentNetwork]);

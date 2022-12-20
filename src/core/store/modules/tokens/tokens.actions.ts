@@ -25,13 +25,28 @@ const clearUserTokenState = createAction<void>('tokens/clearUserTokenState');
 /*                                 Fetch Data                                 */
 /* -------------------------------------------------------------------------- */
 
+// TODO: Fix bug in this function where wallet.networkVersion is undefined when it should be
+// populated.
+// const getTokens = createAsyncThunk<{ tokensData: Token[] }, string | undefined, ThunkAPI>(
+//   'tokens/getTokens',
+//   async (_arg, { getState, extra }) => {
+//     const { wallet } = getState();
+//     const walletNetwork = getNetwork(`${wallet.networkVersion}`);
+//     console.log('subgraph getTokens state: ', wallet);
+//     console.log('subgraph getTokens walletNetwork: ', walletNetwork);
+//     const { tokenService } = extra.services;
+//     const tokensData: Token[] = await tokenService.getSupportedTokens({ network: walletNetwork });
+//     return { tokensData };
+//   }
+// );
+
+// TODO: Deprecate after fixing the bug in the createAsyncThunk above.
 const getTokens = createAsyncThunk<{ tokensData: Token[] }, string | undefined, ThunkAPI>(
   'tokens/getTokens',
   async (_arg, { getState, extra }) => {
-    const { wallet } = getState();
-    const walletNetwork = getNetwork(`${wallet.networkVersion}`);
+    const { network } = getState();
     const { tokenService } = extra.services;
-    const tokensData: Token[] = await tokenService.getSupportedTokens({ network: walletNetwork });
+    const tokensData: Token[] = await tokenService.getSupportedTokens({ network: network.current });
     return { tokensData };
   }
 );

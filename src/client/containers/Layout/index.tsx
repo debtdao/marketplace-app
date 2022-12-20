@@ -165,10 +165,12 @@ export const Layout: FC = ({ children }) => {
           subTitle={''}
           walletAddress={selectedAddress}
           addressEnsName={addressEnsName}
+          //
           onWalletClick={() => dispatch(WalletActions.walletSelect({ network: currentNetwork }))}
           disableWalletSelect={hideControls || isCoinbaseApp()}
           selectedNetwork={currentNetwork}
           networkOptions={SUPPORTED_NETWORKS}
+          //
           onNetworkChange={(network) => dispatch(NetworkActions.changeNetwork({ network: network as Network }))}
           disableNetworkChange={hideControls}
           hideDisabledControls={hideControls}

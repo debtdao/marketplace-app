@@ -9,12 +9,17 @@ export const networkInitialState: NetworkState = {
   current: getConfig().NETWORK,
 };
 
-const { changeNetwork } = NetworkActions;
+const { changeNetwork, changeNetworkGoerli } = NetworkActions;
 
 const networkReducer = createReducer(networkInitialState, (builder) => {
-  builder.addCase(changeNetwork.fulfilled, (state, { payload }) => {
-    state.current = payload.network;
-  });
+  builder
+    .addCase(changeNetwork.fulfilled, (state, { payload }) => {
+      state.current = payload.network;
+    })
+    .addCase(changeNetworkGoerli, (state) => {
+      console.log('subgraph reducer goerli');
+      state.current = 'goerli';
+    });
 });
 
 export default networkReducer;

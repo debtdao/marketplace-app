@@ -75,13 +75,13 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
 
   // // If contract has ABI, these functions generage the bytecode for the functions
   const onTransferFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
-    const hashedSigFunc = generateSig(newFunc.label, contractABI!);
+    const hashedSigFunc = generateSig(newFunc.label, contractABI[revenueContractAddy]!);
     setTransferFunc(hashedSigFunc);
     setTransferFuncType(newFunc);
   };
 
   const onClaimFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
-    const hashedSigFunc = generateSig(newFunc.label, contractABI!);
+    const hashedSigFunc = generateSig(newFunc.label, contractABI[revenueContractAddy]!);
     setClaimFunc(hashedSigFunc);
     setClaimFuncType(newFunc);
   };

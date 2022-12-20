@@ -15,7 +15,6 @@ export const getNetworkId = (network: Network): number => {
 };
 
 export const getNetwork = (networkId: number | string): Network => {
-  console.log(networkId);
   const networkName = CHAIN_IDS[Number(networkId)];
   if (networkName !== undefined) {
     return networkName;

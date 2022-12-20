@@ -2,6 +2,8 @@ import BigNumber from 'bignumber.js';
 
 import { Wei, Unit, Amount, FormattedAmount, Fraction, DataType } from '@types';
 
+import { isValidAddress } from './misc';
+
 BigNumber.set({ EXPONENTIAL_AT: 50 });
 
 export const USDC_DECIMALS = 6;
@@ -127,7 +129,9 @@ export const prettyNumbers = (x: string) => {
 };
 
 export const formatAddress = (address: string) => {
-  return address.substring(0, 6) + '...' + address.substring(address.length - 4, address.length);
+  return isValidAddress(address)
+    ? address.substring(0, 6) + '...' + address.substring(address.length - 4, address.length)
+    : address;
 };
 
 export const getDate = (timestamp: number) => {

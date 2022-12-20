@@ -14,7 +14,7 @@ export class OnchainMetaDataServiceImpl implements OnchainMetaDataService {
 
   public async getAddressEnsName(address: string): Promise<string | null> {
     const addressEnsName = await this.web3Provider.getInstanceOf('ethereum').lookupAddress(address);
-    console.log('address', addressEnsName);
+    // console.log('address', addressEnsName);
     return addressEnsName;
   }
 }

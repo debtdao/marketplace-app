@@ -1,7 +1,8 @@
 import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
-import { BigNumber } from 'ethers';
+import { BigNumber, FixedNumber } from 'ethers';
+import { parseUnits, hexlify } from 'ethers/lib/utils';
 
 import { formatAmount, normalizeAmount, isAddress, toWei, addCreditUpdate } from '@utils';
 import {
@@ -24,7 +25,6 @@ import { TxActionButton } from './components/TxActions';
 import { TxActions } from './components/TxActions';
 import { TxStatus } from './components/TxStatus';
 import { TxAddressInput } from './components/TxAddressInput';
-
 const {
   CONTRACT_ADDRESSES: { DAI },
   MAX_INTEREST_RATE,
@@ -131,7 +131,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   };
 
   const onAmountChange = (amount: string): void => {
-    setTargetTokenAmount(amount);
+    setTargetTokenAmount(amount === '' ? '0' : amount);
   };
 
   const onRateChange = (type: string, amount: string): void => {
@@ -318,6 +318,44 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
     );
   }
 
+  // TODO: Remove this block of console.logs after confirming new math is correct in code review.
+  // console.log(
+  //   'subgraph result 1: ',
+  //   BigNumber.from(targetTokenAmount ? targetTokenAmount : 0)
+  //     .pow(BigNumber.from(10).mul(selectedSellToken.decimals ?? 0))
+  //     .toString()
+  // );
+
+  // console.log('subgraph result 2: ', BigNumber.from(targetTokenAmount ? targetTokenAmount : 0).toString());
+
+  // console.log(
+  //   'subgraph result 3: ',
+  //   BigNumber.from(10)
+  //     .mul(selectedSellToken.decimals ?? 0)
+  //     .toString()
+  // );
+
+  // console.log(
+  //   'subgraph result 4: ',
+  //   BigNumber.from(targetTokenAmount ? targetTokenAmount : 0)
+  //     .pow(BigNumber.from(10).mul(selectedSellToken.decimals ?? 0))
+  //     .toString()
+  // );
+
+  // console.log(
+  //   'subgraph result correct math - BigNumber: ',
+  //   BigNumber.from(targetTokenAmount ? targetTokenAmount : 0)
+  //     .mul(BigNumber.from(10).pow(selectedSellToken.decimals ?? 0))
+  //     .toString()
+  // );
+
+  console.log(
+    'subgraph result correct math - parseUnits: ',
+    parseUnits(targetTokenAmount, selectedSellToken.decimals).toString()
+  );
+
+  console.log('subgraph token decimals: ', selectedSellToken.decimals);
+
   return (
     <StyledTransaction
       onClose={onClose}
@@ -338,11 +376,16 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
         onAmountChange={onAmountChange}
+        // TODO: Remove this block of console.logs after confirming new math is correct in code review.
         //Check if target token amount, if not bigNumber from 0
         // TODO: enable lending/borrowing fractions of tokens
-        amountValue={BigNumber.from(targetTokenAmount ? targetTokenAmount : 0)
-          .pow(BigNumber.from(10).mul(selectedSellToken.decimals ?? 0))
-          .toString()}
+        // amountValue={BigNumber.from(targetTokenAmount ? targetTokenAmount : 0)
+        // .pow(BigNumber.from(10).mul(selectedSellToken.decimals ?? 0))
+        // .toString()}
+        // amountValue={BigNumber.from(targetTokenAmount ? targetTokenAmount : 0)
+        //   .mul(BigNumber.from(10).pow(selectedSellToken.decimals ?? 0))
+        //   .toString()}
+        amountValue={parseUnits(targetTokenAmount, selectedSellToken.decimals).toString()}
         maxAmount={acceptingOffer ? targetTokenAmount : targetBalance}
         selectedToken={selectedSellToken}
         onSelectedTokenChange={onSelectedSellTokenChange}

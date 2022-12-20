@@ -3,6 +3,7 @@ import { Network, ProviderType } from '@types';
 
 const { NETWORK, CHAIN_IDS } = getConfig();
 
+// TODO: use CHAIN_IDS to from Network to Id
 export const getNetworkId = (network: Network): number => {
   switch (network) {
     case 'mainnet':

@@ -17,7 +17,6 @@ const networkReducer = createReducer(networkInitialState, (builder) => {
       state.current = payload.network;
     })
     .addCase(changeNetworkGoerli, (state) => {
-      console.log('subgraph reducer goerli');
       state.current = 'goerli';
     });
 });

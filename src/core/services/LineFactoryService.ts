@@ -39,13 +39,14 @@ export class LineFactoryServiceImpl {
     owner: string,
     borrower: string,
     operator: string,
+    network: Network,
     dryRun: boolean
   ): Promise<TransactionResponse | PopulatedTransaction> {
     return await this.executeContractMethod(
       contractAddress,
       'deploySpigot',
       [owner, borrower, operator],
-      'goerli',
+      network,
       dryRun
     );
   }
@@ -54,9 +55,10 @@ export class LineFactoryServiceImpl {
     contractAddress: Address,
     owner: string,
     borrower: string,
+    network: Network,
     dryRun: boolean
   ): Promise<TransactionResponse | PopulatedTransaction> {
-    return await this.executeContractMethod(contractAddress, 'deployEscrow', [owner, borrower], 'goerli', dryRun);
+    return await this.executeContractMethod(contractAddress, 'deployEscrow', [owner, borrower], network, dryRun);
   }
 
   public async deploySecuredLine(props: {

@@ -11,6 +11,7 @@ import {
   GasFees,
   TransactionReceipt,
   Web3Provider,
+  ProviderType,
 } from '@types';
 import { getProviderType } from '@utils';
 import { getContract } from '@frameworks/ethers';
@@ -45,19 +46,15 @@ export class TransactionServiceImpl implements TransactionService {
       };
       const txArgs = args ? [...args, txOverrides] : [txOverrides];
 
-      console.log('subgraph web3 provider: ', this.web3Provider);
       const signer = this.web3Provider.getSigner();
-      console.log('subgraph signer: ', signer);
       const contract = getContract(contractAddress, abi, signer);
       console.log(contract, contractAddress, abi, 'jackpot');
       const unsignedTx = await contract.populateTransaction[methodName](...txArgs);
-      console.log('subgraph unsigned txn: ', unsignedTx);
       // const contractIface = new Interface(abi);
       // const decodedData = contractIface.decodeFunctionData(methodName, unsignedTx.data!.toString());
       // console.log({ decodedData });
 
       const tx = await signer.sendTransaction(unsignedTx);
-      console.log('subgraph send txn: ', unsignedTx);
       return tx;
     } catch (error: any) {
       // Retry as a legacy tx, for specific error in metamask v10 + ledger transactions
@@ -101,7 +98,7 @@ export class TransactionServiceImpl implements TransactionService {
       };
       const txArgs = args ? [...args, txOverrides] : [txOverrides];
 
-      const contract = getContract(contractAddress, abi, this.web3Provider.getInstanceOf('goerli'));
+      const contract = getContract(contractAddress, abi, this.web3Provider.getInstanceOf(network as ProviderType));
       console.log(contract, 'jackpot');
       return await contract.populateTransaction[methodName](...txArgs);
     } catch (error: any) {

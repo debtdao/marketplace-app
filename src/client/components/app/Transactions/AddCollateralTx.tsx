@@ -130,7 +130,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
 
   const NavigateToDiscord = () => {
     console.log('discord');
-    window.open('https://discord.gg/F83xx67fyQ', '_blank');
+    window.open('https://discord.com/channels/964777235896746024/1054810838818635888/1054811038803054602', '_blank');
     onClose();
   };
 

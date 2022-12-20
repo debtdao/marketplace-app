@@ -1,4 +1,4 @@
-import { networks } from '../config/constants/networks.json';
+import { networks } from '../config/constants/supportedNetworks.json';
 
 const getLineFactoryforNetwork = (network: number | string) => {
   var LineFactory: string = '';

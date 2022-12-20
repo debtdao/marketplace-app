@@ -1,4 +1,13 @@
-export type Network = 'mainnet' | 'ropsten' | 'rinkeby' | 'kovan' | 'arbitrum' | 'other' | 'goerli';
+import _ from 'lodash';
+
+import { getConfig } from '@config';
+
+const { CHAIN_IDS } = getConfig();
+
+const names = _.values(CHAIN_IDS);
+
+// Network can be any network name within CHAIN_IDS
+export type Network = typeof names[number];
 
 export type Symbol = string;
 

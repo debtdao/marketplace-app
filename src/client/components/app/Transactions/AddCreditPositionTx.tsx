@@ -11,7 +11,7 @@ import {
   useAppSelector,
   useSelectedSellToken,
 } from '@hooks';
-import { ACTIVE_STATUS, BORROWER_POSITION_ROLE, PROPOSED_STATUS } from '@src/core/types';
+import { AddCreditProps, ACTIVE_STATUS, BORROWER_POSITION_ROLE, PROPOSED_STATUS } from '@src/core/types';
 import { getConstants } from '@src/config/constants';
 import { TokensActions, TokensSelectors, WalletSelectors, LinesSelectors, LinesActions } from '@store';
 import { Button } from '@components/common';
@@ -153,12 +153,11 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       return;
     }
     let approvalOBj = {
-      spenderAddress: selectedCredit.id,
-      tokenAddress: selectedSellTokenAddress,
+      tokenAddress: selectedSellTokenAddress!,
       amount: toWei(targetTokenAmount, selectedSellToken!.decimals),
-      network: walletNetwork,
+      lineAddress: selectedCredit.id,
+      network: walletNetwork!,
     };
-    //@ts-ignore
     dispatch(LinesActions.approveDeposit(approvalOBj)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionApproved(transactionApproved);
@@ -181,6 +180,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
 
   const addCreditPosition = async () => {
     setLoading(true);
+    console.log('add position ', selectedCredit?.id, selectedSellTokenAddress);
     // TODO set error in state to display no line selected
     if (!selectedCredit?.id || !drate || !frate || lenderAddress === '' || !positions) {
       setLoading(false);
@@ -197,17 +197,18 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       return;
     }
 
-    const transactionObj = {
+    const amountInWei = toWei(targetTokenAmount, selectedSellToken!.decimals);
+
+    const transactionObj: AddCreditProps = {
       lineAddress: selectedCredit.id,
-      drate,
-      frate,
-      amount: toWei(targetTokenAmount, selectedSellToken!.decimals),
+      drate: BigNumber.from(drate),
+      frate: BigNumber.from(frate),
+      amount: BigNumber.from(amountInWei),
       token: selectedSellTokenAddress,
       lender: lenderAddress,
-      network: walletNetwork,
+      network: walletNetwork!,
       dryRun: false,
     };
-    //@ts-ignore
     dispatch(LinesActions.addCredit(transactionObj)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionCompleted(2);

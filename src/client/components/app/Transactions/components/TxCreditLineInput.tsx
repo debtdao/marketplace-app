@@ -3,12 +3,23 @@ import styled from 'styled-components';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import { TokenIcon } from '@components/app';
-import { useAppTranslation } from '@hooks';
-import { Text, Icon, SearchList, LogoIcon, ZapIcon, SearchListItem } from '@components/common';
+import { useAppSelector, useAppTranslation } from '@hooks';
+import { Text, Icon, SearchList, LogoIcon, ZapIcon, SearchListItem, RedirectIcon, Link } from '@components/common';
 import { SecuredLine } from '@src/core/types';
+import { WalletSelectors } from '@src/core/store';
+import { getConfig } from '@src/config';
+const { NETWORK_SETTINGS } = getConfig();
 
 const LineTitle = styled(Text)`
   color: ${({ theme }) => theme.colors.txModalColors.text};
+`;
+
+const RedirectLink = styled(Link)`
+  display: flex;
+`;
+
+const LinkOut = styled(RedirectIcon)`
+  fill: ${({ theme }) => theme.colors.primary};
 `;
 
 const CreditLineData = styled.div`
@@ -120,6 +131,7 @@ const StyledTxCreditLineInput = styled(TransitionGroup)`
   }
 `;
 
+// TODO FUCKING REMOVE!@!!!
 const amountToNumber = (amount: string) => {
   const parsedAmount = amount.replace(/[%,$ ]/g, '');
   return parseInt(parsedAmount);
@@ -153,6 +165,8 @@ export const TxCreditLineInput: FC<TxCreditLineInputProps> = ({
   ...props
 }) => {
   const { t } = useAppTranslation('common');
+  const selectedNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
+  // tODO get borrower ENS
 
   let listItems: SearchListItem[] = [];
   //let zappableItems: SearchListItem[] = [];
@@ -188,6 +202,9 @@ export const TxCreditLineInput: FC<TxCreditLineInputProps> = ({
     ? t('components.transaction.add-credit-input.select-an-offer')
     : t('components.transaction.add-credit-input.select-an-offer');
 
+  const { blockExplorerUrl } = NETWORK_SETTINGS[selectedNetwork];
+  console.log('supported network', blockExplorerUrl, selectedNetwork);
+
   return (
     <StyledTxCreditLineInput {...props}>
       <>{headerText && <Header>{headerText}</Header>}</>
@@ -214,8 +231,18 @@ export const TxCreditLineInput: FC<TxCreditLineInputProps> = ({
             <CreditLineName>{selectedItem.label}</CreditLineName>
           </CreditLineSelector>
           <CreditLineData>
-            <LineTitle ellipsis> Borrower: ENS / {selectedCredit.borrower} </LineTitle>
-            <LineTitle ellipsis> Line: {selectedCredit.id || `0xDebf...1dao`}</LineTitle>
+            <RedirectLink to={`${blockExplorerUrl}/address/${selectedCredit.borrower}`}>
+              <LineTitle ellipsis>
+                {t('components.transaction.add-credit-input.selected-borrower')}: {selectedCredit.borrower}
+              </LineTitle>
+              <LinkOut />
+            </RedirectLink>
+            <RedirectLink to={`${blockExplorerUrl}/address/${selectedCredit.id}`}>
+              <LineTitle ellipsis>
+                {t('components.transaction.add-credit-input.selected-line')}: {selectedCredit.id}
+              </LineTitle>
+              <LinkOut />
+            </RedirectLink>
           </CreditLineData>
         </CreditLineInfo>
       </>

@@ -151,7 +151,6 @@ export class CollateralServiceImpl implements CollateralService {
       throw new Error('addSpigot: bad owner split');
     }
 
-    const settingsData = ethers.utils.AbiCoder.prototype.encode(['uint8', 'bytes4', 'bytes4'], []);
     const {
       setting: { ownerSplit, claimFunction, transferOwnerFunction },
     } = props;
@@ -211,7 +210,6 @@ export class CollateralServiceImpl implements CollateralService {
         amount: props.amount,
         targetToken: props.token,
       };
-      //@ts-ignore
       return <TransactionResponse>(
         await this.executeContractMethod(
           line,

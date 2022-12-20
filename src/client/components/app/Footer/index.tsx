@@ -46,11 +46,11 @@ const socialLinks = [
   //   icon: RedditIcon,
   //   ariaLabel: 'Visit Debt DAO Reddit',
   // },
-  {
-    link: 'https://discord.gg/F83xx67fyQ',
-    icon: DiscordIcon,
-    ariaLabel: 'Join Debt DAO Discord',
-  },
+  // {
+  //   link: 'https://discord.gg/F83xx67fyQ',
+  //   icon: DiscordIcon,
+  //   ariaLabel: 'Join Debt DAO Discord',
+  // },
   // {
   //   link: 'https://medium.com/iearn',
   //   icon: MediumIcon,

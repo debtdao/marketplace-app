@@ -234,8 +234,6 @@ export const TxTokenInput: FC<TxTokenInputProps> = ({
   ...props
 }) => {
   const { t } = useAppTranslation('common');
-  console.log('subgraph amount: ', amountValue);
-  console.log('subgraph amount value: ', amountValue);
   let listItems: SearchListItem[] = [];
   let selectedItem: SearchListItem = {
     id: selectedToken.address,

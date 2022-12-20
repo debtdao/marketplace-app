@@ -2,6 +2,9 @@ import { createReducer } from '@reduxjs/toolkit';
 import { getAddress } from '@ethersproject/address';
 
 import { WalletState } from '@types';
+import { getNetworkId } from '@src/utils';
+
+import { NetworkActions } from '../network/network.actions';
 
 import { WalletActions } from './wallet.actions';
 
@@ -25,6 +28,8 @@ const {
   getAddressEnsName,
   // changeWalletNetwork,
 } = WalletActions;
+
+const { changeNetwork, changeNetworkGoerli } = NetworkActions;
 
 const walletReducer = createReducer(walletInitialState, (builder) => {
   builder
@@ -62,6 +67,15 @@ const walletReducer = createReducer(walletInitialState, (builder) => {
     })
     .addCase(getAddressEnsName.fulfilled, (state, { payload: { addressEnsName } }) => {
       state.addressEnsName = addressEnsName;
+    })
+    // synchronize network across network, lines, and wallet state
+    .addCase(changeNetwork.fulfilled, (state, { payload }) => {
+      // state.current = payload.network;
+      state.networkVersion = getNetworkId(payload.network);
+    })
+    .addCase(changeNetworkGoerli, (state) => {
+      // state.current = 'goerli';
+      state.networkVersion = 5;
     });
 });
 

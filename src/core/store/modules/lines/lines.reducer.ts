@@ -14,7 +14,9 @@ import {
   LinesByRole,
   PositionMap,
 } from '@types';
+import { getNetworkId } from '@src/utils';
 
+import { NetworkActions } from '../network/network.actions';
 import { WalletActions } from '../wallet/wallet.actions';
 
 import { LinesActions } from './lines.actions';
@@ -27,6 +29,8 @@ export const initialLineActionsStatusMap: LineActionsStatusMap = {
 };
 
 const { networkChange } = WalletActions;
+
+const { changeNetwork, changeNetworkGoerli } = NetworkActions;
 
 export const initialUserMetadataStatusMap: UserLineMetadataStatusMap = {
   getUserPortfolio: initialStatus,
@@ -105,7 +109,19 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
 
     .addCase(networkChange, (state, { payload: { network } }) => {
+      // wallet action
       state.network = network;
+    })
+
+    // synchronize network across network, lines, and wallet state
+    .addCase(changeNetwork.fulfilled, (state, { payload }) => {
+      // network actions
+      // state.current = payload.network;
+      state.network = getNetworkId(payload.network);
+    })
+    .addCase(changeNetworkGoerli, (state) => {
+      // state.current = 'goerli';
+      state.network = 5;
     })
 
     /* -------------------------------------------------------------------------- */

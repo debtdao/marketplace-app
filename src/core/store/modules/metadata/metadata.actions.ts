@@ -44,12 +44,11 @@ const getENS = createAsyncThunk<{ address: string; ens: string }, string, ThunkA
     const { onchainMetaDataService } = extra.services;
     const { wallet } = getState();
     const userAddress = wallet.selectedAddress;
-    console.log(address, 'ens');
+    //console.log(address, 'ens');
 
     if (!userAddress) throw new Error('WALLET NOT CONNECT');
     const onchainMetaDataResponse = await onchainMetaDataService.getAddressEnsName(address);
     const ens = onchainMetaDataResponse;
-
     return {
       address,
       ens,

@@ -17,7 +17,7 @@ const onchainMetaDataReducer = createReducer(initialOnchainMetaDataState, (build
     .addCase(getABI.fulfilled, (state, { payload: { address, abi, functions } }) => {
       state.contractABI[address] = abi;
       state.contractFunctions = functions;
-      console.log(state);
+      //console.log(state);
     })
 
     .addCase(getABI.rejected, (state, { error }) => {
@@ -40,7 +40,7 @@ const onchainMetaDataReducer = createReducer(initialOnchainMetaDataState, (build
     })
 
     .addCase(getENS.pending, (state) => {
-      console.log('pending getENS');
+      //console.log('pending getENS');
     });
 });
 

@@ -1,8 +1,9 @@
 import { BigNumber } from 'ethers';
 import { BytesLike } from '@ethersproject/bytes/src.ts';
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
+import _ from 'lodash';
 
-import { ThunkAPI } from '@frameworks/redux';
+import { AppDispatch, ThunkAPI } from '@frameworks/redux';
 import {
   SecuredLine,
   SecuredLineWithEvents,
@@ -22,6 +23,9 @@ import {
   CreditPosition,
   RootState,
   PositionMap,
+  Subscriptions,
+  BaseLineFragResponse,
+  GetLinesResponse,
 } from '@types';
 import {
   formatGetLinesData,
@@ -36,6 +40,7 @@ import { unnullify, getNetwork } from '@utils';
 
 import { TokensActions } from '../tokens/tokens.actions';
 import { TokensSelectors } from '../tokens/tokens.selectors';
+import { OnchainMetaDataActions } from '../metadata/metadata.actions';
 
 /* -------------------------------------------------------------------------- */
 /*                                   Setters                                  */
@@ -79,13 +84,13 @@ const getLine = createAsyncThunk<{ lineData: SecuredLine | undefined }, GetLineA
 
 const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine[] } }, UseCreditLinesParams, ThunkAPI>(
   'lines/getLines',
-  async (categories, { getState, extra }) => {
+  async (categories, { getState, extra, dispatch }) => {
     const {
       wallet,
       tokens: { tokensMap },
     } = getState();
 
-    const { creditLineService } = extra.services;
+    const { creditLineService, onchainMetaDataService } = extra.services;
     const network = getNetwork(`${wallet.networkVersion}`);
     const tokenPrices = Object.entries(tokensMap).reduce(
       (prices, [addy, { priceUsdc }]) => ({ ...prices, [addy]: priceUsdc }),
@@ -93,18 +98,38 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
     );
 
     // ensure consistent ordering of categories
+    console.log(categories);
     const categoryKeys = Object.keys(categories);
     const promises = await Promise.all(
       categoryKeys
         .map((k) => categories[k])
         .map((params: GetLinesArgs) => creditLineService.getLines({ network, ...params }))
     );
-    const linesData = categoryKeys.reduce(
-      (all, category, i) =>
+
+
+      //@ts-ignore
+    const {linesData, allBorrowers } = categoryKeys.reduce(
+      //@ts-ignore
+      ({ linesData, allBorrowers }, category, i) => {
         // @dev assumes `promises` is same order as `categories`
-        !promises[i] ? all : { ...all, [category]: formatGetLinesData(promises[i]!, tokenPrices) },
-      {}
+        if (!promises[i]) {
+          return { linesData, allBorrowers };
+        } else {
+          const categoryLines = formatGetLinesData(promises[i]!, tokenPrices);
+          return {
+            linesData: { ...linesData, [category]: categoryLines },
+            allBorrowers: [...allBorrowers, ...categoryLines.map((line) => line.borrower)],
+          };
+        }
+      },
+      { linesData: {}, allBorrowers: [] }
     );
+    console.log(allBorrowers);
+    allBorrowers.forEach((element: string) => {
+      dispatch(OnchainMetaDataActions.getENS(element));
+    });
+    // do ENS things with borrowers
+    // const borrowers = _.uniq(allborrowers)
 
     return { linesData };
   }

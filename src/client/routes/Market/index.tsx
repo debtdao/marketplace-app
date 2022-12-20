@@ -5,12 +5,22 @@ import { useHistory } from 'react-router-dom';
 import { utils } from 'ethers';
 
 import { useAppSelector, useAppDispatch, useAppTranslation, useQueryParams } from '@hooks';
-import { ModalsActions, LinesActions, LinesSelectors, WalletActions, WalletSelectors } from '@store';
+import {
+  ModalsActions,
+  LinesActions,
+  LinesSelectors,
+  WalletActions,
+  WalletSelectors,
+  OnchainMetaDataActions,
+  OnchainMetaDataSelector
+} from '@store';
 import { RecommendationsCard, SliderCard, ViewContainer } from '@components/app';
 import { SpinnerLoading, Text, Button } from '@components/common';
 import { SecuredLine, UseCreditLinesParams } from '@src/core/types';
 import { DebtDAOBanner } from '@assets/images';
 import { getEnv } from '@config/env';
+import { getENS } from '@src/utils';
+
 
 const StyledRecommendationsCard = styled(RecommendationsCard)``;
 
@@ -39,6 +49,7 @@ export const Market = () => {
   const [search, setSearch] = useState('');
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
+  const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
 
   // TODO not neeed here
   const addCreditStatus = useAppSelector(LinesSelectors.selectLinesActionsStatusMap);
@@ -72,12 +83,15 @@ export const Market = () => {
 
     const expectedCategories = _.keys(defaultLineCategories);
     const currentCategories = _.keys(lineCategoriesForDisplay);
-
+    console.log(expectedCategories);
     // const shouldFetch = expectedCategories.reduce((bool, cat) => bool && cuirrentCategories.includes(cat), true);
     let shouldFetch: boolean = false;
     expectedCategories.forEach((cat) => (shouldFetch = shouldFetch || !currentCategories.includes(cat)));
 
-    if (shouldFetch) fetchMarketData();
+    if (shouldFetch) {
+      fetchMarketData();
+      console.log();
+    }
     console.log('search', search);
   }, []);
 
@@ -140,7 +154,7 @@ export const Market = () => {
               key={key}
               items={val.map(({ id, borrower, spigot, escrow, principal, deposit, start, end }) => ({
                 icon: '',
-                name: borrower,
+                name: (getENS(borrower, ensMap) ? getENS(borrower, ensMap) : borrower)!,
                 start: start,
                 end: end,
                 id: id,

@@ -175,6 +175,7 @@
         "select-token": "2. Select credit token",
         "select-rates": "3. Set your interest rates",
         "back-to-market": "Head back to the Market",
+        "cta": "Add Collateral",
         "no-assets-enabled": {
           "title": "No tokens have been enabled as collateral on your line!",
           "body": "The arbiter is the only one that can enable assets to be deposited as collateral. Find and contact your Arbiter in the Debt DAO discord.",

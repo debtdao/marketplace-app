@@ -181,7 +181,7 @@ const amountToNumber = (amount: string) => {
 interface Token {
   address: string;
   symbol: string;
-  decimals: number;
+  decimals: number | string;
   icon?: string;
   balance?: string;
   balanceUsdc?: string;

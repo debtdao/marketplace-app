@@ -41,13 +41,13 @@ const navLinks: NavigationLink[] = [
     external: true,
     optional: true,
   },
-  {
-    to: 'https://discord.gg/F83xx67fyQ',
-    text: 'navigation.discord',
-    icon: DiscordIcon,
-    external: true,
-    optional: true,
-  },
+  // {
+  //   to: 'https://discord.gg/F83xx67fyQ',
+  //   text: 'navigation.discord',
+  //   icon: DiscordIcon,
+  //   external: true,
+  //   optional: true,
+  // },
   {
     to: '/settings',
     text: 'navigation.settings',

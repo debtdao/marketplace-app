@@ -12,7 +12,7 @@ import {
   WalletActions,
   WalletSelectors,
   OnchainMetaDataActions,
-  OnchainMetaDataSelector
+  OnchainMetaDataSelector,
 } from '@store';
 import { RecommendationsCard, SliderCard, ViewContainer } from '@components/app';
 import { SpinnerLoading, Text, Button } from '@components/common';
@@ -20,7 +20,6 @@ import { SecuredLine, UseCreditLinesParams } from '@src/core/types';
 import { DebtDAOBanner } from '@assets/images';
 import { getEnv } from '@config/env';
 import { getENS } from '@src/utils';
-
 
 const StyledRecommendationsCard = styled(RecommendationsCard)``;
 

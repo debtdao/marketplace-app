@@ -106,9 +106,8 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
         .map((params: GetLinesArgs) => creditLineService.getLines({ network, ...params }))
     );
 
-
-      //@ts-ignore
-    const {linesData, allBorrowers } = categoryKeys.reduce(
+    //@ts-ignore
+    const { linesData, allBorrowers } = categoryKeys.reduce(
       //@ts-ignore
       ({ linesData, allBorrowers }, category, i) => {
         // @dev assumes `promises` is same order as `categories`

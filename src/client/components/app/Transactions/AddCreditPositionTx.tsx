@@ -180,6 +180,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
 
   const addCreditPosition = async () => {
     setLoading(true);
+    console.log('add position ', selectedCredit?.id, selectedSellTokenAddress);
     // TODO set error in state to display no line selected
     if (!selectedCredit?.id || !drate || !frate || lenderAddress === '' || !positions) {
       setLoading(false);

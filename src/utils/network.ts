@@ -1,7 +1,7 @@
 import { getConfig } from '@config';
 import { Network, ProviderType } from '@types';
 
-const { CHAIN_IDS } = getConfig();
+const { NETWORK, CHAIN_IDS } = getConfig();
 
 export const getNetworkId = (network: Network): number => {
   switch (network) {
@@ -14,13 +14,13 @@ export const getNetworkId = (network: Network): number => {
   }
 };
 
-export const getNetwork = (networkId: number | string): Network => {
-  console.log(networkId);
-  const networkName = CHAIN_IDS[Number(networkId)];
-  if (networkName !== undefined) {
-    return networkName;
+export const getNetwork = (networkId?: number | string): Network => {
+  // TODO find out why undefined is a string instead of actual undefined
+  const id = !networkId || networkId === 'undefined' ? NETWORK : networkId;
+  if (id !== undefined) {
+    return typeof id === 'string' ? id : CHAIN_IDS[Number(id)];
   } else {
-    console.warn(`Unknown networkId: ${networkId} (as ${typeof networkId})`);
+    console.warn(`Unknown networkId: ${id} (as ${typeof id})`);
     return 'other';
   }
 };

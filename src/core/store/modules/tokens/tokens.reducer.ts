@@ -86,6 +86,7 @@ const tokensReducer = createReducer(tokensInitialState, (builder) => {
       state.statusMap.getTokens = { loading: true };
     })
     .addCase(getTokens.fulfilled, (state, { payload: { tokensData } }) => {
+      console.log('get yearn tokens', tokensData);
       const tokenAddresses: string[] = [];
       tokensData.forEach((token) => {
         const checkSumAddress = utils.getAddress(token.address);
@@ -96,6 +97,7 @@ const tokensReducer = createReducer(tokensInitialState, (builder) => {
       state.statusMap.getTokens = {};
     })
     .addCase(getTokens.rejected, (state, { error }) => {
+      console.log('get yearn tokens failed', error);
       state.statusMap.getTokens = { error: error.message };
     })
 

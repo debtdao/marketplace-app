@@ -26,7 +26,7 @@ export class TransactionServiceImpl implements TransactionService {
 
   public async execute(props: ExecuteTransactionProps): Promise<TransactionResponse> {
     const { network, methodName, abi, contractAddress, args, overrides } = props;
-
+    console.log('subgraph inside TXN service execute', network);
     let gasFees: GasFees = {};
     try {
       if (network === 'mainnet') {
@@ -45,16 +45,19 @@ export class TransactionServiceImpl implements TransactionService {
       };
       const txArgs = args ? [...args, txOverrides] : [txOverrides];
 
+      console.log('subgraph web3 provider: ', this.web3Provider);
       const signer = this.web3Provider.getSigner();
+      console.log('subgraph signer: ', signer);
       const contract = getContract(contractAddress, abi, signer);
       console.log(contract, contractAddress, abi, 'jackpot');
       const unsignedTx = await contract.populateTransaction[methodName](...txArgs);
-
+      console.log('subgraph unsigned txn: ', unsignedTx);
       // const contractIface = new Interface(abi);
       // const decodedData = contractIface.decodeFunctionData(methodName, unsignedTx.data!.toString());
       // console.log({ decodedData });
 
       const tx = await signer.sendTransaction(unsignedTx);
+      console.log('subgraph send txn: ', unsignedTx);
       return tx;
     } catch (error: any) {
       // Retry as a legacy tx, for specific error in metamask v10 + ledger transactions

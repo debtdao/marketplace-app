@@ -78,8 +78,6 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
           const supportedNetworkSettings = SUPPORTED_NETWORKS.find(
             (network) => NETWORK_SETTINGS[network].networkId === networkId
           );
-          // console.log('subgraph supportedNetworkSettings: ', supportedNetworkSettings);
-          // console.log('subgraph wallet connected: ', wallet.isConnected);
           if (wallet.isConnected && supportedNetworkSettings) {
             web3Provider.register('wallet', getEthersProvider(wallet.provider as ExternalProvider));
             const network = getNetwork(networkId);
@@ -92,9 +90,9 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
             console.log('subgraph - wallet select change network', network);
             dispatch(NetworkActions.changeNetwork({ network }));
           }
-          // TODO: Add dispatch to changeGoerliNetwork
+          // Note: Force state to goerli
           else if (networkId === 5) {
-            console.log('subgraph dispatch network goerli');
+            web3Provider.register('wallet', getEthersProvider(wallet.provider as ExternalProvider));
             dispatch(NetworkActions.changeNetworkGoerli());
           }
         },

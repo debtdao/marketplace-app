@@ -221,7 +221,6 @@ export const PositionsTable = (props: PositionsProps) => {
     return [];
   };
 
-  console.log('subgraph positions: ', positions);
   return (
     <>
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>

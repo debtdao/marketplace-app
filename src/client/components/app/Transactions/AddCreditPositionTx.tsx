@@ -1,8 +1,8 @@
 import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
-import { BigNumber, FixedNumber } from 'ethers';
-import { parseUnits, hexlify } from 'ethers/lib/utils';
+import { BigNumber } from 'ethers';
+// import { parseUnits, hexlify } from 'ethers/lib/utils';
 
 import { formatAmount, normalizeAmount, isAddress, toWei, addCreditUpdate } from '@utils';
 import {

@@ -10,6 +10,7 @@ import { AppSelectors } from '../modules/app/app.selectors';
 import { WalletSelectors } from '../modules/wallet/wallet.selectors';
 import { TokensSelectors, createToken } from '../modules/tokens/tokens.selectors';
 import { NetworkSelectors } from '../modules/network/network.selectors';
+const { NETWORK, TOKEN_ADDRESSES } = getConfig();
 // import { Token } from 'graphql';
 
 const { selectVaultsMap } = VaultsSelectors;
@@ -29,7 +30,15 @@ export const selectDepositTokenOptionsByAsset = createSelector(
     selectServicesEnabled,
     selectWalletNetwork,
   ],
-  (supportedTokens, supportedTokensMap, tokenAddresses, tokensMap, tokensUser, servicesEnabled, currentNetwork) =>
+  (
+    supportedTokens,
+    supportedTokensMap,
+    tokenAddresses,
+    tokensMap,
+    tokensUser,
+    servicesEnabled,
+    currentNetwork = NETWORK
+  ) =>
     memoize((assetAddress?: string): TokenView[] => {
       console.log('TokenService selectDepositTokenOptionsByAsset', currentNetwork, tokensMap, testTokens);
       const { userTokensMap, userTokensAllowancesMap } = tokensUser;
@@ -53,7 +62,7 @@ export const selectDepositTokenOptionsByAsset = createSelector(
         // return allTestTokens;
         return testTokens;
       } else {
-        const { TOKEN_ADDRESSES } = getConfig();
+        console.log('use mainnet tokens ', TOKEN_ADDRESSES, tokensMap);
         const mainTokens = Object.values(TOKEN_ADDRESSES)
           .filter((address) => !!tokensMap[address])
           .map((address) => {
@@ -74,6 +83,7 @@ export const selectDepositTokenOptionsByAsset = createSelector(
         // Return a list of supported tokens with mainTokens (e.g. ETH, WETH, DAI, etc.)
         // coming before subgraphTokens (e.g. AAVE, LINK, etc.) with both indepently sorted
         // from A-Z
+        console.log('use mainnet tokens ', sortedSubgraphTokens, subgraphTokens, mainTokens);
         return unionBy(mainTokens, sortedSubgraphTokens, (o) => o.symbol);
       }
     })

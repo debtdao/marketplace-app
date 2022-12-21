@@ -237,8 +237,13 @@ export interface VaultActionsStatusMap {
 }
 
 export interface OnchainMetaDataState {
-  contractABI: string | undefined;
-  contractFunctions: string[] | undefined;
+  contractABI: { [address: string]: string };
+  contractFunctions: { [address: string]: string[] };
+  // contractFunctions: {
+  //   [address: string]: {
+  //     [functionName: string]: string;
+  //   };
+  // };
   ens: { [address: string]: string };
 }
 

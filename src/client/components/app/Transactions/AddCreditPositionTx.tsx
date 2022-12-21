@@ -134,7 +134,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   };
 
   const onAmountChange = (amount: string): void => {
-    setTargetTokenAmount(amount === '' ? '0' : amount);
+    setTargetTokenAmount(amount ?? '0');
   };
 
   const onRateChange = (type: string, amount: string): void => {

@@ -8,26 +8,26 @@ const { getABI, clearABI, getENS } = OnchainMetaDataActions;
 
 export const initialOnchainMetaDataState: OnchainMetaDataState = {
   contractABI: {},
-  contractFunctions: undefined,
+  contractFunctions: {},
   ens: {},
 };
 
 const onchainMetaDataReducer = createReducer(initialOnchainMetaDataState, (builder) => {
   builder
-    .addCase(getABI.fulfilled, (state, { payload: { address, abi, functions } }) => {
+    .addCase(getABI.fulfilled, (state, { payload: { abi, functionSigs, address } }) => {
       state.contractABI[address] = abi;
-      state.contractFunctions = functions;
+      state.contractFunctions[address] = functionSigs;
       console.log(state);
     })
 
     .addCase(getABI.rejected, (state, { error }) => {
       state.contractABI = {};
-      state.contractFunctions = undefined;
+      state.contractFunctions = {};
     })
 
     .addCase(clearABI, (state) => {
       state.contractABI = {};
-      state.contractFunctions = [];
+      state.contractFunctions = {};
     })
 
     .addCase(getENS.fulfilled, (state, { payload: { address, ens } }) => {

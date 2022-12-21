@@ -45,7 +45,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
 
   // Deploy Line base data state
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
-  const LINEFACTORY = useAppSelector(LinesSelectors.selectNetwork);
+
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const { header, onClose } = props;
   const [borrower, setBorrower] = useState('');
@@ -115,7 +115,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
 
       dispatch(
         LinesActions.deploySecuredLine({
-          factory: getLineFactoryforNetwork(LINEFACTORY!)!,
+          factory: getLineFactoryforNetwork(walletNetwork!)!,
           borrower,
           ttl: BigNumber.from(ttl.toFixed(0)),
           network: walletNetwork,
@@ -152,7 +152,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       // TODO Dynamic var based on network
       dispatch(
         LinesActions.deploySecuredLineWithConfig({
-          factory: getLineFactoryforNetwork(LINEFACTORY!)!,
+          factory: getLineFactoryforNetwork(walletNetwork!)!,
           borrower,
           ttl: BigNumber.from(ttl.toFixed(0)),
           network: walletNetwork,

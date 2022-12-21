@@ -100,6 +100,8 @@ const getNetworkIcon = (network: Network) => {
       return EthereumIcon;
     case 'goerli':
       return EthereumIcon;
+    case 'arbitrum':
+      return ArbitrumIcon;
     default:
       return;
   }
@@ -150,12 +152,6 @@ export const Navbar = ({
     };
   });
 
-  const dropdownSelectedNetwork = {
-    value: selectedNetwork,
-    label: NETWORK_SETTINGS[selectedNetwork].name,
-    Icon: getNetworkIcon(selectedNetwork),
-  };
-
   const dropdownSelectedWalletNetwork = {
     value: walletNetwork,
     label: walletNetworkName,
@@ -182,7 +178,7 @@ export const Navbar = ({
           {!hideDisabledControls && (
             /* turn this into not a list because we only support mainnet right now */
             <StyledOptionList
-              selected={walletNetwork !== undefined ? dropdownSelectedWalletNetwork : dropdownSelectedNetwork}
+              selected={dropdownSelectedWalletNetwork}
               setSelected={(option) => onNetworkChange(option.value)}
               hideIcons={isMobile}
               disabled={disableNetworkChange}

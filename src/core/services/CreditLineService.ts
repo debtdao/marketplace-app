@@ -76,8 +76,9 @@ export class CreditLineServiceImpl implements CreditLineService {
       if (!(await this.isSignerBorrowerOrLender(props.lineAddress, props.id))) {
         throw new Error('Unable to close. Signer is not borrower or lender');
       }
-      return (<TransactionResponse>await this.executeContractMethod(props.lineAddress, 'close', [props.id], 'goerli'))
-        .hash;
+      return (<TransactionResponse>(
+        await this.executeContractMethod(props.lineAddress, 'close', [props.id], props.network)
+      )).hash;
     } catch (e) {
       console.log(`An error occured while closing credit, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
@@ -107,7 +108,7 @@ export class CreditLineServiceImpl implements CreditLineService {
         props.lineAddress,
         'setRates',
         [props.id, props.drate, props.frate],
-        'goerli',
+        props.network,
         true
       );
       const borrower = await this.borrower(line);
@@ -119,7 +120,12 @@ export class CreditLineServiceImpl implements CreditLineService {
       }
 
       return (<TransactionResponse>(
-        await this.executeContractMethod(props.lineAddress, 'setRates', [props.id, props.drate, props.frate], 'goerli')
+        await this.executeContractMethod(
+          props.lineAddress,
+          'setRates',
+          [props.id, props.drate, props.frate],
+          props.network
+        )
       )).hash;
     } catch (e) {
       console.log(`An error occured while setting rate, error = [${JSON.stringify(e)}]`);
@@ -139,7 +145,7 @@ export class CreditLineServiceImpl implements CreditLineService {
         props.lineAddress,
         'increaseCredit',
         [props.id, props.amount],
-        'goerli',
+        props.network,
         true
       );
 
@@ -152,7 +158,7 @@ export class CreditLineServiceImpl implements CreditLineService {
       }
 
       return (<TransactionResponse>(
-        await this.executeContractMethod(props.lineAddress, 'increaseCredit', [props.id, props.amount], 'goerli')
+        await this.executeContractMethod(props.lineAddress, 'increaseCredit', [props.id, props.amount], props.network)
       )).hash;
     } catch (e) {
       console.log(`An error occured while increasing credit, error = [${JSON.stringify(e)}]`);

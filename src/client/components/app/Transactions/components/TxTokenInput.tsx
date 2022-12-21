@@ -234,7 +234,6 @@ export const TxTokenInput: FC<TxTokenInputProps> = ({
   ...props
 }) => {
   const { t } = useAppTranslation('common');
-
   let listItems: SearchListItem[] = [];
   let selectedItem: SearchListItem = {
     id: selectedToken.address,

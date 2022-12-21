@@ -2,6 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import { BigNumber } from 'ethers';
+// import { parseUnits, hexlify } from 'ethers/lib/utils';
 
 import { formatAmount, normalizeAmount, isAddress, toWei, addCreditUpdate } from '@utils';
 import {
@@ -24,7 +25,6 @@ import { TxActionButton } from './components/TxActions';
 import { TxActions } from './components/TxActions';
 import { TxStatus } from './components/TxStatus';
 import { TxAddressInput } from './components/TxAddressInput';
-
 const {
   CONTRACT_ADDRESSES: { DAI },
   MAX_INTEREST_RATE,
@@ -78,6 +78,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
     selectedSellTokenAddress: initialToken,
     allowTokenSelect: true,
   });
+
   const acceptingOffer = props.acceptingOffer || (userMetadata.role === BORROWER_POSITION_ROLE && !!selectedPosition);
 
   //state for params
@@ -117,7 +118,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         })
       );
     }
-    if (selectedTokenAddress === '' && selectedSellToken) {
+    if (!selectedTokenAddress && selectedSellToken) {
       setSelectedTokenAddress(selectedSellToken.address);
     }
 
@@ -133,7 +134,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   };
 
   const onAmountChange = (amount: string): void => {
-    setTargetTokenAmount(amount);
+    setTargetTokenAmount(amount ?? '0');
   };
 
   const onRateChange = (type: string, amount: string): void => {
@@ -157,7 +158,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
     }
 
     let approvalOBj = {
-      tokenAddress: selectedSellTokenAddress!,
+      tokenAddress: selectedSellToken!.address,
       amount: toWei(targetTokenAmount, selectedSellToken!.decimals),
       lineAddress: selectedCredit.id,
       network: walletNetwork!,
@@ -197,7 +198,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       return;
     }
 
-    if (!selectedSellTokenAddress) {
+    if (!selectedSellToken) {
       return;
     }
 
@@ -208,11 +209,12 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       drate: BigNumber.from(drate),
       frate: BigNumber.from(frate),
       amount: BigNumber.from(amountInWei),
-      token: selectedSellTokenAddress,
+      token: selectedSellToken.address,
       lender: lenderAddress,
       network: walletNetwork!,
       dryRun: false,
     };
+
     dispatch(LinesActions.addCredit(transactionObj)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionCompleted(2);
@@ -341,7 +343,6 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
         onAmountChange={onAmountChange}
-        //Check if target token amount, if not bigNumber from 0
         amountValue={toWei(targetTokenAmount, selectedSellToken.decimals)}
         maxAmount={acceptingOffer ? targetTokenAmount : targetBalance}
         selectedToken={selectedSellToken}

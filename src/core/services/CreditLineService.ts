@@ -89,10 +89,10 @@ export class CreditLineServiceImpl implements CreditLineService {
       if (!(await this.isLender(props.lineAddress, props.id))) {
         throw new Error('Cannot withdraw. Signer is not lender');
       }
-      //@ts-ignore
-      return (<TransactionResponse>(
+
+      return <TransactionResponse>(
         await this.executeContractMethod(props.lineAddress, 'withdraw', [props.id, props.amount], props.network)
-      )).hash;
+      );
     } catch (e) {
       console.log(`An error occured while withdrawing credit, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
@@ -117,7 +117,7 @@ export class CreditLineServiceImpl implements CreditLineService {
           `Setting rate is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.lineAddress}]`
         );
       }
-      //@ts-ignore
+
       return (<TransactionResponse>(
         await this.executeContractMethod(props.lineAddress, 'setRates', [props.id, props.drate, props.frate], 'goerli')
       )).hash;
@@ -150,7 +150,7 @@ export class CreditLineServiceImpl implements CreditLineService {
           `Increasing credit is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.lineAddress}]`
         );
       }
-      //@ts-ignore
+
       return (<TransactionResponse>(
         await this.executeContractMethod(props.lineAddress, 'increaseCredit', [props.id, props.amount], 'goerli')
       )).hash;
@@ -183,10 +183,10 @@ export class CreditLineServiceImpl implements CreditLineService {
       //if (unnullify(props.amount, true).gt(unnullify(credit.principal, true).add(simulateAccrue))) {
       //  throw new Error('Amount is greater than (principal + interest to be accrued). Enter lower amount.');
       //}
-      //@ts-ignore
-      return (<TransactionResponse>(
+
+      return <TransactionResponse>(
         await this.executeContractMethod(props.lineAddress, 'depositAndRepay', [props.amount], props.network)
-      )).hash;
+      );
     } catch (e) {
       console.log(`An error occured while depositAndRepay credit, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
@@ -201,10 +201,10 @@ export class CreditLineServiceImpl implements CreditLineService {
       if (!(await this.isBorrower(props.lineAddress))) {
         throw new Error('Deposit and close is not possible because signer is not borrower');
       }
-      //@ts-ignore
-      return (<TransactionResponse>(
+
+      return <TransactionResponse>(
         await this.executeContractMethod(props.lineAddress, 'depositAndClose', [], props.network)
-      )).hash;
+      );
     } catch (e) {
       console.log(`An error occured while depositAndClose credit, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
@@ -235,7 +235,7 @@ export class CreditLineServiceImpl implements CreditLineService {
         lender: props.lender,
         network: props.network,
       };
-      //@ts-ignore
+
       return <TransactionResponse>(
         await this.executeContractMethod(
           line,
@@ -259,7 +259,7 @@ export class CreditLineServiceImpl implements CreditLineService {
         id: props.positionId,
         amount: props.amount,
       };
-      //@ts-ignore
+
       return <TransactionResponse>(
         await this.executeContractMethod(line, 'borrow', [data.id, data.amount], props.network, false)
       );

@@ -104,6 +104,7 @@ export class CollateralServiceImpl implements CollateralService {
   public async addCollateral(props: AddCollateralProps): Promise<TransactionResponse | PopulatedTransaction> {
     // should have already approved tokens from user wallet to Escrow contract
     const { escrowAddress, network, dryRun, token, amount } = props;
+    console.log('add collateral srv props', props);
     return await this.executeContractMethod(
       escrowAddress,
       this.escrowAbi,
@@ -189,7 +190,7 @@ export class CollateralServiceImpl implements CollateralService {
     return await this.executeContractMethod(
       props.lineAddress,
       this.lineAbi,
-      'addSpigot',
+      'updateOwnerSplit',
       [props.revenueContract],
       props.network
     );

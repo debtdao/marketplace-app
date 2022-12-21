@@ -12,7 +12,7 @@ import {
   useAppSelector,
   useSelectedSellToken,
 } from '@hooks';
-import { ACTIVE_STATUS, ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE } from '@src/core/types';
+import { ACTIVE_STATUS, AddCollateralProps, ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE } from '@src/core/types';
 import { getConstants } from '@src/config/constants';
 import {
   TokensActions,
@@ -207,15 +207,15 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
       toUnit(targetTokenAmount, Number(selectedCollateralAsset.decimals)),
       amount
     );
-    const transactionData = {
-      lineAddress: selectedEscrow.line,
+
+    const transactionData: AddCollateralProps = {
+      escrowAddress: selectedEscrow.line,
       amount,
-      token: selectedCollateralAsset,
+      token: selectedCollateralAsset.address,
       network: walletNetwork,
-      dryRun: true,
     };
-    //@ts-ignore
-    dispatch(LinesActions.addCredit(transactionData)).then((res) => {
+
+    dispatch(CollateralActions.addCollateral(transactionData)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionCompleted(2);
         console.log(transactionCompleted, 'tester');

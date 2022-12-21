@@ -3,7 +3,7 @@ import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { AppDispatch, ThunkAPI } from '@frameworks/redux';
 import { getEthersProvider, ExternalProvider } from '@frameworks/ethers';
 import { Theme, RootState, DIContainer, Subscriptions, Network, EVENT_LOGIN } from '@types';
-import { isValidAddress, getProviderType, getNetwork } from '@utils';
+import { isValidAddress, getProviderType, getNetwork, getNetworkId } from '@utils';
 
 import { NetworkActions } from '../network/network.actions';
 import { AppActions } from '../app/app.actions';
@@ -78,7 +78,17 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
           const supportedNetworkSettings = SUPPORTED_NETWORKS.find(
             (network) => NETWORK_SETTINGS[network].networkId === networkId
           );
-          if (wallet.isConnected && supportedNetworkSettings) {
+
+          // Handle unsupported networks
+          const supportedNetworkIds = SUPPORTED_NETWORKS.map((network) => getNetworkId(network));
+          if (!supportedNetworkIds.includes(networkId)) {
+            web3Provider.register('wallet', getEthersProvider(wallet.provider as ExternalProvider));
+            const unsupportedNetwork = getNetwork(networkId);
+            dispatch(NetworkActions.changeNetwork({ network: unsupportedNetwork }));
+          }
+
+          // Add Web3 provider to Yearn context for supported networks
+          else if (wallet.isConnected && supportedNetworkSettings) {
             web3Provider.register('wallet', getEthersProvider(wallet.provider as ExternalProvider));
             const network = getNetwork(networkId);
             const providerType = getProviderType(network);
@@ -89,11 +99,6 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
             });
             console.log('subgraph - wallet select change network', network);
             dispatch(NetworkActions.changeNetwork({ network }));
-          }
-          // Note: Force state to goerli
-          else if (networkId === 5) {
-            web3Provider.register('wallet', getEthersProvider(wallet.provider as ExternalProvider));
-            dispatch(NetworkActions.changeNetworkGoerli());
           }
         },
       };

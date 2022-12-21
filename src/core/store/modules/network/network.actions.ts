@@ -7,8 +7,6 @@ import { Network } from '@types';
 
 import { WalletActions, ChangeWalletNetworkResult } from '../wallet/wallet.actions';
 
-const changeNetworkGoerli = createAction('network/changeGoerliNetwork');
-
 const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network }, ThunkAPI>(
   'network/changeNetwork',
   async ({ network }, { dispatch, extra }) => {
@@ -24,7 +22,13 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
       if (!action.payload.networkChanged) throw new Error('Wallet Network Not Changed');
     }
 
-    if (web3Provider.hasInstanceOf('wallet') && config.SUPPORTED_NETWORKS.includes(network)) {
+    // Handle unsupported networks
+    if (!config.SUPPORTED_NETWORKS.includes(network)) {
+      return { network };
+    }
+
+    // Set Yearn context if network is supported
+    else if (web3Provider.hasInstanceOf('wallet') && config.SUPPORTED_NETWORKS.includes(network)) {
       const providerType = getProviderType(network);
       const provider = web3Provider.getInstanceOf(providerType);
       console.log('change network provider: ', provider);
@@ -37,6 +41,7 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
       // const signer = web3Provider.getSigner();
       // const tx = await signer.connect(provider);
     }
+    // TODO: Change wallet network when network selected in dropdown
     // else {
     //   const providerType = getProviderType(network);
     //   const provider = web3Provider.getInstanceOf(providerType);
@@ -55,5 +60,4 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
 
 export const NetworkActions = {
   changeNetwork,
-  changeNetworkGoerli,
 };

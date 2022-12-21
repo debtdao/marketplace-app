@@ -29,7 +29,7 @@ const {
   // changeWalletNetwork,
 } = WalletActions;
 
-const { changeNetwork, changeNetworkGoerli } = NetworkActions;
+const { changeNetwork } = NetworkActions;
 
 const walletReducer = createReducer(walletInitialState, (builder) => {
   builder
@@ -72,10 +72,6 @@ const walletReducer = createReducer(walletInitialState, (builder) => {
     .addCase(changeNetwork.fulfilled, (state, { payload }) => {
       // state.current = payload.network;
       state.networkVersion = getNetworkId(payload.network);
-    })
-    .addCase(changeNetworkGoerli, (state) => {
-      // state.current = 'goerli';
-      state.networkVersion = 5;
     });
 });
 

@@ -30,7 +30,7 @@ export const initialLineActionsStatusMap: LineActionsStatusMap = {
 
 const { networkChange } = WalletActions;
 
-const { changeNetwork, changeNetworkGoerli } = NetworkActions;
+const { changeNetwork } = NetworkActions;
 
 export const initialUserMetadataStatusMap: UserLineMetadataStatusMap = {
   getUserPortfolio: initialStatus,

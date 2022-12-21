@@ -9,16 +9,12 @@ export const networkInitialState: NetworkState = {
   current: getConfig().NETWORK,
 };
 
-const { changeNetwork, changeNetworkGoerli } = NetworkActions;
+const { changeNetwork } = NetworkActions;
 
 const networkReducer = createReducer(networkInitialState, (builder) => {
-  builder
-    .addCase(changeNetwork.fulfilled, (state, { payload }) => {
-      state.current = payload.network;
-    })
-    .addCase(changeNetworkGoerli, (state) => {
-      state.current = 'goerli';
-    });
+  builder.addCase(changeNetwork.fulfilled, (state, { payload }) => {
+    state.current = payload.network;
+  });
 });
 
 export default networkReducer;

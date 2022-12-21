@@ -222,8 +222,8 @@
         "header":"Enable Spigot",
         "select-function": "Select Function",
         "revenue-contract": "1. Revenue Contract",
-        "function-revenue": "2. Select function to claim revenue",
-        "function-transfer": "3. Select function to transfer ownership of revenue contract",
+        "function-revenue": "3. Select function to claim revenue",
+        "function-transfer": "2. Select function to transfer ownership of revenue contract",
         "cta": "Enable Spigot",
         "enable-failed": "Enable Spigot Failed."
       }

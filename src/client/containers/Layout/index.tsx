@@ -102,9 +102,8 @@ export const Layout: FC = ({ children }) => {
   const selectedLineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
   const previousAddress = usePrevious(selectedAddress);
   const previousNetwork = usePrevious(currentNetwork);
-  const selectedLineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
-  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const userWalletAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
+
   // const path = useAppSelector(({ route }) => route.path);
   const path = location.pathname.toLowerCase().split('/')[1] as Route;
   const isLedgerLive = partner.id === 'ledger';
@@ -172,7 +171,9 @@ export const Layout: FC = ({ children }) => {
 
   useEffect(() => {
     if (activeModal) dispatch(ModalsActions.closeModal());
+
     if (previousNetwork) {
+      console.log('network states previousNetwork: ', previousNetwork);
       dispatch(AppActions.clearAppData());
       dispatch(LinesActions.clearLinesData());
       dispatch(LinesActions.clearLineStatus({ lineAddress: selectedLineAddress! }));
@@ -181,7 +182,9 @@ export const Layout: FC = ({ children }) => {
     }
     if (selectedAddress) dispatch(AppActions.clearUserAppData());
 
-    // dispatch(LinesActions.getLines(defaultLineCategories));
+    // dispatch lines data
+    console.log('network states currentNetwork: ', currentNetwork);
+    dispatch(LinesActions.getLines(defaultLineCategories));
     // dispatch(LinesActions.getLinePage({ id: selectedLineAddress! }));
     // dispatch(LinesActions.getUserPortfolio({ user: userWalletAddress! }));
 

@@ -3,7 +3,9 @@ import { createAsyncThunk, PayloadAction, createAction } from '@reduxjs/toolkit'
 import { ThunkAPI } from '@frameworks/redux';
 import { notify } from '@frameworks/blocknative';
 import { getProviderType, getNetworkId } from '@utils';
-import { Network } from '@types';
+import { Network, UseCreditLinesParams } from '@types';
+import { LinesActions, LinesSelectors, WalletSelectors } from '@store';
+import { useAppSelector } from '@src/client/hooks';
 
 import { WalletActions, ChangeWalletNetworkResult } from '../wallet/wallet.actions';
 
@@ -51,6 +53,14 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
     //   signer.connect(provider);
     //   // signer.connect(provider);
     // }
+
+    // Dispatch line data
+    // const selectedLineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
+    // const userWalletAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
+
+    // dispatch(LinesActions.getLines(defaultLineCategories));
+    // dispatch(LinesActions.getLinePage({ id: selectedLineAddress! }));
+    // dispatch(LinesActions.getUserPortfolio({ user: userWalletAddress! }));
 
     notify.config({ networkId: getNetworkId(network) });
 

@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import { ethers } from 'ethers';
 
 import { Wei, Unit, Amount, FormattedAmount, Fraction, DataType } from '@types';
 
@@ -129,9 +130,16 @@ export const prettyNumbers = (x: string) => {
 };
 
 export const formatAddress = (address: string) => {
-  return isValidAddress(address)
-    ? address.substring(0, 6) + '...' + address.substring(address.length - 4, address.length)
-    : address;
+  if (isValidAddress(address)) {
+    const checkSumAddress = ethers.utils.getAddress(address);
+    const formattedAddress =
+      checkSumAddress.substring(0, 6) +
+      '...' +
+      checkSumAddress.substring(checkSumAddress.length - 4, checkSumAddress.length);
+    return formattedAddress;
+  } else {
+    return address;
+  }
 };
 
 export const getDate = (timestamp: number) => {

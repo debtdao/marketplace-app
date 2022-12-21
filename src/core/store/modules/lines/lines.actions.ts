@@ -27,6 +27,7 @@ import {
   Subscriptions,
   BaseLineFragResponse,
   GetLinesResponse,
+  MarketPageData,
 } from '@types';
 import {
   formatGetLinesData,
@@ -107,15 +108,6 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
         .map((params: GetLinesArgs) => creditLineService.getLines({ network, ...params }))
     );
 
-    interface MarketLines {
-      [key: string]: SecuredLine[];
-    }
-
-    interface MarketPageData {
-      linesData: MarketLines;
-      allBorrowers: string[];
-    }
-
     const { linesData, allBorrowers } = categoryKeys.reduce(
       ({ linesData, allBorrowers }: MarketPageData, category: string, i: number): MarketPageData => {
         // @dev assumes `promises` is same order as `categories`
@@ -133,8 +125,6 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
     );
 
     allBorrowers.map((b) => dispatch(OnchainMetaDataActions.getENS(b)));
-    // do ENS things with borrowers
-    // const borrowers = _.uniq(allborrowers)
 
     return { linesData };
   }

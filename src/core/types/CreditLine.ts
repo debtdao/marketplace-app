@@ -186,6 +186,15 @@ export interface AggregatedSpigot extends BaseCollateralModule {
   // revenueSummary: RevenueSummary;
 }
 
+export interface MarketLines {
+  [key: string]: SecuredLine[];
+}
+
+export interface MarketPageData {
+  linesData: MarketLines;
+  allBorrowers: string[];
+}
+
 export interface LinePageSpigot extends AggregatedSpigot {
   spigots?: { [address: string]: RevenueContract };
 }

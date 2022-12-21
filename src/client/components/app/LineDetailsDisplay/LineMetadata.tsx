@@ -151,7 +151,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
     : Object.values(deposits!)
         .reduce<BigNumber>(
           (sum: BigNumber, d: EscrowDeposit) =>
-            !d ? sum : sum.add(BigNumber.from(Number(d!.token.priceUsdc) ?? '0').mul(d!.amount)),
+            !d || !d.token.priceUsdc ? sum : sum.add(BigNumber.from(Number(d!.token.priceUsdc) ?? '0').mul(d!.amount)),
           BigNumber.from('0')
         )
         .div(BigNumber.from(1)) // scale to usd decimals

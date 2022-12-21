@@ -94,10 +94,11 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const [transactionType, setTransactionType] = useState('propose');
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
 
+  console.log('selectedPosition', selectedPosition, selectedCredit);
   useEffect(() => {
-    if (selectedPosition?.status === PROPOSED_STATUS && userMetadata.role === BORROWER_POSITION_ROLE) {
+    if (selectedPosition?.status === PROPOSED_STATUS) {
       //  selectedPosition.token.decimals instead of 0 as deci
-      const deposit = normalizeAmount(selectedPosition.deposit, 0);
+      const deposit = normalizeAmount(selectedPosition.deposit, selectedPosition.token.decimals);
       console.log('position deposit user input vs norm val', selectedPosition.deposit, deposit);
 
       if (!targetTokenAmount) setTargetTokenAmount(deposit);

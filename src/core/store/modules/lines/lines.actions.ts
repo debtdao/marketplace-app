@@ -306,13 +306,14 @@ const approveDeposit = createAsyncThunk<
 
   const accountAddress = wallet.selectedAddress;
   if (!accountAddress) throw new Error('WALLET NOT CONNECTED');
+  console.log('approve token', tokenAddress, accountAddress, lineAddress, amount);
 
   const approveDepositTx = await tokenService.approve({
     network,
     tokenAddress,
     accountAddress,
     spenderAddress: lineAddress,
-    amount: unnullify(amount, true),
+    amount,
   });
   console.log('this is approval', approveDepositTx);
 });

@@ -1,0 +1,6 @@
+{
+  "options" : {
+    "borrower": "Borrowing",
+    "lender": "Lending"
+  }
+}

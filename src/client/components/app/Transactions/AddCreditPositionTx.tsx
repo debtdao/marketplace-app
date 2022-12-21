@@ -155,6 +155,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       setLoading(false);
       return;
     }
+
     let approvalOBj = {
       tokenAddress: selectedSellTokenAddress!,
       amount: toWei(targetTokenAmount, selectedSellToken!.decimals),
@@ -341,9 +342,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         amount={targetTokenAmount}
         onAmountChange={onAmountChange}
         //Check if target token amount, if not bigNumber from 0
-        amountValue={BigNumber.from(targetTokenAmount ? targetTokenAmount : 0)
-          .pow(BigNumber.from(10).mul(selectedSellToken.decimals ?? 0))
-          .toString()}
+        amountValue={toWei(targetTokenAmount, selectedSellToken.decimals)}
         maxAmount={acceptingOffer ? targetTokenAmount : targetBalance}
         selectedToken={selectedSellToken}
         onSelectedTokenChange={onSelectedSellTokenChange}

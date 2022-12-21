@@ -209,7 +209,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
     );
 
     const transactionData: AddCollateralProps = {
-      escrowAddress: selectedEscrow.line,
+      escrowAddress: selectedEscrow.id,
       amount,
       token: selectedCollateralAsset.address,
       network: walletNetwork,

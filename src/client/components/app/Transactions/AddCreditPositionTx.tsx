@@ -156,6 +156,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       setLoading(false);
       return;
     }
+
     let approvalOBj = {
       tokenAddress: selectedSellToken!.address,
       amount: toWei(targetTokenAmount, selectedSellToken!.decimals),
@@ -342,8 +343,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
         onAmountChange={onAmountChange}
-        // TODO: Modify this block of code to calculate correct USD value.
-        // amountValue={parseUnits(targetTokenAmount, selectedSellToken.decimals).toString()}
+        amountValue={toWei(targetTokenAmount, selectedSellToken.decimals)}
         maxAmount={acceptingOffer ? targetTokenAmount : targetBalance}
         selectedToken={selectedSellToken}
         onSelectedTokenChange={onSelectedSellTokenChange}

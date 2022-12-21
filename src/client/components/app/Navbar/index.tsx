@@ -182,7 +182,6 @@ export const Navbar = ({
           {!hideDisabledControls && (
             /* turn this into not a list because we only support mainnet right now */
             <StyledOptionList
-              //@ts-ignore
               selected={walletNetwork !== undefined ? dropdownSelectedWalletNetwork : dropdownSelectedNetwork}
               setSelected={(option) => onNetworkChange(option.value)}
               hideIcons={isMobile}

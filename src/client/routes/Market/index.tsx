@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import { utils } from 'ethers';
 
+import { useENS } from '@src/client/hooks/useENS';
 import { useAppSelector, useAppDispatch, useAppTranslation, useQueryParams } from '@hooks';
 import {
   ModalsActions,
@@ -19,7 +20,6 @@ import { SpinnerLoading, Text, Button } from '@components/common';
 import { SecuredLine, UseCreditLinesParams } from '@src/core/types';
 import { DebtDAOBanner } from '@assets/images';
 import { getEnv } from '@config/env';
-import { getENS } from '@src/utils';
 
 const StyledRecommendationsCard = styled(RecommendationsCard)``;
 
@@ -89,7 +89,6 @@ export const Market = () => {
 
     if (shouldFetch) {
       fetchMarketData();
-      console.log();
     }
     console.log('search', search);
   }, []);
@@ -153,7 +152,7 @@ export const Market = () => {
               key={key}
               items={val.map(({ id, borrower, spigot, escrow, principal, deposit, start, end }) => ({
                 icon: '',
-                name: (getENS(borrower, ensMap) ? getENS(borrower, ensMap) : borrower)!,
+                name: useENS(borrower),
                 start: start,
                 end: end,
                 id: id,

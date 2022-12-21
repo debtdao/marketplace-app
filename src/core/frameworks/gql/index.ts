@@ -40,7 +40,6 @@ const getGraphURL = (network: string) => {
   } else if (network === 'goerli') {
     url = GRAPH_TEST_API_URL!;
   }
-  console.log('framework url: ', url);
   return url;
 };
 

@@ -67,8 +67,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   }, [selectedSpigot, selectedLine]);
 
   useEffect(() => {
-    if (!selectedContractFunctions && isValidAddress(revenueContractAddy) && !didFetchAbi) {
-      setDidFetchABI(true);
+    if (isValidAddress(revenueContractAddy)) {
       dispatch(OnchainMetaDataActions.getABI(revenueContractAddy));
     }
   }, [revenueContractAddy, didFetchAbi]);
@@ -178,7 +177,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const revFuncDisplayConfigs = [
     {
       header: t('components.transaction.enable-spigot.function-transfer'),
-      options: createListItems(selectedContractFunctions!),
+      options: createListItems(selectedContractFunctions[revenueContractAddy]!),
       type: transferFuncType,
       onChange: onTransferFuncSelection,
       byteCode: transferFunc,
@@ -186,7 +185,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     },
     {
       header: t('components.transaction.enable-spigot.function-revenue'),
-      options: createListItems(selectedContractFunctions!),
+      options: createListItems(selectedContractFunctions[revenueContractAddy]!),
       type: claimFuncType,
       onChange: onClaimFuncSelection,
       byteCode: claimFunc,
@@ -197,7 +196,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const renderFuncSelectors = () =>
     revFuncDisplayConfigs.map(({ header, byteCode, options, type, onChange, onByteChange }) =>
       // if no ABI, input bytecode manually
-      selectedContractFunctions ? (
+      isValidAddress(revenueContractAddy) && contractABI ? (
         <TxFuncSelector
           key={header + String(type)}
           headerText={header}

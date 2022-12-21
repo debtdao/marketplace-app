@@ -198,18 +198,22 @@ export const PositionsTable = (props: PositionsProps) => {
         handler: depositHandler,
         disabled: false,
       };
+      console.log('PositionsTable act opt - accept', position, userRoleMetadata, [approveMutualConsent]);
       return [approveMutualConsent];
     }
     //If user is lender, and line has amount to withdraw, return withdraw action
     if (parseUnits(userRoleMetadata.available).gt(0)) {
+      console.log('PositionsTable act opt - lender', position, userRoleMetadata, actions);
       return actions;
     }
     //Returns actions for borrower on open line
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
+      console.log('PositionsTable act opt - borrower', position, userRoleMetadata, actions);
       return actions;
     }
     return [];
   };
+  console.log('PositionsTable ', userRoleMetadata, actions);
 
   return (
     <>

@@ -52,7 +52,7 @@ const setPosition = createAction<{ id: string; position: CreditPosition }>('line
 const clearLinesData = createAction<void>('lines/clearLinesData');
 const clearUserData = createAction<void>('lines/clearUserData');
 const clearTransactionData = createAction<void>('lines/clearTransactionData');
-const clearSelectedLineAndStatus = createAction<void>('lines/clearSelectedLineAndStatus');
+const clearSelectedLine = createAction<void>('lines/clearSelectedLine');
 const clearLineStatus = createAction<{ lineAddress: string }>('lines/clearLineStatus');
 
 /* -------------------------------------------------------------------------- */
@@ -792,7 +792,7 @@ export const LinesActions = {
   clearTransactionData,
   // getUserLinesSummary,
   // getUserLinesMetadata,
-  clearSelectedLineAndStatus,
+  clearSelectedLine,
   clearLineStatus,
   getDepositAllowance,
   getWithdrawAllowance,

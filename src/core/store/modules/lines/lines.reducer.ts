@@ -14,7 +14,9 @@ import {
   LinesByRole,
   PositionMap,
 } from '@types';
+import { getNetworkId } from '@src/utils';
 
+import { NetworkActions } from '../network/network.actions';
 import { WalletActions } from '../wallet/wallet.actions';
 
 import { LinesActions } from './lines.actions';
@@ -27,6 +29,8 @@ export const initialLineActionsStatusMap: LineActionsStatusMap = {
 };
 
 const { networkChange } = WalletActions;
+
+const { changeNetwork } = NetworkActions;
 
 export const initialUserMetadataStatusMap: UserLineMetadataStatusMap = {
   getUserPortfolio: initialStatus,
@@ -58,7 +62,6 @@ export const linesInitialState: CreditLineState = {
     deploySecuredLine: initialStatus,
     user: initialUserMetadataStatusMap,
   },
-  network: undefined,
 };
 
 const {
@@ -103,11 +106,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(setPosition, (state, { payload: { id, position } }) => {
       state.positionsMap[id] = position;
     })
-
-    .addCase(networkChange, (state, { payload: { network } }) => {
-      state.network = network;
-    })
-
     /* -------------------------------------------------------------------------- */
     /*                                 Clear State                                */
     /* -------------------------------------------------------------------------- */

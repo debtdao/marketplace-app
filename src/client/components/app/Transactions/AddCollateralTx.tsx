@@ -1,9 +1,10 @@
 import { FC, useState, useEffect } from 'react';
+import { BigNumber } from 'ethers';
 import styled from 'styled-components';
 import _ from 'lodash';
 import { useHistory } from 'react-router-dom';
 
-import { formatAmount, normalizeAmount } from '@utils';
+import { formatAmount, normalizeAmount, toUnit, toWei } from '@utils';
 import {
   useAppTranslation,
   useAppDispatch,
@@ -11,9 +12,17 @@ import {
   useAppSelector,
   useSelectedSellToken,
 } from '@hooks';
-import { ACTIVE_STATUS, ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE } from '@src/core/types';
+import { ACTIVE_STATUS, AddCollateralProps, ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE } from '@src/core/types';
 import { getConstants } from '@src/config/constants';
-import { TokensActions, WalletSelectors, LinesSelectors, CollateralSelectors } from '@store';
+import {
+  TokensActions,
+  WalletSelectors,
+  LinesSelectors,
+  CollateralSelectors,
+  CollateralActions,
+  LinesActions,
+  selectDepositTokenOptionsByAsset,
+} from '@store';
 import { Button } from '@components/common';
 
 import { TxContainer } from './components/TxContainer';
@@ -78,62 +87,38 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionApproved, setTransactionApproved] = useState(true);
   const [transactionLoading, setLoading] = useState(false);
-  const [targetTokenAmount, setTargetTokenAmount] = useState('1');
+  const [targetTokenAmount, setTargetTokenAmount] = useState('0');
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedEscrow = useAppSelector(CollateralSelectors.selectSelectedEscrow);
-
-  // const onSelectedTokenChanged = props.onSelectedTokenChanged
-  // const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
-
-  const setSelectedTokenAddress = (token: string) => dispatch(TokensActions.setSelectedTokenAddress);
-  const handleAmountChange = (amount: string) => {
-    setTargetTokenAmount(amount);
-  };
-  //main net logic
+  const allCollateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
   const selectedCollateralAsset = useAppSelector(CollateralSelectors.selectSelectedCollateralAsset);
-  // const selectedTokenAddress = useAppSelector(TokensSelectors.selectToken);
-  const { selectedSellToken, sourceAssetOptions } = useSelectedSellToken({
-    selectedSellTokenAddress: selectedCollateralAsset,
-    allowTokenSelect: true,
-  });
 
-  const enabledCollateralAddressess = _.values(selectedEscrow?.deposits)?.map((d) => d.token.address);
-  const collateralOptions = sourceAssetOptions.filter(({ address }) =>
-    _.includes(enabledCollateralAddressess, address)
-  );
+  const collateralOptions = _.values(selectedEscrow?.deposits).map((d) => d.token);
 
   useEffect(() => {
-    console.log('add position tx useEffect token/creditLine', selectedSellToken, selectedLine);
-    console.log('wallet net', walletNetwork);
-    if (collateralOptions.length > 0 && !selectedSellToken) {
+    if (!selectedEscrow && selectedLine?.escrowId) {
+      console.log('set selected escrow', selectedLine.escrowId);
+      dispatch(CollateralActions.setSelectedEscrow({ escrowAddress: selectedLine.escrowId }));
+    }
+  }, [selectedEscrow, selectedLine]);
+
+  useEffect(() => {
+    if (!selectedCollateralAsset && collateralOptions.length > 0) {
+      console.log('set collat asset', selectedCollateralAsset, collateralOptions[0].address);
       dispatch(
-        TokensActions.setSelectedTokenAddress({
-          tokenAddress: collateralOptions[0].address,
+        CollateralActions.setSelectedCollateralAsset({
+          assetAddress: collateralOptions[0].address,
         })
       );
     }
-
-    if ((!selectedSellToken || selectedSellToken.address === ZERO_ADDRESS) && selectedSellToken) {
-      setSelectedTokenAddress(selectedSellToken.address);
-    }
-
-    if (
-      !selectedLine ||
-      !selectedSellToken
-      // toBN(targetTokenAmount).lte(0) ||
-      // inputError ||
-    ) {
-      return;
-    }
-    // dispatch(CreditLineActions.getCreditLinesDynamicData({ addresses: [initialToken] })); // pulled from DepositTX, not sure why data not already filled
-  }, [selectedSellToken, walletNetwork]);
+  }, [selectedCollateralAsset, collateralOptions]);
 
   const NavigateToDiscord = () => {
-    console.log('discord');
-    window.open('https://discord.gg/F83xx67fyQ', '_blank');
+    window.open('https://discord.com/channels/964777235896746024/1054810838818635888/1054811038803054602', '_blank');
     onClose();
   };
 
+  console.log('no collat to render?', collateralOptions.length === 0);
   if (collateralOptions.length === 0) {
     return (
       <StyledTransaction onClose={onClose} header={t('components.transaction.add-collateral.no-assets-enabled.title')}>
@@ -164,28 +149,39 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
 
   // Event Handlers
   const approveCollateralToken = () => {
-    // setLoading(true);
-    // if (!selectedLine?.id) {
-    //   setLoading(false);
-    //   return;
-    // }
-    // let approvalOBj = {
-    //   tokenAddress: selectedCollateralAsset,
-    //   amount: `${ethers.utils.parseEther(targetTokenAmount)}`,
-    //   network: walletNetwork,
-    // };
-    // console.log('approval obj', approvalOBj);
-    // //@ts-ignore
-    // dispatch(LinesActions.approveDeposit(approvalOBj)).then((res) => {
-    //   if (res.meta.requestStatus === 'rejected') {
-    //     setTransactionApproved(transactionApproved);
-    //     setLoading(false);
-    //   }
-    //   if (res.meta.requestStatus === 'fulfilled') {
-    //     setTransactionApproved(!transactionApproved);
-    //     setLoading(false);
-    //   }
-    // });
+    setLoading(true);
+    console.log('add collateral', selectedEscrow, selectedCollateralAsset, targetTokenAmount);
+    if (!selectedEscrow || !selectedCollateralAsset) {
+      setLoading(false);
+      return;
+    }
+    const amount = BigNumber.from(targetTokenAmount)
+      .mul(BigNumber.from(10).pow(selectedCollateralAsset.decimals))
+      .toString();
+    console.log(
+      'appr collateral',
+      targetTokenAmount,
+      toUnit(targetTokenAmount, Number(selectedCollateralAsset.decimals)),
+      amount
+    );
+    const approveTx = {
+      tokenAddress: selectedCollateralAsset?.address,
+      amount,
+      lineAddress: selectedEscrow.id, // @cleanup and refactor into TokenService
+      network: walletNetwork,
+    };
+    console.log('approval obj', approveTx);
+
+    dispatch(LinesActions.approveDeposit(approveTx)).then((res) => {
+      if (res.meta.requestStatus === 'rejected') {
+        setTransactionApproved(transactionApproved);
+        setLoading(false);
+      }
+      if (res.meta.requestStatus === 'fulfilled') {
+        setTransactionApproved(!transactionApproved);
+        setLoading(false);
+      }
+    });
   };
 
   const onTransactionCompletedDismissed = () => {
@@ -199,43 +195,39 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
   const addCollateral = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    // if (!selectedLine?.escrow || !selectedCollateralAsset || !targetTokenAmount) {
-    //   console.log('check this', selectedLine?.id, targetTokenAmount, selectedCollateralAsset);
-    //   setLoading(false);
-    //   return;
-    // }
+    if (!selectedEscrow || !selectedCollateralAsset || !targetTokenAmount) {
+      console.log('check this', selectedLine?.id, targetTokenAmount, selectedCollateralAsset);
+      setLoading(false);
+      return;
+    }
+    const amount = BigNumber.from(targetTokenAmount).mul(BigNumber.from(10).pow(selectedCollateralAsset.decimals));
+    console.log(
+      'add collateral',
+      targetTokenAmount,
+      toUnit(targetTokenAmount, Number(selectedCollateralAsset.decimals)),
+      amount
+    );
 
-    // const transactionData = {
-    //   lineAddress: selectedLine.id,
-    //   amount: ethers.utils.parseEther(targetTokenAmount),
-    //   token: selectedCollateralAsset,
-    //   network: walletNetwork,
-    //   dryRun: true,
-    // };
-    // //@ts-ignore
-    // dispatch(LinesActions.addCredit(transactionData)).then((res) => {
-    //   if (res.meta.requestStatus === 'rejected') {
-    //     setTransactionCompleted(2);
-    //     console.log(transactionCompleted, 'tester');
-    //     setLoading(false);
-    //   }
-    //   if (res.meta.requestStatus === 'fulfilled') {
-    //     setTransactionCompleted(1);
-    //     console.log(transactionCompleted, 'tester');
-    //     setLoading(false);
-    //   }
-    // });
+    const transactionData: AddCollateralProps = {
+      escrowAddress: selectedEscrow.id,
+      amount,
+      token: selectedCollateralAsset.address,
+      network: walletNetwork,
+    };
+
+    dispatch(CollateralActions.addCollateral(transactionData)).then((res) => {
+      if (res.meta.requestStatus === 'rejected') {
+        setTransactionCompleted(2);
+        console.log(transactionCompleted, 'tester');
+        setLoading(false);
+      }
+      if (res.meta.requestStatus === 'fulfilled') {
+        setTransactionCompleted(1);
+        console.log(transactionCompleted, 'tester');
+        setLoading(false);
+      }
+    });
   };
-
-  const spigotCollateralSettings = [
-    {
-      label: t('components.transaction.enableSpigot'),
-      onAction: addCollateral,
-      status: true,
-      disabled: transactionApproved,
-      contrast: true,
-    },
-  ];
 
   const escrowCollateralSettings = [
     {
@@ -253,17 +245,16 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
       contrast: true,
     },
   ];
-  const txActions =
-    userMetadata.role === ARBITER_POSITION_ROLE
-      ? spigotCollateralSettings
-      : userMetadata.role === BORROWER_POSITION_ROLE
-      ? [...spigotCollateralSettings, ...escrowCollateralSettings]
-      : escrowCollateralSettings;
+  const txActions = userMetadata.role === BORROWER_POSITION_ROLE ? escrowCollateralSettings : [];
 
-  if (!selectedSellToken) return null;
+  console.log('selected collat', selectedCollateralAsset);
+  if (!selectedCollateralAsset) return null;
+  const tokenView = _.find(allCollateralOptions, (t) => t.address === selectedCollateralAsset.address);
+  console.log('add collat', tokenView);
+  if (!tokenView) return null;
   if (!selectedLine) return null;
 
-  const targetBalance = normalizeAmount(selectedSellToken.balance, selectedSellToken.decimals);
+  const targetBalance = normalizeAmount(tokenView.balance, tokenView.decimals);
   const tokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(targetBalance, 4)}`;
 
   if (transactionCompleted === 1) {
@@ -323,8 +314,8 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
         amount={targetTokenAmount}
         amountValue={String(10000000 * Number(targetTokenAmount))}
         maxAmount={targetBalance}
-        onAmountChange={handleAmountChange}
-        selectedToken={selectedSellToken}
+        onAmountChange={setTargetTokenAmount}
+        selectedToken={selectedCollateralAsset}
         tokenOptions={collateralOptions}
         // inputError={!!sourceStatus.error}
         // displayGuidance={displaySourceGuidance}

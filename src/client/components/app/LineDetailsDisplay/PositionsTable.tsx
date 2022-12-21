@@ -335,8 +335,6 @@ export const PositionsTable = (props: PositionsProps) => {
           }
           searching={false}
           filterLabel="Show 0% APY"
-          //@ts-ignore
-          filterBy={''}
           initialSortBy="deposit"
           onAction={() => console.log('action')}
           wrap

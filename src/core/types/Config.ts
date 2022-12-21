@@ -38,9 +38,12 @@ export interface Constants {
   CHAIN_IDS: {
     [KEY: number]: string;
   };
+  CHAIN_NAMES: {
+    [KEY: string]: string;
+  };
   NETWORK_SETTINGS: NetworkSettings;
-  WEB3_PROVIDER_HTTPS: string;
-  WEB3_PROVIDER_WSS: string;
+  MAINNET_PROVIDER_HTTPS: string;
+  MAINNET_PROVIDER_WSS: string;
   GOERLI_PROVIDER_HTTPS: string;
   ARBITRUM_PROVIDER_HTTPS: string;
   BLACKLISTED_LINES: string[];

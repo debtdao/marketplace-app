@@ -73,8 +73,7 @@ export const ActionButtons = ({ actions, alert, value }: ActionButtonsProps) => 
           e.stopPropagation();
           handler(e);
         }}
-        //@ts-ignore
-        value={value}
+        // value={value}
         disabled={disabled}
         hide={hide}
         {...props}

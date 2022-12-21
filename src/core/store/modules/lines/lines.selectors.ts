@@ -56,7 +56,6 @@ const selectLinesActionsStatusMap = (state: RootState) => state.lines.statusMap.
 
 const selectGetLinesStatus = (state: RootState) => state.lines.statusMap.getLines;
 const selectGetLinePageStatus = (state: RootState) => state.lines.statusMap.getLinePage;
-const selectNetwork = (state: RootState) => state.lines.network;
 
 /* ----------------------------- Main Selectors ----------------------------- */
 const selectLines = createSelector([selectLinesMap], (linesMap) => {
@@ -291,8 +290,8 @@ const selectUserPositionMetadata = createSelector(
 
       default:
         // if no selected position, still try to find their position on the line
-        //@ts-ignore
-        const foundPosition = find(line.positions, (p) => p.lender === userAddress);
+
+        const foundPosition = find(_.values(positions), (p) => p.lender === userAddress);
         if (foundPosition) {
           const lenderData = {
             amount: foundPosition.deposit,
@@ -311,7 +310,6 @@ const selectUserPositionMetadata = createSelector(
 );
 
 export const LinesSelectors = {
-  selectNetwork,
   selectLinesState,
   selectLinesMap,
   selectLines,

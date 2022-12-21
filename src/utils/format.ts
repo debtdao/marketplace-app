@@ -135,7 +135,7 @@ export const formatAddress = (address: string) => {
 };
 
 export const getDate = (timestamp: number) => {
-  const months = {
+  const months: { [key: string]: string } = {
     Jan: '01',
     Feb: '02',
     Mar: '03',
@@ -151,7 +151,7 @@ export const getDate = (timestamp: number) => {
   };
   const date = new Date(timestamp * 1000).toString();
   const dateArr = date.split(' ');
-  //@ts-ignore
+
   const finalDate = `${dateArr[2]}/${months[dateArr[1]]}/${dateArr[3]}, ${dateArr[4]}`;
   return finalDate;
 };

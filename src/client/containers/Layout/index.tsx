@@ -147,6 +147,7 @@ export const Layout: FC = ({ children }) => {
     if (activeModal) dispatch(ModalsActions.closeModal());
     if (previousNetwork) dispatch(AppActions.clearAppData());
     if (selectedAddress) dispatch(AppActions.clearUserAppData());
+
     dispatch(TokensActions.getTokens());
     dispatch(TokensActions.getSupportedOracleTokens());
   }, [currentNetwork]);
@@ -164,10 +165,12 @@ export const Layout: FC = ({ children }) => {
           subTitle={''}
           walletAddress={selectedAddress}
           addressEnsName={addressEnsName}
+          //
           onWalletClick={() => dispatch(WalletActions.walletSelect({ network: currentNetwork }))}
           disableWalletSelect={hideControls || isCoinbaseApp()}
           selectedNetwork={currentNetwork}
           networkOptions={SUPPORTED_NETWORKS}
+          //
           onNetworkChange={(network) => dispatch(NetworkActions.changeNetwork({ network: network as Network }))}
           disableNetworkChange={hideControls}
           hideDisabledControls={hideControls}

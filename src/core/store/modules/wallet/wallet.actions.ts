@@ -74,6 +74,7 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
           }
         },
         network: (networkId) => {
+          // console.log('subgraph wallet select: ', network);
           const supportedNetworkSettings = SUPPORTED_NETWORKS.find(
             (network) => NETWORK_SETTINGS[network].networkId === networkId
           );
@@ -86,7 +87,13 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
               read: web3Provider.getInstanceOf(providerType),
               write: web3Provider.getInstanceOf('wallet'),
             });
+            console.log('subgraph - wallet select change network', network);
             dispatch(NetworkActions.changeNetwork({ network }));
+          }
+          // Note: Force state to goerli
+          else if (networkId === 5) {
+            web3Provider.register('wallet', getEthersProvider(wallet.provider as ExternalProvider));
+            dispatch(NetworkActions.changeNetworkGoerli());
           }
         },
       };
@@ -116,6 +123,26 @@ const changeWalletTheme =
     }
   };
 
+// export interface ChangeWalletNetworkResult {
+//   networkChanged: boolean;
+//   networkId: number;
+// }
+
+// const changeWalletNetwork = createAsyncThunk<ChangeWalletNetworkResult, { network: Network }, ThunkAPI>(
+//   'wallet/changeWalletNetwork',
+//   async ({ network }, { extra }) => {
+//     const { wallet } = extra.context;
+//     console.log('subgraph changeWalletNetwork network: ', network);
+//     console.log('subgraph changeWalletNetwork wallet: ', wallet);
+//     let networkChanged = false;
+//     if (wallet.isCreated && wallet.changeNetwork) {
+//       networkChanged = await wallet.changeNetwork(network);
+//     }
+//     const networkId = 1;
+//     return { networkChanged, networkId };
+//   }
+// );
+
 export interface ChangeWalletNetworkResult {
   networkChanged: boolean;
   network: Network;
@@ -126,10 +153,13 @@ const changeWalletNetwork = createAsyncThunk<ChangeWalletNetworkResult, { networ
   async ({ network }, { extra }) => {
     const { wallet } = extra.context;
 
-    let networkChanged = false;
-    if (wallet.isCreated && wallet.changeNetwork) {
-      networkChanged = await wallet.changeNetwork(network);
-    }
+    let networkChanged = true;
+    // let networkChanged = false;
+    // if (wallet.isCreated && wallet.changeNetwork) {
+    //   networkChanged = await wallet.changeNetwork(network);
+    // }
+    console.log('subgraph change wallet network: ', networkChanged);
+    console.log('subgraph network: ', network);
     return { networkChanged, network };
   }
 );

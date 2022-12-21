@@ -2,7 +2,14 @@ import styled from 'styled-components';
 import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 
-import { ModalsActions, LinesActions, LinesSelectors, WalletSelectors, WalletActions } from '@store';
+import {
+  ModalsActions,
+  LinesActions,
+  LinesSelectors,
+  WalletSelectors,
+  WalletActions,
+  OnchainMetaDataSelector,
+} from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { device } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer } from '@components/app';
@@ -10,6 +17,7 @@ import { Input, SearchIcon, Button, RedirectIcon, Link } from '@components/commo
 import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, CreditPosition } from '@src/core/types';
 import { humanize, formatAddress, normalizeAmount } from '@src/utils';
 import { getEnv } from '@config/env';
+import { getENS } from '@src/utils';
 
 const PositionsCard = styled(DetailCard)`
   max-width: ${({ theme }) => theme.globalMaxWidth};
@@ -99,6 +107,7 @@ export const PositionsTable = (props: PositionsProps) => {
   const [actions, setActions] = useState<Transaction[]>([]);
   const { positions } = props;
   const { NETWORK } = getEnv();
+  const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
 
   //Initial set up for positions table
   useEffect(() => {
@@ -303,7 +312,7 @@ export const PositionsTable = (props: PositionsProps) => {
             interest: humanize('amount', position.interestAccrued, position.token.decimals, 2),
             lender: (
               <RouterLink to={`/portfolio/${position.lender}`} key={position.id} selected={false}>
-                {formatAddress(position.lender)}
+                {formatAddress(getENS(position.lender, ensMap)!)}
                 <RedirectLinkIcon />
               </RouterLink>
             ),

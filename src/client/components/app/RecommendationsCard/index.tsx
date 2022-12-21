@@ -1,9 +1,12 @@
 import styled from 'styled-components';
 
-import { prettyNumbers, formatAddress } from '@utils';
+import { prettyNumbers, formatAddress, unnullify } from '@utils';
 import { Card, CardHeader, CardContent, Text, Icon, ChevronRightIcon } from '@components/common';
 import { TokenIcon } from '@components/app';
-import { useAppTranslation } from '@hooks';
+import { useAppTranslation, useAppSelector } from '@hooks';
+import { OnchainMetaDataSelector } from '@src/core/store';
+import { SecuredLine, Item } from '@src/core/types';
+import { getENS } from '@utils';
 
 const TokenListIconSize = '1rem';
 
@@ -110,24 +113,6 @@ const MetricsText = styled.span`
   font-size: 1.6rem;
 `;
 
-interface Item {
-  header?: string;
-  id: string;
-  icon: string;
-  name: string;
-  info: string;
-  principal: any;
-  deposit: any;
-  collateral: string;
-  revenue: string;
-  tags?: string[];
-  start: number;
-  end: number;
-  infoDetail?: string;
-  action?: string;
-  onAction?: () => void;
-}
-
 interface RecommendationsProps {
   header?: string;
   subHeader?: string;
@@ -136,7 +121,7 @@ interface RecommendationsProps {
 
 export const RecommendationsCard = ({ header, subHeader, items, ...props }: RecommendationsProps) => {
   const { t } = useAppTranslation(['common']);
-
+  const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   if (items.length === 0) {
     return null;
   }
@@ -147,21 +132,22 @@ export const RecommendationsCard = ({ header, subHeader, items, ...props }: Reco
 
       <StyledCardContent>
         {items.map((item, i) => (
-          <ItemCard key={`${i}-${item.name}`} variant="primary" onClick={item.onAction ? item.onAction : undefined}>
+          <ItemCard key={`${i}-${item.borrower}`} variant="primary" onClick={item.onAction ? item.onAction : undefined}>
             {item.header && <ItemHeader>{item.header}</ItemHeader>}
 
             <TopIcon>
-              <TokenIcon symbol={item.name} icon={item.icon} size="xxBig" />
+              <TokenIcon symbol={''} icon={item.icon} size="xxBig" />
             </TopIcon>
 
             <ItemInfo>
               <ItemName>
                 {' '}
-                {t('components.line-card.borrower')}: {formatAddress(item.name)}
+                {t('components.line-card.borrower')}: {formatAddress(getENS(item.borrower, ensMap)!)}
               </ItemName>
               <Divider />
               <Metric>
-                ${prettyNumbers(item.revenue)} / ${prettyNumbers(item.deposit)}
+                ${prettyNumbers(unnullify('0'))} / $ {/*TODO: Need to add this functionality*/}
+                {prettyNumbers(item.deposit)}
               </Metric>
               <MetricsTextContainer>
                 <MetricsText>
@@ -173,7 +159,9 @@ export const RecommendationsCard = ({ header, subHeader, items, ...props }: Reco
 
               <ItemInfoLabel>{t('components.line-card.secured-by')}:</ItemInfoLabel>
               <Metric>
-                ${prettyNumbers(item.collateral)} / ${prettyNumbers(item.revenue)}
+                ${prettyNumbers(unnullify(item?.escrow?.collateralValue))} / ${' '}
+                {/*TODO: Need to add this functionality*/}
+                {prettyNumbers(unnullify('0'))}
               </Metric>
               <MetricsTextContainer>
                 <MetricsText>

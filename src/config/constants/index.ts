@@ -4,7 +4,8 @@ import { Constants, NetworkSettings, TokenView } from '@types';
 import { getEnv } from '@config/env';
 
 import { networks } from './supportedNetworks.json';
-import CHAIN_IDS from './chainIds';
+import { CHAIN_IDS, CHAIN_NAMES } from './chainIds';
+
 // import { encode } from '@src/utils';
 
 export const TOKEN_ADDRESSES = {
@@ -92,6 +93,7 @@ export const getConstants = memoize((): Constants => {
     DEBT_DAO_ALERTS_API: 'http://yearn-alerts-balancer-2019386215.us-east-1.elb.amazonaws.com',
     SUPPORTED_NETWORKS: ['mainnet'],
     CHAIN_IDS: CHAIN_IDS,
+    CHAIN_NAMES: CHAIN_NAMES,
     NETWORK_SETTINGS,
     MAINNET_PROVIDER_HTTPS: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     MAINNET_PROVIDER_WSS: `wss://eth-mainnet.ws.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,

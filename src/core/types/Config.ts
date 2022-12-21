@@ -38,6 +38,9 @@ export interface Constants {
   CHAIN_IDS: {
     [KEY: number]: string;
   };
+  CHAIN_NAMES: {
+    [KEY: string]: string;
+  };
   NETWORK_SETTINGS: NetworkSettings;
   MAINNET_PROVIDER_HTTPS: string;
   MAINNET_PROVIDER_WSS: string;

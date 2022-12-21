@@ -1,18 +1,12 @@
 import { getConfig } from '@config';
 import { Network, ProviderType } from '@types';
 
-const { NETWORK, CHAIN_IDS } = getConfig();
+const { NETWORK, CHAIN_IDS, CHAIN_NAMES } = getConfig();
 
 // TODO: use CHAIN_IDS to from Network to Id
 export const getNetworkId = (network: Network): number => {
-  switch (network) {
-    case 'mainnet':
-      return 1;
-    case 'goerli':
-      return 5;
-    default:
-      return 0;
-  }
+  const networkId = Number(CHAIN_NAMES[network]);
+  return networkId ?? 0;
 };
 
 export const getNetwork = (networkId?: number | string): Network => {

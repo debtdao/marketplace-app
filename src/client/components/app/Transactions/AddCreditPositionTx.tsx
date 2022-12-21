@@ -118,7 +118,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         })
       );
     }
-    if ((selectedTokenAddress === '' || !selectedTokenAddress) && selectedSellToken) {
+    if (!selectedTokenAddress && selectedSellToken) {
       setSelectedTokenAddress(selectedSellToken.address);
     }
 

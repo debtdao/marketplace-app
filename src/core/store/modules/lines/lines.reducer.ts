@@ -62,7 +62,6 @@ export const linesInitialState: CreditLineState = {
     deploySecuredLine: initialStatus,
     user: initialUserMetadataStatusMap,
   },
-  network: undefined,
 };
 
 const {
@@ -107,23 +106,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(setPosition, (state, { payload: { id, position } }) => {
       state.positionsMap[id] = position;
     })
-
-    .addCase(networkChange, (state, { payload: { network } }) => {
-      // wallet action
-      state.network = network;
-    })
-
-    // synchronize network across network, lines, and wallet state
-    .addCase(changeNetwork.fulfilled, (state, { payload }) => {
-      // network actions
-      // state.current = payload.network;
-      state.network = getNetworkId(payload.network);
-    })
-    .addCase(changeNetworkGoerli, (state) => {
-      // state.current = 'goerli';
-      state.network = 5;
-    })
-
     /* -------------------------------------------------------------------------- */
     /*                                 Clear State                                */
     /* -------------------------------------------------------------------------- */

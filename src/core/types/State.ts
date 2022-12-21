@@ -127,7 +127,6 @@ export interface CreditLineState {
     deploySecuredLine: Status;
     user: UserLineMetadataStatusMap;
   };
-  network: number | undefined;
 }
 
 export interface CollateralState {

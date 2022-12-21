@@ -47,7 +47,6 @@ let client: any;
 export const getClient = (network: string) => (client ? client : createClient(network));
 const createClient = (network: string): typeof ApolloClient => {
   client = new ApolloClient({
-    // uri: GRAPH_API_URL,
     uri: getGraphURL(network),
     cache: new InMemoryCache(),
   });

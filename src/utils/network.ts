@@ -27,10 +27,10 @@ export const getNetwork = (networkId?: number | string): Network => {
 };
 
 export const getNetworkRpc = (network: Network): string => {
-  const { WEB3_PROVIDER_HTTPS, ARBITRUM_PROVIDER_HTTPS, GOERLI_PROVIDER_HTTPS } = getConfig();
+  const { MAINNET_PROVIDER_HTTPS, ARBITRUM_PROVIDER_HTTPS, GOERLI_PROVIDER_HTTPS } = getConfig();
   switch (network) {
     case 'mainnet':
-      return WEB3_PROVIDER_HTTPS;
+      return MAINNET_PROVIDER_HTTPS;
     // case 'arbitrum':
     //   return ARBITRUM_PROVIDER_HTTPS;
     case 'goerli':

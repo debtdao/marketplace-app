@@ -5,6 +5,7 @@ import _ from 'lodash';
 
 import { AppDispatch, ThunkAPI } from '@frameworks/redux';
 import {
+  LineOfCredit,
   SecuredLine,
   SecuredLineWithEvents,
   TransactionOutcome,
@@ -106,10 +107,17 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
         .map((params: GetLinesArgs) => creditLineService.getLines({ network, ...params }))
     );
 
-    //@ts-ignore
+    interface MarketLines {
+      [key: string]: SecuredLine[];
+    }
+
+    interface MarketPageData {
+      linesData: MarketLines;
+      allBorrowers: string[];
+    }
+
     const { linesData, allBorrowers } = categoryKeys.reduce(
-      //@ts-ignore
-      ({ linesData, allBorrowers }, category, i) => {
+      ({ linesData, allBorrowers }: MarketPageData, category: string, i: number): MarketPageData => {
         // @dev assumes `promises` is same order as `categories`
         if (!promises[i]) {
           return { linesData, allBorrowers };
@@ -123,10 +131,8 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
       },
       { linesData: {}, allBorrowers: [] }
     );
-    console.log(allBorrowers);
-    allBorrowers.forEach((element: string) => {
-      dispatch(OnchainMetaDataActions.getENS(element));
-    });
+
+    allBorrowers.map((b) => dispatch(OnchainMetaDataActions.getENS(b)));
     // do ENS things with borrowers
     // const borrowers = _.uniq(allborrowers)
 

@@ -17,9 +17,10 @@ import {
 } from '@store';
 import { RecommendationsCard, SliderCard, ViewContainer } from '@components/app';
 import { SpinnerLoading, Text, Button } from '@components/common';
-import { SecuredLine, UseCreditLinesParams } from '@src/core/types';
+import { SecuredLine, UseCreditLinesParams, Item } from '@src/core/types';
 import { DebtDAOBanner } from '@assets/images';
 import { getEnv } from '@config/env';
+import { getENS } from '@src/utils';
 
 const StyledRecommendationsCard = styled(RecommendationsCard)``;
 
@@ -150,25 +151,13 @@ export const Market = () => {
             <StyledRecommendationsCard
               header={t(key)}
               key={key}
-              items={val.map(({ id, borrower, spigot, escrow, principal, deposit, start, end }) => ({
-                icon: '',
-                name: useENS(borrower),
-                start: start,
-                end: end,
-                id: id,
-                principal,
-                deposit,
-                collateral: Object.entries(escrow?.deposits || {}) // change to collateralValue once we have prices
-                  .reduce((sum, [_, val]) => sum.add(val.amount), utils.parseUnits('0', 'ether')) // remove 'amount' once the above is changed
-                  .toString(),
-                revenue: Object.values(spigot?.tokenRevenue || {})
-                  .reduce((sum, val) => sum.add(val), utils.parseUnits('0', 'ether'))
-                  .toString(),
-                tags: [spigot ? 'revenue' : '', escrow ? 'collateral' : ''].filter((x) => !!x),
-                info: 'DAO Line of Credit',
-                infoDetail: 'EYY',
-                onAction: () => history.push(`/lines/${id}`),
-              }))}
+              items={
+                val.map(({ id, ...stuff }) => ({
+                  ...stuff,
+                  icon: '',
+                  onAction: () => history.push(`/lines/${id}`),
+                })) as Item[]
+              }
             />
           );
         })

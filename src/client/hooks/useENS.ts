@@ -10,8 +10,8 @@ interface ENSAddress {
   name: string;
 }
 
-export const useENS = ({ address }: ENSAddressProps): ENSAddress => {
+export const useENS = ({ address }: ENSAddressProps): string => {
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const ensName = getENS(address, ensMap) ?? address;
-  return { name: ensName };
+  return ensName;
 };

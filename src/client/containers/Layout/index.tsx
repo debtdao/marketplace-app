@@ -14,12 +14,14 @@ import {
   ModalSelectors,
   NetworkActions,
   PartnerSelectors,
+  LinesActions,
+  LinesSelectors,
 } from '@store';
 import { useAppTranslation, useAppDispatch, useAppSelector, useWindowDimensions, usePrevious } from '@hooks';
 import { Navigation, Navbar, Footer } from '@components/app';
 import { Modals, Alerts } from '@containers';
 import { getConfig } from '@config';
-import { Network, Route } from '@types';
+import { Network, Route, UseCreditLinesParams } from '@types';
 import { device } from '@themes/default';
 import { isInIframe, isCoinbaseApp } from '@utils';
 
@@ -99,12 +101,36 @@ export const Layout: FC = ({ children }) => {
   const collapsedSidebar = useAppSelector(SettingsSelectors.selectSidebarCollapsed);
   const previousAddress = usePrevious(selectedAddress);
   const previousNetwork = usePrevious(currentNetwork);
+  const selectedLineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
+  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
+  const userWalletAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
   // const path = useAppSelector(({ route }) => route.path);
   const path = location.pathname.toLowerCase().split('/')[1] as Route;
   const isLedgerLive = partner.id === 'ledger';
   const isIframe = isInIframe();
   const hideControls = isIframe || isLedgerLive;
   const hideOptionalLinks = isLedgerLive;
+
+  const defaultLineCategories: UseCreditLinesParams = {
+    // using i18m translation as keys for easy display
+    'market:featured.highest-credit': {
+      first: 3,
+      // NOTE: terrible proxy for total credit (oldest = most). Currently getLines only allows filtering by line metadata not modules'
+      orderBy: 'start',
+      orderDirection: 'asc',
+    },
+    'market:featured.highest-revenue': {
+      first: 16,
+      // NOTE: terrible proxy for total revenue earned (highest % = highest notional). Currently getLines only allows filtering by line metadata not modules'
+      orderBy: 'defaultSplit',
+      orderDirection: 'desc',
+    },
+    'market:featured.newest': {
+      first: 15,
+      orderBy: 'start', // NOTE: theoretically gets lines that start in the future, will have to refine query
+      orderDirection: 'desc',
+    },
+  };
 
   let titleLink;
   // TODO Add lab details route when its added the view
@@ -145,8 +171,18 @@ export const Layout: FC = ({ children }) => {
 
   useEffect(() => {
     if (activeModal) dispatch(ModalsActions.closeModal());
-    if (previousNetwork) dispatch(AppActions.clearAppData());
+    if (previousNetwork) {
+      dispatch(AppActions.clearAppData());
+      dispatch(LinesActions.clearLinesData());
+      dispatch(LinesActions.clearLineStatus({ lineAddress: selectedLineAddress! }));
+      dispatch(LinesActions.clearSelectedLineAndStatus());
+      dispatch(LinesActions.clearUserData());
+    }
     if (selectedAddress) dispatch(AppActions.clearUserAppData());
+
+    // dispatch(LinesActions.getLines(defaultLineCategories));
+    // dispatch(LinesActions.getLinePage({ id: selectedLineAddress! }));
+    // dispatch(LinesActions.getUserPortfolio({ user: userWalletAddress! }));
 
     dispatch(TokensActions.getTokens());
     dispatch(TokensActions.getSupportedOracleTokens());

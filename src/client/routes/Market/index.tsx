@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import { utils } from 'ethers';
 
-import { useENS } from '@src/client/hooks/useENS';
 import { useAppSelector, useAppDispatch, useAppTranslation, useQueryParams } from '@hooks';
 import {
   ModalsActions,

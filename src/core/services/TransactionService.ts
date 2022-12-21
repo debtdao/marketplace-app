@@ -11,6 +11,7 @@ import {
   GasFees,
   TransactionReceipt,
   Web3Provider,
+  ProviderType,
 } from '@types';
 import { getProviderType } from '@utils';
 import { getContract } from '@frameworks/ethers';
@@ -26,7 +27,7 @@ export class TransactionServiceImpl implements TransactionService {
 
   public async execute(props: ExecuteTransactionProps): Promise<TransactionResponse> {
     const { network, methodName, abi, contractAddress, args, overrides } = props;
-
+    console.log('subgraph inside TXN service execute', network);
     let gasFees: GasFees = {};
     try {
       if (network === 'mainnet') {
@@ -49,7 +50,6 @@ export class TransactionServiceImpl implements TransactionService {
       const contract = getContract(contractAddress, abi, signer);
       console.log(contract, contractAddress, abi, 'jackpot');
       const unsignedTx = await contract.populateTransaction[methodName](...txArgs);
-
       // const contractIface = new Interface(abi);
       // const decodedData = contractIface.decodeFunctionData(methodName, unsignedTx.data!.toString());
       // console.log({ decodedData });
@@ -98,7 +98,7 @@ export class TransactionServiceImpl implements TransactionService {
       };
       const txArgs = args ? [...args, txOverrides] : [txOverrides];
 
-      const contract = getContract(contractAddress, abi, this.web3Provider.getInstanceOf('goerli'));
+      const contract = getContract(contractAddress, abi, this.web3Provider.getInstanceOf(network as ProviderType));
       console.log(contract, 'jackpot');
       return await contract.populateTransaction[methodName](...txArgs);
     } catch (error: any) {

@@ -1,6 +1,8 @@
+import _ from 'lodash';
+
 // Source: DeFi Llama
 // https://github.com/DefiLlama/chainlist/blob/main/constants/chainIds.js
-const CHAIN_IDS: { [key: number]: string } = {
+export const CHAIN_IDS: { [key: number]: string } = {
   1: 'mainnet', // manually revised from 'ethereum' to 'mainnet'
   3: 'ropsten', // manually added
   4: 'rinkeby', // manually added
@@ -80,4 +82,4 @@ const CHAIN_IDS: { [key: number]: string } = {
   836542336838601: 'curio',
 };
 
-export default CHAIN_IDS;
+export const CHAIN_NAMES = _.invert(CHAIN_IDS);

@@ -8,6 +8,7 @@ const getLineFactoryforNetwork = (network: number | string) => {
     case 'goerli' || 5:
       return (LineFactory = networks.goerli.lineFactory);
   }
+  // Add case that if its any other chain, we inform the user that we are not deployed to that chain
 };
 
 export { getLineFactoryforNetwork };

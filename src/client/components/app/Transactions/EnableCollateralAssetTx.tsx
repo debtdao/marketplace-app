@@ -86,6 +86,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
   // @cleanup TODO pull colalteralOptions from subgraph instread of default yearn tokens
   const collateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
   const selectedAsset = _.find(collateralOptions, (t) => t.address === selectedAssetAddress);
+  console.log('collateralOption', collateralOptions, selectedAsset);
 
   useEffect(() => {
     // if escrow not set yet then correct state
@@ -180,7 +181,6 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
       dryRun: false,
     };
 
-    console.log('enable collataral data', transactionData.escrowAddress, transactionData.token);
     dispatch(CollateralActions.enableCollateral(transactionData)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         console.log('enable collateral faild', res);

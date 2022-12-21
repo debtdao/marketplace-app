@@ -40,7 +40,7 @@ const onchainMetaDataReducer = createReducer(initialOnchainMetaDataState, (build
     })
 
     .addCase(getENS.pending, (state) => {
-      console.log('pending getENS');
+      //console.log('pending getENS');
     });
 });
 

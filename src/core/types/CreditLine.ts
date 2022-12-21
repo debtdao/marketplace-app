@@ -68,6 +68,14 @@ export interface SecuredLine extends LineOfCredit, LineCollateral {
   positions?: PositionMap;
 }
 
+export interface Item extends SecuredLine {
+  header?: string;
+  icon: string;
+  info: string;
+  infoDetail?: string;
+  action?: string;
+  onAction?: () => void;
+}
 // data that isnt included in SecuredLine that we need to fetch for full SecuredLineWithEvents dattype
 // gets merged into existing AggregatedCredit to form LinePageData
 export interface LineEvents {
@@ -175,6 +183,16 @@ export interface AggregatedSpigot extends BaseCollateralModule {
   id: Address;
   // aggregated revenue in USD by token across all spigots
   tokenRevenue: { [key: string]: string }; // TODO: RevenueSummary
+  // revenueSummary: RevenueSummary;
+}
+
+export interface MarketLines {
+  [key: string]: SecuredLine[];
+}
+
+export interface MarketPageData {
+  linesData: MarketLines;
+  allBorrowers: string[];
 }
 
 export interface LinePageSpigot extends AggregatedSpigot {

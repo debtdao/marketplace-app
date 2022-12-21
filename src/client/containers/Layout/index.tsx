@@ -99,6 +99,7 @@ export const Layout: FC = ({ children }) => {
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const activeModal = useAppSelector(ModalSelectors.selectActiveModal);
   const collapsedSidebar = useAppSelector(SettingsSelectors.selectSidebarCollapsed);
+  const selectedLineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
   const previousAddress = usePrevious(selectedAddress);
   const previousNetwork = usePrevious(currentNetwork);
   const selectedLineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);

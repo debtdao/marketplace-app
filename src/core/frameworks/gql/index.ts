@@ -38,10 +38,9 @@ const getGraphURL = (network: string) => {
   if (network === 'mainnet') {
     url = GRAPH_API_URL!;
   } else if (network === 'goerli') {
-    // TODO: This is hardcoded until we fix the undefined GRAPH_TEST_API_URL URL bug.
-    // url = GRAPH_TEST_API_URL!;
-    url = 'https://api.thegraph.com/subgraphs/name/kibagateaux/dd-test';
+    url = GRAPH_TEST_API_URL!;
   }
+  console.log('framework url: ', url);
   return url;
 };
 

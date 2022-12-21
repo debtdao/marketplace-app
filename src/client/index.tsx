@@ -78,12 +78,14 @@ const GlobalStyle = createGlobalStyle`
 
 const container = new Container();
 const store = getStore(container);
+const state = store.getState();
+const graphQLClient = getClient(state.network.current);
 
 export const App = () => {
   return (
     <Provider store={store}>
       <AppContextProvider context={container.context}>
-        <ApolloProvider client={getClient()}>
+        <ApolloProvider client={graphQLClient}>
           <NavSideMenuContextProvider>
             <Themable>
               <GlobalStyle />

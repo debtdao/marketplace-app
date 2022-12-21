@@ -27,12 +27,25 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
     if (web3Provider.hasInstanceOf('wallet') && config.SUPPORTED_NETWORKS.includes(network)) {
       const providerType = getProviderType(network);
       const provider = web3Provider.getInstanceOf(providerType);
+      console.log('change network provider: ', provider);
       const yearn = yearnSdk.getInstanceOf(network);
+      // yearn.context.setProvider(provider);
       yearn.context.setProvider({
         read: provider,
         write: web3Provider.getInstanceOf('wallet'),
       });
+      // const signer = web3Provider.getSigner();
+      // const tx = await signer.connect(provider);
     }
+    // else {
+    //   const providerType = getProviderType(network);
+    //   const provider = web3Provider.getInstanceOf(providerType);
+    //   // create signer
+    //   const signer = web3Provider.getSigner();
+    //   // signer connects connect to new provider
+    //   signer.connect(provider);
+    //   // signer.connect(provider);
+    // }
 
     notify.config({ networkId: getNetworkId(network) });
 

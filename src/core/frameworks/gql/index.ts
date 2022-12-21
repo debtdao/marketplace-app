@@ -16,6 +16,7 @@ import {
   GetLinesResponse,
   SupportedOracleTokenResponse,
   CreditPosition,
+  Network,
 } from '@src/core/types';
 
 import {
@@ -27,14 +28,29 @@ import {
   GET_USER_PORTFOLIO_QUERY,
 } from './queries';
 
-const { GRAPH_API_URL, GRAPH_CHAINLINK_FEED_REGISTRY_API_URL } = getEnv();
+// TODO: GRAPH_CHAINLINK_FEED_REGISTRY_API_URL
+const { GRAPH_API_URL, GRAPH_TEST_API_URL, GRAPH_CHAINLINK_FEED_REGISTRY_API_URL } = getEnv();
 const { BLACKLISTED_LINES: blacklist } = getConstants();
 
+// utility function get GRAPH_API_URL based on network parameter
+const getGraphURL = (network: string) => {
+  let url = '';
+  if (network === 'mainnet') {
+    url = GRAPH_API_URL!;
+  } else if (network === 'goerli') {
+    // TODO: This is hardcoded until we fix the undefined GRAPH_TEST_API_URL URL bug.
+    // url = GRAPH_TEST_API_URL!;
+    url = 'https://api.thegraph.com/subgraphs/name/kibagateaux/dd-test';
+  }
+  return url;
+};
+
 let client: any;
-export const getClient = () => (client ? client : createClient());
-const createClient = (): typeof ApolloClient => {
+export const getClient = (network: string) => (client ? client : createClient(network));
+const createClient = (network: string): typeof ApolloClient => {
   client = new ApolloClient({
-    uri: GRAPH_API_URL,
+    // uri: GRAPH_API_URL,
+    uri: getGraphURL(network),
     cache: new InMemoryCache(),
   });
   return client;
@@ -64,10 +80,10 @@ const createPriceFeedClient = (isOracle?: boolean): typeof ApolloClient => {
  *        1. for creating curried func and 2. for defining arg/return types of that func
  */
 export const createQuery =
-  (query: DocumentNode, path?: string, isOracle?: boolean): Function =>
+  (query: DocumentNode, path?: string, network?: string, isOracle?: boolean): Function =>
   <A, R>(variables: A): Promise<QueryResponse<R>> =>
     new Promise(async (resolve, reject) => {
-      const client = isOracle ? getPriceFeedClient() : getClient();
+      const client = isOracle ? getPriceFeedClient() : getClient(network!);
       client
         .query({ query, variables })
         .then((result: QueryResult) => {
@@ -84,7 +100,6 @@ export const createQuery =
     });
 
 const getLineQuery = createQuery(GET_LINE_QUERY);
-
 export const getLine: QueryCreator<GetLineArgs, SecuredLine> = <GetLineArgs, SecuredLine>(
   arg: GetLineArgs
 ): QueryResponse<SecuredLine> => getLineQuery(arg);
@@ -99,7 +114,7 @@ export const getLines: QueryCreator<GetLinesArgs, GetLinesResponse[]> = <GetLine
   arg: GetLinesArgs
 ): QueryResponse<GetLinesResponse[]> => getLinesQuery({ ...arg, blacklist });
 
-const getSupportedOracleTokensQuery = createQuery(GET_SUPPORTED_ORACLE_TOKENS_QUERY, undefined, true);
+const getSupportedOracleTokensQuery = createQuery(GET_SUPPORTED_ORACLE_TOKENS_QUERY, undefined, undefined, true);
 export const getSupportedOracleTokens: QueryCreator<
   undefined,
   SupportedOracleTokenResponse | undefined

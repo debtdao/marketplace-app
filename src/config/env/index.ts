@@ -19,9 +19,12 @@ export const getEnv = memoize((): Env => {
     REACT_APP_PORTIS_KEY,
     REACT_APP_SEGMENT_API_KEY,
     REACT_APP_GRAPH_API_URL,
+    DEV_REACT_APP_GRAPH_API_URL,
     REACT_APP_GRAPH_CHAINLINK_FEED_REGISTRY_API_URL,
-    REACT_APP_GRAPH_TEST_API_URL,
   } = process.env;
+
+  console.log('framework process env: ', process.env);
+  console.log('framework dev subgraph url: ', DEV_REACT_APP_GRAPH_API_URL);
 
   return {
     ENV: NODE_ENV,
@@ -39,7 +42,7 @@ export const getEnv = memoize((): Env => {
     PORTIS_KEY: REACT_APP_PORTIS_KEY,
     SEGMENT_API_KEY: REACT_APP_SEGMENT_API_KEY,
     GRAPH_API_URL: REACT_APP_GRAPH_API_URL,
-    GRAPH_TEST_API_URL: REACT_APP_GRAPH_TEST_API_URL,
+    GRAPH_TEST_API_URL: DEV_REACT_APP_GRAPH_API_URL,
     GRAPH_CHAINLINK_FEED_REGISTRY_API_URL: REACT_APP_GRAPH_CHAINLINK_FEED_REGISTRY_API_URL,
   };
 });

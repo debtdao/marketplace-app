@@ -15,8 +15,8 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
     const { context, config } = extra;
     const { wallet, web3Provider, yearnSdk } = context;
 
-    // if (!config.SUPPORTED_NETWORKS.includes(network)) throw Error('Network Not Supported');
-    dispatch(AppActions.initApp());
+    // TODO: remove before merging develop branch.
+    // dispatch(AppActions.initApp());
 
     if (wallet.isCreated) {
       const action = (await dispatch(

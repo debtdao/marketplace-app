@@ -4,12 +4,15 @@ import { createGlobalStyle } from 'styled-components';
 import { ApolloProvider } from '@apollo/client';
 import '@i18n';
 
+import { useSelector } from 'react-redux';
 import { Container } from '@container';
 import { getStore } from '@frameworks/redux';
 import { AppContextProvider, NavSideMenuContextProvider } from '@context';
 import { getClient } from '@core/frameworks/gql';
 import { Routes } from '@routes';
 import { Themable } from '@containers';
+// import { NetworkSelectors } from '@store';
+// import { useAppSelector } from '@hooks';
 
 import '@assets/fonts/RobotoFont.css';
 
@@ -80,7 +83,9 @@ export const App = () => {
   const container = new Container();
   const store = getStore(container);
   const state = store.getState();
+  // const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   console.log('network states - app network: ', state.network.current);
+  // console.log('network states - app network 2: ', currentNetwork);
   // // const graphQLClient = getClient(state.network.current);
   const graphQLClient = getClient(state.network.current);
 

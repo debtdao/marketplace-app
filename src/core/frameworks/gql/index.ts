@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, DocumentNode, QueryResult } from '@apollo/client';
+import { ApolloClient, InMemoryCache, DocumentNode, QueryResult, HttpLink } from '@apollo/client';
 import { at } from 'lodash';
 
 import { getEnv } from '@config/env';
@@ -34,29 +34,25 @@ const { BLACKLISTED_LINES: blacklist } = getConstants();
 
 // utility function get GRAPH_API_URL based on network parameter
 const getGraphURL = (network: string) => {
-  let url = '';
+  // let url = '';
+  let link: any;
   if (network === 'mainnet') {
-    url = GRAPH_API_URL!;
+    // url = GRAPH_API_URL!;
+    link = new HttpLink({ uri: GRAPH_API_URL! });
   } else if (network === 'goerli') {
-    url = GRAPH_TEST_API_URL!;
+    // url = GRAPH_TEST_API_URL!;
+    link = new HttpLink({ uri: GRAPH_TEST_API_URL! });
   }
-  return url;
+  // return url;
+  return link;
 };
 
 let client: any;
-// let currentNetwork: any;
-export const getClient = (network: string) => {
-  // console.log('network states - currentNetwork: ', currentNetwork);
-  // console.log('network states - new network: ', network);
-  console.log('network states - client: ', client?.link.options.uri);
-  console.log('network states - client network: ', network);
-  // console.log('network states - client: ', client);
-  // return client && network !== currentNetwork ? client : createClient(network);
-  return client ? client : createClient(network);
-};
+export const getClient = (network: string) => (client ? client : createClient(network));
 const createClient = (network: string): typeof ApolloClient => {
   client = new ApolloClient({
-    uri: getGraphURL(network),
+    // uri: getGraphURL(network),
+    link: getGraphURL(network),
     cache: new InMemoryCache(),
   });
   return client;
@@ -89,14 +85,7 @@ export const createQuery =
   (query: DocumentNode, path?: string, network?: string, isOracle?: boolean): Function =>
   <A, R>(variables: A): Promise<QueryResponse<R>> =>
     new Promise(async (resolve, reject) => {
-      console.log('network states - path: ', path);
-      console.log('network states - isOracle: ', isOracle);
-      console.log('network states - create query network: ', network);
       const client = isOracle ? getPriceFeedClient() : getClient(network!);
-      // if (!isOracle) {
-      //   client.onResetStore(() => client.writeData({ data: { isLoggedIn: false } }));
-      //   // console.log('network states - create query client: ', client);
-      // }
       client
         .query({ query, variables })
         .then((result: QueryResult) => {

@@ -111,6 +111,7 @@ export const Layout: FC = ({ children }) => {
   const hideControls = isIframe || isLedgerLive;
   const hideOptionalLinks = isLedgerLive;
 
+  // TODO: Remove before merging back into develop.
   const defaultLineCategories: UseCreditLinesParams = {
     // using i18m translation as keys for easy display
     'market:featured.highest-credit': {
@@ -141,6 +142,7 @@ export const Layout: FC = ({ children }) => {
   // Used to check zapper api
   // const { ZAPPER_AUTH_TOKEN } = getConfig();
 
+  // TODO: Reset this before merging into develop.
   useEffect(() => {
     dispatch(AppActions.initApp());
 
@@ -173,8 +175,8 @@ export const Layout: FC = ({ children }) => {
   useEffect(() => {
     if (activeModal) dispatch(ModalsActions.closeModal());
 
+    // Clear Redux state when switching networks
     if (previousNetwork) {
-      console.log('network states previousNetwork: ', previousNetwork);
       dispatch(AppActions.clearAppData());
       dispatch(LinesActions.clearLinesData());
       dispatch(LinesActions.clearLineStatus({ lineAddress: selectedLineAddress! }));
@@ -183,7 +185,7 @@ export const Layout: FC = ({ children }) => {
     }
     if (selectedAddress) dispatch(AppActions.clearUserAppData());
 
-    // dispatch lines data
+    // Fetch lines data when switching networks
     console.log('network states currentNetwork: ', currentNetwork);
     dispatch(LinesActions.getLines(defaultLineCategories));
     // dispatch(LinesActions.getLinePage({ id: selectedLineAddress! }));

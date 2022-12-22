@@ -2,6 +2,9 @@ import { createReducer } from '@reduxjs/toolkit';
 import { getAddress } from '@ethersproject/address';
 
 import { WalletState } from '@types';
+import { getNetworkId } from '@src/utils';
+
+import { NetworkActions } from '../network/network.actions';
 
 import { WalletActions } from './wallet.actions';
 
@@ -16,7 +19,17 @@ export const walletInitialState: WalletState = {
   error: undefined,
 };
 
-const { addressChange, balanceChange, networkChange, walletChange, walletSelect, getAddressEnsName } = WalletActions;
+const {
+  addressChange,
+  balanceChange,
+  networkChange,
+  walletChange,
+  walletSelect,
+  getAddressEnsName,
+  // changeWalletNetwork,
+} = WalletActions;
+
+const { changeNetwork } = NetworkActions;
 
 const walletReducer = createReducer(walletInitialState, (builder) => {
   builder
@@ -28,8 +41,15 @@ const walletReducer = createReducer(walletInitialState, (builder) => {
       state.selectedAddress = address ? getAddress(address) : undefined;
     })
     .addCase(networkChange, (state, { payload: { network } }) => {
+      console.log('subgraph wallet networkChange reducer: ', network);
       state.networkVersion = network;
     })
+    // Use networkId to set the state
+    // .addCase(changeWalletNetwork.fulfilled, (state, { payload: { networkChanged, networkId } }) => {
+    //   console.log('subgraph wallet reducer networkId: ', networkId);
+    //   state.networkVersion = networkId;
+    //   console.log('subgraph wallet reducer state: ', state.networkVersion);
+    // })
     .addCase(balanceChange, (state, { payload: { balance } }) => {
       state.balance = balance;
     })
@@ -47,6 +67,11 @@ const walletReducer = createReducer(walletInitialState, (builder) => {
     })
     .addCase(getAddressEnsName.fulfilled, (state, { payload: { addressEnsName } }) => {
       state.addressEnsName = addressEnsName;
+    })
+    // synchronize network across network, lines, and wallet state
+    .addCase(changeNetwork.fulfilled, (state, { payload }) => {
+      // state.current = payload.network;
+      state.networkVersion = getNetworkId(payload.network);
     });
 });
 

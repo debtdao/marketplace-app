@@ -1,3 +1,4 @@
+import { getAddress } from '@ethersproject/address';
 import { createSelector } from '@reduxjs/toolkit';
 
 import { Address, AggregatedEscrow, AggregatedSpigot, RootState } from '@types';
@@ -16,7 +17,11 @@ const selectSelectedSpigotAddress = (state: RootState) => state.collateral.selec
 const selectSpigotForSelectedLine = (state: RootState) =>
   state.lines.linesMap[state.lines.selectedLineAddress ?? '']?.spigotId;
 
-const selectSelectedCollateralAsset = (state: RootState) => state.collateral.selectedCollateralAsset;
+const selectSelectedCollateralAsset = (state: RootState) => {
+  return state.collateral.selectedCollateralAsset
+    ? state.tokens.tokensMap[getAddress(state.collateral.selectedCollateralAsset)]
+    : undefined;
+};
 const selectSelectedRevenueContractAddress = (state: RootState) => state.collateral.selectedRevenueContract;
 
 const selectSelectedEscrow = createSelector([selectCollateralMap, selectSelectedEscrowAddress], (cMap, addy) => {

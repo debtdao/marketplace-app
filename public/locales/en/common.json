@@ -175,6 +175,7 @@
         "select-token": "2. Select credit token",
         "select-rates": "3. Set your interest rates",
         "back-to-market": "Head back to the Market",
+        "cta": "Add Collateral",
         "no-assets-enabled": {
           "title": "No tokens have been enabled as collateral on your line!",
           "body": "The arbiter is the only one that can enable assets to be deposited as collateral. Find and contact your Arbiter in the Debt DAO discord.",
@@ -221,8 +222,8 @@
         "header":"Enable Spigot",
         "select-function": "Select Function",
         "revenue-contract": "1. Revenue Contract",
-        "function-revenue": "2. Select function to claim revenue",
-        "function-transfer": "3. Select function to transfer ownership of revenue contract",
+        "function-revenue": "3. Select function to claim revenue",
+        "function-transfer": "2. Select function to transfer ownership of revenue contract",
         "cta": "Enable Spigot",
         "enable-failed": "Enable Spigot Failed."
       }

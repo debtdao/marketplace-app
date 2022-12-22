@@ -17,7 +17,7 @@ import {
 } from '@src/core/types';
 import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
 import { Button, Text, RedirectIcon } from '@components/common';
-import { LinesSelectors, ModalsActions, WalletSelectors, WalletActions } from '@src/core/store';
+import { LinesSelectors, ModalsActions, WalletSelectors, WalletActions, CollateralActions } from '@src/core/store';
 import { humanize } from '@src/utils';
 import { getEnv } from '@config/env';
 
@@ -190,14 +190,17 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const depositHandler = (token: TokenView) => {
     if (!walletIsConnected) {
       connectWallet();
+    } else {
+      dispatch(CollateralActions.setSelectedCollateralAsset({ assetAddress: token.address }));
+      dispatch(ModalsActions.openModal({ modalName: 'addCollateral' }));
     }
-    dispatch(ModalsActions.openModal({ modalName: 'addCollateral' }));
   };
 
   const addSpigotHandler = (token: TokenView) => {
     if (!walletIsConnected) {
       connectWallet();
     } else {
+      dispatch(CollateralActions.setSelectedRevenueContract({ contractAddress: token.address }));
       dispatch(ModalsActions.openModal({ modalName: 'enableSpigot' }));
     }
   };

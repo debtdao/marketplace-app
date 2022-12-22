@@ -5,12 +5,21 @@ import { useHistory } from 'react-router-dom';
 import { utils } from 'ethers';
 
 import { useAppSelector, useAppDispatch, useAppTranslation, useQueryParams } from '@hooks';
-import { ModalsActions, LinesActions, LinesSelectors, WalletActions, WalletSelectors } from '@store';
+import {
+  ModalsActions,
+  LinesActions,
+  LinesSelectors,
+  WalletActions,
+  WalletSelectors,
+  OnchainMetaDataActions,
+  OnchainMetaDataSelector,
+} from '@store';
 import { RecommendationsCard, SliderCard, ViewContainer } from '@components/app';
 import { SpinnerLoading, Text, Button } from '@components/common';
-import { SecuredLine, UseCreditLinesParams } from '@src/core/types';
+import { SecuredLine, UseCreditLinesParams, Item } from '@src/core/types';
 import { DebtDAOBanner } from '@assets/images';
 import { getEnv } from '@config/env';
+import { getENS } from '@src/utils';
 
 const StyledRecommendationsCard = styled(RecommendationsCard)``;
 
@@ -39,6 +48,7 @@ export const Market = () => {
   const [search, setSearch] = useState('');
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
+  const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
 
   // TODO not neeed here
   const addCreditStatus = useAppSelector(LinesSelectors.selectLinesActionsStatusMap);
@@ -72,12 +82,14 @@ export const Market = () => {
 
     const expectedCategories = _.keys(defaultLineCategories);
     const currentCategories = _.keys(lineCategoriesForDisplay);
-
+    console.log(expectedCategories);
     // const shouldFetch = expectedCategories.reduce((bool, cat) => bool && cuirrentCategories.includes(cat), true);
     let shouldFetch: boolean = false;
     expectedCategories.forEach((cat) => (shouldFetch = shouldFetch || !currentCategories.includes(cat)));
 
-    if (shouldFetch) fetchMarketData();
+    if (shouldFetch) {
+      fetchMarketData();
+    }
     console.log('search', search);
   }, []);
 
@@ -138,25 +150,13 @@ export const Market = () => {
             <StyledRecommendationsCard
               header={t(key)}
               key={key}
-              items={val.map(({ id, borrower, spigot, escrow, principal, deposit, start, end }) => ({
-                icon: '',
-                name: borrower,
-                start: start,
-                end: end,
-                id: id,
-                principal,
-                deposit,
-                collateral: Object.entries(escrow?.deposits || {}) // change to collateralValue once we have prices
-                  .reduce((sum, [_, val]) => sum.add(val.amount), utils.parseUnits('0', 'ether')) // remove 'amount' once the above is changed
-                  .toString(),
-                revenue: Object.values(spigot?.tokenRevenue || {})
-                  .reduce((sum, val) => sum.add(val), utils.parseUnits('0', 'ether'))
-                  .toString(),
-                tags: [spigot ? 'revenue' : '', escrow ? 'collateral' : ''].filter((x) => !!x),
-                info: 'DAO Line of Credit',
-                infoDetail: 'EYY',
-                onAction: () => history.push(`/lines/${id}`),
-              }))}
+              items={
+                val.map(({ id, ...stuff }) => ({
+                  ...stuff,
+                  icon: '',
+                  onAction: () => history.push(`/lines/${id}`),
+                })) as Item[]
+              }
             />
           );
         })

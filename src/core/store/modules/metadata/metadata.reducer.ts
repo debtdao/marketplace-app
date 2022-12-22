@@ -7,27 +7,27 @@ import { OnchainMetaDataActions } from './metadata.actions';
 const { getABI, clearABI, getENS } = OnchainMetaDataActions;
 
 export const initialOnchainMetaDataState: OnchainMetaDataState = {
-  contractABI: undefined,
-  contractFunctions: undefined,
+  contractABI: {},
+  contractFunctions: {},
   ens: {},
 };
 
 const onchainMetaDataReducer = createReducer(initialOnchainMetaDataState, (builder) => {
   builder
-    .addCase(getABI.fulfilled, (state, { payload: { abi, functions } }) => {
-      state.contractABI = abi;
-      state.contractFunctions = functions;
+    .addCase(getABI.fulfilled, (state, { payload: { abi, functionSigs, address } }) => {
+      state.contractABI[address] = abi;
+      state.contractFunctions[address] = functionSigs;
       console.log(state);
     })
 
     .addCase(getABI.rejected, (state, { error }) => {
-      state.contractABI = undefined;
-      state.contractFunctions = undefined;
+      state.contractABI = {};
+      state.contractFunctions = {};
     })
 
     .addCase(clearABI, (state) => {
-      state.contractABI = '';
-      state.contractFunctions = [];
+      state.contractABI = {};
+      state.contractFunctions = {};
     })
 
     .addCase(getENS.fulfilled, (state, { payload: { address, ens } }) => {
@@ -40,7 +40,7 @@ const onchainMetaDataReducer = createReducer(initialOnchainMetaDataState, (build
     })
 
     .addCase(getENS.pending, (state) => {
-      console.log('pending getENS');
+      //console.log('pending getENS');
     });
 });
 

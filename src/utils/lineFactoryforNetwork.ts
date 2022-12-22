@@ -9,6 +9,7 @@ const getLineFactoryforNetwork = (network: number | string) => {
     default:
       return (LineFactory = networks.goerli.lineFactory);
   }
+  // Add case that if its any other chain, we inform the user that we are not deployed to that chain
 };
 
 export { getLineFactoryforNetwork };

@@ -40,7 +40,6 @@ export const selectDepositTokenOptionsByAsset = createSelector(
     currentNetwork = NETWORK
   ) =>
     memoize((assetAddress?: string): TokenView[] => {
-      console.log('TokenService selectDepositTokenOptionsByAsset', currentNetwork, tokensMap, testTokens);
       const { userTokensMap, userTokensAllowancesMap } = tokensUser;
       if (currentNetwork === 'goerli') {
         // TODO: fill in token values appropriately with values from subgraph
@@ -62,7 +61,6 @@ export const selectDepositTokenOptionsByAsset = createSelector(
         // return allTestTokens;
         return testTokens;
       } else {
-        console.log('use mainnet tokens ', TOKEN_ADDRESSES, tokensMap);
         const mainTokens = Object.values(TOKEN_ADDRESSES)
           .filter((address) => !!tokensMap[address])
           .map((address) => {
@@ -83,7 +81,6 @@ export const selectDepositTokenOptionsByAsset = createSelector(
         // Return a list of supported tokens with mainTokens (e.g. ETH, WETH, DAI, etc.)
         // coming before subgraphTokens (e.g. AAVE, LINK, etc.) with both indepently sorted
         // from A-Z
-        console.log('use mainnet tokens ', sortedSubgraphTokens, subgraphTokens, mainTokens);
         return unionBy(mainTokens, sortedSubgraphTokens, (o) => o.symbol);
       }
     })

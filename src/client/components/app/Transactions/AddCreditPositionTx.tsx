@@ -2,6 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import { BigNumber } from 'ethers';
+// import { parseUnits, hexlify } from 'ethers/lib/utils';
 
 import { formatAmount, normalizeAmount, isAddress, toWei, addCreditUpdate } from '@utils';
 import {
@@ -24,7 +25,6 @@ import { TxActionButton } from './components/TxActions';
 import { TxActions } from './components/TxActions';
 import { TxStatus } from './components/TxStatus';
 import { TxAddressInput } from './components/TxAddressInput';
-
 const {
   CONTRACT_ADDRESSES: { DAI },
   MAX_INTEREST_RATE,
@@ -78,6 +78,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
     selectedSellTokenAddress: initialToken,
     allowTokenSelect: true,
   });
+
   const acceptingOffer = props.acceptingOffer || (userMetadata.role === BORROWER_POSITION_ROLE && !!selectedPosition);
 
   //state for params
@@ -95,7 +96,10 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
 
   useEffect(() => {
     if (selectedPosition?.status === PROPOSED_STATUS && userMetadata.role === BORROWER_POSITION_ROLE) {
-      const deposit = normalizeAmount(selectedPosition.deposit, selectedPosition.token.decimals);
+      //  selectedPosition.token.decimals instead of 0 as deci
+      const deposit = normalizeAmount(selectedPosition.deposit, 0);
+      console.log('position deposit user input vs norm val', selectedPosition.deposit, deposit);
+
       if (!targetTokenAmount) setTargetTokenAmount(deposit);
       if (!selectedSellTokenAddress) setSelectedTokenAddress(selectedPosition.token.address);
       if (!drate) setDrate(normalizeAmount(selectedPosition.dRate, 0));
@@ -114,7 +118,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         })
       );
     }
-    if (selectedTokenAddress === '' && selectedSellToken) {
+    if (!selectedTokenAddress && selectedSellToken) {
       setSelectedTokenAddress(selectedSellToken.address);
     }
 
@@ -130,7 +134,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   };
 
   const onAmountChange = (amount: string): void => {
-    setTargetTokenAmount(amount);
+    setTargetTokenAmount(amount ?? '0');
   };
 
   const onRateChange = (type: string, amount: string): void => {
@@ -152,8 +156,9 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       setLoading(false);
       return;
     }
+
     let approvalOBj = {
-      tokenAddress: selectedSellTokenAddress!,
+      tokenAddress: selectedSellToken!.address,
       amount: toWei(targetTokenAmount, selectedSellToken!.decimals),
       lineAddress: selectedCredit.id,
       network: walletNetwork!,
@@ -193,7 +198,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       return;
     }
 
-    if (!selectedSellTokenAddress) {
+    if (!selectedSellToken) {
       return;
     }
 
@@ -204,11 +209,12 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       drate: BigNumber.from(drate),
       frate: BigNumber.from(frate),
       amount: BigNumber.from(amountInWei),
-      token: selectedSellTokenAddress,
+      token: selectedSellToken.address,
       lender: lenderAddress,
       network: walletNetwork!,
       dryRun: false,
     };
+
     dispatch(LinesActions.addCredit(transactionObj)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionCompleted(2);
@@ -337,9 +343,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
         onAmountChange={onAmountChange}
-        amountValue={BigNumber.from(targetTokenAmount ?? 0)
-          .pow(BigNumber.from(10).mul(selectedSellToken.decimals ?? 0))
-          .toString()}
+        amountValue={toWei(targetTokenAmount, selectedSellToken.decimals)}
         maxAmount={acceptingOffer ? targetTokenAmount : targetBalance}
         selectedToken={selectedSellToken}
         onSelectedTokenChange={onSelectedSellTokenChange}

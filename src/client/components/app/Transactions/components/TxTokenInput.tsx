@@ -181,7 +181,7 @@ const amountToNumber = (amount: string) => {
 interface Token {
   address: string;
   symbol: string;
-  decimals: number;
+  decimals: number | string;
   icon?: string;
   balance?: string;
   balanceUsdc?: string;
@@ -234,7 +234,6 @@ export const TxTokenInput: FC<TxTokenInputProps> = ({
   ...props
 }) => {
   const { t } = useAppTranslation('common');
-
   let listItems: SearchListItem[] = [];
   let selectedItem: SearchListItem = {
     id: selectedToken.address,

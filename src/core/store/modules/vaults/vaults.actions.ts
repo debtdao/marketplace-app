@@ -405,9 +405,9 @@ const approveMigrate = createAsyncThunk<
   ThunkAPI
 >('vaults/approveMigrate', async ({ vaultFromAddress, migrationContractAddress }, { dispatch }) => {
   const spenderAddress = migrationContractAddress ?? getConfig().CONTRACT_ADDRESSES.trustedVaultMigrator;
-  //@ts-ignore
-  const result = await dispatch(TokensActions.approve({ tokenAddress: vaultFromAddress, spenderAddress }));
-  unwrapResult(result);
+
+  // const result = await dispatch(TokensActions.approve({ tokenAddress: vaultFromAddress, spenderAddress }));
+  // unwrapResult(result);
 });
 
 const getDepositAllowance = createAsyncThunk<

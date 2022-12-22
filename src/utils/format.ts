@@ -1,6 +1,9 @@
 import BigNumber from 'bignumber.js';
+import { ethers } from 'ethers';
 
 import { Wei, Unit, Amount, FormattedAmount, Fraction, DataType } from '@types';
+
+import { isValidAddress } from './misc';
 
 BigNumber.set({ EXPONENTIAL_AT: 50 });
 
@@ -127,11 +130,20 @@ export const prettyNumbers = (x: string) => {
 };
 
 export const formatAddress = (address: string) => {
-  return address.substring(0, 6) + '...' + address.substring(address.length - 4, address.length);
+  if (isValidAddress(address)) {
+    const checkSumAddress = ethers.utils.getAddress(address);
+    const formattedAddress =
+      checkSumAddress.substring(0, 6) +
+      '...' +
+      checkSumAddress.substring(checkSumAddress.length - 4, checkSumAddress.length);
+    return formattedAddress;
+  } else {
+    return address;
+  }
 };
 
 export const getDate = (timestamp: number) => {
-  const months = {
+  const months: { [key: string]: string } = {
     Jan: '01',
     Feb: '02',
     Mar: '03',
@@ -147,7 +159,7 @@ export const getDate = (timestamp: number) => {
   };
   const date = new Date(timestamp * 1000).toString();
   const dateArr = date.split(' ');
-  //@ts-ignore
+
   const finalDate = `${dateArr[2]}/${months[dateArr[1]]}/${dateArr[3]}, ${dateArr[4]}`;
   return finalDate;
 };

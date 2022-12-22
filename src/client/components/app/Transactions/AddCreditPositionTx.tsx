@@ -197,7 +197,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
 
   const addCreditPosition = async () => {
     setLoading(true);
-    console.log('add position ', selectedCredit?.id, selectedSellTokenAddress);
+    console.log('add position ', selectedCredit?.id, positionToken?.address);
     // TODO set error in state to display no line selected
     if (!selectedCredit?.id || !drate || !frate || lenderAddress === '' || !positions) {
       setLoading(false);
@@ -210,18 +210,18 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       return;
     }
 
-    if (!selectedSellToken) {
+    if (!positionToken) {
       return;
     }
 
-    const amountInWei = toWei(targetTokenAmount, selectedSellToken!.decimals);
+    const amountInWei = toWei(targetTokenAmount, positionToken!.decimals);
 
     const transactionObj: AddCreditProps = {
       lineAddress: selectedCredit.id,
       drate: BigNumber.from(drate),
       frate: BigNumber.from(frate),
       amount: BigNumber.from(amountInWei),
-      token: selectedSellToken.address,
+      token: positionToken.address,
       lender: lenderAddress,
       network: walletNetwork!,
       dryRun: false,

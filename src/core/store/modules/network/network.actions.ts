@@ -4,7 +4,7 @@ import { ThunkAPI } from '@frameworks/redux';
 import { notify } from '@frameworks/blocknative';
 import { getProviderType, getNetworkId } from '@utils';
 import { Network, UseCreditLinesParams } from '@types';
-import { LinesActions, LinesSelectors, WalletSelectors } from '@store';
+import { AppActions, LinesActions, LinesSelectors, WalletSelectors } from '@store';
 import { useAppSelector } from '@src/client/hooks';
 
 import { WalletActions, ChangeWalletNetworkResult } from '../wallet/wallet.actions';
@@ -16,6 +16,7 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
     const { wallet, web3Provider, yearnSdk } = context;
 
     // if (!config.SUPPORTED_NETWORKS.includes(network)) throw Error('Network Not Supported');
+    dispatch(AppActions.initApp());
 
     if (wallet.isCreated) {
       const action = (await dispatch(

@@ -44,16 +44,17 @@ const getGraphURL = (network: string) => {
 };
 
 let client: any;
-let currentNetwork: any;
+// let currentNetwork: any;
 export const getClient = (network: string) => {
-  console.log('network states - currentNetwork: ', currentNetwork);
-  console.log('network states - new network: ', network);
-  console.log('network states - client: ', client);
-  return client && network !== currentNetwork ? client : createClient(network);
+  // console.log('network states - currentNetwork: ', currentNetwork);
+  // console.log('network states - new network: ', network);
+  console.log('network states - client: ', client?.link.options.uri);
+  console.log('network states - client network: ', network);
+  // console.log('network states - client: ', client);
+  // return client && network !== currentNetwork ? client : createClient(network);
+  return client ? client : createClient(network);
 };
 const createClient = (network: string): typeof ApolloClient => {
-  console.log('network states - graphql client: ', network);
-  currentNetwork = network;
   client = new ApolloClient({
     uri: getGraphURL(network),
     cache: new InMemoryCache(),
@@ -88,7 +89,14 @@ export const createQuery =
   (query: DocumentNode, path?: string, network?: string, isOracle?: boolean): Function =>
   <A, R>(variables: A): Promise<QueryResponse<R>> =>
     new Promise(async (resolve, reject) => {
+      console.log('network states - path: ', path);
+      console.log('network states - isOracle: ', isOracle);
+      console.log('network states - create query network: ', network);
       const client = isOracle ? getPriceFeedClient() : getClient(network!);
+      // if (!isOracle) {
+      //   client.onResetStore(() => client.writeData({ data: { isLoggedIn: false } }));
+      //   // console.log('network states - create query client: ', client);
+      // }
       client
         .query({ query, variables })
         .then((result: QueryResult) => {

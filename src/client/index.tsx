@@ -80,8 +80,8 @@ export const App = () => {
   const container = new Container();
   const store = getStore(container);
   const state = store.getState();
-  console.log('network states - ultimate state: ', state.network.current);
-  // const graphQLClient = getClient(state.network.current);
+  console.log('network states - app network: ', state.network.current);
+  // // const graphQLClient = getClient(state.network.current);
   const graphQLClient = getClient(state.network.current);
 
   return (

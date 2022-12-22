@@ -152,7 +152,7 @@ export const PositionsTable = (props: PositionsProps) => {
 
   //Returns a list of transactions to display on positions table
   const getUserPositionActions = (position: CreditPosition) => {
-    if(userRoleMetadata.role === ARBITER_POSITION_ROLE) {
+    if (userRoleMetadata.role === ARBITER_POSITION_ROLE) {
       return [
         {
           name: t('components.transaction.liquidate'),
@@ -177,12 +177,12 @@ export const PositionsTable = (props: PositionsProps) => {
         disabled: false,
       };
       const repayAction = {
-          name: t('components.transaction.deposit-and-repay.header'),
-          handler: depositAndRepayHandler,
-          disabled: false,
-        };
+        name: t('components.transaction.deposit-and-repay.header'),
+        handler: depositAndRepayHandler,
+        disabled: false,
+      };
 
-      if(position.deposit === position.principal) return [repayAction];
+      if (position.deposit === position.principal) return [repayAction];
       else return [borrowAction, repayAction];
     }
 

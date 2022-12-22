@@ -203,7 +203,7 @@
       "borrow-credit": {
         "header": "Borrow",
         "select-line": "1. Select a Position:",
-        "select-amount": "2. Select Token and Amount:",
+        "select-amount": "2. Amount to Borrow:",
         "your-rates": "3. Your Rates:"
       },
       "deposit-and-repay": {

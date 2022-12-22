@@ -10,6 +10,7 @@ const linkTransition = 'filter 200ms ease-in-out';
 
 const LinkList = styled.div`
   display: flex;
+  justify-content: space-evenly;
   flex: 1;
   color: inherit;
 `;

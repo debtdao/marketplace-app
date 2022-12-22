@@ -59,7 +59,7 @@ const setPosition = createAction<{ id: string; position: CreditPosition }>('line
 const clearLinesData = createAction<void>('lines/clearLinesData');
 const clearUserData = createAction<void>('lines/clearUserData');
 const clearTransactionData = createAction<void>('lines/clearTransactionData');
-const clearSelectedLineAndStatus = createAction<void>('lines/clearSelectedLineAndStatus');
+const clearSelectedLine = createAction<void>('lines/clearSelectedLine');
 const clearLineStatus = createAction<{ lineAddress: string }>('lines/clearLineStatus');
 
 /* -------------------------------------------------------------------------- */
@@ -326,13 +326,14 @@ const approveDeposit = createAsyncThunk<
 
   const accountAddress = wallet.selectedAddress;
   if (!accountAddress) throw new Error('WALLET NOT CONNECTED');
+  console.log('approve token', tokenAddress, accountAddress, lineAddress, amount);
 
   const approveDepositTx = await tokenService.approve({
     network,
     tokenAddress,
     accountAddress,
     spenderAddress: lineAddress,
-    amount: unnullify(amount, true),
+    amount,
   });
   console.log('this is approval', approveDepositTx);
 });
@@ -811,7 +812,7 @@ export const LinesActions = {
   clearTransactionData,
   // getUserLinesSummary,
   // getUserLinesMetadata,
-  clearSelectedLineAndStatus,
+  clearSelectedLine,
   clearLineStatus,
   getDepositAllowance,
   getWithdrawAllowance,

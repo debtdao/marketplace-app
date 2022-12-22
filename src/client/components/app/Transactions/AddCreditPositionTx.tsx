@@ -74,10 +74,12 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
   const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
   const initialToken: string = selectedSellTokenAddress || DAI;
+  console.log('add credit init tok', selectedPosition?.token.address, selectedSellTokenAddress, DAI);
   const { selectedSellToken, sourceAssetOptions } = useSelectedSellToken({
     selectedSellTokenAddress: initialToken,
     allowTokenSelect: true,
   });
+  const positionToken = selectedPosition?.token || selectedSellToken;
 
   const acceptingOffer = props.acceptingOffer || (userMetadata.role === BORROWER_POSITION_ROLE && !!selectedPosition);
 
@@ -94,10 +96,11 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const [transactionType, setTransactionType] = useState('propose');
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
 
+  console.log('selectedPosition', selectedPosition, selectedCredit);
   useEffect(() => {
-    if (selectedPosition?.status === PROPOSED_STATUS && userMetadata.role === BORROWER_POSITION_ROLE) {
+    if (selectedPosition?.status === PROPOSED_STATUS) {
       //  selectedPosition.token.decimals instead of 0 as deci
-      const deposit = normalizeAmount(selectedPosition.deposit, 0);
+      const deposit = normalizeAmount(selectedPosition.deposit, selectedPosition.token.decimals);
       console.log('position deposit user input vs norm val', selectedPosition.deposit, deposit);
 
       if (!targetTokenAmount) setTargetTokenAmount(deposit);
@@ -109,6 +112,14 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       setTransactionType('accept');
     }
   }, [selectedPosition]);
+
+  // if(1selectedSellToken || selectedSellToken?.address !== selectedPosition?.token.address) {
+  //   setSelectedTokenAddress(selectedPosition?.token.address);
+  //   dispatch(
+  //     TokensActions.setSelectedTokenAddress({
+  //       tokenAddress: selectedPosition?.token.address,
+  //     });
+  // }
 
   useEffect(() => {
     if (!selectedSellToken) {
@@ -163,6 +174,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       lineAddress: selectedCredit.id,
       network: walletNetwork!,
     };
+    console.log('aprrove token for lender', approvalOBj);
     dispatch(LinesActions.approveDeposit(approvalOBj)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionApproved(transactionApproved);
@@ -185,7 +197,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
 
   const addCreditPosition = async () => {
     setLoading(true);
-    console.log('add position ', selectedCredit?.id, selectedSellTokenAddress);
+    console.log('add position ', selectedCredit?.id, positionToken?.address);
     // TODO set error in state to display no line selected
     if (!selectedCredit?.id || !drate || !frate || lenderAddress === '' || !positions) {
       setLoading(false);
@@ -198,18 +210,18 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       return;
     }
 
-    if (!selectedSellToken) {
+    if (!positionToken) {
       return;
     }
 
-    const amountInWei = toWei(targetTokenAmount, selectedSellToken!.decimals);
+    const amountInWei = toWei(targetTokenAmount, positionToken!.decimals);
 
     const transactionObj: AddCreditProps = {
       lineAddress: selectedCredit.id,
       drate: BigNumber.from(drate),
       frate: BigNumber.from(frate),
       amount: BigNumber.from(amountInWei),
-      token: selectedSellToken.address,
+      token: positionToken.address,
       lender: lenderAddress,
       network: walletNetwork!,
       dryRun: false,
@@ -269,10 +281,11 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
           },
         ];
 
-  if (!selectedSellToken) return null;
+  console.log('add cred sellToken', selectedPosition, positionToken, selectedSellToken);
+  if (!positionToken) return null;
   if (!selectedCredit) return null;
 
-  const targetBalance = normalizeAmount(selectedSellToken.balance, selectedSellToken.decimals);
+  const targetBalance = normalizeAmount(positionToken.balance, positionToken.decimals);
   const tokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(targetBalance, 4)}`;
 
   if (transactionCompleted === 1) {
@@ -343,9 +356,9 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
         onAmountChange={onAmountChange}
-        amountValue={toWei(targetTokenAmount, selectedSellToken.decimals)}
+        amountValue={toWei(targetTokenAmount, positionToken.decimals)}
         maxAmount={acceptingOffer ? targetTokenAmount : targetBalance}
-        selectedToken={selectedSellToken}
+        selectedToken={positionToken}
         onSelectedTokenChange={onSelectedSellTokenChange}
         tokenOptions={sourceAssetOptions}
         readOnly={acceptingOffer}

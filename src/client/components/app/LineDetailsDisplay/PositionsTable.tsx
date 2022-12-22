@@ -97,7 +97,6 @@ export const PositionsTable = (props: PositionsProps) => {
   const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
-  const [actions, setActions] = useState<ActionButtonProps[]>([]);
   const { positions } = props;
   const { NETWORK } = getEnv();
 
@@ -109,46 +108,6 @@ export const PositionsTable = (props: PositionsProps) => {
       dispatch(LinesActions.getLinePage({ id: lineAddress }));
     }
   }, [lineAddress, selectedLine]);
-
-  useEffect(() => {
-    console.log('position action role', userRoleMetadata);
-    switch (userRoleMetadata.role) {
-      case BORROWER_POSITION_ROLE:
-        setActions([
-          {
-            name: t('components.transaction.borrow'),
-            handler: borrowHandler,
-            disabled: false,
-          },
-          {
-            name: t('components.transaction.deposit-and-repay.header'),
-            handler: depositAndRepayHandler,
-            disabled: false,
-          },
-        ]);
-        break;
-      case LENDER_POSITION_ROLE:
-        setActions([
-          {
-            name: t('components.transaction.withdraw'),
-            handler: withdrawHandler,
-            disabled: false,
-          },
-        ]);
-        break;
-      case ARBITER_POSITION_ROLE:
-        setActions([
-          {
-            name: t('components.transaction.liquidate'),
-            handler: liquidateHandler,
-            disabled: false,
-          },
-        ]);
-        break;
-      default:
-        setActions([]);
-    }
-  }, [userRoleMetadata]);
 
   //Action Handlers for positions table
 
@@ -193,34 +152,57 @@ export const PositionsTable = (props: PositionsProps) => {
 
   //Returns a list of transactions to display on positions table
   const getUserPositionActions = (position: CreditPosition) => {
-    if (position.status === 'PROPOSED' && userRoleMetadata.role === BORROWER_POSITION_ROLE) {
-      const approveMutualConsent = {
-        name: t('components.transaction.add-credit.accept-terms'),
-        handler: depositHandler,
+    if(userRoleMetadata.role === ARBITER_POSITION_ROLE) {
+      return [
+        {
+          name: t('components.transaction.liquidate'),
+          handler: liquidateHandler,
+          disabled: false,
+        },
+      ];
+    }
+
+    if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
+      if (position.status === 'PROPOSED') {
+        const approveMutualConsent = {
+          name: t('components.transaction.add-credit.accept-terms'),
+          handler: depositHandler,
+          disabled: false,
+        };
+        return [approveMutualConsent];
+      }
+      const borrowAction = {
+        name: t('components.transaction.borrow'),
+        handler: borrowHandler,
         disabled: false,
       };
-      console.log('PositionsTable act opt - accept', position, userRoleMetadata, [approveMutualConsent]);
-      return [approveMutualConsent];
+      const repayAction = {
+          name: t('components.transaction.deposit-and-repay.header'),
+          handler: depositAndRepayHandler,
+          disabled: false,
+        };
+
+      if(position.deposit === position.principal) return [repayAction];
+      else return [borrowAction, repayAction];
     }
 
     //If user is lender, and line has amount to withdraw, return withdraw action
-    console.log('lender vs wallet', position.lender, userWallet);
     if (
       getAddress(position.lender) == userWallet &&
       BigNumber.from(position.deposit).gt(BigNumber.from(position.principal))
     ) {
-      console.log('PositionsTable act opt - lender', position, userRoleMetadata, actions);
-      return actions;
+      return [
+        {
+          name: t('components.transaction.withdraw'),
+          handler: withdrawHandler,
+          disabled: false,
+        },
+      ];
     }
-    // Returns actions for borrower on open line
-    if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
-      console.log('PositionsTable act opt - borrower', position, userRoleMetadata, actions);
-      return actions;
-    }
-    // return actions;
+
+    // not party to line. no actions;
     return [];
   };
-  console.log('PositionsTable final metadata/actions ', userRoleMetadata, actions);
 
   return (
     <>

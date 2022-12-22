@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { useEffect, useState } from 'react';
-import { ethers } from 'ethers';
-import { parseUnits } from 'ethers/lib/utils';
+import { BigNumber, ethers } from 'ethers';
+import { getAddress, parseUnits } from 'ethers/lib/utils';
 
 import { ModalsActions, LinesActions, LinesSelectors, WalletSelectors, WalletActions } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
@@ -111,6 +111,7 @@ export const PositionsTable = (props: PositionsProps) => {
   }, [lineAddress, selectedLine]);
 
   useEffect(() => {
+    console.log('position action role', userRoleMetadata);
     switch (userRoleMetadata.role) {
       case BORROWER_POSITION_ROLE:
         setActions([
@@ -147,7 +148,7 @@ export const PositionsTable = (props: PositionsProps) => {
       default:
         setActions([]);
     }
-  }, [userWallet]);
+  }, [userRoleMetadata]);
 
   //Action Handlers for positions table
 
@@ -201,19 +202,25 @@ export const PositionsTable = (props: PositionsProps) => {
       console.log('PositionsTable act opt - accept', position, userRoleMetadata, [approveMutualConsent]);
       return [approveMutualConsent];
     }
+
     //If user is lender, and line has amount to withdraw, return withdraw action
-    if (parseUnits(userRoleMetadata.available).gt(0)) {
+    console.log('lender vs wallet', position.lender, userWallet);
+    if (
+      getAddress(position.lender) == userWallet &&
+      BigNumber.from(position.deposit).gt(BigNumber.from(position.principal))
+    ) {
       console.log('PositionsTable act opt - lender', position, userRoleMetadata, actions);
       return actions;
     }
-    //Returns actions for borrower on open line
+    // Returns actions for borrower on open line
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
       console.log('PositionsTable act opt - borrower', position, userRoleMetadata, actions);
       return actions;
     }
+    // return actions;
     return [];
   };
-  console.log('PositionsTable ', userRoleMetadata, actions);
+  console.log('PositionsTable final metadata/actions ', userRoleMetadata, actions);
 
   return (
     <>

@@ -137,17 +137,6 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     });
   };
 
-  const handleSetTransferByte = (byte: string) => {
-    setTransferFunc(byte);
-  };
-
-  const handleSetClaimByte = (byte: string) => {
-    setClaimFunc(byte);
-  };
-
-  const createListItems = (functions: string[]) =>
-    !functions ? [] : functions.map((func, i) => ({ id: i.toString(), label: func, value: '' }));
-
   if (!selectedLine) return null;
 
   if (transactionCompleted === 1) {
@@ -174,50 +163,11 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     );
   }
 
-  const revFuncDisplayConfigs = [
-    {
-      header: t('components.transaction.enable-spigot.function-transfer'),
-      options: createListItems(selectedContractFunctions[revenueContractAddy]!),
-      type: transferFuncType,
-      onChange: onTransferFuncSelection,
-      byteCode: transferFunc,
-      onByteChange: handleSetTransferByte,
-    },
-    {
-      header: t('components.transaction.enable-spigot.function-revenue'),
-      options: createListItems(selectedContractFunctions[revenueContractAddy]!),
-      type: claimFuncType,
-      onChange: onClaimFuncSelection,
-      byteCode: claimFunc,
-      onByteChange: handleSetClaimByte,
-    },
-  ];
+  const isVerifiedContract = isValidAddress(revenueContractAddy) && contractABI;
+  const funcOptions = !selectedContractFunctions[revenueContractAddy]
+    ? []
+    : selectedContractFunctions[revenueContractAddy].map((func, i) => ({ id: i.toString(), label: func, value: '' }));
 
-  const renderFuncSelectors = () =>
-    revFuncDisplayConfigs.map(({ header, byteCode, options, type, onChange, onByteChange }) =>
-      // if no ABI, input bytecode manually
-      isValidAddress(revenueContractAddy) && contractABI ? (
-        <TxFuncSelector
-          key={header + String(type)}
-          headerText={header}
-          typeOptions={options}
-          selectedType={type}
-          onSelectedTypeChange={onChange}
-        />
-      ) : (
-        <TxByteInput
-          key={header + byteCode}
-          headerText={header}
-          inputText={' '}
-          inputError={false}
-          byteCode={byteCode}
-          onByteCodeChange={onByteChange}
-          readOnly={false}
-        />
-      )
-    );
-
-  console.log('render enable spigot', transactionLoading, revenueContractAddy);
   return (
     // <div />
     <StyledTransaction onClose={onClose} header={header}>
@@ -226,7 +176,43 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
         address={revenueContractAddy}
         onAddressChange={setRevenueContractAdd}
       />
-      {renderFuncSelectors()}
+
+      {isVerifiedContract ? (
+        <>
+          <TxFuncSelector
+            headerText={t('components.transaction.enable-spigot.function-transfer')}
+            typeOptions={funcOptions}
+            selectedType={transferFuncType}
+            onSelectedTypeChange={onTransferFuncSelection}
+          />
+          <TxFuncSelector
+            headerText={t('components.transaction.enable-spigot.function-revenue')}
+            typeOptions={funcOptions}
+            selectedType={claimFuncType}
+            onSelectedTypeChange={onClaimFuncSelection}
+          />
+        </>
+      ) : (
+        // if no ABI, input bytecode manually
+        <>
+          <TxByteInput
+            headerText={t('components.transaction.enable-spigot.function-transfer')}
+            inputText={' '}
+            inputError={false}
+            byteCode={transferFunc}
+            onByteCodeChange={setTransferFunc}
+            readOnly={false}
+          />
+          <TxByteInput
+            headerText={t('components.transaction.enable-spigot.function-revenue')}
+            inputText={' '}
+            inputError={false}
+            byteCode={claimFunc}
+            onByteCodeChange={setClaimFunc}
+            readOnly={false}
+          />
+        </>
+      )}
 
       <TxActions>
         <TxActionButton

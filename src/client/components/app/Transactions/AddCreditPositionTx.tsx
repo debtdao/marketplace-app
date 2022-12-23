@@ -79,7 +79,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
     selectedSellTokenAddress: initialToken,
     allowTokenSelect: true,
   });
-  const positionToken = selectedPosition?.token || selectedSellToken;
+  const positionToken = selectedPosition?.token ?? selectedSellToken;
 
   const acceptingOffer = props.acceptingOffer || (userMetadata.role === BORROWER_POSITION_ROLE && !!selectedPosition);
 

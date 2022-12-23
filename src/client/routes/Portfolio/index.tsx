@@ -9,6 +9,7 @@ import { SummaryCard, ViewContainer } from '@components/app';
 import { isValidAddress } from '@utils';
 import { LENDER_POSITION_ROLE, BORROWER_POSITION_ROLE, CreditPosition } from '@src/core/types';
 import { PositionsTable } from '@src/client/components/app/LineDetailsDisplay/PositionsTable';
+import { device } from '@themes/default';
 
 const StyledViewContainer = styled(ViewContainer)`
   display: grid;
@@ -16,8 +17,34 @@ const StyledViewContainer = styled(ViewContainer)`
   grid-auto-rows: min-content;
 `;
 
-const HeaderCard = styled(SummaryCard)`
+const PortfolioHeader = styled.div`
   grid-column: 1 / 3;
+  display: flex;
+  justify-content: space-between;
+
+  @media ${device.desktop} {
+    justify-content: space-around;
+  }
+`;
+
+const PortfolioOption = styled.div<{ active: boolean }>`
+  ${({ theme, active }) => `
+    margin: ${theme.spacing.lg} 0;
+    color: ${theme.colors.titles};
+    font-size: ${theme.fonts.sizes.xl};
+    font-weight: 700;
+    cursor: pointer;
+    ${
+      active
+        ? `padding-bottom: ${theme.spacing.sm};
+                border-bottom: solid 2px ${theme.colors.primaryVariant};`
+        : ''
+    }
+    :hover {
+      padding-bottom: ${theme.spacing.sm};
+      border-bottom: solid 2px ${theme.colors.secondaryVariantB};
+    }
+  `}
 `;
 
 const RoleOption = styled.div<{ active?: boolean }>`
@@ -51,7 +78,7 @@ type userParams = {
 };
 
 export const Portfolio = () => {
-  const { t } = useAppTranslation(['common', 'home']);
+  const { t } = useAppTranslation(['common', 'home', 'portfolio']);
   const { userAddress } = useParams<userParams>();
   const dispatch = useAppDispatch();
 
@@ -59,21 +86,9 @@ export const Portfolio = () => {
   const userPortfolio = useAppSelector(LinesSelectors.selectUserPortfolio);
   const portfolioAddress = userAddress ? userAddress : userWallet;
   const allPositions = useAppSelector(LinesSelectors.selectPositionsMap);
-  const [currentRole, setRole] = useState<string>(BORROWER_POSITION_ROLE);
+  const [selectedRole, setRole] = useState<string>(BORROWER_POSITION_ROLE);
 
-  const setSelectedLine = (address: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress: address }));
   const availableRoles = [BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE];
-
-  const SummaryCardItems = availableRoles.map((role: string) => {
-    return {
-      header: t(''),
-      Component: (
-        <RoleOption onClick={() => setRole(role)} active={role === currentRole} key={`s-${role}`}>
-          {t(`settings:${role}`)}
-        </RoleOption>
-      ),
-    };
-  });
 
   useEffect(() => {
     if (!isValidAddress(portfolioAddress!)) {
@@ -91,27 +106,41 @@ export const Portfolio = () => {
   );
 
   useEffect(() => {
-    if (userPortfolio && currentRole === BORROWER_POSITION_ROLE) {
-      const { borrowerLineOfCredits } = userPortfolio;
-
-      if (borrowerLineOfCredits && borrowerLineOfCredits[0]) {
-        const lineId = borrowerLineOfCredits[0].id;
-        setSelectedLine(lineId);
+    if (userPortfolio) {
+      if (selectedRole === BORROWER_POSITION_ROLE) {
+        if (borrowerLineOfCredits && borrowerLineOfCredits[0]) {
+          const lineAddress = borrowerLineOfCredits[0].id;
+          dispatch(LinesActions.clearSelectedLine());
+          dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
+        }
+      } else {
+        if (lenderPositions && lenderPositions[0]) {
+          const position = lenderPositions[0];
+          dispatch(LinesActions.clearSelectedLine());
+          dispatch(LinesActions.setSelectedLinePosition({ position }));
+        }
       }
     }
-  }, [userPortfolio, currentRole]);
+  }, [userPortfolio, selectedRole]);
 
+  console.log('portfolio page', selectedRole);
   return (
     <StyledViewContainer>
-      <HeaderCard items={SummaryCardItems} cardSize="small" />
+      <PortfolioHeader>
+        {availableRoles.map((role: string) => (
+          <PortfolioOption onClick={() => setRole(role)} active={role === selectedRole} key={`s-${role}`}>
+            {t('portfolio:options.' + role)}
+          </PortfolioOption>
+        ))}
+      </PortfolioHeader>
 
-      {currentRole === BORROWER_POSITION_ROLE && (
+      {selectedRole === BORROWER_POSITION_ROLE && (
         <StyledBorrowerContainer>
           <PositionsTable positions={borrowerPositions} />
         </StyledBorrowerContainer>
       )}
 
-      {currentRole === LENDER_POSITION_ROLE && (
+      {selectedRole === LENDER_POSITION_ROLE && (
         <StyledBorrowerContainer>
           <PositionsTable positions={lenderPositions.map((id) => allPositions[id])} />
         </StyledBorrowerContainer>

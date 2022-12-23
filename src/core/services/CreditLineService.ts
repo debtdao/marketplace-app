@@ -286,7 +286,7 @@ export class CreditLineServiceImpl implements CreditLineService {
     // TODO. pass network as param all the way down from actions
     // const { getSigner } = this.web3Provider;
     // const user = getSigner();
-
+    console.log(`CreditService Tx - ${network}: ${contractAddress}.${methodName}(${params.join(', ')})`);
     try {
       props = {
         network: network,

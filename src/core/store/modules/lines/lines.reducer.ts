@@ -85,7 +85,7 @@ const {
   clearLinesData,
   clearUserData,
   // getUserLinesMetadata,
-  clearSelectedLineAndStatus,
+  clearSelectedLine,
   clearLineStatus,
 } = LinesActions;
 
@@ -100,6 +100,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
 
     .addCase(setSelectedLinePosition, (state, { payload: { position } }) => {
+      console.log('set position', position, state.positionsMap[position ?? ''], state.positionsMap);
       state.selectedPosition = position;
     })
 
@@ -126,11 +127,10 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     //   state.statusMap.getExpectedTransactionOutcome = {};
     // })
 
-    .addCase(clearSelectedLineAndStatus, (state) => {
+    .addCase(clearSelectedLine, (state) => {
       if (!state.selectedLineAddress) return;
-      //const currentAddress = state.selectedLineAddress;
-      // state.statusMap.linesActionsStatusMap[currentAddress] = initialLineActionsStatusMap;
       state.selectedLineAddress = undefined;
+      state.selectedPosition = undefined;
     })
 
     .addCase(clearLineStatus, (state, { payload: { lineAddress } }) => {

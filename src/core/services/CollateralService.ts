@@ -364,6 +364,7 @@ export class CollateralServiceImpl implements CollateralService {
     // const { getSigner } = this.web3Provider;
     // const user = getSigner();
 
+    console.log(`CollateralService Tx - ${network}: ${contractAddress}.${methodName}(${params.join(', ')})`);
     try {
       props = {
         network: network,

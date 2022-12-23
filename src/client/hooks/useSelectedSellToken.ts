@@ -1,7 +1,7 @@
 import { keyBy } from 'lodash';
 
 import { useAppSelector } from '@hooks';
-import { selectDepositTokenOptionsByAsset } from '@store';
+import { LinesSelectors, selectDepositTokenOptionsByAsset } from '@store';
 import { GeneralLabView, GeneralVaultView, TokenView } from '@types';
 import { testTokens } from '@config/constants';
 
@@ -23,7 +23,7 @@ export const useSelectedSellToken = ({
 }: SelectedSellTokenProps): SelectedSellToken => {
   const sellTokensOptions = useAppSelector(selectDepositTokenOptionsByAsset)(selectedVaultOrLab?.address);
 
-  let fullTokensOptions = sellTokensOptions.concat(testTokens);
+  let fullTokensOptions = sellTokensOptions.concat(testTokens); // @cleanup remove
 
   const sellTokensOptionsMap = keyBy(fullTokensOptions, 'address');
   let selectedSellToken: TokenView | undefined = selectedSellTokenAddress

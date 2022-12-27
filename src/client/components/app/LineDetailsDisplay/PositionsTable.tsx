@@ -186,7 +186,7 @@ export const PositionsTable = (props: PositionsProps) => {
         disabled: false,
       };
       const repayAction = {
-        name: t('components.transaction.deposit-and-repay.header'),
+        name: t('components.transaction.repay.header'),
         handler: depositAndRepayHandler,
         disabled: false,
       };

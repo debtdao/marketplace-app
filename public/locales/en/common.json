@@ -206,13 +206,23 @@
         "select-amount": "2. Amount to Borrow:",
         "your-rates": "3. Your Rates:"
       },
-      "deposit-and-repay": {
+      "repay": {
         "header": "Repay",
         "select-position": "1. Select Position to Repay:",
-        "repay-type": "2. Select Repay Type:",
         "select-amount": "3. You Owe:",
-        "your-rates": "4. Your Interest Rates:",
-        "select-repay": "Select Repayment Method"
+        "repay-type": "2. Select Source of Funds:",
+        "your-rates": "4. Your Current Rates:",
+        "select-repay-option": "Select Repayment Method",
+        "repaying-from": "Repaying from your",
+        "from-wallet": "wallet",
+        "from-unused": "unused reserves",
+        "from-spigot": "spigot",
+        "claim-and-repay": {
+
+        },
+        "claim-and-trade": {
+
+        }
       },
       "withdraw-credit": {
         "header": "Withdraw",

@@ -9,7 +9,7 @@ export * from './AddCreditPositionTx';
 export * from './EnableCollateralAssetTx';
 export * from './EnableSpigotTx';
 export * from './AddCollateralTx';
-export * from './RepayTx';
+export * from './RepayPositionTx';
 export * from './MigrateTx';
 export * from './TestTx';
 export * from './WithdrawCreditTx';

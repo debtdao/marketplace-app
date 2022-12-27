@@ -120,7 +120,6 @@
       "max": "MAX",
       "migrate": "Migrate",
       "reinvest": "Reinvest",
-      "repay": "Repay",
       "reward": "Reward",
       "sign": "Sign",
       "stake": "Stake",
@@ -215,28 +214,35 @@
         "select-repay-option": "Select Repayment Method",
         "repaying-from": "Repaying from your",
         "close": {
-          "title": "close",
-          "cta": ""
+          "title": "Close",
+          "desc": "permanently close line",
+          "cta": "Close"
         },
         "deposit-and-repay": {
-          "title": "repay",
-          "cta": ""
+          "title": "Deposit & repay",
+          "desc": "from your wallet",
+          "cta": "Deposit & Repay"
         },
         "deposit-and-close": {
-          "title": "repay and close",
-          "cta": ""
+          "title": "Repay & close",
+          "desc": "",
+          "cta": "Close"
         },
         "unused": {
-          "title": "from reserves",
-          "cta": ""
+          "title": "From reserves",
+          "desc": "from excess revenue",
+          "cta": "Repay"
         },
         "claim-and-repay": {
-          "title": "from revenue",
-          "cta": ""
+          "title": "From revenue",
+          "desc": "claim revenue from spigot and repay",
+          "cta": "Claim & Repay",
+          "claim-token": "Revenue token to claim"
         },
         "claim-and-trade": {
-          "title": "to reserves",
-          "cta": ""
+          "title": "To reserves",
+          "desc": "claim revenue from spigot and store in unused reserves",
+          "cta": "Claim & Trade"
         }
       },
       "withdraw-credit": {

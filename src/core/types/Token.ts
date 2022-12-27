@@ -29,8 +29,8 @@ export interface TokenDynamicData {
 export interface GetTradeQuoteProps {
   sellToken: string; // token symbol or address
   buyToken: string; // token symbol or address
-  sellAmount: string; // in sellToken decimals
-  buyAmount: string; // in buyToken decimals
+  sellAmount?: string; // in sellToken decimals
+  buyAmount?: string; // in buyToken decimals
   network?: Network;
 
   // optional protection fields

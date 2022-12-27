@@ -210,7 +210,7 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
             <LineTitle ellipsis> Lender: {position?.lender} </LineTitle>
             <LineTitle ellipsis>
               {`${normalizeAmount(position?.deposit, 18)} ${position?.token.symbol}
-              @${position?.dRate}/${position?.fRate}%`}
+              @ ${normalizeAmount(position?.fRate, 2)}% / ${normalizeAmount(position?.dRate, 2)}$ `}
             </LineTitle>
           </CreditLineData>
         </CreditLineInfo>

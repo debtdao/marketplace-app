@@ -1,5 +1,6 @@
-import { Network } from '@src/core/types';
-import { GetTradeQuoteProps } from '@types';
+import { PopulatedTransaction } from 'ethers';
+
+import { Network, GetTradeQuoteProps } from '@types';
 
 import { get } from './http';
 
@@ -19,12 +20,25 @@ const getReferrerForNetwork = (network: Network) => {
   }
 };
 
-export const getTradeQuote = async ({ network = 'mainnet', ...params }: GetTradeQuoteProps) => {
+interface ZeroExAPIValidationError {
+  reason: 'Validation Failed';
+  validationErrors: {
+    field: string; // field in order
+    code: number;
+    reason: string; // e.g. "INSUFFICIENT_ASSET_LIQUIDITY"
+    description: string; // e.g. "We cant trade this token pair at the requested amount due to a lack of liquidity"}
+  };
+}
+
+export const getTradeQuote = async ({
+  network = 'mainnet',
+  ...params
+}: GetTradeQuoteProps): Promise<PopulatedTransaction | ZeroExAPIValidationError> => {
   console.log('get 0x quote params', params);
 
   // revenue go brrrrr
   const referralFees = {
-    buyTokenPercentageFee: 10,
+    buyTokenPercentageFee: '0.1',
     feeRecipient: getReferrerForNetwork(network),
   };
 
@@ -41,7 +55,22 @@ export const getTradeQuote = async ({ network = 'mainnet', ...params }: GetTrade
     if (response) {
       return response;
     }
-  } catch (e) {
+  } catch (e: any) {
+    // example failed response
+    // {"code":100,,"]}
     console.log('failed getting 0x price  quote', e);
+    if (e?.validationErrors) {
+      return e.validationErrors[0];
+    }
   }
+
+  return {
+    reason: 'Validation Failed',
+    validationErrors: {
+      field: 'n/a',
+      code: 0,
+      reason: 'no api request made',
+      description: 'default error messsage',
+    },
+  } as ZeroExAPIValidationError;
 };

@@ -1,8 +1,9 @@
 import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { BigNumber, ethers } from 'ethers';
+import { getAddress } from '@ethersproject/address';
 
-import { formatAmount, normalizeAmount, toWei, depositAndRepayUpdate, normalize } from '@utils';
+import { formatAmount, normalizeAmount, toWei, depositAndRepayUpdate, normalize, bn, getTradeQuote } from '@utils';
 import { useAppTranslation, useAppDispatch, useAppSelector, useSelectedSellToken } from '@hooks';
 import { TokensActions, TokensSelectors, VaultsSelectors, LinesSelectors, LinesActions, WalletSelectors } from '@store';
 import { getConstants, testTokens } from '@src/config/constants';
@@ -31,40 +32,40 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
   const { acceptingOffer, header, onClose, onPositionChange } = props;
-  const repaymentOptions = [
-    {
-      id: 'close',
-      label: t('components.transaction.repay.close.title'),
-      value: t('components.transaction.repay.close.title'),
-    },
+  const allRepaymentOptions = [
     {
       id: 'deposit-and-repay',
       label: t('components.transaction.repay.deposit-and-repay.title'),
-      value: t('components.transaction.repay.deposit-and-repay.title'),
+      value: t('components.transaction.repay.deposit-and-repay.desc'),
     },
     {
       id: 'deposit-and-close',
       label: t('components.transaction.repay.deposit-and-close.title'),
-      value: t('components.transaction.repay.deposit-and-close.title'),
+      value: t('components.transaction.repay.deposit-and-close.desc'),
     },
     {
       id: 'unused',
       label: t('components.transaction.repay.unused.title'),
-      value: t('components.transaction.repay.unused.title'),
+      value: t('components.transaction.repay.unused.desc'),
+    },
+    {
+      id: 'close',
+      label: t('components.transaction.repay.close.title'),
+      value: t('components.transaction.repay.close.desc'),
     },
     {
       id: 'claim-and-repay',
       label: t('components.transaction.repay.claim-and-repay.title'),
-      value: t('components.transaction.repay.claim-and-repay.title'),
+      value: t('components.transaction.repay.claim-and-repay.desc'),
     },
     {
       id: 'claim-and-trade',
       label: t('components.transaction.repay.claim-and-trade.title'),
-      value: t('components.transaction.repay.claim-and-trade.title'),
+      value: t('components.transaction.repay.claim-and-trade.desc'),
     },
   ];
 
-  const [repayType, setRepayType] = useState(repaymentOptions[0]);
+  const [repayType, setRepayType] = useState(allRepaymentOptions[0]);
   const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const [transactionCompleted, setTransactionCompleted] = useState(0);
@@ -85,6 +86,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     selectedVaultOrLab: useAppSelector(VaultsSelectors.selectRecommendations)[0],
     allowTokenSelect: true,
   });
+  // @cleanup TODO only use sell token for claimAndRepay/Trade. use selectedPosition.token for everything else
 
   useEffect(() => {
     console.log('repay type', repayType);
@@ -351,8 +353,9 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     });
   };
 
+  // @cleanup TODO move directly into renderComponent(), dont need 2 switch statements
   const getActionsForRepayType = (type: { id: string; label: string; value: string }) => {
-    // @cleanup TODO refactor and simplify
+    // @TODO filter based off of userMetadata.role
     switch (type.id) {
       case 'close':
         return [
@@ -487,6 +490,79 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     );
   }
 
+  let InputComponents; // might need to do this if returning from func causes rendering issues
+  const renderInputComponents = () => {
+    console.log('render repay inputs for type: ', repayType);
+    switch (repayType.id) {
+      case 'claim-and-repay':
+      case 'claim-and-trade':
+        // TODO  input for token being claimed
+        // TODO set targetAmount to unused + getOwnerTokens
+        const buyToken = selectedPosition.token.address;
+        const sellToken = selectedSellToken.address;
+        console.log('repay from rev - buy/sell tokens', buyToken, sellToken);
+
+        if (getAddress(buyToken) !== getAddress(sellToken)) {
+          const tradeTx = getTradeQuote({
+            buyToken,
+            sellToken,
+            sellAmount: targetAmount,
+            network: walletNetwork,
+          });
+          console.log('get 0x trade quote', tradeTx);
+        }
+
+        return (
+          <TxTokenInput
+            key={'token-input'}
+            headerText={t('components.transaction.repay.claim-and-repay.claim-token')}
+            inputText={tokenHeaderText}
+            amount={targetAmount}
+            onAmountChange={onAmountChange}
+            // @cleanup TODO
+            maxAmount={getMaxRepay()}
+            selectedToken={selectedSellToken}
+            onSelectedTokenChange={onSelectedSellTokenChange}
+            // @cleanup TODO
+            tokenOptions={sourceAssetOptions}
+            // inputError={!!sourceStatus.error}
+            readOnly={false}
+            // displayGuidance={displaySourceGuidance}
+          />
+        );
+
+      case 'deposit-and-close':
+      case 'close':
+      case 'deposit-and-repay':
+      default:
+        const isClosing = repayType.id === 'deposit-and-repay';
+        const amount = isClosing
+          ? bn(selectedPosition.principal)!.add(bn(selectedPosition.interestAccrued)!)!.toString()
+          : targetAmount;
+
+        console.log('repay from wallet inputs. isClosing, amount', isClosing, amount);
+
+        return (
+          <TxTokenInput
+            key={'token-input'}
+            headerText={t('components.transaction.repay.select-amount')}
+            inputText={tokenHeaderText}
+            amount={normalizeAmount(amount, selectedPosition.token.decimals)}
+            onAmountChange={(amnt) => setTargetAmount(toWei(amnt, selectedPosition.token.decimals))}
+            // @cleanup TODO
+            maxAmount={getMaxRepay()}
+            selectedToken={selectedSellToken}
+            onSelectedTokenChange={onSelectedSellTokenChange}
+            // @cleanup TODO
+            tokenOptions={sourceAssetOptions}
+            // inputError={!!sourceStatus.error}
+            readOnly={isClosing ? true : false}
+            // displayGuidance={displaySourceGuidance}
+          />
+        );
+    }
+  };
+
   return (
     <StyledTransaction onClose={onClose} header={header || t('components.transaction.repay.header')}>
       <TxPositionInput
@@ -501,33 +577,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         readOnly={false}
         // displayGuidance={displaySourceGuidance}
       />
-      <TxDropdown
-        key={'type-input'}
-        headerText={t('components.transaction.repay.repay-type')}
-        inputText={t('components.transaction.repay.select-repay-option')}
-        onSelectedTypeChange={onSelectedTypeChange}
-        selectedType={repayType}
-        typeOptions={repaymentOptions}
-        // creditOptions={sourceCreditOptions}
-        // inputError={!!sourceStatus.error}
-      />
-      <TxTokenInput
-        key={'token-input'}
-        headerText={t('components.transaction.repay.select-amount')}
-        inputText={tokenHeaderText}
-        amount={targetAmount}
-        onAmountChange={onAmountChange}
-        // @cleanup TODO
-        amountValue={String(10000000 * Number(targetAmount))}
-        maxAmount={getMaxRepay()}
-        selectedToken={selectedSellToken}
-        onSelectedTokenChange={onSelectedSellTokenChange}
-        // @cleanup TODO
-        tokenOptions={walletNetwork === 'goerli' ? testTokens : sourceAssetOptions}
-        // inputError={!!sourceStatus.error}
-        readOnly={acceptingOffer}
-        // displayGuidance={displaySourceGuidance}
-      />
       <TxRateInput
         key={'frate'}
         headerText={t('components.transaction.repay.your-rates')}
@@ -539,6 +588,21 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         setRateChange={() => {}}
         readOnly={true}
       />
+      <TxDropdown
+        key={'type-input'}
+        headerText={t('components.transaction.repay.repay-type')}
+        inputText={t('components.transaction.repay.select-repay-option')}
+        onSelectedTypeChange={onSelectedTypeChange}
+        selectedType={repayType}
+        typeOptions={allRepaymentOptions}
+        // creditOptions={sourceCreditOptions}
+        // inputError={!!sourceStatus.error}
+      />
+      {/* Make subcomponent to render diff payment option inputs */}
+      {/* PRIORITY - repay to test 0x */}
+      {/* <InputComponents /> */}
+      {renderInputComponents()}
+
       <TxActions>
         {getActionsForRepayType(repayType).map(({ label, onAction, status, disabled, contrast }) => (
           <TxActionButton

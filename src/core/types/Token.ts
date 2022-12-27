@@ -1,5 +1,4 @@
-import { Address } from './Blockchain';
-
+import { Address, Network } from './Blockchain';
 export interface UserTokenData {
   address: string;
   balance: string;
@@ -24,4 +23,18 @@ export interface TokenView {
 export interface TokenDynamicData {
   address: Address;
   priceUsdc: string;
+}
+
+// https://docs.0x.org/0x-api-swap/api-references/get-swap-v1-quote
+export interface GetTradeQuoteProps {
+  sellToken: string; // token symbol or address
+  buyToken: string; // token symbol or address
+  sellAmount: string; // in sellToken decimals
+  buyAmount: string; // in buyToken decimals
+  network?: Network;
+
+  // optional protection fields
+  slippagePercentage?: string;
+  priceImpactProtectionPercentage?: string;
+  enableSlippageProtection?: boolean;
 }

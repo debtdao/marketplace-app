@@ -30,6 +30,9 @@ import {
   Network,
   GetUserPortfolioProps,
   GetUserPortfolioResponse,
+  UseAndRepayProps,
+  ClaimAndRepayProps,
+  ClaimAndTradeProps,
 } from '@types';
 import { getConfig } from '@config';
 import { SecuredLineABI } from '@services/contracts';
@@ -71,14 +74,12 @@ export class CreditLineServiceImpl implements CreditLineService {
     return await this.web3Provider.getSigner().getAddress();
   }
 
-  public async close(props: CloseProps): Promise<string> {
+  public async close(props: CloseProps): Promise<TransactionResponse | PopulatedTransaction> {
     try {
       if (!(await this.isSignerBorrowerOrLender(props.lineAddress, props.id))) {
         throw new Error('Unable to close. Signer is not borrower or lender');
       }
-      return (<TransactionResponse>(
-        await this.executeContractMethod(props.lineAddress, 'close', [props.id], props.network)
-      )).hash;
+      return this.executeContractMethod(props.lineAddress, 'close', [props.id], props.network);
     } catch (e) {
       console.log(`An error occured while closing credit, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
@@ -215,6 +216,55 @@ export class CreditLineServiceImpl implements CreditLineService {
       console.log(`An error occured while depositAndClose credit, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
     }
+  }
+
+  // Trade functions
+
+  public async claimAndTrade(props: ClaimAndTradeProps): Promise<TransactionResponse | PopulatedTransaction> {
+    // todo use CreditLineService
+    if (!(await this.isBorrowing(props.lineAddress))) {
+      throw new Error('Claim and trade is not possible because not borrowing');
+    }
+    // todo call contract for first position and check that lender is them
+    // const role = props.userPositionMetadata.role;
+    // if (role !== BORROWER_POSITION_ROLE && role !== LENDER_POSITION_ROLE) {
+    //   throw new Error('Claim and trade is not possible because signer is not borrower');
+    // }
+
+    // TODO check that there are tokens to claim on spigot
+    // TODO simulate trade and try to check against known token prices
+
+    return await this.executeContractMethod(
+      props.lineAddress,
+      'claimAndTrade',
+      [props.claimToken, props.zeroExTradeData],
+      props.network
+    );
+  }
+
+  // repay from spigot revenue collateral
+
+  public async claimAndRepay(props: ClaimAndRepayProps): Promise<TransactionResponse | PopulatedTransaction> {
+    if (!(await this.isBorrowing(props.lineAddress))) {
+      throw new Error('Claim and repay is not possible because not borrowing');
+    }
+
+    if (!(await this.isSignerBorrowerOrLender(props.lineAddress, await this.getFirstID(props.lineAddress)))) {
+      throw new Error('Claim and repay is not possible because signer is not borrower or lender');
+    }
+
+    return await this.executeContractMethod(
+      props.lineAddress,
+      'claimAndRepay',
+      [props.claimToken, props.zeroExTradeData],
+      props.network
+    );
+  }
+
+  public async useAndRepay(props: UseAndRepayProps): Promise<TransactionResponse | PopulatedTransaction> {
+    // TODO check unused is <= amount
+    // TODO
+    return await this.executeContractMethod(props.lineAddress, 'useAndRepay', [props.amount], props.network);
   }
 
   public async addCredit(props: AddCreditProps): Promise<TransactionResponse | PopulatedTransaction> {

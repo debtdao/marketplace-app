@@ -254,68 +254,6 @@ export class CollateralServiceImpl implements CollateralService {
     );
   }
 
-  // Trade functions
-
-  public async claimAndTrade(props: ClaimAndTradeProps): Promise<TransactionResponse | PopulatedTransaction> {
-    // todo use CreditLineService
-    if (!(await this.creditLineService.isBorrowing(props.lineAddress))) {
-      throw new Error('Claim and trade is not possible because not borrowing');
-    }
-    // todo call contract for first position and check that lender is them
-    // const role = props.userPositionMetadata.role;
-    // if (role !== BORROWER_POSITION_ROLE && role !== LENDER_POSITION_ROLE) {
-    //   throw new Error('Claim and trade is not possible because signer is not borrower');
-    // }
-
-    // TODO check that there are tokens to claim on spigot
-    // TODO simulate trade and try to check against known token prices
-
-    return await this.executeContractMethod(
-      props.lineAddress,
-      this.lineAbi,
-      'claimAndTrade',
-      [props.claimToken, props.zeroExTradeData],
-      props.network
-    );
-  }
-
-  // repay from spigot revenue collateral
-
-  public async claimAndRepay(props: ClaimAndRepayProps): Promise<TransactionResponse | PopulatedTransaction> {
-    if (!(await this.creditLineService.isBorrowing(props.lineAddress))) {
-      throw new Error('Claim and repay is not possible because not borrowing');
-    }
-
-    if (
-      !(await this.creditLineService.isSignerBorrowerOrLender(
-        props.lineAddress,
-        await this.getFirstID(props.lineAddress)
-      ))
-    ) {
-      throw new Error('Claim and repay is not possible because signer is not borrower or lender');
-    }
-
-    return await this.executeContractMethod(
-      props.lineAddress,
-      this.lineAbi,
-      'claimAndRepay',
-      [props.claimToken, props.zeroExTradeData],
-      props.network
-    );
-  }
-
-  public async useAndRepay(props: UseAndRepayProps): Promise<TransactionResponse | PopulatedTransaction> {
-    // TODO check unused is <= amount
-    // TODO
-    return await this.executeContractMethod(
-      props.lineAddress,
-      this.lineAbi,
-      'useAndRepay',
-      [props.amount],
-      props.network
-    );
-  }
-
   private async getSignerAddress(): Promise<Address> {
     return await this.web3Provider.getSigner().getAddress();
   }

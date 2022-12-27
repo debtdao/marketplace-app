@@ -159,21 +159,25 @@ export interface CreditLineService {
   getUserLinePositions: (...args: any) => Promise<any | undefined>;
   getUserPortfolio: (props: GetUserPortfolioProps) => Promise<GetUserPortfolioResponse | undefined>;
   getExpectedTransactionOutcome: (...args: any) => Promise<any | undefined>;
+
+  // Repay from wallet
   depositAndRepay: (
     props: DepositAndRepayProps
     //interest: InterestRateCreditService
   ) => Promise<TransactionResponse | PopulatedTransaction>;
   depositAndClose: (props: DepositAndCloseProps) => Promise<TransactionResponse | PopulatedTransaction>;
+  close: (props: CloseProps) => Promise<TransactionResponse | PopulatedTransaction>;
+
+  // Repay with revenue collateral
+  claimAndTrade(props: ClaimAndTradeProps): Promise<TransactionResponse | PopulatedTransaction>;
+  claimAndRepay(props: ClaimAndRepayProps): Promise<TransactionResponse | PopulatedTransaction>;
+  useAndRepay(props: UseAndRepayProps): Promise<TransactionResponse | PopulatedTransaction>;
+
   addCredit: (props: AddCreditProps) => Promise<TransactionResponse | PopulatedTransaction>;
   borrow: (props: BorrowCreditProps) => Promise<TransactionResponse | PopulatedTransaction>;
   withdraw: (props: WithdrawLineProps) => Promise<TransactionResponse | PopulatedTransaction>;
-  // close: (props: CloseProps) => Promise<TransactionResponse>;
-  // withdraw: (props: WithdrawLineProps) => Promise<TransactionResponse>;
   // setRates: (props: SetRatesProps) => Promise<TransactionResponse | PopulatedTransaction>;
   // increaseCredit: (props: IncreaseCreditProps) => Promise<TransactionResponse | PopulatedTransaction>;
-  // depositAndRepay: (props: DepositAndRepayProps) => Promise<TransactionResponse | PopulatedTransaction>;
-  // depositAndClose: (props: DepositAndCloseProps) => Promise<TransactionResponse | PopulatedTransaction>;
-  //deploySecuredLine: (props: any) => Promise<TransactionResponse | PopulatedTransaction>;
 
   // helpers
   getFirstID: (contractAddress: string) => Promise<BytesLike>;
@@ -254,7 +258,29 @@ export interface DepositAndRepayProps {
 export interface DepositAndCloseProps {
   lineAddress: string;
   network: Network;
-  id: string;
+}
+export interface ClaimAndTradeProps {
+  // userPositionMetadata: UserPositionMetadata;
+  lineAddress: string;
+  claimToken: Address;
+  zeroExTradeData: BytesLike;
+  network: Network;
+  dryRun?: boolean;
+}
+export interface ClaimAndRepayProps {
+  // userPositionMetadata: UserPositionMetadata;
+  lineAddress: string;
+  claimToken: Address;
+  zeroExTradeData: BytesLike;
+  network: Network;
+  dryRun?: boolean;
+}
+export interface UseAndRepayProps {
+  // userPositionMetadata: UserPositionMetadata;
+  lineAddress: string;
+  amount: BigNumber;
+  network: Network;
+  dryRun?: boolean;
 }
 
 export interface ApproveLineDepositProps {
@@ -349,30 +375,6 @@ export interface ReleaseCollateraltProps {
   dryRun?: boolean;
 }
 
-export interface ClaimAndTradeProps {
-  // userPositionMetadata: UserPositionMetadata;
-  lineAddress: string;
-  claimToken: Address;
-  zeroExTradeData: BytesLike;
-  network: Network;
-  dryRun?: boolean;
-}
-export interface ClaimAndRepayProps {
-  // userPositionMetadata: UserPositionMetadata;
-  lineAddress: string;
-  claimToken: Address;
-  zeroExTradeData: BytesLike;
-  network: Network;
-  dryRun?: boolean;
-}
-export interface UseAndRepayProps {
-  // userPositionMetadata: UserPositionMetadata;
-  lineAddress: string;
-  amount: BigNumber;
-  network: Network;
-  dryRun?: boolean;
-}
-
 export interface SweepSpigotProps {
   // userPositionMetadata: UserPositionMetadata;
   lineAddress: string;
@@ -437,11 +439,6 @@ export interface CollateralService {
 
   // spigot itself
   releaseSpigot(props: ReleaseSpigotProps): Promise<TransactionResponse | PopulatedTransaction>;
-
-  // repay with revenue collateral
-  claimAndTrade(props: ClaimAndTradeProps): Promise<TransactionResponse | PopulatedTransaction>;
-  claimAndRepay(props: ClaimAndRepayProps): Promise<TransactionResponse | PopulatedTransaction>;
-  useAndRepay(props: UseAndRepayProps): Promise<TransactionResponse | PopulatedTransaction>;
 
   // view functions
   isSpigotOwner(spigotAddress?: string, lineAddress?: string): Promise<boolean>;

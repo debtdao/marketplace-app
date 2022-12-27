@@ -214,14 +214,29 @@
         "your-rates": "4. Your Current Rates:",
         "select-repay-option": "Select Repayment Method",
         "repaying-from": "Repaying from your",
-        "from-wallet": "wallet",
-        "from-unused": "unused reserves",
-        "from-spigot": "spigot",
+        "close": {
+          "title": "close",
+          "cta": ""
+        },
+        "deposit-and-repay": {
+          "title": "repay",
+          "cta": ""
+        },
+        "deposit-and-close": {
+          "title": "repay and close",
+          "cta": ""
+        },
+        "unused": {
+          "title": "from reserves",
+          "cta": ""
+        },
         "claim-and-repay": {
-
+          "title": "from revenue",
+          "cta": ""
         },
         "claim-and-trade": {
-
+          "title": "to reserves",
+          "cta": ""
         }
       },
       "withdraw-credit": {

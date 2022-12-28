@@ -36,7 +36,7 @@ import { getConfig } from '@config';
 import { getContract } from '@frameworks/ethers';
 import { unnullify } from '@src/utils';
 
-import { SecuredLineABI } from './contracts';
+import { SecuredLineABI, SpigotABI } from './contracts';
 import { EscrowABI } from './contracts';
 // import { SpigotABI } from './contracts';
 
@@ -68,7 +68,7 @@ export class CollateralServiceImpl implements CollateralService {
     const { GRAPH_API_URL } = getConfig();
     this.graphUrl = GRAPH_API_URL || 'https://api.thegraph.com';
     this.lineAbi = SecuredLineABI;
-    this.spigotAbi = SecuredLineABI; // TODO
+    this.spigotAbi = SpigotABI;
     this.escrowAbi = EscrowABI;
   }
 
@@ -199,11 +199,15 @@ export class CollateralServiceImpl implements CollateralService {
 
   public async claimRevenue(props: ClaimRevenueProps): Promise<TransactionResponse | PopulatedTransaction> {
     // TODO get current status and split from subgraph and simulate calling updateSplit if it will change anything *return false)
+
+    const data = !props.claimData ? '0x00000000' : props.claimData; // default to push payment if no data passed
+
+    console.log('collat svc: claimRevenu()', this.spigotAbi, data);
     return await this.executeContractMethod(
       props.spigotAddress,
       this.spigotAbi,
       'claimRevenue',
-      [props.revenueContract, props.claimData],
+      [props.revenueContract, props.token, data],
       props.network
     );
   }
@@ -322,9 +326,9 @@ export class CollateralServiceImpl implements CollateralService {
         abi,
         args: params,
         methodName: methodName,
-        // overrides: {
-        // gasLimit: 600000,
-        // },
+        overrides: {
+          gasLimit: 600000,
+        },
       };
 
       const tx = await this.transactionService.execute(props);

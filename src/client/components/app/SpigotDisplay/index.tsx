@@ -10,9 +10,13 @@ import {
   LinesSelectors,
   CollateralSelectors,
   WalletSelectors,
+  CollateralActions,
+  ModalsActions,
 } from '@store';
 import { getENS } from '@src/utils';
 import { useExplorerURL } from '@src/client/hooks/useExplorerURL';
+
+import { ActionButtons } from '../ActionButtons';
 
 interface SpigotDisplayProps {}
 
@@ -77,6 +81,21 @@ export const SpigotDisplay = (props: SpigotDisplayProps) => {
   // if we have all data render full UI
 
   if (!selectedSpigot) return null;
+
+  const claimRev = {
+    name: t('spigot:claim-revenue'),
+    handler: () => {
+      dispatch(ModalsActions.openModal({ modalName: 'claimRevenue' }));
+      // open modal, dispatch action inside modal
+      // dispatch(
+      //   CollateralActions.claimRevenue({
+      //     spigotAddress: selectedSpigot.id,
+      //     revenueContract: selectedRevenueContract
+      //   })
+      // )
+    },
+  };
+
   return (
     <Container>
       <Header>
@@ -87,6 +106,7 @@ export const SpigotDisplay = (props: SpigotDisplayProps) => {
           </SpigotAddy>
         </Link>
       </Header>
+      <ActionButtons actions={[claimRev]} />
     </Container>
   );
 };

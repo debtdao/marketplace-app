@@ -358,6 +358,7 @@ export interface AddCollateralProps {
 export interface ClaimRevenueProps {
   spigotAddress: Address;
   revenueContract: Address;
+  token: Address;
   claimData: BytesLike;
   network: Network;
   dryRun?: boolean;

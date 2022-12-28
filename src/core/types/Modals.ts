@@ -10,6 +10,7 @@ export type ModalName =
   | 'createLine'
   | 'borrow'
   | 'depositAndRepay'
+  | 'claimRevenue'
   // yearn modals
   | 'test'
   | 'comingSoon'

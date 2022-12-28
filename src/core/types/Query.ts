@@ -1,7 +1,37 @@
-import { LineStatusTypes, PositionStatusTypes } from '@types';
+import { PopulatedTransaction } from 'ethers';
 
-import { Address } from './Blockchain';
+import { LineStatusTypes, PositionStatusTypes } from './CreditLine';
+import { Address, Network } from './Blockchain';
 
+// 0x API
+
+// https://docs.0x.org/0x-api-swap/api-references/get-swap-v1-quote
+export interface GetTradeQuoteProps {
+  sellToken: string; // token symbol or address
+  buyToken: string; // token symbol or address
+  sellAmount?: string; // in sellToken decimals
+  buyAmount?: string; // in buyToken decimals
+  network?: Network;
+
+  // optional protection fields
+  slippagePercentage?: string;
+  priceImpactProtectionPercentage?: string;
+  enableSlippageProtection?: boolean;
+}
+
+export interface ZeroExAPIValidationError {
+  reason: 'Validation Failed';
+  validationErrors: {
+    field: string; // field in order
+    code: number;
+    reason: string; // e.g. "INSUFFICIENT_ASSET_LIQUIDITY"
+    description: string; // e.g. "We cant trade this token pair at the requested amount due to a lack of liquidity"}
+  };
+}
+
+export interface ZeroExAPIQuoteResponse extends PopulatedTransaction, GetTradeQuoteProps {}
+
+// Subgraph
 export interface QueryCreator<ArgType, ResponseType> {
   (args: ArgType): QueryResponse<ResponseType>;
 }

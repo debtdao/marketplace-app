@@ -218,18 +218,18 @@ export class CreditLineServiceImpl implements CreditLineService {
     }
   }
 
-  // Trade functions
-
+  // Trade and repay functions from spigot revenue collateral
   public async claimAndTrade(props: ClaimAndTradeProps): Promise<TransactionResponse | PopulatedTransaction> {
-    // todo use CreditLineService
+    console.log('credit svc: claimAndtrade()', props, await this.isBorrowing(props.lineAddress));
+
     if (!(await this.isBorrowing(props.lineAddress))) {
       throw new Error('Claim and trade is not possible because not borrowing');
     }
-    // todo call contract for first position and check that lender is them
-    // const role = props.userPositionMetadata.role;
-    // if (role !== BORROWER_POSITION_ROLE && role !== LENDER_POSITION_ROLE) {
-    //   throw new Error('Claim and trade is not possible because signer is not borrower');
-    // }
+
+    // TODO call contract for first position and check that props.buyToken == credits[0].token
+    if ((await this.getSignerAddress()) !== (await this.arbiter(props.lineAddress))) {
+      throw new Error('Claim and trade is blocked if not from arbiter address');
+    }
 
     // TODO check that there are tokens to claim on spigot
     // TODO simulate trade and try to check against known token prices
@@ -242,17 +242,18 @@ export class CreditLineServiceImpl implements CreditLineService {
     );
   }
 
-  // repay from spigot revenue collateral
-
   public async claimAndRepay(props: ClaimAndRepayProps): Promise<TransactionResponse | PopulatedTransaction> {
+    console.log('credit svc: claimAndRepay()', props, await this.isBorrowing(props.lineAddress));
     if (!(await this.isBorrowing(props.lineAddress))) {
       throw new Error('Claim and repay is not possible because not borrowing');
     }
 
+    // TODO change check to arbiter
     if (!(await this.isSignerBorrowerOrLender(props.lineAddress, await this.getFirstID(props.lineAddress)))) {
       throw new Error('Claim and repay is not possible because signer is not borrower or lender');
     }
 
+    console.log('sending claim and repay tx');
     return await this.executeContractMethod(
       props.lineAddress,
       'claimAndRepay',
@@ -382,6 +383,10 @@ export class CreditLineServiceImpl implements CreditLineService {
     return await this._getContract(contractAddress).borrower();
   }
 
+  public async arbiter(contractAddress: string): Promise<Address> {
+    return await this._getContract(contractAddress).arbiter();
+  }
+
   public async isActive(contractAddress: string): Promise<boolean> {
     return (await this._getContract(contractAddress).status()) === STATUS.ACTIVE;
   }
@@ -389,7 +394,7 @@ export class CreditLineServiceImpl implements CreditLineService {
   public async isBorrowing(contractAddress: string): Promise<boolean> {
     const id = await this._getContract(contractAddress).ids(0);
     return (
-      (await this._getContract(contractAddress).count()) !== 0 &&
+      (await this._getContract(contractAddress).counts()[0]) !== 0 &&
       (await this._getContract(contractAddress).credits(id)).principal !== 0
     );
   }
@@ -422,7 +427,7 @@ export class CreditLineServiceImpl implements CreditLineService {
   public async isSignerBorrowerOrLender(contractAddress: string, id: BytesLike): Promise<boolean> {
     const signer = await this.getSignerAddress();
     const credit = await this._getContract(contractAddress).credits(id);
-    return signer === credit.lender || signer === (await this.contract.borrower());
+    return signer === credit.lender || signer === (await this.borrower(contractAddress));
   }
 
   /* Subgraph Getters */

@@ -1,6 +1,6 @@
 import { PopulatedTransaction } from 'ethers';
 
-import { Network, GetTradeQuoteProps } from '@types';
+import { Network, GetTradeQuoteProps, ZeroExAPIQuoteResponse, ZeroExAPIValidationError } from '@types';
 
 import { get } from './http';
 
@@ -20,22 +20,20 @@ const getReferrerForNetwork = (network: Network) => {
   }
 };
 
-interface ZeroExAPIValidationError {
-  reason: 'Validation Failed';
-  validationErrors: {
-    field: string; // field in order
-    code: number;
-    reason: string; // e.g. "INSUFFICIENT_ASSET_LIQUIDITY"
-    description: string; // e.g. "We cant trade this token pair at the requested amount due to a lack of liquidity"}
-  };
-}
-
 export const getTradeQuote = async ({
   network = 'mainnet',
   ...params
-}: GetTradeQuoteProps): Promise<PopulatedTransaction | ZeroExAPIValidationError> => {
+}: GetTradeQuoteProps): Promise<ZeroExAPIQuoteResponse> => {
   console.log('get 0x quote params', params);
-
+  const genericError = {
+    reason: 'Validation Failed',
+    validationErrors: {
+      field: 'n/a',
+      code: 0,
+      reason: 'no api request made',
+      description: 'default error messsage',
+    },
+  } as ZeroExAPIValidationError;
   // revenue go brrrrr
   const referralFees = {
     buyTokenPercentageFee: '0.1',
@@ -52,25 +50,18 @@ export const getTradeQuote = async ({
     console.log('0x api response', response);
     // console.log('price + trade data', );
     // return price, + trade exchange addy+ calldata
-    if (response) {
-      return response;
-    }
+    if (response?.data) {
+      const { buyTokenAddress, sellTokenAddress } = response.data;
+      return { ...response.data, buyToken: buyTokenAddress, sellToken: sellTokenAddress };
+    } else throw genericError;
   } catch (e: any) {
     // example failed response
     // {"code":100,,"]}
     console.log('failed getting 0x price  quote', e);
     if (e?.validationErrors) {
-      return e.validationErrors[0];
+      throw e.validationErrors[0];
     }
   }
 
-  return {
-    reason: 'Validation Failed',
-    validationErrors: {
-      field: 'n/a',
-      code: 0,
-      reason: 'no api request made',
-      description: 'default error messsage',
-    },
-  } as ZeroExAPIValidationError;
+  throw genericError;
 };

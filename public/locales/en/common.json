@@ -237,7 +237,8 @@
           "title": "From revenue",
           "desc": "claim revenue from spigot and repay",
           "cta": "Claim & Repay",
-          "claim-token": "Revenue token to claim"
+          "claim-token": "Revenue token to claim",
+          "insufficient-liquidity": "Insufficient Liquidity for revenue token"
         },
         "claim-and-trade": {
           "title": "To reserves",

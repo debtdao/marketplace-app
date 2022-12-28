@@ -1,13 +1,14 @@
-import { FC, useState, useEffect } from 'react';
+import _ from 'lodash';
 import styled from 'styled-components';
 import { BigNumber, ethers } from 'ethers';
+import { FC, useState, useEffect } from 'react';
 import { getAddress } from '@ethersproject/address';
 
 import { formatAmount, normalizeAmount, toWei, depositAndRepayUpdate, normalize, bn, getTradeQuote } from '@utils';
 import { useAppTranslation, useAppDispatch, useAppSelector, useSelectedSellToken } from '@hooks';
 import { TokensActions, TokensSelectors, VaultsSelectors, LinesSelectors, LinesActions, WalletSelectors } from '@store';
 import { getConstants, testTokens } from '@src/config/constants';
-import { CreditPosition } from '@src/core/types';
+import { CreditPosition, TokenView, ZeroExAPIQuoteResponse } from '@src/core/types';
 
 import { TxContainer } from './components/TxContainer';
 import { TxTokenInput } from './components/TxTokenInput';
@@ -19,6 +20,10 @@ import { TxDropdown } from './components/TxDropdown';
 import { TxPositionInput } from './components/TxPositionInput';
 
 const StyledTransaction = styled(TxContainer)``;
+const TradeError = styled.h3`
+  color: red;
+  font-weight: 800;
+`;
 
 interface RepayPositionProps {
   header: string;
@@ -27,6 +32,10 @@ interface RepayPositionProps {
   onSelectedCreditLineChange: Function;
   onPositionChange: (data: { credit?: string; token: string | undefined; amount?: string }) => void;
 }
+
+const {
+  CONTRACT_ADDRESSES: { DAI, ETH },
+} = getConstants();
 
 export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const { t } = useAppTranslation('common');
@@ -68,61 +77,56 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const [repayType, setRepayType] = useState(allRepaymentOptions[0]);
   const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
-  const [transactionCompleted, setTransactionCompleted] = useState(0);
-  const [transactionLoading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<string[]>(['']);
-  const [transactionApproved, setTransactionApproved] = useState(true);
-  const [targetAmount, setTargetAmount] = useState('1');
-  const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
-  const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
-  const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
-  //const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
-  const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
-  const initialToken: string = selectedSellTokenAddress ?? selectedPosition!.token.address;
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
+  const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
+  const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
+  const initialToken: string = selectedSellTokenAddress ?? selectedPosition?.token.address ?? DAI;
 
+  // @cleanup TODO only use sell token for claimAndRepay/Trade. use selectedPosition.token for everything else
   const { selectedSellToken, sourceAssetOptions } = useSelectedSellToken({
     selectedSellTokenAddress: initialToken,
     selectedVaultOrLab: useAppSelector(VaultsSelectors.selectRecommendations)[0],
     allowTokenSelect: true,
   });
-  // @cleanup TODO only use sell token for claimAndRepay/Trade. use selectedPosition.token for everything else
+
+  // used for 0x testing
+  const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
+
+  const [transactionCompleted, setTransactionCompleted] = useState(0);
+  const [transactionLoading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<string[]>(['']);
+  const [transactionApproved, setTransactionApproved] = useState(true);
+  const [targetAmount, setTargetAmount] = useState('100000000000');
+
+  const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
+  const [tokensToBuy, setTokensToBuy] = useState('');
+  const [tradeData, setTradeData] = useState<ZeroExAPIQuoteResponse>();
+  const [haveFetched0x, setHaveFetched0x] = useState<boolean>(false);
 
   useEffect(() => {
     console.log('repay type', repayType);
   }, [repayType]);
 
   useEffect(() => {
-    if (!selectedSellToken) {
+    if (!selectedSellToken && !_.isEmpty(sourceAssetOptions)) {
       dispatch(
         TokensActions.setSelectedTokenAddress({
           tokenAddress: sourceAssetOptions[0].address,
         })
       );
     }
-    if (selectedTokenAddress === '' && selectedSellToken) {
+    if (!selectedTokenAddress && selectedSellToken) {
       setSelectedTokenAddress(selectedSellToken.address);
     }
 
-    if (
-      !selectedCredit ||
-      !selectedSellToken
-      // toBN(targetTokenAmount).lte(0) ||
-      // inputError ||
-    ) {
-      return;
-    }
+    // if (!selectedPosition || !selectedSellToken) {
+    //   return;
+    // }
 
-    dispatch(TokensActions.getTokensDynamicData({ addresses: [initialToken] })); // pulled from DepositTX, not sure why data not already filled
-    // dispatch(CreditLineActions.getCreditLinesDynamicData({ addresses: [initialToken] })); // pulled from DepositTX, not sure why data not already filled
+    // dispatch(TokensActions.getTokensDynamicData({ addresses: [initialToken] }));
   }, [selectedSellToken]);
 
   // Event Handlers
-
-  const onAmountChange = (amount: string): void => {
-    setTargetAmount(amount);
-    // _updatePosition();
-  };
 
   const onTransactionCompletedDismissed = () => {
     if (onClose) {
@@ -134,12 +138,12 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
   const approveDepositAndRepay = () => {
     setLoading(true);
-    if (!selectedCredit?.id || !selectedPosition) {
+    if (!selectedPosition?.line || !selectedPosition) {
       setLoading(false);
       return;
     }
     let approvalOBj = {
-      lineAddress: selectedCredit.id,
+      lineAddress: selectedPosition.line,
       tokenAddress: selectedSellTokenAddress!,
       amount: toWei(targetAmount, selectedPosition.token.decimals),
       network: walletNetwork!,
@@ -159,7 +163,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const depositAndRepay = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    if (!selectedCredit?.id) {
+    if (!selectedPosition?.line) {
       setErrors([...errors, 'no selected credit ID']);
       setLoading(false);
       return;
@@ -190,11 +194,11 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       return;
     }
 
-    console.log('repayTX', selectedCredit.id);
+    console.log('repayTX', selectedPosition.line);
 
     dispatch(
       LinesActions.depositAndRepay({
-        lineAddress: selectedCredit.id,
+        lineAddress: selectedPosition.line,
         amount: ethers.utils.parseEther(targetAmount),
         network: walletNetwork,
       })
@@ -220,14 +224,14 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const depositAndClose = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    if (!selectedCredit?.id || !selectedPosition || !walletNetwork) {
+    if (!selectedPosition?.line || !selectedPosition || !walletNetwork) {
       setLoading(false);
       return;
     }
 
     dispatch(
       LinesActions.depositAndClose({
-        lineAddress: selectedCredit.id,
+        lineAddress: selectedPosition.line,
         id: selectedPosition.id,
         network: walletNetwork,
       })
@@ -246,19 +250,42 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const claimAndRepay = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    if (!selectedCredit?.id || !targetAmount || !selectedSellTokenAddress || !walletNetwork) {
+    console.log(
+      'repay modal: claimAndrepay()',
+      tradeData,
+      selectedPosition,
+      !targetAmount,
+      !selectedSellTokenAddress,
+      !walletNetwork
+    );
+    if (!tradeData?.data || !selectedPosition?.line || !targetAmount || !selectedSellTokenAddress || !walletNetwork) {
       setLoading(false);
+      return;
+    }
+
+    if (
+      getAddress(tradeData.sellToken) !== getAddress(selectedSellTokenAddress) ||
+      getAddress(tradeData.buyToken) !== getAddress(selectedPosition.token.address)
+    ) {
+      console.log(
+        '0x quote for wrong tokens',
+        tradeData.sellToken,
+        selectedSellTokenAddress,
+        tradeData.buyToken,
+        selectedPosition.token.address
+      );
       return;
     }
 
     dispatch(
       LinesActions.claimAndRepay({
-        lineAddress: selectedCredit.id,
+        lineAddress: selectedPosition.line,
         claimToken: selectedSellTokenAddress,
-        calldata: '',
+        calldata: tradeData.data,
         network: walletNetwork,
       })
     ).then((res) => {
+      console.log('repay modal: post claimAndrepay()', res);
       if (res.meta.requestStatus === 'rejected') {
         setTransactionCompleted(2);
         setLoading(false);
@@ -274,16 +301,29 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const claimAndTrade = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    if (!selectedCredit?.id || !targetAmount || !selectedSellTokenAddress || !walletNetwork) {
+    if (!tradeData?.data || !selectedPosition?.line || !targetAmount || !selectedSellTokenAddress || !walletNetwork) {
       setLoading(false);
+      return;
+    }
+    if (
+      getAddress(tradeData.sellToken) !== getAddress(selectedSellTokenAddress) ||
+      getAddress(tradeData.buyToken) !== getAddress(selectedPosition.token.address)
+    ) {
+      console.log(
+        '0x quote for wrong tokens',
+        tradeData.sellToken,
+        selectedSellTokenAddress,
+        tradeData.buyToken,
+        selectedPosition.token.address
+      );
       return;
     }
 
     dispatch(
       LinesActions.claimAndTrade({
-        lineAddress: selectedCredit.id,
+        lineAddress: selectedPosition.line,
         claimToken: selectedSellTokenAddress,
-        calldata: '',
+        calldata: tradeData.data,
         network: walletNetwork,
       })
     ).then((res) => {
@@ -302,14 +342,14 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const useAndRepay = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    if (!selectedCredit?.id || !targetAmount || !selectedSellTokenAddress || !walletNetwork) {
+    if (!selectedPosition?.line || !targetAmount || !selectedSellTokenAddress || !walletNetwork) {
       setLoading(false);
       return;
     }
 
     // dispatch(
     //   LinesActions.useAndRepay({
-    //     lineAddress: selectedCredit.id,
+    //     lineAddress: selectedPosition.line,
     //     amount: BigNumber.from(targetAmount),
     //     network: walletNetwork,
     //   })
@@ -329,14 +369,14 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const closePosition = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
-    if (!selectedCredit || !selectedPosition || !targetAmount || !selectedSellTokenAddress || !walletNetwork) {
+    if (!selectedPosition || !selectedPosition || !targetAmount || !selectedSellTokenAddress || !walletNetwork) {
       setLoading(false);
       return;
     }
 
     dispatch(
       LinesActions.close({
-        lineAddress: selectedCredit.id,
+        lineAddress: selectedPosition.line,
         id: selectedPosition.id,
         network: walletNetwork,
       })
@@ -360,50 +400,50 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       case 'close':
         return [
           {
-            label: t('components.repay.close.cta'),
+            label: t('components.transaction.repay.close.cta'),
             onAction: closePosition,
             status: true,
-            disabled: transactionApproved,
+            disabled: !transactionApproved,
             contrast: false,
           },
         ];
       case 'deposit-and-close':
         return [
           {
-            label: t('components.repay.close.cta'),
+            label: t('components.transaction.repay.close.cta'),
             onAction: depositAndClose,
             status: true,
-            disabled: transactionApproved,
+            disabled: !transactionApproved,
             contrast: false,
           },
         ];
       case 'unused':
         return [
           {
-            label: t('components.repay.cta'),
+            label: t('components.transaction.use-and-repay.cta'),
             onAction: useAndRepay,
             status: true,
-            disabled: transactionApproved,
+            disabled: !transactionApproved,
             contrast: false,
           },
         ];
       case 'claim-and-repay':
         return [
           {
-            label: t('components.repay.claim-and-repay.cta'),
+            label: t('components.transaction.repay.claim-and-repay.cta'),
             onAction: claimAndRepay,
             status: true,
-            disabled: transactionApproved,
+            disabled: !haveFetched0x,
             contrast: false,
           },
         ];
       case 'claim-and-trade':
         return [
           {
-            label: t('components.repay.claim-and-trade.cta'),
+            label: t('components.transaction.repay.claim-and-trade.cta'),
             onAction: claimAndTrade,
             status: true,
-            disabled: transactionApproved,
+            disabled: !transactionApproved,
             contrast: false,
           },
         ];
@@ -418,7 +458,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             contrast: false,
           },
           {
-            label: t('components.repay.deposit-and-repay.cta'),
+            label: t('components.transaction.repay.deposit-and-repay.cta'),
             onAction: depositAndRepay,
             status: true,
             disabled: transactionApproved,
@@ -428,8 +468,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     }
   };
 
-  //const onSelectedCreditLineChange = (addr: string): void => {
-  //  setSelectedCredit(addr);
+  //const selectedPositionLineChange = (addr: string): void => {
+  //  selectedPosition(addr);
   //  _updatePosition();
   //};
 
@@ -442,7 +482,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     dispatch(LinesActions.setSelectedLinePosition({ position: arg.id }));
   };
 
-  if (!selectedCredit || selectedPosition === undefined) return null;
+  if (!selectedPosition) return null;
   if (!selectedSellToken) return null;
 
   const onSelectedSellTokenChange = (tokenAddress: string) => {
@@ -496,46 +536,83 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     switch (repayType.id) {
       case 'claim-and-repay':
       case 'claim-and-trade':
-        // TODO  input for token being claimed
         // TODO set targetAmount to unused + getOwnerTokens
+
         const buyToken = selectedPosition.token.address;
         const sellToken = selectedSellToken.address;
-        console.log('repay from rev - buy/sell tokens', buyToken, sellToken);
+        console.log(
+          'repay from rev - buy/sell tokens',
+          getAddress(buyToken) !== getAddress(sellToken),
+          getAddress(buyToken),
+          getAddress(sellToken)
+        );
 
-        if (getAddress(buyToken) !== getAddress(sellToken)) {
+        if (getAddress(buyToken) !== getAddress(sellToken) && !haveFetched0x) {
+          setHaveFetched0x(true);
           const tradeTx = getTradeQuote({
-            buyToken,
-            sellToken,
+            // set fake data for testing 0x
+            buyToken: DAI,
+            sellToken: ETH,
+
+            // buyToken,
+            // sellToken,
             sellAmount: targetAmount,
             network: walletNetwork,
+          }).then((result) => {
+            console.log('repay modal: trade quote res', result, result?.buyAmount);
+            if (result) {
+              setTokensToBuy(result.buyAmount!);
+              setTradeData(result);
+            }
           });
+
           console.log('get 0x trade quote', tradeTx);
         }
 
+        console.log(
+          'repay modal: bought tokens qoute',
+          tokensToBuy,
+          tokensMap,
+          !!tokensToBuy,
+          tokensMap[DAI],
+          tokensMap[ETH]
+        );
         return (
-          <TxTokenInput
-            key={'token-input'}
-            headerText={t('components.transaction.repay.claim-and-repay.claim-token')}
-            inputText={tokenHeaderText}
-            amount={targetAmount}
-            onAmountChange={onAmountChange}
-            // @cleanup TODO
-            maxAmount={getMaxRepay()}
-            selectedToken={selectedSellToken}
-            onSelectedTokenChange={onSelectedSellTokenChange}
-            // @cleanup TODO
-            tokenOptions={sourceAssetOptions}
-            // inputError={!!sourceStatus.error}
-            readOnly={false}
-            // displayGuidance={displaySourceGuidance}
-          />
+          <>
+            <TxTokenInput
+              headerText={t('components.transaction.repay.claim-and-repay.claim-token')}
+              inputText={tokenHeaderText}
+              amount={normalizeAmount(targetAmount, selectedPosition.token.decimals)}
+              onAmountChange={(amnt) => setTargetAmount(toWei(amnt, selectedPosition.token.decimals))}
+              // token to claim from spigot
+              // selectedToken={selectedSellToken}
+              selectedToken={tokensMap[ETH]}
+              onSelectedTokenChange={onSelectedSellTokenChange}
+              // TODO get options from unusedToken data in subgraph
+              tokenOptions={sourceAssetOptions}
+              readOnly={true}
+            />
+            {/* trade data from 0x API response */}
+            {!!tokensToBuy ? (
+              <TxTokenInput
+                headerText={t('components.transaction.repay.claim-and-repay.credit-token')}
+                inputText={t('components.transaction.repay.claim-and-repay.buy-amount')}
+                amount={normalizeAmount(tokensToBuy, selectedPosition.token.decimals)}
+                selectedToken={tokensMap[DAI]}
+                // selectedToken={selectedPosition.token}
+                readOnly={true}
+              />
+            ) : (
+              <TradeError> {t('components.transaction.repay.claim-and-repay.insufficient-liquidity')} </TradeError>
+            )}
+          </>
         );
 
       case 'deposit-and-close':
       case 'close':
       case 'deposit-and-repay':
       default:
-        const isClosing = repayType.id === 'deposit-and-repay';
+        const isClosing = repayType.id !== 'deposit-and-repay';
         const amount = isClosing
           ? bn(selectedPosition.principal)!.add(bn(selectedPosition.interestAccrued)!)!.toString()
           : targetAmount;
@@ -544,7 +621,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
         return (
           <TxTokenInput
-            key={'token-input'}
             headerText={t('components.transaction.repay.select-amount')}
             inputText={tokenHeaderText}
             amount={normalizeAmount(amount, selectedPosition.token.decimals)}
@@ -554,7 +630,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             selectedToken={selectedSellToken}
             onSelectedTokenChange={onSelectedSellTokenChange}
             // @cleanup TODO
-            tokenOptions={sourceAssetOptions}
+            // tokenOptions={sourceAssetOptions}
+
             // inputError={!!sourceStatus.error}
             readOnly={isClosing ? true : false}
             // displayGuidance={displaySourceGuidance}
@@ -566,7 +643,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   return (
     <StyledTransaction onClose={onClose} header={header || t('components.transaction.repay.header')}>
       <TxPositionInput
-        key={'credit-input'}
         headerText={t('components.transaction.borrow-credit.select-line')}
         inputText={t('components.transaction.borrow-credit.select-line')}
         onSelectedPositionChange={onSelectedPositionChange}
@@ -578,7 +654,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         // displayGuidance={displaySourceGuidance}
       />
       <TxRateInput
-        key={'frate'}
         headerText={t('components.transaction.repay.your-rates')}
         frate={selectedPosition.fRate}
         drate={selectedPosition.dRate}
@@ -589,7 +664,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         readOnly={true}
       />
       <TxDropdown
-        key={'type-input'}
         headerText={t('components.transaction.repay.repay-type')}
         inputText={t('components.transaction.repay.select-repay-option')}
         onSelectedTypeChange={onSelectedTypeChange}

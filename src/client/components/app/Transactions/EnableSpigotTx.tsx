@@ -193,10 +193,15 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     },
   ];
 
-  const renderFuncSelectors = () =>
-    revFuncDisplayConfigs.map(({ header, byteCode, options, type, onChange, onByteChange }) =>
+  const renderFuncSelectors = () => {
+    console.log('func selector', selectedContractFunctions[revenueContractAddy]);
+    return revFuncDisplayConfigs.map(({ header, byteCode, options, type, onChange, onByteChange }) =>
       // if no ABI, input bytecode manually
-      isValidAddress(revenueContractAddy) && contractABI ? (
+
+      isValidAddress(revenueContractAddy) &&
+      contractABI &&
+      selectedContractFunctions[revenueContractAddy] !== undefined &&
+      selectedContractFunctions[revenueContractAddy]!.length !== 0 ? (
         <TxFuncSelector
           key={header + String(type)}
           headerText={header}
@@ -216,6 +221,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
         />
       )
     );
+  };
 
   console.log('render enable spigot', transactionLoading, revenueContractAddy);
   return (

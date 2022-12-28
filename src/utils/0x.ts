@@ -24,7 +24,8 @@ export const getTradeQuote = async ({
   network = 'mainnet',
   ...params
 }: GetTradeQuoteProps): Promise<ZeroExAPIQuoteResponse> => {
-  console.log('get 0x quote params', params);
+  console.log('0x: quote params', params);
+
   const genericError = {
     reason: 'Validation Failed',
     validationErrors: {
@@ -33,31 +34,28 @@ export const getTradeQuote = async ({
       reason: 'no api request made',
       description: 'default error messsage',
     },
-  } as ZeroExAPIValidationError;
+  };
+
+  // to track all usage data about debt dao in 0x db
+  const affiliateMetadata = { affiliateAddress: getReferrerForNetwork(network) };
+
   // revenue go brrrrr
   const referralFees = {
     buyTokenPercentageFee: '0.1',
     feeRecipient: getReferrerForNetwork(network),
   };
 
-  // to track all data from debt dao in 0x db
-  const affiliateMetadata = { affiliateAddress: getReferrerForNetwork(network) };
-
   try {
     const response = await get(`${getBaseURLForNetwork(network)}swap/v1/quote`, {
       params: { ...referralFees, ...affiliateMetadata, ...params },
     });
-    console.log('0x api response', response);
-    // console.log('price + trade data', );
-    // return price, + trade exchange addy+ calldata
+    console.log('0x: response', response);
     if (response?.data) {
       const { buyTokenAddress, sellTokenAddress } = response.data;
       return { ...response.data, buyToken: buyTokenAddress, sellToken: sellTokenAddress };
     } else throw genericError;
   } catch (e: any) {
-    // example failed response
-    // {"code":100,,"]}
-    console.log('failed getting 0x price  quote', e);
+    console.log('0x: quote failed', e);
     if (e?.validationErrors) {
       throw e.validationErrors[0];
     }

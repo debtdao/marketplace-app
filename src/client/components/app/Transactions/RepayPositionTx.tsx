@@ -104,10 +104,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const [haveFetched0x, setHaveFetched0x] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log('repay type', repayType);
-  }, [repayType]);
-
-  useEffect(() => {
     if (!selectedSellToken && !_.isEmpty(sourceAssetOptions)) {
       dispatch(
         TokensActions.setSelectedTokenAddress({
@@ -160,6 +156,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     });
   };
 
+  // @cleanup make HoF for repay actions - genPaymentMethod(action) => (validatorFunc) => (data) => { validateFunc(data); dispatch(action, data).then(handleGoodAction);}
   const depositAndRepay = () => {
     setLoading(true);
     // TODO set error in state to display no line selected
@@ -347,6 +344,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       return;
     }
 
+    // this throwsa "conditional hook called" even tho its an action + not being called anywher except callback
     // dispatch(
     //   LinesActions.useAndRepay({
     //     lineAddress: selectedPosition.line,
@@ -393,7 +391,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     });
   };
 
-  // @cleanup TODO move directly into renderComponent(), dont need 2 switch statements
+  // @cleanup TODO move directly into renderInputComponents() or a map, dont need 2 switch statements
   const getActionsForRepayType = (type: { id: string; label: string; value: string }) => {
     // @TODO filter based off of userMetadata.role
     switch (type.id) {
@@ -490,14 +488,12 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   };
 
   //Calculate maximum repay amount, then humanize for readability
-  const getMaxRepay = () => {
+  const getMaxRepay = (): string => {
     if (!selectedPosition) {
-      setErrors([...errors, 'no selected position']);
-      return;
+      return '0';
     }
-    let maxRepay: string = `${Number(selectedPosition.principal) + Number(selectedPosition.interestAccrued)}`;
-    maxRepay = normalize('amount', `${maxRepay}`, selectedPosition.token.decimals);
-    return maxRepay;
+    const maxRepay: string = `${Number(selectedPosition.principal) + Number(selectedPosition.interestAccrued)}`;
+    return normalizeAmount(maxRepay, selectedPosition.token.decimals);
   };
 
   const targetBalance = normalizeAmount(selectedSellToken.balance, selectedSellToken.decimals);
@@ -531,6 +527,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   }
 
   let InputComponents; // might need to do this if returning from func causes rendering issues
+  // @cleanup TODO try and move to its own component
   const renderInputComponents = () => {
     console.log('render repay inputs for type: ', repayType);
     switch (repayType.id) {
@@ -551,11 +548,11 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
           setHaveFetched0x(true);
           const tradeTx = getTradeQuote({
             // set fake data for testing 0x
-            buyToken: DAI,
-            sellToken: ETH,
+            // buyToken: DAI,
+            // sellToken: ETH,
 
-            // buyToken,
-            // sellToken,
+            buyToken,
+            sellToken,
             sellAmount: targetAmount,
             network: walletNetwork,
           }).then((result) => {
@@ -569,14 +566,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
           console.log('get 0x trade quote', tradeTx);
         }
 
-        console.log(
-          'repay modal: bought tokens qoute',
-          tokensToBuy,
-          tokensMap,
-          !!tokensToBuy,
-          tokensMap[DAI],
-          tokensMap[ETH]
-        );
         return (
           <>
             <TxTokenInput
@@ -585,21 +574,22 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
               amount={normalizeAmount(targetAmount, selectedPosition.token.decimals)}
               onAmountChange={(amnt) => setTargetAmount(toWei(amnt, selectedPosition.token.decimals))}
               // token to claim from spigot
-              // selectedToken={selectedSellToken}
-              selectedToken={tokensMap[ETH]}
+              selectedToken={selectedSellToken}
+              // 0x testing data
+              // selectedToken={tokensMap[ETH]}
               onSelectedTokenChange={onSelectedSellTokenChange}
-              // TODO get options from unusedToken data in subgraph
-              tokenOptions={sourceAssetOptions}
+              tokenOptions={sourceAssetOptions} // TODO get options from unusedToken data in subgraph
               readOnly={true}
             />
-            {/* trade data from 0x API response */}
+            {/* redner bought tokens based on trade data from 0x API response */}
             {!!tokensToBuy ? (
               <TxTokenInput
                 headerText={t('components.transaction.repay.claim-and-repay.credit-token')}
                 inputText={t('components.transaction.repay.claim-and-repay.buy-amount')}
                 amount={normalizeAmount(tokensToBuy, selectedPosition.token.decimals)}
-                selectedToken={tokensMap[DAI]}
-                // selectedToken={selectedPosition.token}
+                selectedToken={selectedPosition.token}
+                // 0x testing data
+                // selectedToken={tokensMap[DAI]}
                 readOnly={true}
               />
             ) : (
@@ -629,12 +619,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             maxAmount={getMaxRepay()}
             selectedToken={selectedSellToken}
             onSelectedTokenChange={onSelectedSellTokenChange}
-            // @cleanup TODO
-            // tokenOptions={sourceAssetOptions}
-
-            // inputError={!!sourceStatus.error}
             readOnly={isClosing ? true : false}
-            // displayGuidance={displaySourceGuidance}
           />
         );
     }

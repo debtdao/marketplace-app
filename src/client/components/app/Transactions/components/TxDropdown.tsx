@@ -154,24 +154,11 @@ export const TxDropdown: FC<TxDropdownProps> = ({
   const { t } = useAppTranslation('common');
   const [isOpen, setOpenedSearch] = useState(false);
 
-  console.log('repay type options dropdown', typeOptions);
   if (!typeOptions) return null;
-  // if (typeOptions && typeOptions.length > 1) {
-  //   typeOptions = typeOptions
-  //     .filter((s) => !!s)
-  //     .map((item) => {
-  //       return {
-  //         id: item!.id,
-  //         label: item!.label,
-  //         value: item!.value,
-  //       };
-  //     });
-  // }
 
   const openSearchList = () => {
     setOpenedSearch(true);
   };
-  console.log('dropdwon selected', isOpen, selectedType);
 
   return (
     <StyledTxCreditLineInput {...props}>

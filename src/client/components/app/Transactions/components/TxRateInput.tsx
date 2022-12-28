@@ -166,15 +166,13 @@ export const TxRateInput: FC<TxRateInputProps> = ({
           <PositionData>
             <AmountInputContainer>
               <RatesContainer>
-                <AmountTitle ellipsis>
-                  {'Drawn Down Rate' || t('components.transaction.deposit.rates-title')}
-                </AmountTitle>
+                <AmountTitle ellipsis>{'Facility Rate' || t('components.transaction.deposit.rates-title')}</AmountTitle>
                 <InterestRateInputContainer>
                   <StyledAmountInput
                     //format from bps to % to display and back to bps to set value
-                    value={normalizeAmount(drate, 2)}
-                    onChange={(e) => (setRateChange ? setRateChange('d', toWei(e.target.value, 2)) : '')}
-                    placeholder={'15.00'}
+                    value={normalizeAmount(frate, 2)}
+                    onChange={(e) => (setRateChange ? setRateChange('f', toWei(e.target.value, 2)) : '')}
+                    placeholder={'5.00'}
                     readOnly={readOnly}
                     error={inputError}
                     type="number"
@@ -184,12 +182,14 @@ export const TxRateInput: FC<TxRateInputProps> = ({
                 </InterestRateInputContainer>
               </RatesContainer>
               <RatesContainer>
-                <AmountTitle ellipsis>{'Facility Rate' || t('components.transaction.deposit.rates-title')}</AmountTitle>
+                <AmountTitle ellipsis>
+                  {'Drawn Down Rate' || t('components.transaction.deposit.rates-title')}
+                </AmountTitle>
                 <InterestRateInputContainer>
                   <StyledAmountInput
                     //format from bps to % to display and back to bps to set value
-                    value={normalizeAmount(frate, 2)}
-                    onChange={(e) => (setRateChange ? setRateChange('f', toWei(e.target.value, 2)) : '')}
+                    value={normalizeAmount(drate, 2)}
+                    onChange={(e) => (setRateChange ? setRateChange('d', toWei(e.target.value, 2)) : '')}
                     placeholder={'25.00'}
                     readOnly={readOnly}
                     error={inputError}

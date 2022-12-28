@@ -163,7 +163,11 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     );
   }
 
-  const isVerifiedContract = isValidAddress(revenueContractAddy) && contractABI;
+  const isVerifiedContract =
+    isValidAddress(revenueContractAddy) &&
+    contractABI &&
+    selectedContractFunctions[revenueContractAddy] !== undefined &&
+    selectedContractFunctions[revenueContractAddy]!.length !== 0;
   const funcOptions = !selectedContractFunctions[revenueContractAddy]
     ? []
     : selectedContractFunctions[revenueContractAddy].map((func, i) => ({ id: i.toString(), label: func, value: '' }));

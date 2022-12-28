@@ -45,11 +45,11 @@ export const LineDetail = () => {
   const { NETWORK_SETTINGS } = getConfig();
   const { lineAddress } = useParams<LineDetailRouteParams>();
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
+  const tokensStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   // const selectedLineCreditEvents = useAppSelector(LinesSelectors.selectSelectedLineCreditEvents);
   const getLinePageStatus = useAppSelector(LinesSelectors.selectGetLinePageStatus);
   // const linesPageData = useAppSelector(LinesSelectors.selectLinePageData);
-  const tokensStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   //const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   //const walletName = useAppSelector(WalletSelectors.selectWallet);
@@ -98,7 +98,8 @@ export const LineDetail = () => {
   //const displayAddToken = walletIsConnected && walletName.name === 'MetaMask';
   return (
     <LineDetailView>
-      {generalLoading && <SpinnerLoading flex="1" width="100%" height="100%" />}
+      {selectedLine && <LineDetailsDisplay />}
+      {generalLoading && <SpinnerLoading flex="1" width="100%" height="20%" />}
 
       {!generalLoading && !selectedLine && (
         <StyledSliderCard
@@ -110,7 +111,6 @@ export const LineDetail = () => {
           }
         />
       )}
-      {selectedLine && <LineDetailsDisplay />}
     </LineDetailView>
   );
 };

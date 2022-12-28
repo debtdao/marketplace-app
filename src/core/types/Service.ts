@@ -355,6 +355,14 @@ export interface AddCollateralProps {
   dryRun?: boolean;
 }
 
+export interface ClaimRevenueProps {
+  spigotAddress: Address;
+  revenueContract: Address;
+  claimData: BytesLike;
+  network: Network;
+  dryRun?: boolean;
+}
+
 export interface LiquidateEscrowAssetProps {
   // userPositionMetadata: UserPositionMetadata;
   lineAddress: Address;
@@ -428,6 +436,7 @@ export interface CollateralService {
   addCollateral(props: AddCollateralProps): Promise<TransactionResponse | PopulatedTransaction>;
   releaseCollateral(props: ReleaseCollateraltProps): Promise<TransactionResponse | PopulatedTransaction>;
   // spigot
+  claimRevenue(props: ClaimRevenueProps): Promise<TransactionResponse | PopulatedTransaction>;
   updateOwnerSplit(props: UpdateSpigotOwnerSplitProps): Promise<TransactionResponse | PopulatedTransaction>;
   addSpigot(props: AddSpigotProps): Promise<TransactionResponse | PopulatedTransaction>;
 

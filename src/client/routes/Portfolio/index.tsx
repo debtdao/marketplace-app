@@ -19,11 +19,12 @@ const StyledViewContainer = styled(ViewContainer)`
 
 const PortfolioHeader = styled.div`
   grid-column: 1 / 3;
+  grid-column-gap: ${({ theme }) => theme.spacing.xl};
   display: flex;
   justify-content: space-between;
 
   @media ${device.desktop} {
-    justify-content: space-around;
+    justify-content: flex-start;
   }
 `;
 

@@ -4,6 +4,7 @@ import { Layout } from '@containers';
 
 import { Portfolio } from './Portfolio';
 import { LineDetail } from './LineDetail';
+import { Spigot } from './Spigot';
 import { Market } from './Market';
 import { Settings } from './Settings';
 import { Disclaimer } from './Disclaimer';
@@ -21,6 +22,10 @@ const routesMap = [
   {
     path: '/lines/:lineAddress',
     component: LineDetail,
+  },
+  {
+    path: '/spigots/:spigotAddress',
+    component: Spigot,
   },
   {
     path: '/settings',

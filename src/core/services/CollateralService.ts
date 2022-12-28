@@ -30,6 +30,7 @@ import {
   LIQUIDATABLE_STATUS,
   UseAndRepayProps,
   UpdateSpigotOwnerSplitProps,
+  ClaimRevenueProps,
 } from '@types';
 import { getConfig } from '@config';
 import { getContract } from '@frameworks/ethers';
@@ -196,6 +197,17 @@ export class CollateralServiceImpl implements CollateralService {
     );
   }
 
+  public async claimRevenue(props: ClaimRevenueProps): Promise<TransactionResponse | PopulatedTransaction> {
+    // TODO get current status and split from subgraph and simulate calling updateSplit if it will change anything *return false)
+    return await this.executeContractMethod(
+      props.spigotAddress,
+      this.spigotAbi,
+      'claimRevenue',
+      [props.revenueContract, props.claimData],
+      props.network
+    );
+  }
+
   // Liquidate functions
 
   public async releaseSpigot(props: ReleaseSpigotProps): Promise<TransactionResponse | PopulatedTransaction> {
@@ -310,9 +322,9 @@ export class CollateralServiceImpl implements CollateralService {
         abi,
         args: params,
         methodName: methodName,
-        overrides: {
-          gasLimit: 600000,
-        },
+        // overrides: {
+        // gasLimit: 600000,
+        // },
       };
 
       const tx = await this.transactionService.execute(props);

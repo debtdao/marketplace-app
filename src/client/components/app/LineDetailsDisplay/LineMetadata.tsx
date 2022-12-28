@@ -16,16 +16,26 @@ import {
   TokenView,
 } from '@src/core/types';
 import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
-import { Button, Text, RedirectIcon } from '@components/common';
+import { Button, Text, RedirectIcon, Link } from '@components/common';
 import { LinesSelectors, ModalsActions, WalletSelectors, WalletActions, CollateralActions } from '@src/core/store';
 import { humanize } from '@src/utils';
 import { getEnv } from '@config/env';
 
 const SectionHeader = styled.h3`
   ${({ theme }) => `
+    display: flex;
     font-size: ${theme.fonts.sizes.xl};
     font-weight: 600;
     margin: ${theme.spacing.xl} 0;
+    color: ${theme.colors.primary};
+  `}
+`;
+
+const CollateralTypeName = styled(Link)`
+  ${({ theme }) => `
+    font-size: ${theme.fonts.sizes.xl};
+    font-weight: 600;
+    margin: 0 ${theme.fonts.sizes.sm};
     color: ${theme.colors.primary};
   `}
 `;
@@ -133,12 +143,12 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
+  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const dispatch = useAppDispatch();
   const { NETWORK } = getEnv();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
   const { principal, deposit, totalInterestPaid, revenue, deposits } = props;
-  const modules = [revenue && 'revenue', deposits && 'escrow'].filter((x) => !!x);
   const totalRevenue = isEmpty(revenue)
     ? ''
     : Object.values(revenue!)
@@ -263,7 +273,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
         return null;
     }
   };
-
   return (
     <>
       <ThreeColumnLayout>
@@ -276,7 +285,14 @@ export const LineMetadata = (props: LineMetadataProps) => {
       </ThreeColumnLayout>
       <SectionHeader>
         {t('lineDetails:metadata.secured-by')}
-        {modules.map((m) => t(`lineDetails:metadata.${m}.title`)).join(' + ')}
+        <CollateralTypeName to={'/spigots/' + selectedLine?.spigotId}>
+          {' '}
+          {t(`lineDetails:metadata.revenue.title`)}{' '}
+        </CollateralTypeName>
+        {' + '}
+        {/* uncomment when escrow page made:
+          <CollateralTypeName to={'/spigot/' + selectedLine?.escrowId}> */}{' '}
+        {t(`lineDetails:metadata.escrow.title`)} {/* </CollateralTypeName> */}
       </SectionHeader>
 
       {!revenue && !deposits && <MetricName>{t('lineDetails:metadata.unsecured')}</MetricName>}

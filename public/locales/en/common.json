@@ -324,6 +324,7 @@
   "pages": {
     "market": "Debt DAO Credit Market",
     "lines": "Line Of Credit",
+    "spigots": "Debt DAO Spigot",
     "portfolio": "Credit Investment Portfolio",
     "disclaimer": "Disclaimer",
     "settings": "Settings",

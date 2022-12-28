@@ -194,7 +194,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   ];
 
   const renderFuncSelectors = () => {
-    console.log('func selector', selectedContractFunctions[revenueContractAddy]);
+    // console.log('func selector', selectedContractFunctions[revenueContractAddy]);
     return revFuncDisplayConfigs.map(({ header, byteCode, options, type, onChange, onByteChange }) =>
       // if no ABI, input bytecode manually
 

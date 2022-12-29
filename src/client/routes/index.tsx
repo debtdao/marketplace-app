@@ -10,9 +10,9 @@ import { Settings } from './Settings';
 import { Disclaimer } from './Disclaimer';
 import { Health } from './Health';
 
-const routesMap = [
+const routes = [
   {
-    path: '/portfolio/:userAddress?',
+    path: `/portfolio/:network/:userAddress?`,
     component: Portfolio,
   },
   {
@@ -20,7 +20,7 @@ const routesMap = [
     component: Market,
   },
   {
-    path: '/lines/:lineAddress',
+    path: `/lines/:network/:lineAddress`,
     component: LineDetail,
   },
   {
@@ -46,9 +46,9 @@ export const Routes = () => {
         <Route>
           <Layout>
             <Switch>
-              {routesMap.map((route, index) => (
-                <Route key={index} exact path={route.path} component={route.component} />
-              ))}
+              {routes.map((route, index) => {
+                return <Route key={index} exact path={route.path} component={route.component} />;
+              })}
               <Route path="*">
                 <Redirect to="/market" />
               </Route>

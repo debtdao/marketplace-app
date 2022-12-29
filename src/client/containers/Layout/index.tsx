@@ -21,9 +21,9 @@ import { useAppTranslation, useAppDispatch, useAppSelector, useWindowDimensions,
 import { Navigation, Navbar, Footer } from '@components/app';
 import { Modals, Alerts } from '@containers';
 import { getConfig } from '@config';
-import { Network, Route } from '@types';
+import { Network, Route, UseCreditLinesParams } from '@types';
 import { device } from '@themes/default';
-import { isInIframe, isCoinbaseApp } from '@utils';
+import { isInIframe, isCoinbaseApp, getNetworkId } from '@utils';
 
 const contentSeparation = '1.6rem';
 
@@ -102,6 +102,8 @@ export const Layout: FC = ({ children }) => {
   const selectedLineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
   const previousAddress = usePrevious(selectedAddress);
   const previousNetwork = usePrevious(currentNetwork);
+  const userWalletAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
+
   // const path = useAppSelector(({ route }) => route.path);
   const path = location.pathname.toLowerCase().split('/')[1] as Route;
   const isLedgerLive = partner.id === 'ledger';
@@ -118,6 +120,7 @@ export const Layout: FC = ({ children }) => {
   // Used to check zapper api
   // const { ZAPPER_AUTH_TOKEN } = getConfig();
 
+  // TODO: Reset this before merging into develop.
   useEffect(() => {
     dispatch(AppActions.initApp());
 
@@ -148,20 +151,23 @@ export const Layout: FC = ({ children }) => {
 
   useEffect(() => {
     if (activeModal) dispatch(ModalsActions.closeModal());
+
+    // Clear Redux state when switching networks
+    // TODO: Switch networks without requiring a page refresh.
     if (previousNetwork) {
-      // clear lines data from state
-      dispatch(LinesActions.clearLinesData());
-      dispatch(LinesActions.clearLineStatus({ lineAddress: selectedLineAddress! }));
-      dispatch(LinesActions.clearSelectedLineAndStatus());
-      dispatch(LinesActions.clearUserData());
-      // clear app data
-      dispatch(AppActions.clearAppData());
+      window.location.reload();
+      // dispatch(AppActions.clearAppData());
+      // dispatch(LinesActions.clearLinesData());
+      // dispatch(LinesActions.clearLineStatus({ lineAddress: selectedLineAddress! }));
+      // dispatch(LinesActions.clearSelectedLineAndStatus());
+      // dispatch(LinesActions.clearUserData());
     }
     if (selectedAddress) dispatch(AppActions.clearUserAppData());
 
-    // dispatch last line action with current network
-    dispatch(LinesActions.getLines());
-    dispatch(LinesActions.getLinePage());
+    // Fetch lines data when switching networks
+    // dispatch(LinesActions.getLines(defaultLineCategories));
+    // dispatch(LinesActions.getLinePage({ id: selectedLineAddress! }));
+    // dispatch(LinesActions.getUserPortfolio({ user: userWalletAddress! }));
 
     dispatch(TokensActions.getTokens());
     dispatch(TokensActions.getSupportedOracleTokens());

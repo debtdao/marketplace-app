@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 
 import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
 import { RedirectIcon, Text, Link } from '@components/common';
-import { OnchainMetaDataActions, OnchainMetaDataSelector, LinesSelectors } from '@store';
+import { OnchainMetaDataActions, OnchainMetaDataSelector, LinesSelectors, NetworkSelectors } from '@store';
 import { getENS } from '@src/utils';
 
 import { LineMetadata } from './LineMetadata';
@@ -66,7 +66,7 @@ const BorrowerName = styled(Text)`
 export const LineDetailsDisplay = (props: LineDetailsProps) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
-
+  const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
@@ -92,7 +92,7 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   const StandardMetadata = (metadataProps: any) => (
     <>
       <Header>
-        <RouterLink to={`/portfolio/${borrower}`} key={borrower} selected={false}>
+        <RouterLink to={`/portfolio/${currentNetwork}/${borrower}`} key={borrower} selected={false}>
           <BorrowerName>
             {t('lineDetails:metadata.borrower')} {'  :  '} {borrowerID}
             <Redirect />

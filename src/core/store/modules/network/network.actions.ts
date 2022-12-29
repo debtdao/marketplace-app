@@ -3,17 +3,21 @@ import { createAsyncThunk, PayloadAction, createAction } from '@reduxjs/toolkit'
 import { ThunkAPI } from '@frameworks/redux';
 import { notify } from '@frameworks/blocknative';
 import { getProviderType, getNetworkId } from '@utils';
-import { Network } from '@types';
+import { Network, UseCreditLinesParams } from '@types';
+import { AppActions, LinesActions, LinesSelectors, WalletSelectors } from '@store';
+import { useAppSelector } from '@src/client/hooks';
+import { getConfig } from '@src/config';
 
 import { WalletActions, ChangeWalletNetworkResult } from '../wallet/wallet.actions';
 
+const { NETWORK_SETTINGS } = getConfig();
+
 const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network }, ThunkAPI>(
   'network/changeNetwork',
-  async ({ network }, { dispatch, extra }) => {
+  async ({ network }, { dispatch, getState, extra }) => {
     const { context, config } = extra;
     const { wallet, web3Provider, yearnSdk } = context;
-
-    // if (!config.SUPPORTED_NETWORKS.includes(network)) throw Error('Network Not Supported');
+    const { network: networkState } = getState();
 
     if (wallet.isCreated) {
       const action = (await dispatch(
@@ -23,34 +27,58 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
     }
 
     // Handle unsupported networks
-    if (!config.SUPPORTED_NETWORKS.includes(network)) {
+    if (!config.SUPPORTED_NETWORKS.concat('goerli').includes(network)) {
       return { network };
     }
 
-    // Set Yearn context if network is supported
-    else if (web3Provider.hasInstanceOf('wallet') && config.SUPPORTED_NETWORKS.includes(network)) {
+    const chainSettings = {
+      chainId: `0x${getNetworkId(network).toString(16)}`,
+      rpcUrls: [NETWORK_SETTINGS[network].rpcUrl],
+      nativeCurrency: {
+        name: 'Ethereum',
+        symbol: 'ETH',
+        decimals: 18,
+      },
+      blockExplorerUrls: [NETWORK_SETTINGS[network].blockExplorerUrl],
+    };
+
+    // Change wallet network to match selected network in dropdown
+    try {
+      if (!window.ethereum) throw new Error('web3 provider No crypto wallet found!');
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: chainSettings.chainId }],
+      });
+    } catch (switchError: any) {
+      // This error code indicates that the chain has not been added to wallet
+      console.log('web3 provider switch error: ', switchError);
+      if (switchError.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{ ...chainSettings }],
+          });
+        } catch (addError: any) {
+          console.log('web3 provider add error: ', addError);
+        }
+      }
+      // revert to previous network if user rejects request to change wallet network
+      else if (switchError.code === 4001) {
+        return { network: networkState.current };
+      }
+      // handle other "switch" errors
+    }
+
+    // Set Yearn context
+    if (web3Provider.hasInstanceOf('wallet') && config.SUPPORTED_NETWORKS.includes(network)) {
       const providerType = getProviderType(network);
       const provider = web3Provider.getInstanceOf(providerType);
-      console.log('change network provider: ', provider);
       const yearn = yearnSdk.getInstanceOf(network);
-      // yearn.context.setProvider(provider);
       yearn.context.setProvider({
         read: provider,
         write: web3Provider.getInstanceOf('wallet'),
       });
-      // const signer = web3Provider.getSigner();
-      // const tx = await signer.connect(provider);
     }
-    // TODO: Change wallet network when network selected in dropdown
-    // else {
-    //   const providerType = getProviderType(network);
-    //   const provider = web3Provider.getInstanceOf(providerType);
-    //   // create signer
-    //   const signer = web3Provider.getSigner();
-    //   // signer connects connect to new provider
-    //   signer.connect(provider);
-    //   // signer.connect(provider);
-    // }
 
     notify.config({ networkId: getNetworkId(network) });
 

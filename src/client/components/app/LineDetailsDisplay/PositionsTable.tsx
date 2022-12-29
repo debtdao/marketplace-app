@@ -10,6 +10,7 @@ import {
   WalletSelectors,
   WalletActions,
   OnchainMetaDataSelector,
+  NetworkSelectors,
 } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { device } from '@themes/default';
@@ -100,7 +101,7 @@ export const PositionsTable = (props: PositionsProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const dispatch = useAppDispatch();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
-
+  const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const userRoleMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
@@ -293,7 +294,7 @@ export const PositionsTable = (props: PositionsProps) => {
             principal: humanize('amount', position.principal, position.token.decimals, 2),
             interest: humanize('amount', position.interestAccrued, position.token.decimals, 2),
             lender: (
-              <RouterLink to={`/portfolio/${position.lender}`} key={position.id} selected={false}>
+              <RouterLink to={`/portfolio/${currentNetwork}/${position.lender}`} key={position.id} selected={false}>
                 {formatAddress(getENS(position.lender, ensMap)!)}
                 <RedirectLinkIcon />
               </RouterLink>

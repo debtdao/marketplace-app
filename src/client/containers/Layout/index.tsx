@@ -159,7 +159,8 @@ export const Layout: FC = ({ children }) => {
     //       })
     //     );
     //   });
-  }, [currentNetwork]);
+  }, []);
+  // }, [currentNetwork]);
 
   useEffect(() => {
     dispatch(RouteActions.changeRoute({ path: location.pathname }));

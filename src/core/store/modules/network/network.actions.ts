@@ -30,7 +30,7 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
     }
 
     // Handle unsupported networks
-    if (!config.SUPPORTED_NETWORKS.includes(network)) {
+    if (!config.SUPPORTED_NETWORKS.concat('goerli').includes(network)) {
       return { network };
     }
 

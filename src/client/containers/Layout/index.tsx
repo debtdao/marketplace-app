@@ -176,8 +176,8 @@ export const Layout: FC = ({ children }) => {
 
     // Clear Redux state when switching networks
     if (previousNetwork) {
-      console.log('new network  - previous: ', previousNetwork);
-      console.log('new network - current: ', currentNetwork);
+      console.log('network states  - previous: ', previousNetwork);
+      console.log('network states  - current: ', currentNetwork);
       window.location.reload();
       // dispatch(AppActions.clearAppData());
       // dispatch(LinesActions.clearLinesData());
@@ -188,8 +188,9 @@ export const Layout: FC = ({ children }) => {
     if (selectedAddress) dispatch(AppActions.clearUserAppData());
 
     // Fetch lines data when switching networks
-    // console.log('network states currentNetwork: ', currentNetwork);
+    console.log('network states currentNetwork: ', currentNetwork);
     // dispatch(LinesActions.getLines(defaultLineCategories));
+
     // dispatch(LinesActions.getLinePage({ id: selectedLineAddress! }));
     // dispatch(LinesActions.getUserPortfolio({ user: userWalletAddress! }));
 

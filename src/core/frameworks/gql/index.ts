@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, DocumentNode, QueryResult } from '@apollo/client';
+import { ApolloClient, InMemoryCache, DocumentNode, QueryResult, HttpLink } from '@apollo/client';
 import { at } from 'lodash';
 
 import { getEnv } from '@config/env';
@@ -34,20 +34,20 @@ const { BLACKLISTED_LINES: blacklist } = getConstants();
 
 // utility function get GRAPH_API_URL based on network parameter
 const getGraphURL = (network: string) => {
-  let url = '';
+  let link: any;
   if (network === 'mainnet') {
-    url = GRAPH_API_URL!;
+    link = new HttpLink({ uri: GRAPH_API_URL! });
   } else if (network === 'goerli') {
-    url = GRAPH_TEST_API_URL!;
+    link = new HttpLink({ uri: GRAPH_TEST_API_URL! });
   }
-  return url;
+  return link;
 };
 
 let client: any;
 export const getClient = (network: string) => (client ? client : createClient(network));
 const createClient = (network: string): typeof ApolloClient => {
   client = new ApolloClient({
-    uri: getGraphURL(network),
+    link: getGraphURL(network),
     cache: new InMemoryCache(),
   });
   return client;

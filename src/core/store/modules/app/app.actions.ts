@@ -44,7 +44,7 @@ const clearUserAppData = createAsyncThunk<void, void, ThunkAPI>('app/clearUserAp
 
 const initApp = createAsyncThunk<void, void, ThunkAPI>('app/initApp', async (_arg, { dispatch, getState, extra }) => {
   const { CONTRACT_ADDRESSES, NETWORK } = extra.config;
-  const { wallet, settings } = getState();
+  const { wallet, settings, network } = getState();
   if (isLedgerLive()) {
     if (NETWORK !== 'mainnet') await dispatch(NetworkActions.changeNetwork({ network: 'mainnet' }));
     if (settings.signedApprovalsEnabled) await dispatch(SettingsActions.toggleSignedApprovals());
@@ -60,6 +60,7 @@ const initApp = createAsyncThunk<void, void, ThunkAPI>('app/initApp', async (_ar
     await dispatch(WalletActions.walletSelect({ walletName, network: 'mainnet' }));
   } else if (wallet.name && wallet.name !== 'Iframe') {
     await dispatch(WalletActions.walletSelect({ walletName: wallet.name, network: NETWORK }));
+    // await dispatch(WalletActions.walletSelect({ walletName: wallet.name, network: network.current }));
   }
   dispatch(checkExternalServicesStatus());
   // TODO use when sdk ready
@@ -82,10 +83,12 @@ const checkExternalServicesStatus = createAsyncThunk<void, void, ThunkAPI>(
         'service is currently experiencing technical issues and have been temporarily disabled. We apologize for any inconvenience this may cause, we are actively working on resolving these issues';
       const downgradedServicesMessages = [];
       const { zapper, simulations } = data;
-      if (!zapper) {
-        dispatch(disableService({ service: 'zapper' }));
-        downgradedServicesMessages.push(`Zapper ${errorMessageTemplate}`);
-      }
+
+      // TODO: Reenable Zapper alerts if that is a desired feature.
+      // if (!zapper) {
+      //   dispatch(disableService({ service: 'zapper' }));
+      //   downgradedServicesMessages.push(`Zapper ${errorMessageTemplate}`);
+      // }
 
       if (!simulations) {
         dispatch(disableService({ service: 'tenderly' }));

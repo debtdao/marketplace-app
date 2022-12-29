@@ -74,7 +74,7 @@ const StyledNavbar = styled.header<{ warning?: boolean }>`
   margin-top: 1%;
   margin-bottom: 1%;
   background-color: ${({ theme }) => theme.colors.surface};
-  // z-index: ${({ theme }) => theme.zindex.navbar};
+  z-index: ${({ theme }) => theme.zindex.navbar};
   ${({ warning, theme }) =>
     !warning &&
     `

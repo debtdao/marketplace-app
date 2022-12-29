@@ -376,10 +376,12 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
         inputText={tokenHeaderText}
         amount={targetAmount}
         onAmountChange={onAmountChange}
+        // @cleanup TODO
         amountValue={String(10000000 * Number(targetAmount))}
         maxAmount={getMaxRepay()}
         selectedToken={selectedSellToken}
         onSelectedTokenChange={onSelectedSellTokenChange}
+        // @cleanup TODO
         tokenOptions={walletNetwork === 'goerli' ? testTokens : sourceAssetOptions}
         // inputError={!!sourceStatus.error}
         readOnly={acceptingOffer}

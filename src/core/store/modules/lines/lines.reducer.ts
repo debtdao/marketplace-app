@@ -61,7 +61,6 @@ export const linesInitialState: CreditLineState = {
     getUserPortfolio: initialStatus,
     deploySecuredLine: initialStatus,
     user: initialUserMetadataStatusMap,
-    // lastAction: () => void,
   },
 };
 

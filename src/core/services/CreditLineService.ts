@@ -383,7 +383,6 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   public async getLines(prop: GetLinesProps): Promise<GetLinesResponse[] | undefined> {
     // todo get all token prices from yearn add update store with values
-    console.log('network states - props: ', prop.network);
     const response = getLines(prop)
       .then((data) => data)
       .catch((err) => {

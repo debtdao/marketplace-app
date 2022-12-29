@@ -68,7 +68,6 @@ export const Navigation = ({ hideOptionalLinks }: NavigationProps) => {
     }
     return !(link.optional && hideOptionalLinks);
   });
-  console.log('nav links - display links: ', displayLinks);
 
   // NOTE Auto collapse sidenav on mobile
 

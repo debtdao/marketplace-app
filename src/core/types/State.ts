@@ -126,7 +126,6 @@ export interface CreditLineState {
     getUserPortfolio: Status;
     deploySecuredLine: Status;
     user: UserLineMetadataStatusMap;
-    // lastAction: () => void;
   };
 }
 

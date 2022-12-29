@@ -160,7 +160,6 @@ export const NavSidebar = ({ navLinks, ...props }: NavSidebarProps) => {
   const linkList = (
     <LinkList className="link-list">
       {navLinks.map((link, index) => {
-        console.log('nav link: ', link);
         return (
           <RouterLink to={link.to} key={index} selected={currentPath === link.to} external={link.external}>
             <LinkIcon Component={link.icon} />

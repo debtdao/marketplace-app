@@ -106,33 +106,10 @@ export const Layout: FC = ({ children }) => {
 
   // const path = useAppSelector(({ route }) => route.path);
   const path = location.pathname.toLowerCase().split('/')[1] as Route;
-  console.log('route path - layout: ', path);
   const isLedgerLive = partner.id === 'ledger';
   const isIframe = isInIframe();
   const hideControls = isIframe || isLedgerLive;
   const hideOptionalLinks = isLedgerLive;
-
-  // TODO: Remove before merging back into develop.
-  const defaultLineCategories: UseCreditLinesParams = {
-    // using i18m translation as keys for easy display
-    'market:featured.highest-credit': {
-      first: 3,
-      // NOTE: terrible proxy for total credit (oldest = most). Currently getLines only allows filtering by line metadata not modules'
-      orderBy: 'start',
-      orderDirection: 'asc',
-    },
-    'market:featured.highest-revenue': {
-      first: 16,
-      // NOTE: terrible proxy for total revenue earned (highest % = highest notional). Currently getLines only allows filtering by line metadata not modules'
-      orderBy: 'defaultSplit',
-      orderDirection: 'desc',
-    },
-    'market:featured.newest': {
-      first: 15,
-      orderBy: 'start', // NOTE: theoretically gets lines that start in the future, will have to refine query
-      orderDirection: 'desc',
-    },
-  };
 
   let titleLink;
   // TODO Add lab details route when its added the view
@@ -161,10 +138,8 @@ export const Layout: FC = ({ children }) => {
     //     );
     //   });
   }, []);
-  // }, [currentNetwork]);
 
   useEffect(() => {
-    console.log('route path - location: ', location);
     dispatch(RouteActions.changeRoute({ path: location.pathname }));
   }, [location]);
 
@@ -178,9 +153,8 @@ export const Layout: FC = ({ children }) => {
     if (activeModal) dispatch(ModalsActions.closeModal());
 
     // Clear Redux state when switching networks
+    // TODO: Switch networks without requiring a page refresh.
     if (previousNetwork) {
-      console.log('network states  - previous: ', previousNetwork);
-      console.log('network states  - current: ', currentNetwork);
       window.location.reload();
       // dispatch(AppActions.clearAppData());
       // dispatch(LinesActions.clearLinesData());
@@ -191,9 +165,7 @@ export const Layout: FC = ({ children }) => {
     if (selectedAddress) dispatch(AppActions.clearUserAppData());
 
     // Fetch lines data when switching networks
-    console.log('network states currentNetwork: ', currentNetwork);
     // dispatch(LinesActions.getLines(defaultLineCategories));
-
     // dispatch(LinesActions.getLinePage({ id: selectedLineAddress! }));
     // dispatch(LinesActions.getUserPortfolio({ user: userWalletAddress! }));
 

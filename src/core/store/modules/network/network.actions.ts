@@ -19,9 +19,6 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
     const { wallet, web3Provider, yearnSdk } = context;
     const { network: networkState } = getState();
 
-    // TODO: remove before merging develop branch.
-    // dispatch(AppActions.initApp());
-
     if (wallet.isCreated) {
       const action = (await dispatch(
         WalletActions.changeWalletNetwork({ network })
@@ -82,14 +79,6 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
         write: web3Provider.getInstanceOf('wallet'),
       });
     }
-
-    // Dispatch line data
-    // const selectedLineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
-    // const userWalletAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
-
-    // dispatch(LinesActions.getLines(defaultLineCategories));
-    // dispatch(LinesActions.getLinePage({ id: selectedLineAddress! }));
-    // dispatch(LinesActions.getUserPortfolio({ user: userWalletAddress! }));
 
     notify.config({ networkId: getNetworkId(network) });
 

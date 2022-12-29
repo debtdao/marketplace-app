@@ -45,8 +45,6 @@ const clearUserAppData = createAsyncThunk<void, void, ThunkAPI>('app/clearUserAp
 const initApp = createAsyncThunk<void, void, ThunkAPI>('app/initApp', async (_arg, { dispatch, getState, extra }) => {
   const { CONTRACT_ADDRESSES, NETWORK } = extra.config;
   const { wallet, settings, network } = getState();
-  console.log('network states - initApp network: ', network.current);
-  console.log('network states - initApp NETWORK: ', NETWORK);
   if (isLedgerLive()) {
     if (NETWORK !== 'mainnet') await dispatch(NetworkActions.changeNetwork({ network: 'mainnet' }));
     if (settings.signedApprovalsEnabled) await dispatch(SettingsActions.toggleSignedApprovals());

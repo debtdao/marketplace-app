@@ -23,7 +23,7 @@ import { Modals, Alerts } from '@containers';
 import { getConfig } from '@config';
 import { Network, Route, UseCreditLinesParams } from '@types';
 import { device } from '@themes/default';
-import { isInIframe, isCoinbaseApp } from '@utils';
+import { isInIframe, isCoinbaseApp, getNetworkId } from '@utils';
 
 const contentSeparation = '1.6rem';
 
@@ -177,6 +177,7 @@ export const Layout: FC = ({ children }) => {
 
     // Clear Redux state when switching networks
     if (previousNetwork) {
+      // window.location.reload();
       dispatch(AppActions.clearAppData());
       dispatch(LinesActions.clearLinesData());
       dispatch(LinesActions.clearLineStatus({ lineAddress: selectedLineAddress! }));
@@ -188,6 +189,7 @@ export const Layout: FC = ({ children }) => {
     // Fetch lines data when switching networks
     console.log('network states currentNetwork: ', currentNetwork);
     dispatch(LinesActions.getLines(defaultLineCategories));
+
     // dispatch(LinesActions.getLinePage({ id: selectedLineAddress! }));
     // dispatch(LinesActions.getUserPortfolio({ user: userWalletAddress! }));
 

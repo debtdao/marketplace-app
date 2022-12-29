@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { createGlobalStyle } from 'styled-components';
 import { ApolloProvider } from '@apollo/client';
@@ -13,7 +13,6 @@ import { Routes } from '@routes';
 import { Themable } from '@containers';
 // import { NetworkSelectors } from '@store';
 // import { useAppSelector } from '@hooks';
-
 import '@assets/fonts/RobotoFont.css';
 
 const GlobalStyle = createGlobalStyle`
@@ -83,13 +82,20 @@ export const App = () => {
   const container = new Container();
   const store = getStore(container);
   const state = store.getState();
-  // const variable = useSelector((state: RootState) => state.variable);
-  // const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
-  console.log('network states - state: ', state);
-  console.log('network states - app network: ', state.network.current);
-  // console.log('network states - app network 2: ', currentNetwork);
-  // // const graphQLClient = getClient(state.network.current);
+
+  console.log('app states - app network: ', state.network.current);
+  // // // console.log('network states - app network 2: ', currentNetwork);
+  // // // // const graphQLClient = getClient(state.network.current);
+
+  // const [appState, setAppState] = useState<any>(state.network.current);
+
+  // useEffect(() => {
+  //   console.log('app states - useEffect');
+  //   setAppState(state.network.current);
+  // }, [appState]);
+
   const graphQLClient = getClient(state.network.current);
+  // console.log('app states - app state: ', currentNetwork);
 
   return (
     <Provider store={store}>

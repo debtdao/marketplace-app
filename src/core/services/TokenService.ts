@@ -195,12 +195,12 @@ export class TokenServiceImpl implements TokenService {
   /* -------------------------------------------------------------------------- */
   public async approve(props: ApproveProps): Promise<TransactionResponse> {
     const { network, tokenAddress, spenderAddress, amount } = props;
-    return await this.transactionService.execute({
+    return (await this.transactionService.execute({
       network,
       methodName: 'approve',
       contractAddress: tokenAddress,
       abi: erc20Abi,
       args: [spenderAddress, amount],
-    });
+    })) as TransactionResponse;
   }
 }

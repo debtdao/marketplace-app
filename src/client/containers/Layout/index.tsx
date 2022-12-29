@@ -14,6 +14,8 @@ import {
   ModalSelectors,
   NetworkActions,
   PartnerSelectors,
+  LinesActions,
+  LinesSelectors,
 } from '@store';
 import { useAppTranslation, useAppDispatch, useAppSelector, useWindowDimensions, usePrevious } from '@hooks';
 import { Navigation, Navbar, Footer } from '@components/app';
@@ -97,6 +99,7 @@ export const Layout: FC = ({ children }) => {
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const activeModal = useAppSelector(ModalSelectors.selectActiveModal);
   const collapsedSidebar = useAppSelector(SettingsSelectors.selectSidebarCollapsed);
+  const selectedLineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
   const previousAddress = usePrevious(selectedAddress);
   const previousNetwork = usePrevious(currentNetwork);
   // const path = useAppSelector(({ route }) => route.path);
@@ -145,8 +148,20 @@ export const Layout: FC = ({ children }) => {
 
   useEffect(() => {
     if (activeModal) dispatch(ModalsActions.closeModal());
-    if (previousNetwork) dispatch(AppActions.clearAppData());
+    if (previousNetwork) {
+      // clear lines data from state
+      dispatch(LinesActions.clearLinesData());
+      dispatch(LinesActions.clearLineStatus({ lineAddress: selectedLineAddress! }));
+      dispatch(LinesActions.clearSelectedLineAndStatus());
+      dispatch(LinesActions.clearUserData());
+      // clear app data
+      dispatch(AppActions.clearAppData());
+    }
     if (selectedAddress) dispatch(AppActions.clearUserAppData());
+
+    // dispatch last line action with current network
+    dispatch(LinesActions.getLines());
+    dispatch(LinesActions.getLinePage());
 
     dispatch(TokensActions.getTokens());
     dispatch(TokensActions.getSupportedOracleTokens());

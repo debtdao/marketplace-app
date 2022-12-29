@@ -22,6 +22,18 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
     // TODO: remove before merging develop branch.
     // dispatch(AppActions.initApp());
 
+    if (wallet.isCreated) {
+      const action = (await dispatch(
+        WalletActions.changeWalletNetwork({ network })
+      )) as PayloadAction<ChangeWalletNetworkResult>;
+      if (!action.payload.networkChanged) throw new Error('Wallet Network Not Changed');
+    }
+
+    // Handle unsupported networks
+    if (!config.SUPPORTED_NETWORKS.includes(network)) {
+      return { network };
+    }
+
     const chainSettings = {
       chainId: `0x${getNetworkId(network).toString(16)}`,
       rpcUrls: [NETWORK_SETTINGS[network].rpcUrl],
@@ -33,15 +45,7 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
       blockExplorerUrls: [NETWORK_SETTINGS[network].blockExplorerUrl],
     };
 
-    if (wallet.isCreated) {
-      const action = (await dispatch(
-        WalletActions.changeWalletNetwork({ network })
-      )) as PayloadAction<ChangeWalletNetworkResult>;
-      if (!action.payload.networkChanged) throw new Error('Wallet Network Not Changed');
-    }
-
     // Change wallet network to match selected network in dropdown
-
     try {
       if (!window.ethereum) throw new Error('web3 provider No crypto wallet found!');
       await window.ethereum.request({
@@ -68,13 +72,8 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
       // handle other "switch" errors
     }
 
-    // Handle unsupported networks
-    if (!config.SUPPORTED_NETWORKS.includes(network)) {
-      return { network };
-    }
-
-    // Set Yearn context if network is supported
-    else if (web3Provider.hasInstanceOf('wallet') && config.SUPPORTED_NETWORKS.includes(network)) {
+    // Set Yearn context
+    if (web3Provider.hasInstanceOf('wallet') && config.SUPPORTED_NETWORKS.includes(network)) {
       const providerType = getProviderType(network);
       const provider = web3Provider.getInstanceOf(providerType);
       const yearn = yearnSdk.getInstanceOf(network);

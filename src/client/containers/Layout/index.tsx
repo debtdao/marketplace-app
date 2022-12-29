@@ -159,8 +159,7 @@ export const Layout: FC = ({ children }) => {
     //       })
     //     );
     //   });
-  }, []);
-  // }, [currentNetwork]);
+  }, [currentNetwork]);
 
   useEffect(() => {
     dispatch(RouteActions.changeRoute({ path: location.pathname }));
@@ -177,19 +176,20 @@ export const Layout: FC = ({ children }) => {
 
     // Clear Redux state when switching networks
     if (previousNetwork) {
-      // window.location.reload();
-      dispatch(AppActions.clearAppData());
-      dispatch(LinesActions.clearLinesData());
-      dispatch(LinesActions.clearLineStatus({ lineAddress: selectedLineAddress! }));
-      dispatch(LinesActions.clearSelectedLineAndStatus());
-      dispatch(LinesActions.clearUserData());
+      console.log('new network  - previous: ', previousNetwork);
+      console.log('new network - current: ', currentNetwork);
+      window.location.reload();
+      // dispatch(AppActions.clearAppData());
+      // dispatch(LinesActions.clearLinesData());
+      // dispatch(LinesActions.clearLineStatus({ lineAddress: selectedLineAddress! }));
+      // dispatch(LinesActions.clearSelectedLineAndStatus());
+      // dispatch(LinesActions.clearUserData());
     }
     if (selectedAddress) dispatch(AppActions.clearUserAppData());
 
     // Fetch lines data when switching networks
-    console.log('network states currentNetwork: ', currentNetwork);
-    dispatch(LinesActions.getLines(defaultLineCategories));
-
+    // console.log('network states currentNetwork: ', currentNetwork);
+    // dispatch(LinesActions.getLines(defaultLineCategories));
     // dispatch(LinesActions.getLinePage({ id: selectedLineAddress! }));
     // dispatch(LinesActions.getUserPortfolio({ user: userWalletAddress! }));
 

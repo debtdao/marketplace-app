@@ -106,6 +106,7 @@ export const Layout: FC = ({ children }) => {
 
   // const path = useAppSelector(({ route }) => route.path);
   const path = location.pathname.toLowerCase().split('/')[1] as Route;
+  console.log('route path - layout: ', path);
   const isLedgerLive = partner.id === 'ledger';
   const isIframe = isInIframe();
   const hideControls = isIframe || isLedgerLive;
@@ -163,6 +164,7 @@ export const Layout: FC = ({ children }) => {
   // }, [currentNetwork]);
 
   useEffect(() => {
+    console.log('route path - location: ', location);
     dispatch(RouteActions.changeRoute({ path: location.pathname }));
   }, [location]);
 

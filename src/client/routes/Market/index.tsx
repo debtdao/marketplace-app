@@ -160,7 +160,7 @@ export const Market = () => {
                 val.map(({ id, ...stuff }) => ({
                   ...stuff,
                   icon: '',
-                  onAction: () => history.push(`/lines/${id}`),
+                  onAction: () => history.push(`/lines/${currentNetwork}/${id}`),
                 })) as Item[]
               }
             />

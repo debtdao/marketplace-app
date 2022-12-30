@@ -68,6 +68,14 @@ export interface SecuredLine extends LineOfCredit, LineCollateral {
   positions?: PositionMap;
 }
 
+export interface Item extends SecuredLine {
+  header?: string;
+  icon: string;
+  info: string;
+  infoDetail?: string;
+  action?: string;
+  onAction?: () => void;
+}
 // data that isnt included in SecuredLine that we need to fetch for full SecuredLineWithEvents dattype
 // gets merged into existing SecuredLine to form SecuredLineWithEvents
 export interface LineEvents {
@@ -88,7 +96,6 @@ export interface CreditPosition {
   interestAccrued: string;
   interestRepaid: string;
   totalInterestRepaid: string;
-  // decimals: string;
   // borrower: Address;
   dRate: string;
   fRate: string;
@@ -151,7 +158,7 @@ export interface EscrowDeposit extends Collateral {
   events?: EscrowEvent[];
 }
 
-export interface EscrowDepositList {
+export interface EscrowDepositMap {
   [token: string]: EscrowDeposit;
 }
 
@@ -160,10 +167,12 @@ export interface AggregatedEscrow extends BaseEscrow, BaseCollateralModule {
   cratio: string;
   minCRatio: string;
   collateralValue: string;
-  deposits?: EscrowDepositList;
-  type: CollateralTypes;
-  line: string;
-  events?: CollateralEvent[];
+  // TODO: remove or add back in?
+  // deposits?: EscrowDepositList;
+  // type: CollateralTypes;
+  // line: string;
+  // events?: CollateralEvent[];
+  deposits?: EscrowDepositMap;
 }
 
 export interface RevenueSummary extends Collateral {
@@ -171,14 +180,26 @@ export interface RevenueSummary extends Collateral {
   token: TokenView;
   amount: string;
   value: string;
-  firstRevenueTimestamp: number;
-  lastRevenueTimestamp: number;
+  timeOfFirstIncome: number;
+  timeOfLastIncome: number;
 }
 
+export interface RevenueSummaryMap {
+  [key: string]: RevenueSummary;
+}
 export interface AggregatedSpigot extends BaseCollateralModule {
   id: Address;
   // aggregated revenue in USD by token across all spigots
-  tokenRevenue: { [key: string]: string }; // TODO: RevenueSummary
+  revenueSummary: RevenueSummaryMap;
+}
+
+export interface MarketLines {
+  [key: string]: SecuredLine[];
+}
+
+export interface MarketPageData {
+  linesData: MarketLines;
+  allBorrowers: string[];
 }
 
 export interface LinePageSpigot extends AggregatedSpigot {

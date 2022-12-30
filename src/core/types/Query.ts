@@ -154,12 +154,12 @@ export interface LineEventFragResponse {
 }
 
 export interface SpigotRevenueSummaryFragResponse {
-  token: Address;
+  token: TokenFragRepsonse;
+  totalVolume: string;
   totalVolumeUsd: string;
   timeOfFirstIncome: number;
   timeOfLastIncome: number;
 }
-
 export interface SpigotEventFragResponse {
   __typename: 'ClaimRevenueEvent';
   timestamp: number;

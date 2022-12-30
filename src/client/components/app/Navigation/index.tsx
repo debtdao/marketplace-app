@@ -2,7 +2,7 @@ import { ElementType, useEffect } from 'react';
 import styled from 'styled-components';
 
 import { useAppDispatch, useAppSelector, useWindowDimensions } from '@hooks';
-import { SettingsActions, SettingsSelectors } from '@store';
+import { NetworkSelectors, SettingsActions, SettingsSelectors, WalletSelectors } from '@store';
 import { VaultIcon, SettingsIcon, SearchIcon, DiscordIcon, WalletIcon } from '@components/common';
 
 import { NavSidebar } from './NavSidebar';
@@ -41,13 +41,13 @@ const navLinks: NavigationLink[] = [
     external: true,
     optional: true,
   },
-  {
-    to: 'https://discord.gg/F83xx67fyQ',
-    text: 'navigation.discord',
-    icon: DiscordIcon,
-    external: true,
-    optional: true,
-  },
+  // {
+  //   to: 'https://discord.gg/F83xx67fyQ',
+  //   text: 'navigation.discord',
+  //   icon: DiscordIcon,
+  //   external: true,
+  //   optional: true,
+  // },
   {
     to: '/settings',
     text: 'navigation.settings',
@@ -59,8 +59,15 @@ const navLinks: NavigationLink[] = [
 export const Navigation = ({ hideOptionalLinks }: NavigationProps) => {
   const { isMobile, isTablet, isDesktop } = useWindowDimensions();
   const dispatch = useAppDispatch();
+  const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
+  const userAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
 
-  const displayLinks = navLinks.filter((link) => !(link.optional && hideOptionalLinks));
+  const displayLinks = navLinks.filter((link) => {
+    if (link.text === 'navigation.portfolio') {
+      link.to = `/portfolio/${currentNetwork}/${userAddress}`;
+    }
+    return !(link.optional && hideOptionalLinks);
+  });
 
   // NOTE Auto collapse sidenav on mobile
 

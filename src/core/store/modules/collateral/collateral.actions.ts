@@ -65,8 +65,8 @@ const addCollateral = createAsyncThunk<
   const userAddress = wallet.selectedAddress;
   if (!userAddress) throw new Error('WALLET NOT CONNECTED');
 
+  console.log('addCollateral action props', props);
   // TODO chekc that they are arbiter on line that owns Escrowbeforethey send tx
-
   const { collateralService } = services;
   const tx = await collateralService.addCollateral(props);
   console.log('addCollateral tx', tx);

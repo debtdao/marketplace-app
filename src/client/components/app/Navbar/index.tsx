@@ -1,13 +1,14 @@
 import styled from 'styled-components';
+import _ from 'lodash';
 
 import { ConnectWalletButton } from '@components/app';
 import { OptionList, EthereumIcon, ArbitrumIcon, Link } from '@components/common';
 import { WalletSelectors } from '@src/core/store';
-import { useAppSelector } from '@hooks';
-import { useWindowDimensions } from '@hooks';
+import { useAppSelector, useWindowDimensions } from '@hooks';
 import { Network } from '@types';
 import { device } from '@themes/default';
 import { getConfig } from '@config';
+import { getConstants } from '@src/config/constants';
 
 const StyledOptionList = styled(OptionList)`
   width: 15rem;
@@ -42,20 +43,43 @@ const StyledText = styled.h1<{ toneDown?: boolean }>`
   `}
 `;
 
+const BannerWarningText = styled.h2<{ toneDown?: boolean }>`
+  display: inline-flex;
+  font-size: 2.4rem;
+  font-weight: 700;
+  // text-align: center;
+  color: ${({ theme }) => theme.colors.titles};
+  margin: 0;
+  padding: 0;
+
+  ${({ toneDown, theme }) =>
+    toneDown &&
+    `
+    color: ${theme.colors.textsSecondary};
+  `}
+`;
+
 const StyledLink = styled(Link)`
   font-size: 2.4rem;
   font-weight: 700;
 `;
 
-const StyledNavbar = styled.header`
+const StyledNavbar = styled.header<{ warning?: boolean }>`
   position: sticky;
   top: 0;
   left: 0;
   width: 100%;
   display: flex;
   align-items: center;
+  margin-top: 1%;
+  margin-bottom: 1%;
   background-color: ${({ theme }) => theme.colors.surface};
   z-index: ${({ theme }) => theme.zindex.navbar};
+  ${({ warning, theme }) =>
+    !warning &&
+    `
+    z-index: ${theme.zindex.navbar};
+  `}
   max-width: ${({ theme }) => theme.globalMaxWidth};
   padding: ${({ theme }) => theme.card.padding};
   border-radius: ${({ theme }) => theme.globalRadius};
@@ -74,10 +98,10 @@ const getNetworkIcon = (network: Network) => {
   switch (network) {
     case 'mainnet':
       return EthereumIcon;
-    case 'arbitrum':
-      return ArbitrumIcon;
     case 'goerli':
       return EthereumIcon;
+    case 'arbitrum':
+      return ArbitrumIcon;
     default:
       return;
   }
@@ -116,16 +140,21 @@ export const Navbar = ({
   const { isMobile } = useWindowDimensions();
   const { NETWORK_SETTINGS } = getConfig();
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
+  const walletNetworkName = useAppSelector(WalletSelectors.selectWalletNetworkName);
 
-  const dropdownSelectedNetwork = {
-    value: selectedNetwork,
-    label: NETWORK_SETTINGS[selectedNetwork].name,
-    Icon: getNetworkIcon(selectedNetwork),
-  };
+  const { SUPPORTED_NETWORKS } = getConstants();
+
+  // TODO: goerli is not included in SUPPORTED_NETWORKS from config/constants because doing so causes issues with the Yearn SDK which does not support Goerli test network.
+  const SUPPORTED_NETWORK_OPTIONS = SUPPORTED_NETWORKS.concat('goerli').map((network) => {
+    return {
+      value: network,
+      label: NETWORK_SETTINGS[network].name ?? 'other',
+    };
+  });
 
   const dropdownSelectedWalletNetwork = {
     value: walletNetwork,
-    label: walletNetwork,
+    label: walletNetworkName,
     Icon: getNetworkIcon(walletNetwork!),
   };
 
@@ -134,36 +163,55 @@ export const Navbar = ({
   const titleText = secondTitleEnabled ? <>{title}&nbsp;/&nbsp;</> : title;
 
   return (
-    <StyledNavbar className={className}>
-      {title && (
-        <>
-          <StyledText toneDown={secondTitleEnabled}>
-            {titleLink ? <StyledLink to={titleLink}>{titleText}</StyledLink> : titleText}
-          </StyledText>
-          {secondTitleEnabled && <StyledText>{subTitle}</StyledText>}
-        </>
-      )}
-
-      <StyledNavbarActions>
-        {!hideDisabledControls && (
-          /* turn this into not a list because we only support mainnet right now */
-          <StyledOptionList
-            //@ts-ignore
-            selected={walletNetwork !== undefined ? dropdownSelectedWalletNetwork : dropdownSelectedNetwork}
-            setSelected={(option) => onNetworkChange(option.value)}
-            options={[]}
-            hideIcons={isMobile}
-            disabled={disableNetworkChange}
-          />
+    <div>
+      <StyledNavbar className={className}>
+        {title && (
+          <>
+            <StyledText toneDown={secondTitleEnabled}>
+              {titleLink ? <StyledLink to={titleLink}>{titleText}</StyledLink> : titleText}
+            </StyledText>
+            {secondTitleEnabled && <StyledText>{subTitle}</StyledText>}
+          </>
         )}
 
-        <ConnectWalletButton
-          address={walletAddress}
-          ensName={addressEnsName}
-          onClick={() => onWalletClick && onWalletClick()}
-          disabled={disableWalletSelect}
-        />
-      </StyledNavbarActions>
-    </StyledNavbar>
+        <StyledNavbarActions>
+          {!hideDisabledControls && (
+            /* turn this into not a list because we only support mainnet right now */
+            <StyledOptionList
+              selected={dropdownSelectedWalletNetwork}
+              setSelected={(option) => onNetworkChange(option.value)}
+              hideIcons={isMobile}
+              disabled={disableNetworkChange}
+              options={SUPPORTED_NETWORK_OPTIONS}
+            />
+          )}
+
+          <ConnectWalletButton
+            address={walletAddress}
+            ensName={addressEnsName}
+            onClick={() => onWalletClick && onWalletClick()}
+            disabled={disableWalletSelect}
+          />
+        </StyledNavbarActions>
+      </StyledNavbar>
+
+      {/* Display warning if not connected to supported network! */}
+      {/* TODO: Add goerli to SUPPORTED_NETWORKS. Difficult to do because goerli is not supported by Yearn SDK. */}
+      {!(SUPPORTED_NETWORKS.includes(walletNetwork ?? 'other') || walletNetwork === 'goerli') && (
+        <StyledNavbar warning={true}>
+          {title && (
+            <>
+              <BannerWarningText toneDown={secondTitleEnabled}>
+                Your wallet is connected to an unsupported network.
+                <br></br>
+                <br></br>
+                Please connect to one of the supported networks to use the Debt DAO market.
+              </BannerWarningText>
+              {secondTitleEnabled && <StyledText>{subTitle}</StyledText>}
+            </>
+          )}
+        </StyledNavbar>
+      )}
+    </div>
   );
 };

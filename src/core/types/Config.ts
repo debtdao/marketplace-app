@@ -35,9 +35,16 @@ export interface Constants {
   DEBT_DAO_API: string;
   DEBT_DAO_ALERTS_API: string;
   SUPPORTED_NETWORKS: Network[];
+  CHAIN_IDS: {
+    [KEY: number]: string;
+  };
+  CHAIN_NAMES: {
+    [KEY: string]: string;
+  };
   NETWORK_SETTINGS: NetworkSettings;
-  WEB3_PROVIDER_HTTPS: string;
-  WEB3_PROVIDER_WSS: string;
+  MAINNET_PROVIDER_HTTPS: string;
+  MAINNET_PROVIDER_WSS: string;
+  GOERLI_PROVIDER_HTTPS: string;
   ARBITRUM_PROVIDER_HTTPS: string;
   BLACKLISTED_LINES: string[];
   CONTRACT_ADDRESSES: {

@@ -1,6 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
+package-lock.json
 /node_modules
 /.pnp
 .pnp.js
@@ -29,5 +30,4 @@ yarn-error.log*
 .vscode
 
 # Zone Identifier files (ADS / Windows)
-
 **/*Zone.Identifier

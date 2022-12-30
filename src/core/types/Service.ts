@@ -227,6 +227,7 @@ export interface BorrowCreditProps {
 export interface CloseProps {
   lineAddress: string;
   id: string;
+  network: Network;
 }
 export interface WithdrawLineProps {
   dryRun?: boolean;
@@ -241,11 +242,13 @@ export interface SetRatesProps {
   id: string;
   frate: string;
   drate: string;
+  network: Network;
 }
 export interface IncreaseCreditProps {
   lineAddress: string;
   id: string;
   amount: BigNumber;
+  network: Network;
 }
 export interface DepositAndRepayProps {
   lineAddress: string;

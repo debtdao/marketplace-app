@@ -3,6 +3,7 @@ import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { ThunkAPI } from '@frameworks/redux';
 import { TokenDynamicData, Token, Balance, Integer, SupportedOracleTokenResponse } from '@types';
 import { Network } from '@types';
+import { getNetwork } from '@src/utils';
 
 /* -------------------------------------------------------------------------- */
 /*                                   Setters                                  */
@@ -48,22 +49,24 @@ const getTokensDynamicData = createAsyncThunk<
   { addresses: string[] },
   ThunkAPI
 >('tokens/getTokensDynamic', async ({ addresses }, { getState, extra }) => {
-  const { network } = getState();
+  const { wallet } = getState();
   const { tokenService } = extra.services;
-  const tokensDynamicData = await tokenService.getTokensDynamicData({ network: network.current, addresses });
+  const walletNetwork = getNetwork(`${wallet.networkVersion}`);
+  const tokensDynamicData = await tokenService.getTokensDynamicData({ network: walletNetwork, addresses });
   return { tokensDynamicData };
 });
 
 const getUserTokens = createAsyncThunk<{ userTokens: Balance[] }, { addresses?: string[] }, ThunkAPI>(
   'tokens/getUserTokens',
   async ({ addresses }, { extra, getState }) => {
-    const { network, wallet } = getState();
+    const { wallet } = getState();
     const accountAddress = wallet.selectedAddress;
+    const walletNetwork = getNetwork(`${wallet.networkVersion}`);
     if (!accountAddress) throw new Error('WALLET NOT CONNECTED');
     console.log('');
     const { tokenService } = extra.services;
     const userTokens = await tokenService.getUserTokensData({
-      network: network.current,
+      network: walletNetwork,
       accountAddress,
       tokenAddresses: addresses,
     });
@@ -76,8 +79,9 @@ const getTokenAllowance = createAsyncThunk<
   { tokenAddress: string; spenderAddress: string },
   ThunkAPI
 >('tokens/getTokenAllowance', async ({ tokenAddress, spenderAddress }, { extra, getState }) => {
-  const { network, wallet } = getState();
+  const { wallet } = getState();
   const accountAddress = wallet.selectedAddress;
+  const walletNetwork = getNetwork(`${wallet.networkVersion}`);
   if (!accountAddress) {
     throw new Error('WALLET NOT CONNECTED');
   }
@@ -87,7 +91,7 @@ const getTokenAllowance = createAsyncThunk<
 
   const { tokenService } = extra.services;
   const allowance = await tokenService.getTokenAllowance({
-    network: network.current,
+    network: walletNetwork,
     accountAddress,
     tokenAddress,
     spenderAddress,

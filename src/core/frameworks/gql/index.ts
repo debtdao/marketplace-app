@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, DocumentNode, QueryResult } from '@apollo/client';
+import { ApolloClient, InMemoryCache, DocumentNode, QueryResult, HttpLink } from '@apollo/client';
 import { at } from 'lodash';
 
 import { getEnv } from '@config/env';
@@ -19,6 +19,7 @@ import {
   GetLineEventsResponse,
   SupportedOracleTokenResponse,
   CreditPosition,
+  Network,
 } from '@src/core/types';
 
 import {
@@ -31,14 +32,26 @@ import {
 } from './queries';
 import possibleTypes from './possibleTypes.json';
 
-const { GRAPH_API_URL, GRAPH_CHAINLINK_FEED_REGISTRY_API_URL } = getEnv();
+// TODO: GRAPH_CHAINLINK_FEED_REGISTRY_API_URL
+const { GRAPH_API_URL, GRAPH_TEST_API_URL, GRAPH_CHAINLINK_FEED_REGISTRY_API_URL } = getEnv();
 const { BLACKLISTED_LINES: blacklist } = getConstants();
 
+// utility function get GRAPH_API_URL based on network parameter
+const getGraphURL = (network: string) => {
+  let link: any;
+  if (network === 'mainnet') {
+    link = new HttpLink({ uri: GRAPH_API_URL! });
+  } else if (network === 'goerli') {
+    link = new HttpLink({ uri: GRAPH_TEST_API_URL! });
+  }
+  return link;
+};
+
 let client: any;
-export const getClient = () => (client ? client : createClient());
-const createClient = (): typeof ApolloClient => {
+export const getClient = (network: string) => (client ? client : createClient(network));
+const createClient = (network: string): typeof ApolloClient => {
   client = new ApolloClient({
-    uri: GRAPH_API_URL,
+    link: getGraphURL(network),
     cache: new InMemoryCache({
       possibleTypes,
     }),
@@ -70,26 +83,26 @@ const createPriceFeedClient = (isOracle?: boolean): typeof ApolloClient => {
  *        1. for creating curried func and 2. for defining arg/return types of that func
  */
 export const createQuery =
-  (query: DocumentNode, path?: string, isOracle?: boolean): Function =>
+  (query: DocumentNode, path?: string, network?: string, isOracle?: boolean): Function =>
   <A, R>(variables: A): Promise<QueryResponse<R>> =>
     new Promise(async (resolve, reject) => {
-      const client = isOracle ? getPriceFeedClient() : getClient();
+      const client = isOracle ? getPriceFeedClient() : getClient(network!);
       client
         .query({ query, variables })
         .then((result: QueryResult) => {
+          console.log('gql result', result, query);
           const { data, error } = result;
           const requestedData = path ? at(data, [path])[0] : data;
           if (error) return reject(error);
           else return resolve(requestedData);
         })
         .catch((error: any) => {
-          console.log('TokenService gql request error', error);
+          console.log('gql request error', error);
           reject(error);
         });
     });
 
 const getLineQuery = createQuery(GET_LINE_QUERY);
-
 export const getLine: QueryCreator<GetLineArgs, SecuredLine> = <GetLineArgs, SecuredLine>(
   arg: GetLineArgs
 ): QueryResponse<SecuredLine> => getLineQuery(arg);
@@ -112,7 +125,7 @@ export const getLineEvents: QueryCreator<GetLineEventsArgs, GetLineEventsRespons
   arg: GetLineEventsArgs
 ): QueryResponse<GetLineEventsResponse> => getLineEventsQuery(arg);
 
-const getSupportedOracleTokensQuery = createQuery(GET_SUPPORTED_ORACLE_TOKENS_QUERY, undefined, true);
+const getSupportedOracleTokensQuery = createQuery(GET_SUPPORTED_ORACLE_TOKENS_QUERY, undefined, undefined, true);
 export const getSupportedOracleTokens: QueryCreator<
   undefined,
   SupportedOracleTokenResponse | undefined

@@ -10,6 +10,7 @@ import { AppSelectors } from '../modules/app/app.selectors';
 import { WalletSelectors } from '../modules/wallet/wallet.selectors';
 import { TokensSelectors, createToken } from '../modules/tokens/tokens.selectors';
 import { NetworkSelectors } from '../modules/network/network.selectors';
+const { NETWORK, TOKEN_ADDRESSES } = getConfig();
 // import { Token } from 'graphql';
 
 const { selectVaultsMap } = VaultsSelectors;
@@ -29,9 +30,16 @@ export const selectDepositTokenOptionsByAsset = createSelector(
     selectServicesEnabled,
     selectWalletNetwork,
   ],
-  (supportedTokens, supportedTokensMap, tokenAddresses, tokensMap, tokensUser, servicesEnabled, currentNetwork) =>
+  (
+    supportedTokens,
+    supportedTokensMap,
+    tokenAddresses,
+    tokensMap,
+    tokensUser,
+    servicesEnabled,
+    currentNetwork = NETWORK
+  ) =>
     memoize((assetAddress?: string): TokenView[] => {
-      console.log('TokenService selectDepositTokenOptionsByAsset', currentNetwork, tokensMap, testTokens);
       const { userTokensMap, userTokensAllowancesMap } = tokensUser;
       if (currentNetwork === 'goerli') {
         // TODO: fill in token values appropriately with values from subgraph
@@ -53,7 +61,6 @@ export const selectDepositTokenOptionsByAsset = createSelector(
         // return allTestTokens;
         return testTokens;
       } else {
-        const { TOKEN_ADDRESSES } = getConfig();
         const mainTokens = Object.values(TOKEN_ADDRESSES)
           .filter((address) => !!tokensMap[address])
           .map((address) => {

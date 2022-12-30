@@ -14,7 +14,9 @@ import {
   LinesByRole,
   PositionMap,
 } from '@types';
+import { getNetworkId } from '@src/utils';
 
+import { NetworkActions } from '../network/network.actions';
 import { WalletActions } from '../wallet/wallet.actions';
 
 import { LinesActions } from './lines.actions';
@@ -27,6 +29,8 @@ export const initialLineActionsStatusMap: LineActionsStatusMap = {
 };
 
 const { networkChange } = WalletActions;
+
+const { changeNetwork } = NetworkActions;
 
 export const initialUserMetadataStatusMap: UserLineMetadataStatusMap = {
   getUserPortfolio: initialStatus,
@@ -58,7 +62,6 @@ export const linesInitialState: CreditLineState = {
     deploySecuredLine: initialStatus,
     user: initialUserMetadataStatusMap,
   },
-  network: undefined,
 };
 
 const {
@@ -82,7 +85,7 @@ const {
   clearLinesData,
   clearUserData,
   // getUserLinesMetadata,
-  clearSelectedLineAndStatus,
+  clearSelectedLine,
   clearLineStatus,
 } = LinesActions;
 
@@ -97,17 +100,13 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
 
     .addCase(setSelectedLinePosition, (state, { payload: { position } }) => {
+      console.log('set position', position, state.positionsMap[position ?? ''], state.positionsMap);
       state.selectedPosition = position;
     })
 
     .addCase(setPosition, (state, { payload: { id, position } }) => {
       state.positionsMap[id] = position;
     })
-
-    .addCase(networkChange, (state, { payload: { network } }) => {
-      state.network = network;
-    })
-
     /* -------------------------------------------------------------------------- */
     /*                                 Clear State                                */
     /* -------------------------------------------------------------------------- */
@@ -128,11 +127,10 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     //   state.statusMap.getExpectedTransactionOutcome = {};
     // })
 
-    .addCase(clearSelectedLineAndStatus, (state) => {
+    .addCase(clearSelectedLine, (state) => {
       if (!state.selectedLineAddress) return;
-      //const currentAddress = state.selectedLineAddress;
-      // state.statusMap.linesActionsStatusMap[currentAddress] = initialLineActionsStatusMap;
       state.selectedLineAddress = undefined;
+      state.selectedPosition = undefined;
     })
 
     .addCase(clearLineStatus, (state, { payload: { lineAddress } }) => {

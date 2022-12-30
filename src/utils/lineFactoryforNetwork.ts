@@ -1,4 +1,4 @@
-import { networks } from '../config/constants/networks.json';
+import { networks } from '../config/constants/supportedNetworks.json';
 
 const getLineFactoryforNetwork = (network: number | string) => {
   var LineFactory: string = '';
@@ -8,6 +8,7 @@ const getLineFactoryforNetwork = (network: number | string) => {
     case 'goerli' || 5:
       return (LineFactory = networks.goerli.lineFactory);
   }
+  // Add case that if its any other chain, we inform the user that we are not deployed to that chain
 };
 
 export { getLineFactoryforNetwork };

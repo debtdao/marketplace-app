@@ -15,6 +15,7 @@
       "content": "No User Content"
     },
     "positions-card": {
+      "line": "Line",
       "positions": "Positions",
       "drate": "dRate",
       "frate": "fRate",
@@ -151,7 +152,9 @@
       "add-credit-input": {
         "search-accept-credit": "Accepting Deal",
         "search-select-credit": "Find Deal",
-        "select-an-offer": "Select An Offer"
+        "select-an-offer": "Select An Offer",
+        "selected-borrower": "Borrower",
+        "selected-line": "Line"
       },
       "add-credit": {
         "header": "Setup deal terms",
@@ -162,6 +165,7 @@
         "select-rates": "4. Set Interest Rates",
         "lender-address": "Ethereum Address",
         "back-to-market": "Head back to the Market",
+        "accept-terms": "Accept",
         "bad-line": {
           "title": "This line can not be deposited into",
           "body": "Your chosen line is not in a healthy state. You can find more lines to deposit into back in the marketplace."
@@ -173,6 +177,7 @@
         "select-token": "2. Select credit token",
         "select-rates": "3. Set your interest rates",
         "back-to-market": "Head back to the Market",
+        "cta": "Add Collateral",
         "no-assets-enabled": {
           "title": "No tokens have been enabled as collateral on your line!",
           "body": "The arbiter is the only one that can enable assets to be deposited as collateral. Find and contact your Arbiter in the Debt DAO discord.",
@@ -199,7 +204,7 @@
       "borrow-credit": {
         "header": "Borrow",
         "select-line": "1. Select a Position:",
-        "select-amount": "2. Select Token and Amount:",
+        "select-amount": "2. Amount to Borrow:",
         "your-rates": "3. Your Rates:"
       },
       "deposit-and-repay": {
@@ -219,8 +224,8 @@
         "header":"Enable Spigot",
         "select-function": "Select Function",
         "revenue-contract": "1. Revenue Contract",
-        "function-revenue": "2. Select function to claim revenue",
-        "function-transfer": "3. Select function to transfer ownership of revenue contract",
+        "function-revenue": "3. Select function to claim revenue",
+        "function-transfer": "2. Select function to transfer ownership of revenue contract",
         "cta": "Enable Spigot",
         "enable-failed": "Enable Spigot Failed."
       }

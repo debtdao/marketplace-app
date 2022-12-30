@@ -4,7 +4,6 @@ import { ThunkAPI } from '@frameworks/redux';
 import { isGnosisApp, isLedgerLive, isCoinbaseApp, get } from '@utils';
 import { ExternalServiceId, EVENT_NAVIGATE_EXTERNAL_1ST_PARTY, EVENT_NAVIGATE_EXTERNAL_3RD_PARTY } from '@types';
 import { idUser, trackPage, trackAnalyticsEvent } from '@frameworks/segment';
-import { getEnv } from '@config/env';
 import { AnalyticsEventNames, LogAppAnalyticsActionProps } from '@src/core/types/ProductAnalytics';
 
 import { WalletActions } from '../wallet/wallet.actions';
@@ -44,24 +43,24 @@ const clearUserAppData = createAsyncThunk<void, void, ThunkAPI>('app/clearUserAp
 /* -------------------------------------------------------------------------- */
 
 const initApp = createAsyncThunk<void, void, ThunkAPI>('app/initApp', async (_arg, { dispatch, getState, extra }) => {
-  const { CONTRACT_ADDRESSES } = extra.config;
-  const { wallet, network, settings } = getState();
+  const { CONTRACT_ADDRESSES, NETWORK } = extra.config;
+  const { wallet, settings, network } = getState();
   if (isLedgerLive()) {
-    if (network.current !== 'mainnet') await dispatch(NetworkActions.changeNetwork({ network: 'mainnet' }));
+    if (NETWORK !== 'mainnet') await dispatch(NetworkActions.changeNetwork({ network: 'mainnet' }));
     if (settings.signedApprovalsEnabled) await dispatch(SettingsActions.toggleSignedApprovals());
     await dispatch(WalletActions.walletSelect({ walletName: 'Iframe', network: 'mainnet' }));
     await dispatch(PartnerActions.changePartner({ id: 'ledger', address: CONTRACT_ADDRESSES.LEDGER }));
   } else if (isGnosisApp()) {
     const walletName = 'Gnosis Safe';
-    if (network.current !== 'mainnet') await dispatch(NetworkActions.changeNetwork({ network: 'mainnet' }));
+    if (NETWORK !== 'mainnet') await dispatch(NetworkActions.changeNetwork({ network: 'mainnet' }));
     if (settings.signedApprovalsEnabled) await dispatch(SettingsActions.toggleSignedApprovals());
     await dispatch(WalletActions.walletSelect({ walletName, network: 'mainnet' }));
   } else if (isCoinbaseApp()) {
     const walletName = 'Coinbase Wallet';
     await dispatch(WalletActions.walletSelect({ walletName, network: 'mainnet' }));
   } else if (wallet.name && wallet.name !== 'Iframe') {
-    const { NETWORK } = getEnv();
     await dispatch(WalletActions.walletSelect({ walletName: wallet.name, network: NETWORK }));
+    // await dispatch(WalletActions.walletSelect({ walletName: wallet.name, network: network.current }));
   }
   dispatch(checkExternalServicesStatus());
   // TODO use when sdk ready
@@ -84,10 +83,12 @@ const checkExternalServicesStatus = createAsyncThunk<void, void, ThunkAPI>(
         'service is currently experiencing technical issues and have been temporarily disabled. We apologize for any inconvenience this may cause, we are actively working on resolving these issues';
       const downgradedServicesMessages = [];
       const { zapper, simulations } = data;
-      if (!zapper) {
-        dispatch(disableService({ service: 'zapper' }));
-        downgradedServicesMessages.push(`Zapper ${errorMessageTemplate}`);
-      }
+
+      // TODO: Reenable Zapper alerts if that is a desired feature.
+      // if (!zapper) {
+      //   dispatch(disableService({ service: 'zapper' }));
+      //   downgradedServicesMessages.push(`Zapper ${errorMessageTemplate}`);
+      // }
 
       if (!simulations) {
         dispatch(disableService({ service: 'tenderly' }));

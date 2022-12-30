@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import { Card, CardHeader, CardContent, CardElement, CardEmptyList, ToggleButton } from '@components/common';
 import { sort } from '@utils';
+import { PROPOSED_STATUS } from '@src/core/types';
 
 const StyledCardElement = styled(CardElement)<{ stripes?: boolean }>`
   display: flex;
@@ -202,13 +203,6 @@ export const DetailCard = <T,>({
 
       {displayData.map((item, i) => (
         <StyledCardContent
-          //@ts-ignore
-          style={
-            //@ts-ignore
-            item.status === 'PROPOSED'
-              ? { borderLeft: '10px solid #FAFF00', marginBottom: '1rem' }
-              : { borderLeft: '10px solid #05FF00', marginBottom: '1rem' }
-          }
           key={`content-${i}`}
           wrap={wrap}
           pointer={!!onAction}

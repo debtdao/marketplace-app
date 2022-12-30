@@ -89,6 +89,7 @@ const RedirectLinkIcon = styled(RedirectIcon)`
 
 interface PositionsProps {
   positions: CreditPosition[];
+  displayLine?: boolean; // whether to add the positions line to the table
 }
 
 interface ActionButtonProps {
@@ -97,7 +98,7 @@ interface ActionButtonProps {
   disabled: boolean;
 }
 
-export const PositionsTable = (props: PositionsProps) => {
+export const PositionsTable = ({ positions, displayLine = false }: PositionsProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const dispatch = useAppDispatch();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
@@ -106,7 +107,6 @@ export const PositionsTable = (props: PositionsProps) => {
   const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
-  const { positions } = props;
   const { NETWORK } = getEnv();
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
 
@@ -214,6 +214,7 @@ export const PositionsTable = (props: PositionsProps) => {
     return [];
   };
 
+  console.log('positions table display line', displayLine, !displayLine);
   return (
     <>
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
@@ -226,7 +227,15 @@ export const PositionsTable = (props: PositionsProps) => {
               key: 'status',
               header: t('components.positions-card.status'),
               sortable: true,
-              width: '14rem',
+              width: '12rem',
+              className: 'col-apy',
+            },
+            {
+              key: 'line',
+              hide: !displayLine,
+              header: t('components.positions-card.line'),
+              sortable: true,
+              width: '8rem',
               className: 'col-apy',
             },
             {
@@ -290,6 +299,12 @@ export const PositionsTable = (props: PositionsProps) => {
             deposit: humanize('amount', position.deposit, position.token.decimals, 2),
             drate: `${normalizeAmount(position.dRate, 2)} %`,
             frate: `${normalizeAmount(position.fRate, 2)} %`,
+            line: (
+              <RouterLink to={`/lines/${currentNetwork}/${position.line}`} key={position.line} selected={false}>
+                {position.line}
+                <RedirectLinkIcon />
+              </RouterLink>
+            ),
             status: position.status,
             principal: humanize('amount', position.principal, position.token.decimals, 2),
             interest: humanize('amount', position.interestAccrued, position.token.decimals, 2),
@@ -300,16 +315,13 @@ export const PositionsTable = (props: PositionsProps) => {
               </RouterLink>
             ),
             token: (
-              <a
-                //change to etherscan on launch
-                href={`https://etherscan.io/address/${position.token.address}`}
-                target={'_blank'}
-                key={`${position.token.symbol}-${position.id}`}
-                rel={'noreferrer'}
+              <RouterLink
+                key={position.token.address}
+                to={`https://etherscan.io/address/${position.token.address}`}
+                selected={false}
               >
                 {position.token.symbol}
-                <RedirectLinkIcon />
-              </a>
+              </RouterLink>
             ),
             actions: <ActionButtons value={position.id} actions={getUserPositionActions(position)} />,
           }))}

@@ -1,5 +1,6 @@
 import { isEmpty, zipWith } from 'lodash';
 import { BigNumber, utils } from 'ethers';
+import { getAddress } from '@ethersproject/address';
 import _ from 'lodash';
 
 import {
@@ -19,7 +20,7 @@ import {
   SpigotRevenueSummaryFragResponse,
   BasePositionFragResponse,
   LineEventFragResponse,
-  EscrowDepositList,
+  EscrowDepositMap,
   TokenFragRepsonse,
   COLLATERAL_TYPE_REVENUE,
   COLLATERAL_TYPE_ASSET,
@@ -30,6 +31,9 @@ import {
   LENDER_POSITION_ROLE,
   BaseLineFragResponse,
   EscrowDeposit,
+  RevenueSummary,
+  RevenueSummaryMap,
+  AggregatedSpigot,
 } from '@types';
 
 import { humanize, normalizeAmount, normalize } from './format';
@@ -146,6 +150,8 @@ export function formatGetLinesData(
     } = data;
     const { credit, spigot, escrow } = formatSecuredLineData(
       rest.id,
+      escrowRes?.id ?? '',
+      spigotRes?.id ?? '',
       positions,
       escrowRes?.deposits ?? [],
       spigotRes?.revenues ?? [],
@@ -175,6 +181,8 @@ export function formatGetLinesData(
 
 export const formatSecuredLineData = (
   line: Address, // BaseLineFrag
+  spigotId: Address,
+  escrowId: Address,
   positionFrags: (BasePositionFragResponse | BasePositionFragResponse)[],
   collateralDeposits: BaseEscrowDepositFragResponse[],
   revenues: SpigotRevenueSummaryFragResponse[],
@@ -189,13 +197,13 @@ export const formatSecuredLineData = (
     positionIds: string[];
     positions: PositionMap;
   };
-  spigot: { type: CollateralTypes; line: string; tokenRevenue: { [key: string]: string } };
+  spigot: AggregatedSpigot;
   escrow: {
     type: CollateralTypes;
     line: string;
     collateralValue: string;
     cratio: string;
-    deposits: EscrowDepositList;
+    deposits: EscrowDepositMap;
     // TODO add formated deposits here
   };
 } => {
@@ -223,7 +231,7 @@ export const formatSecuredLineData = (
     { principal, deposit, highestApy }
   );
 
-  const [collateralValue, deposits]: [BigNumber, EscrowDepositList] = collateralDeposits.reduce(
+  const [collateralValue, deposits]: [BigNumber, EscrowDepositMap] = collateralDeposits.reduce(
     (agg, collateralDeposit) => {
       const price = unnullify(tokenPrices[collateralDeposit.token.id], true);
       return !collateralDeposit.enabled
@@ -254,9 +262,25 @@ export const formatSecuredLineData = (
   };
 
   // aggregated revenue in USD by token across all spigots
-  const tokenRevenue: { [key: string]: string } = revenues.reduce((ggg, revenue) => {
-    return { ...revenue, [revenue.token]: (revenue.totalVolumeUsd ?? '0').toString() };
-  }, {});
+  const revenueSummary: RevenueSummaryMap = revenues.reduce<any>(
+    (summaries, { token, totalVolume, totalVolumeUsd, ...summary }) => {
+      console.log('rev', summaries, { ...summary, totalVolume, totalVolumeUsd });
+      return {
+        ...summaries,
+        [getAddress(token.id)]: {
+          ...summary,
+          token: _createTokenView(
+            token,
+            BigNumber.from(totalVolume),
+            BigNumber.from(totalVolumeUsd).div(BigNumber.from(totalVolume))
+          ), // use avg price at time of revenue
+          amount: totalVolume,
+          value: (totalVolumeUsd ?? '0').toString(),
+        },
+      };
+    },
+    {} as RevenueSummaryMap
+  );
 
   const positions = positionFrags.reduce((obj: any, c: BasePositionFragResponse): PositionMap => {
     const { dRate, fRate, id, lender, line: lineObj, token, ...financials } = c;
@@ -291,7 +315,7 @@ export const formatSecuredLineData = (
       positions,
     },
     escrow,
-    spigot: { type: COLLATERAL_TYPE_REVENUE, line, tokenRevenue },
+    spigot: { id: spigotId, type: COLLATERAL_TYPE_REVENUE, line, revenueSummary },
   };
 };
 
@@ -314,7 +338,15 @@ export const formatLinePageData = (
     credit,
     spigot: spigotData,
     escrow: escrowData,
-  } = formatSecuredLineData(metadata.id, positions!, escrow?.deposits || [], spigot?.summaries || [], tokenPrices);
+  } = formatSecuredLineData(
+    metadata.id,
+    escrow?.id ?? '',
+    spigot?.id ?? '',
+    positions!,
+    escrow?.deposits || [],
+    spigot?.summaries || [],
+    tokenPrices
+  );
 
   // derivative or aggregated data we need to compute and store while mapping position data
   // position id and APY
@@ -379,7 +411,15 @@ export const formatUserPortfolioData = (
         credit,
         spigot: spigotData,
         escrow: escrowData,
-      } = formatSecuredLineData(rest.id, positions, escrow?.deposits || [], spigot?.summaries || [], tokenPrices);
+      } = formatSecuredLineData(
+        rest.id,
+        escrow?.id ?? '',
+        spigot?.id ?? '',
+        positions,
+        escrow?.deposits || [],
+        spigot?.summaries || [],
+        tokenPrices
+      );
 
       return {
         ...rest,

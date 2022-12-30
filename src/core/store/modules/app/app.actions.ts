@@ -85,10 +85,10 @@ const checkExternalServicesStatus = createAsyncThunk<void, void, ThunkAPI>(
       const { zapper, simulations } = data;
 
       // TODO: Reenable Zapper alerts if that is a desired feature.
-      // if (!zapper) {
-      //   dispatch(disableService({ service: 'zapper' }));
-      //   downgradedServicesMessages.push(`Zapper ${errorMessageTemplate}`);
-      // }
+      if (!zapper) {
+        dispatch(disableService({ service: 'zapper' }));
+        downgradedServicesMessages.push(`Zapper ${errorMessageTemplate}`);
+      }
 
       if (!simulations) {
         dispatch(disableService({ service: 'tenderly' }));

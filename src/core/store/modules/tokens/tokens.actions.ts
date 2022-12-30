@@ -1,7 +1,8 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
+import { ethers } from 'ethers';
 
 import { ThunkAPI } from '@frameworks/redux';
-import { TokenDynamicData, Token, Balance, Integer, SupportedOracleTokenResponse } from '@types';
+import { TokenDynamicData, Token, Balance, Integer, SupportedOracleTokenResponse, TokenFragRepsonse } from '@types';
 import { Network } from '@types';
 import { getNetwork } from '@src/utils';
 
@@ -37,7 +38,7 @@ const getTokens = createAsyncThunk<{ tokensData: Token[] }, string | undefined, 
 
 const getSupportedOracleTokens = createAsyncThunk<{ tokensData: any }, string | undefined, ThunkAPI>(
   'tokens/getSupportedTokens',
-  async (_arg, { getState, extra }) => {
+  async (_arg, { getState, extra, dispatch }) => {
     const { tokenService } = extra.services;
     const tokensData: SupportedOracleTokenResponse | undefined = await tokenService.getSupportedOracleTokens();
     return { tokensData };
@@ -61,7 +62,9 @@ const getUserTokens = createAsyncThunk<{ userTokens: Balance[] }, { addresses?: 
   async ({ addresses }, { extra, getState }) => {
     const { wallet } = getState();
     const accountAddress = wallet.selectedAddress;
-    const walletNetwork = getNetwork(`${wallet.networkVersion}`);
+    const walletNetwork = getNetwork(wallet.networkVersion);
+    console.log('token actions - get user tokens', 'do I get here?');
+    console.log('token actions - account address', accountAddress);
     if (!accountAddress) throw new Error('WALLET NOT CONNECTED');
     console.log('');
     const { tokenService } = extra.services;
@@ -70,6 +73,7 @@ const getUserTokens = createAsyncThunk<{ userTokens: Balance[] }, { addresses?: 
       accountAddress,
       tokenAddresses: addresses,
     });
+    console.log('token actions - get user tokens', userTokens);
     return { userTokens };
   }
 );

@@ -1,3 +1,5 @@
+import { ethers } from 'ethers';
+
 import {
   TokenService,
   YearnSdk,
@@ -53,7 +55,6 @@ export class TokenServiceImpl implements TokenService {
     const { WETH } = this.config.CONTRACT_ADDRESSES;
     const yearn = this.yearnSdk.getInstanceOf(network);
     const supportedTokens = await yearn.tokens.supported();
-
     // TODO: remove fixedSupportedTokens when WETH symbol is fixed on sdk
     const fixedSupportedTokens = supportedTokens.map((token) => ({
       ...token,
@@ -85,9 +86,13 @@ export class TokenServiceImpl implements TokenService {
     accountAddress,
     tokenAddresses,
   }: GetUserTokensDataProps): Promise<Balance[]> {
+    console.log('token actions - get user token service');
+    console.log('token actions - network: ', network);
     const { USE_MAINNET_FORK } = this.config;
     const yearn = this.yearnSdk.getInstanceOf(network);
-    const balances = await yearn.tokens.balances(accountAddress);
+    console.log('token actions - yearn obj', yearn);
+    console.log('token actions - balances: ', yearn.tokens.balances(accountAddress, tokenAddresses));
+    const balances = await yearn.tokens.balances(accountAddress, tokenAddresses);
     if (USE_MAINNET_FORK) {
       return this.getBalancesForFork(balances, accountAddress);
     }

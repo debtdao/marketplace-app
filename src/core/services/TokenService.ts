@@ -82,19 +82,9 @@ export class TokenServiceImpl implements TokenService {
     return addresses.map((address: string) => ({ address, priceUsdc: pricesUsdcMap[address] }));
   }
 
-  public async getUserTokensData({
-    network,
-    accountAddress,
-    tokenAddresses,
-  }: GetUserTokensDataProps): Promise<Balance[]> {
-    // console.log('token actions - get user token service');
-    // console.log('token actions - network: ', network);
-    console.log('token actions - addresses: ', tokenAddresses);
+  public async getUserTokensData({ network, accountAddress }: GetUserTokensDataProps): Promise<Balance[]> {
     const { USE_MAINNET_FORK } = this.config;
     const yearn = this.yearnSdk.getInstanceOf(network);
-    console.log('token actions - yearn obj', yearn);
-    // console.log('token actions - balances: ', yearn.tokens.balances(accountAddress, tokenAddresses));
-    // const balances = await yearn.tokens.balances(accountAddress, tokenAddresses);
     const balances = await getBalances(yearn, network, accountAddress);
     if (USE_MAINNET_FORK) {
       return this.getBalancesForFork(balances, accountAddress);

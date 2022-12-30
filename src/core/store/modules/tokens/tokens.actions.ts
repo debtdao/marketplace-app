@@ -63,18 +63,12 @@ const getUserTokens = createAsyncThunk<{ userTokens: Balance[] }, { addresses?: 
     const { wallet } = getState();
     const accountAddress = wallet.selectedAddress;
     const walletNetwork = getNetwork(wallet.networkVersion);
-    console.log('token actions - wallet network', walletNetwork);
-    console.log('token actions - account address', accountAddress);
-    // console.log('token actions - supported addresses', addresses);
     if (!accountAddress) throw new Error('WALLET NOT CONNECTED');
-    console.log('');
     const { tokenService } = extra.services;
     const userTokens = await tokenService.getUserTokensData({
       network: walletNetwork,
       accountAddress,
-      tokenAddresses: addresses,
     });
-    console.log('token actions - get user tokens', userTokens);
     return { userTokens };
   }
 );

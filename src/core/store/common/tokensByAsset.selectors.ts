@@ -66,9 +66,6 @@ export const selectDepositTokenOptionsByAsset = createSelector(
           .map((address) => {
             const tokenData = tokensMap[address];
             const userTokenData = userTokensMap[address];
-            console.log('user token data: ', userTokenData);
-            console.log('user token address: ', address);
-            console.log('user tokens map: ', userTokensMap);
             const allowancesMap = userTokensAllowancesMap[address] ?? {};
             return createToken({ tokenData, userTokenData, allowancesMap });
           });
@@ -81,12 +78,6 @@ export const selectDepositTokenOptionsByAsset = createSelector(
             return createToken({ tokenData, userTokenData, allowancesMap });
           });
         const sortedSubgraphTokens = sortBy(subgraphTokens, (o) => o.symbol);
-        console.log(
-          'tokens: ',
-          unionBy(mainTokens, sortedSubgraphTokens, (o) => o.symbol)
-        );
-        console.log('main tokens: ', mainTokens);
-        console.log('supported tokens length: ', unionBy(mainTokens, sortedSubgraphTokens, (o) => o.symbol).length);
         // Return a list of supported tokens with mainTokens (e.g. ETH, WETH, DAI, etc.)
         // coming before subgraphTokens (e.g. AAVE, LINK, etc.) with both indepently sorted
         // from A-Z

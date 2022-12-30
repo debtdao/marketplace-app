@@ -174,9 +174,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       lineAddress: selectedCredit.id,
       network: walletNetwork!,
     };
-    console.log('approve token for lender', approvalOBj);
     dispatch(LinesActions.approveDeposit(approvalOBj)).then((res) => {
-      console.log('approve token result: ', res);
       if (res.meta.requestStatus === 'rejected') {
         setTransactionApproved(transactionApproved);
         setLoading(false);
@@ -231,7 +229,6 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
     dispatch(LinesActions.addCredit(transactionObj)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionApproved(transactionApproved);
-        //setTransactionCompleted(2);
         setLoading(false);
       }
       if (res.meta.requestStatus === 'fulfilled' && transactionType === 'accept') {

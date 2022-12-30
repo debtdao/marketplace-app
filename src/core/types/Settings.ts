@@ -14,10 +14,7 @@ export interface NetworkSettings {
       name: string;
       symbol: string;
       decimals: number;
-      address: string;
     };
-    wrappedTokenAddress: string;
-    zapsEnabled?: boolean;
     simulationsEnabled?: boolean;
     earningsEnabled?: boolean;
     notifyEnabled?: boolean;

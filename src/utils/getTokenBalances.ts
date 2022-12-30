@@ -1,7 +1,7 @@
 // NOTE: This code was adapted from Yearn SDK: https://github.com/yearn/yearn-sdk/blob/546e583/src/interfaces/token.ts#L93
 // The Yearn SDK function, balances, fails to return data.
 
-import { Address, SourceBalances, Yearn } from '@yfi/sdk';
+import { Address, Yearn } from '@yfi/sdk';
 
 import { getConstants } from '@src/config/constants';
 

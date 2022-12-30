@@ -137,7 +137,6 @@ const tokensReducer = createReducer(tokensInitialState, (builder) => {
         fetchedTokenAddesses.push(userToken.address);
         state.user.userTokensMap[userToken.address] = userToken;
       });
-      console.log('token actions - get user tokens reducer: ', state.user.userTokensMap);
       state.user.userTokensAddresses = union(state.user.userTokensAddresses, fetchedTokenAddesses);
       state.statusMap.user.getUserTokens = {};
     })

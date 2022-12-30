@@ -119,17 +119,9 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
       })
     );
 
-    //
+    // Generate User Tokens Map in state with supported tokens from subgraph
     const supportedTokens = TokensSelectors.selectSupportedTokens(getState());
-    // console.log('supported token addresses: ', supportedTokens);
     dispatch(TokensActions.getUserTokens({ addresses: supportedTokens }));
-
-    // const tokenAddresses = tokensData?.supportedTokens?.map((supportedToken: any) => {
-    //   return ethers.utils.getAddress(supportedToken.token.id);
-    // });
-    // // console.log('supported token addresses: ', tokenAddresses);
-    // dispatch(getUserTokens({ addresses: tokenAddresses }));
-
     return { isConnected };
   }
 );

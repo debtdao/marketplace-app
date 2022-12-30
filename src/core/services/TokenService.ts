@@ -22,6 +22,7 @@ import { getContract } from '@frameworks/ethers';
 import { get, getUniqueAndCombine, toBN, USDC_DECIMALS } from '@utils';
 import { getConstants } from '@config/constants';
 import { getSupportedOracleTokens } from '@frameworks/gql';
+import { getBalances } from '@src/utils/getTokenBalances';
 
 import erc20Abi from './contracts/erc20.json';
 
@@ -86,13 +87,15 @@ export class TokenServiceImpl implements TokenService {
     accountAddress,
     tokenAddresses,
   }: GetUserTokensDataProps): Promise<Balance[]> {
-    console.log('token actions - get user token service');
-    console.log('token actions - network: ', network);
+    // console.log('token actions - get user token service');
+    // console.log('token actions - network: ', network);
+    console.log('token actions - addresses: ', tokenAddresses);
     const { USE_MAINNET_FORK } = this.config;
     const yearn = this.yearnSdk.getInstanceOf(network);
     console.log('token actions - yearn obj', yearn);
-    console.log('token actions - balances: ', yearn.tokens.balances(accountAddress, tokenAddresses));
-    const balances = await yearn.tokens.balances(accountAddress, tokenAddresses);
+    // console.log('token actions - balances: ', yearn.tokens.balances(accountAddress, tokenAddresses));
+    // const balances = await yearn.tokens.balances(accountAddress, tokenAddresses);
+    const balances = await getBalances(yearn, network, accountAddress);
     if (USE_MAINNET_FORK) {
       return this.getBalancesForFork(balances, accountAddress);
     }

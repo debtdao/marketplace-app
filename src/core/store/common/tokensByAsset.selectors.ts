@@ -85,6 +85,8 @@ export const selectDepositTokenOptionsByAsset = createSelector(
           'tokens: ',
           unionBy(mainTokens, sortedSubgraphTokens, (o) => o.symbol)
         );
+        console.log('main tokens: ', mainTokens);
+        console.log('supported tokens length: ', unionBy(mainTokens, sortedSubgraphTokens, (o) => o.symbol).length);
         // Return a list of supported tokens with mainTokens (e.g. ETH, WETH, DAI, etc.)
         // coming before subgraphTokens (e.g. AAVE, LINK, etc.) with both indepently sorted
         // from A-Z

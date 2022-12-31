@@ -10,7 +10,8 @@
     "RemoveCollateralEvent"
   ],
   "EventWithValue": [
-    "ClaimEscrowEvent",
+    "ClaimOwnerTokensEvent",
+    "ClaimOperatorTokensEvent",
     "ClaimRevenueEvent",
     "TradeRevenueEvent",
     "AddCollateralEvent",
@@ -37,9 +38,9 @@
   "SpigotControllerEvent": [
     "UpdateOwnerEvent",
     "UpdateOperatorEvent",
-    "UpdateTreasuryEvent",
     "UpdateWhitelistFunctionEvent",
-    "ClaimEscrowEvent",
+    "ClaimOwnerTokensEvent",
+    "ClaimOperatorTokensEvent",
     "ClaimRevenueEvent",
     "DeploySpigotEvent"
   ],

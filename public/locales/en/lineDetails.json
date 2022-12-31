@@ -12,8 +12,7 @@
     "unsecured": "This is an unsecured line of credit. You MUST trust the borrower.",
     "revenue": {
       "title": "Revenue",
-      "per-month": "/ month",
-      "no-revenue": "No revenue earned on Spigot"
+      "total": "Total Spigoted Revenue"
     },
     "escrow": {
       "title": "Collateral",

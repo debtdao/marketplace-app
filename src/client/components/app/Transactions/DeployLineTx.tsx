@@ -232,6 +232,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
             headerText={t('components.transaction.deploy-line.cratio')}
             inputLabel={t('components.transaction.deploy-line.cratio-input')}
             width={'sm'}
+            placeholder={'30%'}
             amount={cratio}
             maxAmount={'max string'}
             onInputChange={onCratioChange}
@@ -243,6 +244,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
             headerText={t('components.transaction.deploy-line.revenue-split')}
             inputLabel={t('components.transaction.deploy-line.revenue-split-input')}
             width={'sm'}
+            placeholder={'90%'}
             amount={revenueSplit}
             maxAmount={'max string'}
             onInputChange={onRevenueSplitChange}

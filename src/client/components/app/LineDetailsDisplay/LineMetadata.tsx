@@ -182,18 +182,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
   };
   const renderSpigotMetadata = () => {
     if (!revenue) return null;
-    if (!totalRevenue)
-      return (
-        <MetricDataDisplay
-          title={t('lineDetails:metadata.revenue.no-revenue')}
-          data={`$ ${prettyNumbers(totalRevenue)}`}
-        />
-      );
     return (
-      <MetricDataDisplay
-        title={t('lineDetails:metadata.revenue.per-month')}
-        data={`$ ${prettyNumbers(totalRevenue)}`}
-      />
+      <MetricDataDisplay title={t('lineDetails:metadata.revenue.total')} data={`$ ${prettyNumbers(totalRevenue)}`} />
     );
   };
 

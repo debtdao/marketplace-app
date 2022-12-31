@@ -269,6 +269,7 @@ export const formatSecuredLineData = (
         ...summaries,
         [getAddress(token.id)]: {
           ...summary,
+          type: COLLATERAL_TYPE_REVENUE,
           token: _createTokenView(
             token,
             BigNumber.from(totalVolume),

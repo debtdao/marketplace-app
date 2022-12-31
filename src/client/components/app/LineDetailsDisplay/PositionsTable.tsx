@@ -162,8 +162,15 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
 
   //Returns a list of transactions to display on positions table
   const getUserPositionActions = (position: CreditPosition) => {
+    const repayAction = {
+      name: t('components.transaction.repay.header'),
+      handler: depositAndRepayHandler,
+      disabled: false,
+    };
+
     if (userRoleMetadata.role === ARBITER_POSITION_ROLE) {
       return [
+        repayAction,
         {
           name: t('components.transaction.liquidate'),
           handler: liquidateHandler,
@@ -181,14 +188,10 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
         };
         return [approveMutualConsent];
       }
+
       const borrowAction = {
         name: t('components.transaction.borrow'),
         handler: borrowHandler,
-        disabled: false,
-      };
-      const repayAction = {
-        name: t('components.transaction.repay.header'),
-        handler: depositAndRepayHandler,
         disabled: false,
       };
 

@@ -10,7 +10,7 @@ import { AppSelectors } from '../modules/app/app.selectors';
 import { WalletSelectors } from '../modules/wallet/wallet.selectors';
 import { TokensSelectors, createToken } from '../modules/tokens/tokens.selectors';
 import { NetworkSelectors } from '../modules/network/network.selectors';
-const { NETWORK, TOKEN_ADDRESSES } = getConfig();
+const { NETWORK, TOKEN_ADDRESSES, ETHEREUM_ADDRESS } = getConfig();
 // import { Token } from 'graphql';
 
 const { selectVaultsMap } = VaultsSelectors;
@@ -62,7 +62,7 @@ export const selectDepositTokenOptionsByAsset = createSelector(
         return testTokens;
       } else {
         const mainTokens = Object.values(TOKEN_ADDRESSES)
-          .filter((address) => !!tokensMap[address])
+          .filter((address) => !!tokensMap[address] && address !== ETHEREUM_ADDRESS)
           .map((address) => {
             const tokenData = tokensMap[address];
             const userTokenData = userTokensMap[address];

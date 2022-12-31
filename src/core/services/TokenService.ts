@@ -1,3 +1,5 @@
+import { ethers } from 'ethers';
+
 import {
   TokenService,
   YearnSdk,
@@ -20,6 +22,7 @@ import { getContract } from '@frameworks/ethers';
 import { get, getUniqueAndCombine, toBN, USDC_DECIMALS } from '@utils';
 import { getConstants } from '@config/constants';
 import { getSupportedOracleTokens } from '@frameworks/gql';
+import { getBalances } from '@src/utils/getTokenBalances';
 
 import erc20Abi from './contracts/erc20.json';
 
@@ -53,7 +56,6 @@ export class TokenServiceImpl implements TokenService {
     const { WETH } = this.config.CONTRACT_ADDRESSES;
     const yearn = this.yearnSdk.getInstanceOf(network);
     const supportedTokens = await yearn.tokens.supported();
-
     // TODO: remove fixedSupportedTokens when WETH symbol is fixed on sdk
     const fixedSupportedTokens = supportedTokens.map((token) => ({
       ...token,
@@ -80,14 +82,10 @@ export class TokenServiceImpl implements TokenService {
     return addresses.map((address: string) => ({ address, priceUsdc: pricesUsdcMap[address] }));
   }
 
-  public async getUserTokensData({
-    network,
-    accountAddress,
-    tokenAddresses,
-  }: GetUserTokensDataProps): Promise<Balance[]> {
+  public async getUserTokensData({ network, accountAddress }: GetUserTokensDataProps): Promise<Balance[]> {
     const { USE_MAINNET_FORK } = this.config;
     const yearn = this.yearnSdk.getInstanceOf(network);
-    const balances = await yearn.tokens.balances(accountAddress);
+    const balances = await getBalances(yearn, network, accountAddress);
     if (USE_MAINNET_FORK) {
       return this.getBalancesForFork(balances, accountAddress);
     }
@@ -195,12 +193,12 @@ export class TokenServiceImpl implements TokenService {
   /* -------------------------------------------------------------------------- */
   public async approve(props: ApproveProps): Promise<TransactionResponse> {
     const { network, tokenAddress, spenderAddress, amount } = props;
-    return await this.transactionService.execute({
+    return (await this.transactionService.execute({
       network,
       methodName: 'approve',
       contractAddress: tokenAddress,
       abi: erc20Abi,
       args: [spenderAddress, amount],
-    });
+    })) as TransactionResponse;
   }
 }

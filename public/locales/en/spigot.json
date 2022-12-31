@@ -1,8 +1,10 @@
 {
+  "claim-revenue": "Claim Revenue",
   "metadata": {
     "revenue": {
       "no-revenue": "",
       "per-month": "",
+      "total": "",
       "lifetime-revenue": "",
       "30d-revenue": ""
     }

@@ -178,6 +178,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
         inputText={t('components.transaction.claim-revenue.rev-contract-input')}
       />
       <TxTokenInput
+        headerText={t('components.transaction.claim-revenue.rev-token-input-header')}
         selectedToken={selectedSellToken!}
         onSelectedTokenChange={onSelectedSellTokenChange}
         tokenOptions={sourceAssetOptions}
@@ -187,6 +188,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
       <TxByteInput
         byteCode={claimData}
         onByteCodeChange={setClaimData}
+        headerText={t('components.transaction.claim-revenue.claim-data-header')}
         inputText={t('components.transaction.claim-revenue.claim-data-input')}
       />
       {/* need to fetch revContract ABI from etherscan and try to configure content that way. */}

@@ -1,4 +1,7 @@
-import { ApolloClient, InMemoryCache, DocumentNode, QueryResult, HttpLink } from '@apollo/client';
+import * as fs from 'fs';
+import * as path from 'path';
+
+import { ApolloClient, InMemoryCache, DocumentNode, QueryResult, HttpLink, ApolloLink } from '@apollo/client';
 import { at } from 'lodash';
 
 import { getEnv } from '@config/env';
@@ -30,7 +33,10 @@ import {
   GET_SUPPORTED_ORACLE_TOKENS_QUERY,
   GET_USER_PORTFOLIO_QUERY,
 } from './queries';
-import possibleTypes from './possibleTypes.json';
+import possibleSubgraphTypes from './possibleTypes.json';
+
+const fetch = require('cross-fetch');
+// import * as fetch from 'cross-fetch';
 
 // TODO: GRAPH_CHAINLINK_FEED_REGISTRY_API_URL
 const { GRAPH_API_URL, GRAPH_TEST_API_URL, GRAPH_CHAINLINK_FEED_REGISTRY_API_URL } = getEnv();
@@ -47,15 +53,85 @@ const getGraphURL = (network: string) => {
   return link;
 };
 
+type PossibleTypeMap = {
+  [supertype: string]: string[];
+};
+
+const generateSubgraphTypes = async (url: string): Promise<PossibleTypeMap> => {
+  const homeDirectory = path.resolve(process.cwd());
+  const destinationDirectory = '/src/core/frameworks/gql/possibleSubgraphTypes.json';
+  const destinationPath = path.join(homeDirectory, destinationDirectory);
+  console.log('path home: ', homeDirectory);
+  console.log('path destination: ', destinationPath);
+  return fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      variables: {},
+      query: `
+      {
+        __schema {
+          types {
+            kind
+            name
+            possibleTypes {
+              name
+            }
+          }
+        }
+      }
+    `,
+    }),
+  })
+    .then((result: Response) => result.json())
+    .then((result: any) => {
+      const possibleTypes: { [key: string]: string[] } = {};
+
+      result.data.__schema.types.forEach((supertype: any) => {
+        if (supertype.possibleTypes) {
+          possibleTypes[supertype.name] = supertype.possibleTypes.map((subtype: any) => subtype.name);
+        }
+      });
+      console.log('successful processing? ', result);
+      console.log('successful processing possibleTypes? ', possibleTypes);
+      // write file in backup directory
+      // fs.writeFile(destinationPath, JSON.stringify(possibleTypes), (err) => {
+      //   if (err) {
+      //     console.error('Error writing possibleTypes.json', err);
+      //   } else {
+      //     console.log('Fragment types successfully extracted!');
+      //   }
+      // });
+
+      // // write file in backup directory
+      // fs.writeFileSync(destinationPath, JSON.stringify(possibleTypes));
+      // console.log('Fragment types successfully extracted!');
+
+      console.log('possible types - function: ', possibleTypes);
+
+      return possibleTypes;
+    })
+    .catch((error: any) => {
+      console.error('Error generating subgraph types:', error);
+    });
+};
+
 let client: any;
 export const getClient = (network: string) => (client ? client : createClient(network));
+// const createClient = async (network: string): Promise<typeof ApolloClient> => {
 const createClient = (network: string): typeof ApolloClient => {
+  const GRAPH_API_URL_LINK = getGraphURL(network);
+  console.log('GRAPH API URL: ', GRAPH_API_URL_LINK);
+  // const possibleTypes = await generateSubgraphTypes(GRAPH_API_URL_LINK.options.uri); //??possibleSubgraphTypes;
+  // console.log('possible types - prev generated: ', possibleSubgraphTypes);
+  // console.log('possible types - newly created: ', possibleTypes);
   client = new ApolloClient({
-    link: getGraphURL(network),
+    link: GRAPH_API_URL_LINK,
     cache: new InMemoryCache({
-      possibleTypes,
+      possibleTypes: possibleSubgraphTypes, // ?? possibleTypes,
     }),
   });
+  // console.log('possible types - client: ', client);
   return client;
 };
 

@@ -142,7 +142,7 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
 
     const selectedLine = LinesSelectors.selectSelectedLinePage(state);
     const tokenPrices = TokensSelectors.selectTokenPrices(state);
-    // const network = getNetwork(state.wallet.networkVersion);
+    const network = getNetwork(state.wallet.networkVersion);
     // const selectedLine = LinesSelectors.selectSelectedLinePage(state);
     // const linePageResponse = await creditLineService.getLinePage({
     //   network,
@@ -150,6 +150,7 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
     // });
 
     // query and add credit and collateral events to pre-existing line
+    console.log('get line selected: ', selectedLine);
     if (selectedLine) {
       const lineEvents = await creditLineService.getLineEvents({ network: state.network.current, id });
       const selectedLineWithEvents = formatLineWithEvents(selectedLine, lineEvents);
@@ -158,10 +159,7 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
       return { linePageData: selectedLineWithEvents };
     } else {
       try {
-        const linePageData = formatLinePageData(
-          await creditLineService.getLinePage({ network: state.network.current, id }),
-          tokenPrices
-        );
+        const linePageData = formatLinePageData(await creditLineService.getLinePage({ network, id }), tokenPrices);
         console.log('get line page data 2: ', linePageData);
 
         if (!linePageData) throw new Error();

@@ -9,8 +9,9 @@ import { prettyNumbers } from '@src/utils';
 import {
   ARBITER_POSITION_ROLE,
   BORROWER_POSITION_ROLE,
+  Collateral,
   EscrowDeposit,
-  EscrowDepositList,
+  EscrowDepositMap,
   LENDER_POSITION_ROLE,
   RevenueSummary,
   TokenView,
@@ -105,7 +106,7 @@ interface LineMetadataProps {
   startTime: number;
   endTime: number;
   revenue?: { [token: string]: RevenueSummary };
-  deposits?: EscrowDepositList;
+  deposits?: EscrowDepositMap;
 }
 
 interface Metric {
@@ -152,19 +153,21 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const totalRevenue = isEmpty(revenue)
     ? ''
     : Object.values(revenue!)
-        .reduce((sum, rev) => sum.add(BigNumber.from(rev)), BigNumber.from('0'))
-        .div(BigNumber.from(1)) // scale to usd decimals
+        // use historical price data for revenue
+        .reduce((sum, rev) => sum.add(BigNumber.from(rev.value)), BigNumber.from('0'))
+        // .div(BigNumber.from(1)) // scale to usd decimals
         .toString();
 
   const totalCollateral = isEmpty(deposits)
     ? ''
     : Object.values(deposits!)
         .reduce<BigNumber>(
-          (sum: BigNumber, d: EscrowDeposit) =>
+          (sum: BigNumber, d) =>
+            // use current market value for tokens. if no price dont display.
             !d || !d.token.priceUsdc ? sum : sum.add(BigNumber.from(Number(d!.token.priceUsdc) ?? '0').mul(d!.amount)),
           BigNumber.from('0')
         )
-        .div(BigNumber.from(1)) // scale to usd decimals
+        // .div(BigNumber.from(1)) // scale to usd decimals
         .toString();
 
   const renderEscrowMetadata = () => {
@@ -213,7 +216,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
     }
   };
 
-  const allCollateral = [...Object.values(deposits ?? {}), ...Object.values(revenue ?? {})];
+  const allCollateral: Collateral[] = [...Object.values(deposits ?? {}), ...Object.values(revenue ?? {})];
 
   const getCollateralRowActionForRole = (role: string) => {
     switch (role) {
@@ -226,6 +229,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
     }
   };
 
+  console.log('all collateral', allCollateral);
   const formattedCollataralData = allCollateral.map((c) => ({
     ...c,
     key: c.type + c.token.toString(),

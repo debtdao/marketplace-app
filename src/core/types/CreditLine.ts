@@ -158,7 +158,7 @@ export interface EscrowDeposit extends Collateral {
   displayIcon?: string; // url to token icon
 }
 
-export interface EscrowDepositList {
+export interface EscrowDepositMap {
   [token: string]: EscrowDeposit;
 }
 
@@ -167,7 +167,7 @@ export interface AggregatedEscrow extends BaseEscrow {
   cratio: string;
   minCRatio: string;
   collateralValue: string;
-  deposits?: EscrowDepositList;
+  deposits?: EscrowDepositMap;
 }
 
 export interface RevenueSummary extends Collateral {
@@ -175,15 +175,17 @@ export interface RevenueSummary extends Collateral {
   token: TokenView;
   amount: string;
   value: string;
-  firstRevenueTimestamp: number;
-  lastRevenueTimestamp: number;
+  timeOfFirstIncome: number;
+  timeOfLastIncome: number;
 }
 
+export interface RevenueSummaryMap {
+  [key: string]: RevenueSummary;
+}
 export interface AggregatedSpigot extends BaseCollateralModule {
   id: Address;
   // aggregated revenue in USD by token across all spigots
-  tokenRevenue: { [key: string]: string }; // TODO: RevenueSummary
-  // revenueSummary: RevenueSummary;
+  revenueSummary: RevenueSummaryMap;
 }
 
 export interface MarketLines {

@@ -108,7 +108,7 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   return (
     <Container>
       <StandardMetadata
-        revenue={spigot?.tokenRevenue}
+        revenue={spigot?.revenueSummary}
         deposits={escrow?.deposits}
         deposit={deposit}
         principal={principal}

@@ -141,20 +141,17 @@ export const Modals = () => {
         </CSSTransition>
       )}
 
-      {activeModal === 'addPosition' && (
-        <CSSTransition key={'addPosition'} timeout={modalTimeout} classNames="slideBottom">
-          <AddCreditPositionTxModal onClose={closeModal} />
-        </CSSTransition>
-      )}
+      {/* //////////////////////////// CREDIT ///////////////////////////// */}
 
-      {activeModal === 'liquidateBorrower' && (
-        <CSSTransition key={'liquidateBorrower'} timeout={modalTimeout} classNames="slideBottom">
-          <LiquidateBorrowerTxModal onClose={closeModal} />
-        </CSSTransition>
-      )}
       {activeModal === 'createLine' && (
         <CSSTransition key={'createLine'} timeout={modalTimeout} classNames="slideBottom">
           <DeployLineTxModal onClose={closeModal} />
+        </CSSTransition>
+      )}
+
+      {activeModal === 'addPosition' && (
+        <CSSTransition key={'addPosition'} timeout={modalTimeout} classNames="slideBottom">
+          <AddCreditPositionTxModal onClose={closeModal} />
         </CSSTransition>
       )}
 
@@ -169,6 +166,8 @@ export const Modals = () => {
           <RepayPositionTxModal onClose={closeModal} />
         </CSSTransition>
       )}
+
+      {/* //////////////////////////// COLLATERAL ///////////////////////////// */}
 
       {activeModal === 'withdraw' && (
         <CSSTransition key={'withdraw'} timeout={modalTimeout} classNames="slideBottom">
@@ -197,6 +196,12 @@ export const Modals = () => {
       {activeModal === 'claimRevenue' && (
         <CSSTransition key={'claimRevenue'} timeout={modalTimeout} classNames="slideBottom">
           <ClaimRevenueTxModal onClose={closeModal} />
+        </CSSTransition>
+      )}
+
+      {activeModal === 'liquidateBorrower' && (
+        <CSSTransition key={'liquidateBorrower'} timeout={modalTimeout} classNames="slideBottom">
+          <LiquidateBorrowerTxModal onClose={closeModal} />
         </CSSTransition>
       )}
 

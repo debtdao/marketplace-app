@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
 import { RedirectIcon, Text, Link } from '@components/common';
 import { OnchainMetaDataActions, OnchainMetaDataSelector, LinesSelectors, NetworkSelectors } from '@store';
+import { Network } from '@src/core/types';
 import { getENS } from '@src/utils';
 
 import { LineMetadata } from './LineMetadata';
@@ -12,6 +13,7 @@ import { PositionsTable } from './PositionsTable';
 
 interface LineDetailsProps {
   onAddCollateral?: Function;
+  lineNetwork: Network;
 }
 
 const Container = styled.div`
@@ -66,7 +68,6 @@ const BorrowerName = styled(Text)`
 export const LineDetailsDisplay = (props: LineDetailsProps) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
-  const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
@@ -89,25 +90,22 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
   const { principal, deposit, escrow, borrower, spigot, start, end } = selectedLine;
 
-  const StandardMetadata = (metadataProps: any) => (
-    <>
+  console.log('line detail index lineNetwork', props.lineNetwork);
+  const StandardMetadata = (metadataProps: any) => <></>;
+
+  // allow passing in core data first if we have it already and let Page data render once returned
+  // if we have all data render full UI
+  return (
+    <Container>
       <Header>
-        <RouterLink to={`/portfolio/${currentNetwork}/${borrower}`} key={borrower} selected={false}>
+        <RouterLink to={`/portfolio/${props.lineNetwork}/${borrower}`} key={borrower} selected={false}>
           <BorrowerName>
             {t('lineDetails:metadata.borrower')} {'  :  '} {borrowerID}
             <Redirect />
           </BorrowerName>
         </RouterLink>
       </Header>
-      <LineMetadata {...metadataProps} />
-    </>
-  );
-
-  // allow passing in core data first if we have it already and let Page data render once returned
-  // if we have all data render full UI
-  return (
-    <Container>
-      <StandardMetadata
+      <LineMetadata
         revenue={spigot?.revenueSummary}
         deposits={escrow?.deposits}
         deposit={deposit}
@@ -115,6 +113,7 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
         totalInterestPaid={'0'}
         startTime={start}
         endTime={end}
+        lineNetwork={props.lineNetwork}
       />
 
       {positions && <PositionsTable positions={_.values(positions)} />}

@@ -9,8 +9,6 @@ import { prettyNumbers } from '@src/utils';
 import {
   ARBITER_POSITION_ROLE,
   BORROWER_POSITION_ROLE,
-  EscrowDeposit,
-  EscrowDepositList,
   LENDER_POSITION_ROLE,
   RevenueSummary,
   TokenView,

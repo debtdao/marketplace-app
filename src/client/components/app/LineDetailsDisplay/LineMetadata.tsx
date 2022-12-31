@@ -13,6 +13,7 @@ import {
   EscrowDeposit,
   EscrowDepositMap,
   LENDER_POSITION_ROLE,
+  Network,
   RevenueSummary,
   TokenView,
 } from '@src/core/types';
@@ -107,6 +108,7 @@ interface LineMetadataProps {
   endTime: number;
   revenue?: { [token: string]: RevenueSummary };
   deposits?: EscrowDepositMap;
+  lineNetwork: Network;
 }
 
 interface Metric {
@@ -149,7 +151,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const { NETWORK } = getEnv();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
-  const { principal, deposit, totalInterestPaid, revenue, deposits } = props;
+  const { lineNetwork, principal, deposit, totalInterestPaid, revenue, deposits } = props;
   const totalRevenue = isEmpty(revenue)
     ? ''
     : Object.values(revenue!)
@@ -279,7 +281,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
       </ThreeColumnLayout>
       <SectionHeader>
         {t('lineDetails:metadata.secured-by')}
-        <CollateralTypeName to={'/spigots/' + selectedLine?.spigotId}>
+        <CollateralTypeName to={`/spigots/${lineNetwork}/${selectedLine?.spigotId}`}>
           {' '}
           {t(`lineDetails:metadata.revenue.title`)}{' '}
         </CollateralTypeName>

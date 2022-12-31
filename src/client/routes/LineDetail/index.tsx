@@ -35,6 +35,7 @@ const LineDetailView = styled(ViewContainer)`
 
 export interface LineDetailRouteParams {
   lineAddress: string;
+  network: string;
 }
 
 export const LineDetail = () => {
@@ -43,7 +44,7 @@ export const LineDetail = () => {
   const history = useHistory();
   const isMounting = useIsMounting();
   const { NETWORK_SETTINGS } = getConfig();
-  const { lineAddress } = useParams<LineDetailRouteParams>();
+  const { network, lineAddress } = useParams<LineDetailRouteParams>();
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
   const tokensStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
@@ -98,7 +99,7 @@ export const LineDetail = () => {
   //const displayAddToken = walletIsConnected && walletName.name === 'MetaMask';
   return (
     <LineDetailView>
-      {selectedLine && <LineDetailsDisplay />}
+      {selectedLine && <LineDetailsDisplay lineNetwork={network} />}
       {generalLoading && <SpinnerLoading flex="1" width="100%" height="20%" />}
 
       {!generalLoading && !selectedLine && (

@@ -44,6 +44,7 @@ const SpigotView = styled(ViewContainer)`
 
 export interface SpigotRouteParams {
   spigotAddress: string;
+  network: string;
 }
 
 export const Spigot = () => {
@@ -51,7 +52,7 @@ export const Spigot = () => {
   const dispatch = useAppDispatch();
   const history = useHistory();
   const isMounting = useIsMounting();
-  const { spigotAddress } = useParams<SpigotRouteParams>();
+  const { network, spigotAddress } = useParams<SpigotRouteParams>();
   const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
 
@@ -75,7 +76,8 @@ export const Spigot = () => {
   if (!selectedSpigot) return null;
 
   const generalLoading = appStatus.loading;
-  const { id, line, tokenRevenue } = selectedSpigot;
+  const { id, line, revenueSummary } = selectedSpigot;
+  console.log('spiggy rev summy', revenueSummary);
   // getSpigotPageStatus.loading ||
   // tokensStatus.loading;
 
@@ -83,7 +85,7 @@ export const Spigot = () => {
   return (
     <SpigotView>
       <SpigotDisplay />
-      {line ? <Link to={`/lines/${line}`}> {t("View Spigot's owner")}</Link> : null}
+      {line ? <Link to={`/lines/${network}/${line}`}> {t("View Spigot's owner")}</Link> : null}
       {generalLoading && <SpinnerLoading flex="1" width="100%" height="20%" />}
     </SpigotView>
   );

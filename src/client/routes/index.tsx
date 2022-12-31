@@ -24,7 +24,7 @@ const routes = [
     component: LineDetail,
   },
   {
-    path: '/spigots/:spigotAddress',
+    path: '/spigots/:network/:spigotAddress',
     component: Spigot,
   },
   {

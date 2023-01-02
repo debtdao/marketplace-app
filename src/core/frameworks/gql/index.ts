@@ -33,7 +33,8 @@ import {
   GET_SUPPORTED_ORACLE_TOKENS_QUERY,
   GET_USER_PORTFOLIO_QUERY,
 } from './queries';
-import possibleSubgraphTypes from './possibleTypes.json';
+// import possibleSubgraphTypes from './possibleTypes.json';
+import { possibleTypes } from './possibleTypes.js';
 
 const fetch = require('cross-fetch');
 // import * as fetch from 'cross-fetch';
@@ -128,7 +129,8 @@ const createClient = (network: string): typeof ApolloClient => {
   client = new ApolloClient({
     link: GRAPH_API_URL_LINK,
     cache: new InMemoryCache({
-      possibleTypes: possibleSubgraphTypes, // ?? possibleTypes,
+      // possibleTypes: possibleSubgraphTypes, // ?? possibleTypes,
+      possibleTypes,
     }),
   });
   // console.log('possible types - client: ', client);

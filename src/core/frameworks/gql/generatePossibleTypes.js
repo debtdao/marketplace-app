@@ -12,9 +12,9 @@ const fetch = require('cross-fetch');
 const GRAPH_API_URL = process.env.GRAPH_API_URL;
 
 const homeDirectory = path.resolve(process.cwd());
-const destinationDirectoryJSON = '/src/core/frameworks/gql/possibleTypes.json';
+// const destinationDirectoryJSON = '/src/core/frameworks/gql/possibleTypes.json';
+// const destinationPathJSON = path.join(homeDirectory, destinationDirectoryJSON);
 const destinationDirectoryJS = '/src/core/frameworks/gql/possibleTypes.js';
-const destinationPathJSON = path.join(homeDirectory, destinationDirectoryJSON);
 const destinationPathJS = path.join(homeDirectory, destinationDirectoryJS);
 
 fetch(`${GRAPH_API_URL}`, {
@@ -55,13 +55,13 @@ fetch(`${GRAPH_API_URL}`, {
     //   }
     // });
 
-    fs.writeFile(destinationPathJSON, JSON.stringify(possibleTypes), (err) => {
-      if (err) {
-        console.error('Error writing possibleTypes.json', err);
-      } else {
-        console.log('Fragment types successfully extracted!');
-      }
-    });
+    // fs.writeFile(destinationPathJSON, JSON.stringify(possibleTypes), (err) => {
+    //   if (err) {
+    //     console.error('Error writing possibleTypes.json', err);
+    //   } else {
+    //     console.log('Fragment types successfully extracted!');
+    //   }
+    // });
 
     fs.writeFile(
       destinationPathJS,

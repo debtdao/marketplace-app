@@ -255,6 +255,8 @@ export function formatGetLinesData(
     );
     // const deposits = escrowRes?.deposits.map((d: any) => ({ ...d, token: d.token.id }));
     // formatAggData (positions, deposits, summaries);
+    console.log('escrow 1: ', escrow);
+    console.log('escrow 2: ', escrowRes);
 
     return {
       ...rest,
@@ -309,7 +311,6 @@ export const formatSecuredLineData = (
   //   deposits: EscrowDepositList;
   //   // TODO add formated deposits here
   // };
-
   // TODO: Add EscrowDeposit map to AggregatedEscrow type
   // TODO: Remove this before merging into develop.
   // spigot: AggregatedSpigot;
@@ -325,6 +326,7 @@ export const formatSecuredLineData = (
   // derivative or aggregated data we need to compute and store while mapping position data
   const collateralDeposits: BaseEscrowDepositFragResponse[] = escrow?.deposits || [];
   const revenues: SpigotRevenueSummaryFragResponse[] = spigot?.summaries || [];
+  console.log('category lines escrow: ', escrow);
 
   // position id, token address, APY
   const highestApy: [string, string, string] = ['', '', '0'];
@@ -390,7 +392,7 @@ export const formatSecuredLineData = (
   const creditEvents = formatCreditEvents('', BigNumber.from(0), eventFrags);
 
   const aggregatedEscrow = {
-    id: escrow.id,
+    id: escrowId,
     type: COLLATERAL_TYPE_ASSET,
     line,
     deposits,

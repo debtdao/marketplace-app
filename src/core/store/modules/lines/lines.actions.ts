@@ -153,7 +153,7 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
     console.log('get line selected: ', selectedLine);
     if (selectedLine) {
       const lineEvents = await creditLineService.getLineEvents({ network: state.network.current, id });
-      const selectedLineWithEvents = formatLineWithEvents(selectedLine, lineEvents);
+      const selectedLineWithEvents = formatLineWithEvents(selectedLine, lineEvents, tokenPrices);
       console.log('FormatLineWithEvents - selected line: ', selectedLine);
       console.log('get line events: ', lineEvents);
       console.log('FormatLineWithEvents  - get line page data 1: ', selectedLineWithEvents);

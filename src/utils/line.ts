@@ -470,7 +470,8 @@ export const formatSecuredLineData = (
 
 export const formatLineWithEvents = (
   selectedLine: SecuredLineWithEvents,
-  lineEvents: GetLineEventsResponse | undefined
+  lineEvents: GetLineEventsResponse | undefined,
+  tokenPrices: { [token: string]: BigNumber }
 ): SecuredLineWithEvents | undefined => {
   if (!lineEvents) return undefined;
   const { creditEvents: oldCreditEvents, collateralEvents: oldCollateralEvents, escrow, ...rest } = selectedLine;
@@ -479,8 +480,8 @@ export const formatLineWithEvents = (
   // Create collateralEvents
   console.log('FormatLineWithEvents - Get Line Events: ', lineEvents);
   console.log('FormatLineWithEvents - selectedLine: ', selectedLine);
-  console.log('Get Line Events Escrow: ', escrow);
-  console.log('Get Line Events Spigot: ', spigot);
+  // console.log('Get Line Events Escrow: ', escrow);
+  // console.log('Get Line Events Spigot: ', spigot);
   const collateralEvents = formatEscrowToCollateralEvents(escrow);
   // console.log('get line page data 1: ', collateralEvents);
   console.log('FormatLineWithEvents - collateralEvents: ', collateralEvents);
@@ -503,11 +504,60 @@ export const formatLineWithEvents = (
   // );
   // console.log('escrow events: ', escrowCollateralEvents);
   // add spigot.events to selectedLine
-  // let escrowRes = { ...escrow };
-  // escrowRes.deposits =
+
+  // Create new aggregated escrow object
+  const [collateralValue, deposits]: [BigNumber, EscrowDepositMap] = lineEvents.escrow.deposits.reduce(
+    (agg, collateralDeposit) => {
+      const price = unnullify(tokenPrices[collateralDeposit.token.id], true);
+      return !collateralDeposit.enabled
+        ? agg
+        : [
+            agg[0].add(parseUnits(unnullify(collateralDeposit.amount).toString(), 'ether').mul(price)),
+            {
+              ...agg[1],
+              [collateralDeposit.token.id]: {
+                ...collateralDeposit,
+                type: COLLATERAL_TYPE_ASSET,
+                token: _createTokenView(collateralDeposit.token, BigNumber.from(collateralDeposit.amount), price),
+              },
+            },
+          ];
+    },
+    [BigNumber.from(0), {}]
+  );
+
+  const aggregatedEscrow: AggregatedEscrow = {
+    id: escrow!.id,
+    type: COLLATERAL_TYPE_ASSET,
+    line: escrow!.line,
+    deposits,
+    collateralValue: collateralValue.toString(),
+    cratio: escrow!.cratio,
+    minCRatio: escrow!.minCRatio,
+  };
+  console.log('FormatLineWithEvents - aggregatedEscrow: ', aggregatedEscrow);
+  // const aggregatedEscrow = {
+  //   id: escrowId,
+  //   type: COLLATERAL_TYPE_ASSET,
+  //   line,
+  //   deposits,
+  //   collateralValue: collateralValue.toString(),
+  //   cratio: parseUnits(unnullify(credit.principal).toString(), 'ether').eq(0)
+  //     ? '0'
+  //     : collateralValue.div(unnullify(credit.principal).toString()).toString(),
+  //   // TODO: fill in with appropriate value, not copied directly from cratio
+  //   minCRatio: parseUnits(unnullify(credit.principal).toString(), 'ether').eq(0)
+  //     ? '0'
+  //     : collateralValue.div(unnullify(credit.principal).toString()).toString(),
+  // };
 
   // Add collateralEvents and creditEvents to SecuredLine
-  const selectedLineWithEvents = { creditEvents, collateralEvents, escrow, ...rest } as SecuredLineWithEvents;
+  const selectedLineWithEvents = {
+    creditEvents,
+    collateralEvents,
+    escrow: aggregatedEscrow,
+    ...rest,
+  } as SecuredLineWithEvents;
   return selectedLineWithEvents;
 };
 

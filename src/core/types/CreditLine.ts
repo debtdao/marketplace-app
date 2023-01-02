@@ -167,11 +167,9 @@ export interface AggregatedEscrow extends BaseEscrow, BaseCollateralModule {
   cratio: string;
   minCRatio: string;
   collateralValue: string;
-  // TODO: remove or add back in?
-  // deposits?: EscrowDepositList;
-  // type: CollateralTypes;
-  // line: string;
-  // events?: CollateralEvent[];
+  type: CollateralTypes;
+  line: string;
+  events?: CollateralEvent[];
   deposits?: EscrowDepositMap;
 }
 

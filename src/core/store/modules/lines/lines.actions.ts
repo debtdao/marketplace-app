@@ -434,7 +434,7 @@ const depositAndRepay = createAsyncThunk<
     //dispatch(getLinePage({ id: lineAddress }));
     // dispatch(getUserLinesSummary());
     // dispatch(getUserLinesMetadata({ linesAddresses: [lineAddress] }));
-    //dispatch(TokensActions.getUserTokens({ addresses: [tokenAddress, lineAddress] }));
+    // dispatch(TokensActions.getUserTokens({ addresses: [tokenAddress, lineAddress] }));
   },
   {
     // serializeError: parseError,
@@ -646,7 +646,6 @@ const liquidate = createAsyncThunk<
     // dispatch(getLinePage({ id: lineAddress }));
     // // dispatch(getUserLinesSummary());
     // // dispatch(getUserLinesMetadata({ linesAddresses: [lineAddress] }));
-    // dispatch(TokensActions.getUserTokens({ addresses: [tokenAddress, lineAddress] }));
   },
   {
     // serializeError: parseError,

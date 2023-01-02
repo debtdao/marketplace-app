@@ -45,10 +45,11 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
 
   // Deploy Line base data state
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
+  const walletAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
 
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const { header, onClose } = props;
-  const [borrower, setBorrower] = useState('');
+  const [borrowerAddress, setBorrowerAddress] = useState(walletAddress ? walletAddress : '');
   const [inputAddressWarning, setWarning] = useState('');
   const [inputTTLWarning, setTTLWarning] = useState('');
   const [loading, setLoading] = useState(false);
@@ -92,12 +93,12 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
   };
 
   const onBorrowerAddressChange = (address: string) => {
-    setBorrower(address);
+    setBorrowerAddress(address);
   };
 
   const deploySecuredLineNoConfig = async () => {
     setLoading(true);
-    let checkSumAddress = await isAddress(borrower);
+    let checkSumAddress = await isAddress(borrowerAddress);
     let ttl = Number(timeToLive) * 24 * 60 * 60;
 
     if (!checkSumAddress || walletNetwork === undefined) {
@@ -116,7 +117,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       dispatch(
         LinesActions.deploySecuredLine({
           factory: getLineFactoryforNetwork(walletNetwork!)!,
-          borrower,
+          borrower: borrowerAddress,
           ttl: BigNumber.from(ttl.toFixed(0)),
           network: walletNetwork,
         })
@@ -137,7 +138,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
 
   const deploySecuredLineWithConfig = async () => {
     setLoading(true);
-    let checkSumAddress = await isAddress(borrower);
+    let checkSumAddress = await isAddress(borrowerAddress);
 
     let ttl = Number(timeToLive) * 24 * 60 * 60;
 
@@ -153,7 +154,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       dispatch(
         LinesActions.deploySecuredLineWithConfig({
           factory: getLineFactoryforNetwork(walletNetwork!)!,
-          borrower,
+          borrower: borrowerAddress,
           ttl: BigNumber.from(ttl.toFixed(0)),
           network: walletNetwork,
           revenueSplit: BigNumber.from(revenueSplit),
@@ -203,9 +204,10 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       <TxAddressInput
         key={'credit-input'}
         headerText={t('components.transaction.deploy-line.select-borrower')}
-        inputText={t('components.transaction.deploy-line.select-borrower')}
+        // inputText={t('components.transaction.deploy-line.select-borrower')}
+        inputText={''}
         onAddressChange={onBorrowerAddressChange}
-        address={borrower}
+        address={borrowerAddress}
         // creditOptions={sourceCreditOptions}
         // inputError={!!sourceStatus.error}
         readOnly={false}

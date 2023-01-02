@@ -204,7 +204,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(getLinePage.fulfilled, (state, { payload: { linePageData } }) => {
       if (linePageData) {
         // overwrite actual positions with referential ids
-        const { positions, collateralEvents, creditEvents, ...metadata } = linePageData;
+        const { positions, creditEvents, ...metadata } = linePageData;
         state.linesMap = { ...state.linesMap, [linePageData.id]: { ...metadata } };
         state.positionsMap = { ...state.positionsMap, ...positions };
         state.eventsMap = { ...state.eventsMap, [metadata.id]: creditEvents };

@@ -114,8 +114,10 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
       if (line.escrow) map[line.escrowId!] = line.escrow;
       if (line.spigot) map[line.spigotId!] = line.spigot;
       state.collateralMap = { ...state.collateralMap, ...map };
-      state.eventsMap = { ...state.eventsMap, [line.id]: line.collateralEvents };
+      // state.eventsMap = { ...state.eventsMap, [line.id]: line.collateralEvents };
+      state.eventsMap = { ...state.eventsMap, [line.id]: line.escrow!.events ?? [] };
       // console.log('Get Line Page collateral reducer eventsMap: ', state.eventsMap);
+      console.log('Get Line Page collateral reducer collateralMap: ', state.collateralMap);
     })
 
     /* -------------------------------- getUserPortfolio ------------------------------- */

@@ -1,5 +1,5 @@
 import { isEmpty, zipWith } from 'lodash';
-import { BigNumber, utils } from 'ethers';
+import { BigNumber, ethers, utils } from 'ethers';
 import { getAddress } from '@ethersproject/address';
 import _ from 'lodash';
 
@@ -38,6 +38,7 @@ import {
   RevenueSummary,
   RevenueSummaryMap,
   AggregatedSpigot,
+  SpigotEventFragResponse,
 } from '@types';
 
 import { humanize, normalizeAmount, normalize } from './format';
@@ -90,10 +91,7 @@ export const formatCollateralEvents = (
   type: ModuleNames,
   token: TokenFragRepsonse,
   price: BigNumber = BigNumber.from(0),
-  // events: EscrowDepositList,
-  // events: CollateralEvent[],
   events: EscrowEventFragResponse[] | undefined,
-  // events: EscrowDepositList, //| SpigotEvents, //
   tokenRevenue?: any
 ): [number, CollateralEvent[]] => {
   let totalVal = 0;
@@ -135,6 +133,23 @@ export const formatCollateralEvents = (
   });
   const validEvents = newEvents.filter((x) => !!x) as CollateralEvent[];
   return [totalVal, validEvents];
+};
+
+export const formatSpigotCollateralEvents = (events: SpigotEventFragResponse[] | undefined): CollateralEvent[] => {
+  if (!events) return [];
+  const spigotEvents = events
+    .filter((event: SpigotEventFragResponse) => event.__typename === 'ClaimRevenueEvent')
+    .map((event: SpigotEventFragResponse) => {
+      const { revenueToken, escrowed: amount, timestamp, value } = event;
+      return {
+        id: revenueToken.id as Address,
+        type: 'revenue' as CollateralTypes,
+        timestamp,
+        amount: Number(amount),
+        value: Number(value),
+      };
+    });
+  return spigotEvents;
 };
 
 /** Formatting functions. from GQL structured response to flat data for redux state  */
@@ -313,12 +328,14 @@ export const formatSecuredLineData = (
     {} as RevenueSummaryMap
   );
 
+  const spigotEvents = formatSpigotCollateralEvents(spigot.events);
+
   const aggregatedSpigot: AggregatedSpigot = {
     id: spigotId,
     type: COLLATERAL_TYPE_REVENUE,
     line,
     revenueSummary,
-    events: spigot.events,
+    events: spigotEvents,
   };
 
   const positions = positionFrags.reduce((obj: any, c: BasePositionFragResponse): PositionMap => {
@@ -405,6 +422,9 @@ export const formatLineWithEvents = (
     )
   );
 
+  // Get spigot collateral events
+  const spigotEvents = formatSpigotCollateralEvents(lineEvents.spigot.events);
+
   // Add events and deposits to escrow object
   const aggregatedEscrow: AggregatedEscrow = {
     id: escrow!.id,
@@ -423,10 +443,8 @@ export const formatLineWithEvents = (
     type: COLLATERAL_TYPE_ASSET,
     line: spigot!.line,
     revenueSummary: spigot!.revenueSummary,
-    events: spigot?.events ?? [],
+    events: spigotEvents,
   };
-  console.log('FormatLineWithEvents  - spigot: ', selectedLine.spigot);
-  console.log('FormatLineWithEvents  - spigot events: ', lineEvents.spigot);
 
   // Add collateralEvents and creditEvents to SecuredLine
   const selectedLineWithEvents = {

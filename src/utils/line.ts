@@ -197,9 +197,7 @@ export const formatSecuredLineData = (
   positionFrags: (BasePositionFragResponse | BasePositionFragResponse)[],
   eventFrags: LineEventFragResponse[],
   escrow: any,
-  // collateralDeposits: BaseEscrowDepositFragResponse[],
   spigot: any,
-  // revenues: SpigotRevenueSummaryFragResponse[],
   tokenPrices: { [token: string]: BigNumber }
 ): {
   credit: {
@@ -276,11 +274,9 @@ export const formatSecuredLineData = (
     )
   );
 
-  // TODO: get spigot collateral events
-
   const creditEvents = formatCreditEvents('', BigNumber.from(0), eventFrags);
 
-  const aggregatedEscrow = {
+  const aggregatedEscrow: AggregatedEscrow = {
     id: escrowId,
     type: COLLATERAL_TYPE_ASSET,
     line,
@@ -317,6 +313,14 @@ export const formatSecuredLineData = (
     {} as RevenueSummaryMap
   );
 
+  const aggregatedSpigot: AggregatedSpigot = {
+    id: spigotId,
+    type: COLLATERAL_TYPE_REVENUE,
+    line,
+    revenueSummary,
+    events: spigot.events,
+  };
+
   const positions = positionFrags.reduce((obj: any, c: BasePositionFragResponse): PositionMap => {
     const { dRate, fRate, id, lender, line: lineObj, token, ...financials } = c;
     const lenderAddress = lender.id;
@@ -351,7 +355,7 @@ export const formatSecuredLineData = (
     },
     creditEvents,
     escrow: aggregatedEscrow,
-    spigot: { id: spigotId, type: COLLATERAL_TYPE_REVENUE, line, revenueSummary },
+    spigot: aggregatedSpigot,
   };
 };
 
@@ -361,7 +365,7 @@ export const formatLineWithEvents = (
   tokenPrices: { [token: string]: BigNumber }
 ): SecuredLineWithEvents | undefined => {
   if (!lineEvents) return undefined;
-  const { creditEvents: oldCreditEvents, escrow, ...rest } = selectedLine;
+  const { creditEvents: oldCreditEvents, escrow, spigot, ...rest } = selectedLine;
   const { events: creditEvents } = lineEvents;
 
   // Create new aggregated escrow object
@@ -413,10 +417,22 @@ export const formatLineWithEvents = (
     deposits,
   };
 
+  // Add events to spigot object
+  const aggregatedSpigot: AggregatedSpigot = {
+    id: spigot!.id,
+    type: COLLATERAL_TYPE_ASSET,
+    line: spigot!.line,
+    revenueSummary: spigot!.revenueSummary,
+    events: spigot?.events ?? [],
+  };
+  console.log('FormatLineWithEvents  - spigot: ', selectedLine.spigot);
+  console.log('FormatLineWithEvents  - spigot events: ', lineEvents.spigot);
+
   // Add collateralEvents and creditEvents to SecuredLine
   const selectedLineWithEvents = {
     creditEvents,
     escrow: aggregatedEscrow,
+    spigot: aggregatedSpigot,
     ...rest,
   } as SecuredLineWithEvents;
   return selectedLineWithEvents;
@@ -454,11 +470,6 @@ export const formatLinePageData = (
     tokenPrices
   );
 
-  const formattedSpigot = {
-    ...spigot!,
-    ...spigotData,
-  };
-
   const pageData: SecuredLineWithEvents = {
     // metadata
     ...metadata,
@@ -470,7 +481,8 @@ export const formatLinePageData = (
     // TODO add UsePositionMetada,
     spigotId: spigot?.id ?? '',
     escrowId: escrow?.id ?? '',
-    spigot: formattedSpigot,
+    // spigot: formattedSpigot,
+    spigot: spigotData,
     escrow: escrowData,
   };
   return pageData;

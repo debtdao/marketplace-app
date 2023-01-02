@@ -188,6 +188,7 @@ export interface AggregatedSpigot extends BaseCollateralModule {
   id: Address;
   // aggregated revenue in USD by token across all spigots
   revenueSummary: RevenueSummaryMap;
+  events?: CollateralEvent[];
 }
 
 export interface MarketLines {

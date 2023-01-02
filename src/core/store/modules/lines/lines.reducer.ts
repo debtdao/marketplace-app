@@ -189,7 +189,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
           categories[category] = [...(categories[category] || []), l.id];
         })
       );
-      // console.log('Get Lines linesdata: ', lines);
       state.linesMap = { ...state.linesMap, ...lines };
       state.positionsMap = { ...state.positionsMap, ...positions };
       state.categories = { ...state.categories, ...categories };

@@ -407,9 +407,7 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   public async getLinePage(prop: GetLinePageProps): Promise<GetLinePageResponse | undefined> {
     const response = getLinePage(prop)
-      .then((data) => {
-        return data;
-      })
+      .then((data) => data)
       .catch((err) => {
         console.log('CreditLineService: error fetching line page data', err);
         return undefined;
@@ -432,9 +430,7 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   public async getUserPortfolio(prop: GetUserPortfolioProps): Promise<GetUserPortfolioResponse | undefined> {
     const response = getUserPortfolio(prop)
-      .then((data) => {
-        return data;
-      })
+      .then((data) => data)
       .catch((err) => {
         console.log('CreditLineService error fetching user portfolio', err);
         return undefined;

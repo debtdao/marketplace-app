@@ -79,7 +79,6 @@ export interface Item extends SecuredLine {
 // data that isnt included in SecuredLine that we need to fetch for full SecuredLineWithEvents dattype
 // gets merged into existing SecuredLine to form SecuredLineWithEvents
 export interface LineEvents {
-  // collateralEvents: CollateralEvent[];
   creditEvents: CreditEvent[];
 }
 
@@ -155,7 +154,7 @@ export interface EscrowDeposit extends Collateral {
   value: string;
   enabled: boolean;
   displayIcon?: string; // url to token icon
-  events?: EscrowEvent[];
+  events?: CollateralEvent[];
 }
 
 export interface EscrowDepositMap {
@@ -265,13 +264,6 @@ export interface SetRateEvent {
   timestamp: number;
   dRate: number;
   fRate: number;
-}
-
-// Escrow Events
-export interface EscrowEvent {
-  __typename: string;
-  id: Address;
-  timestamp: number;
 }
 
 // Collateral Events

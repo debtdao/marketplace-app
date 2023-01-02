@@ -100,17 +100,10 @@ export const formatCollateralEvents = (
   if (!events) return [totalVal, []];
   // TODO promise.all token price fetching for better performance
   const newEvents: (CollateralEvent | undefined)[] = events?.map((event: any): CollateralEvent | undefined => {
-    // console.log('get line page data - individual event: ', event);
     const { __typename, timestamp, amount, value = unnullify(0, true) } = event;
     if (!timestamp || !amount) return undefined;
-    // console.log(
-    //   'get line page data - individual event 2: ',
-    //   unnullify(price.toString(), true),
-    //   unnullify((amount.toString(), true))
-    // );
     // const valueNow = unnullify(price.toString(), true).times(unnullify((amount.toString(), true)));
     const valueNow = 0;
-    console.log('get line page data - individual event 3: ', valueNow);
     let collatType;
     switch (type) {
       case SPIGOT_MODULE_NAME:
@@ -141,7 +134,6 @@ export const formatCollateralEvents = (
     };
   });
   const validEvents = newEvents.filter((x) => !!x) as CollateralEvent[];
-  // console.log('line page data - valid events: ', validEvents);
   return [totalVal, validEvents];
 };
 
@@ -422,7 +414,6 @@ export const formatLineWithEvents = (
   };
 
   // Add collateralEvents and creditEvents to SecuredLine
-  console.log('FormatLineWithEvents  - ...rest:  ', rest);
   const selectedLineWithEvents = {
     creditEvents,
     escrow: aggregatedEscrow,
@@ -437,7 +428,6 @@ export const formatLinePageData = (
 ): SecuredLineWithEvents | undefined => {
   if (!lineData) return undefined;
   // add token Prices as arg
-  // console.log('User Portfolio actions selectedLine 2: ', lineData);
   const {
     spigot,
     escrow,

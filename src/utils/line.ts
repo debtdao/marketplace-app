@@ -87,6 +87,7 @@ export const formatCreditEvents = (
  * @return totalVal, CollateralEvent[] - current total value of all collateral
  */
 
+// TODO: refactor this function as it currently only works for Escrow events, not Spigot events or Line/Credit Events
 export const formatCollateralEvents = (
   type: ModuleNames,
   token: TokenFragRepsonse,
@@ -135,6 +136,7 @@ export const formatCollateralEvents = (
   return [totalVal, validEvents];
 };
 
+// TODO: Refactor this function by merging it with formatCollateralEvents.
 export const formatSpigotCollateralEvents = (events: SpigotEventFragResponse[] | undefined): CollateralEvent[] => {
   if (!events) return [];
   const spigotEvents = events

@@ -245,8 +245,8 @@ export function formatGetLinesData(
     } = data;
     const { credit, spigot, escrow } = formatSecuredLineData(
       rest.id,
-      escrowRes?.id ?? '',
       spigotRes?.id ?? '',
+      escrowRes?.id ?? '',
       positions,
       events,
       escrowRes?.deposits ?? [],
@@ -255,8 +255,6 @@ export function formatGetLinesData(
     );
     // const deposits = escrowRes?.deposits.map((d: any) => ({ ...d, token: d.token.id }));
     // formatAggData (positions, deposits, summaries);
-    console.log('escrow 1: ', escrow);
-    console.log('escrow 2: ', escrowRes);
 
     return {
       ...rest,
@@ -479,10 +477,34 @@ export const formatLineWithEvents = (
   const { events: creditEvents, spigot } = lineEvents;
 
   // Create collateralEvents
+  console.log('FormatLineWithEvents - Get Line Events: ', lineEvents);
+  console.log('FormatLineWithEvents - selectedLine: ', selectedLine);
   console.log('Get Line Events Escrow: ', escrow);
   console.log('Get Line Events Spigot: ', spigot);
   const collateralEvents = formatEscrowToCollateralEvents(escrow);
-  console.log('get line page data 1: ', collateralEvents);
+  // console.log('get line page data 1: ', collateralEvents);
+  console.log('FormatLineWithEvents - collateralEvents: ', collateralEvents);
+  // create escrow.events from deposit.events and add to selectedLine
+  console.log('FormatLineWithEvents - escrow deposits: ', escrow?.deposits);
+  // const escrowCollateralEvents: CollateralEvent[] = _.flatten(
+  //   _.merge(
+  //     escrow?.deposits?.map((deposit: CollateralEvent) => {
+  //       const [totalDepositValue, depositCollateralEvents] = formatCollateralEvents(
+  //         'escrow',
+  //         deposit.token,
+  //         BigNumber.from(0),
+  //         deposit.events,
+  //         {}
+  //       );
+  //       // console.log('individual deposit collateral events: ', depositCollateralEvents);
+  //       return depositCollateralEvents;
+  //     })
+  //   )
+  // );
+  // console.log('escrow events: ', escrowCollateralEvents);
+  // add spigot.events to selectedLine
+  // let escrowRes = { ...escrow };
+  // escrowRes.deposits =
 
   // Add collateralEvents and creditEvents to SecuredLine
   const selectedLineWithEvents = { creditEvents, collateralEvents, escrow, ...rest } as SecuredLineWithEvents;

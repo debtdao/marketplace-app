@@ -79,6 +79,7 @@ export interface Item extends SecuredLine {
 // data that isnt included in SecuredLine that we need to fetch for full SecuredLineWithEvents dattype
 // gets merged into existing SecuredLine to form SecuredLineWithEvents
 export interface LineEvents {
+  collateralEvents: CollateralEvent[];
   creditEvents: CreditEvent[];
 }
 
@@ -161,7 +162,7 @@ export interface EscrowDepositMap {
   [token: string]: EscrowDeposit;
 }
 
-export interface AggregatedEscrow extends BaseEscrow, BaseCollateralModule {
+export interface AggregatedEscrow extends BaseEscrow {
   id: Address;
   cratio: string;
   minCRatio: string;

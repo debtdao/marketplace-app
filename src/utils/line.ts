@@ -226,6 +226,7 @@ export const formatSecuredLineData = (
     positionIds: string[];
     positions: PositionMap;
   };
+  collateralEvents: CollateralEvent[];
   creditEvents: CreditEvent[];
   spigot: AggregatedSpigot;
   escrow: AggregatedEscrow;
@@ -331,6 +332,7 @@ export const formatSecuredLineData = (
   );
 
   const spigotEvents = formatSpigotCollateralEvents(spigot.events);
+  const collateralEvents = _.concat(spigotEvents, escrowCollateralEvents);
 
   const aggregatedSpigot: AggregatedSpigot = {
     id: spigotId,
@@ -372,6 +374,7 @@ export const formatSecuredLineData = (
       positionIds: Object.keys(positions),
       positions,
     },
+    collateralEvents,
     creditEvents,
     escrow: aggregatedEscrow,
     spigot: aggregatedSpigot,
@@ -384,7 +387,13 @@ export const formatLineWithEvents = (
   tokenPrices: { [token: string]: BigNumber }
 ): SecuredLineWithEvents | undefined => {
   if (!lineEvents) return undefined;
-  const { creditEvents: oldCreditEvents, escrow, spigot, ...rest } = selectedLine;
+  const {
+    creditEvents: oldCreditEvents,
+    collateralEvents: oldCollateralEvents,
+    escrow,
+    spigot,
+    ...rest
+  } = selectedLine;
   const { events: creditEvents } = lineEvents;
 
   // Create new aggregated escrow object
@@ -426,6 +435,7 @@ export const formatLineWithEvents = (
 
   // Get spigot collateral events
   const spigotEvents = formatSpigotCollateralEvents(lineEvents.spigot.events);
+  const collateralEvents = _.concat(spigotEvents, escrowCollateralEvents);
 
   // Add events and deposits to escrow object
   const aggregatedEscrow: AggregatedEscrow = {
@@ -450,6 +460,7 @@ export const formatLineWithEvents = (
 
   // Add collateralEvents and creditEvents to SecuredLine
   const selectedLineWithEvents = {
+    collateralEvents,
     creditEvents,
     escrow: aggregatedEscrow,
     spigot: aggregatedSpigot,
@@ -464,6 +475,7 @@ export const formatLinePageData = (
 ): SecuredLineWithEvents | undefined => {
   if (!lineData) return undefined;
   // add token Prices as arg
+  console.log('FormatLineWithEvents - get line page data 1 - 2: ', lineData);
   const {
     spigot,
     escrow,
@@ -476,6 +488,7 @@ export const formatLinePageData = (
   } = lineData;
   const {
     credit,
+    collateralEvents,
     creditEvents,
     spigot: spigotData,
     escrow: escrowData,
@@ -495,6 +508,7 @@ export const formatLinePageData = (
     ...metadata,
     // debt data
     ...credit,
+    collateralEvents,
     creditEvents,
     borrower: borrower.id,
     status: status.toLowerCase() as LineStatusTypes,

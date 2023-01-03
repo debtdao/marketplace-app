@@ -242,8 +242,6 @@ export const GET_LINE_EVENTS_QUERY = gql`
       }
 
       escrow {
-        id
-        minCRatio
         deposits {
           amount
           enabled

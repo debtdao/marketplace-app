@@ -133,6 +133,11 @@ const selectSelectedLinePage = createSelector(
   [selectSelectedLine, selectPositionsForSelectedLine, selectCollateralForSelectedLine, selectEventsForLine],
   (line, positions, collateral, events): SecuredLineWithEvents | undefined => {
     if (!line) return undefined;
+    console.log('selectedLine - line: ', line);
+    console.log('selectedLine - positions: ', positions);
+    console.log('selectedLine - collateral: ', collateral);
+    console.log('selectedLine - events: ', events);
+    console.log('selectedLine - full object; ', { ...line, positions, ...collateral, ...events });
     return { ...line, positions, ...collateral, ...events };
   }
 );

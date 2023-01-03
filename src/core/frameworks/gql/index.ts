@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { ApolloClient, InMemoryCache, DocumentNode, QueryResult, HttpLink, ApolloLink } from '@apollo/client';
+import { ApolloClient, InMemoryCache, DocumentNode, QueryResult } from '@apollo/client';
 import { at } from 'lodash';
 
 import { getEnv } from '@config/env';
@@ -42,14 +42,14 @@ const { GRAPH_API_URL, GRAPH_TEST_API_URL, GRAPH_CHAINLINK_FEED_REGISTRY_API_URL
 const { BLACKLISTED_LINES: blacklist } = getConstants();
 
 // utility function get GRAPH_API_URL based on network parameter
-const getGraphURL = (network: string) => {
-  let link: any;
+export const getGraphURL = (network: string) => {
+  let url = '';
   if (network === 'mainnet') {
-    link = new HttpLink({ uri: GRAPH_API_URL! });
+    url = GRAPH_API_URL!;
   } else if (network === 'goerli') {
-    link = new HttpLink({ uri: GRAPH_TEST_API_URL! });
+    url = GRAPH_TEST_API_URL!;
   }
-  return link;
+  return url;
 };
 
 type PossibleTypeMap = {
@@ -122,15 +122,37 @@ export const generateSubgraphTypes = async (url: string): Promise<PossibleTypeMa
     });
 };
 
+// Async version of getClient
+// let client: any;
+// export const getClient = async (network: string) => (client ? client : await createClient(network));
+// // export const createClient = async (network: string): Promise<typeof ApolloClient> => {
+// export const createClient = async (network: string): Promise<ApolloClient<{}>> => {
+//   const graphApiUrL = getGraphURL(network);
+//   console.log('GRAPH QL API URL Network: ', network);
+//   console.log('GRAPH QL API URL: ', graphApiUrL);
+//   const generatedSubgraphTypes = await generateSubgraphTypes(graphApiUrL);
+//   client = new ApolloClient({
+//     uri: graphApiUrL,
+//     cache: new InMemoryCache({
+//       possibleTypes: generatedSubgraphTypes ?? possibleTypes,
+//     }),
+//   });
+//   return client;
+// };
+
+// Synchronous version of getClient
 let client: any;
 export const getClient = (network: string) => (client ? client : createClient(network));
-const createClient = async (network: string): Promise<typeof ApolloClient> => {
-  const GRAPH_API_URL_LINK = getGraphURL(network);
-  const generatedSubgraphTypes = await generateSubgraphTypes(GRAPH_API_URL_LINK.options.uri);
+// const createClient = async (network: string): Promise<typeof ApolloClient> => {
+// export const createClient = (network: string): typeof ApolloClient => {
+export const createClient = (network: string): ApolloClient<{}> => {
+  const graphApiUrL = getGraphURL(network);
+  // const generatedSubgraphTypes = await generateSubgraphTypes(graphApiUrL);
   client = new ApolloClient({
-    link: GRAPH_API_URL_LINK,
+    uri: graphApiUrL,
     cache: new InMemoryCache({
-      possibleTypes: generatedSubgraphTypes ?? possibleTypes,
+      // possibleTypes: generatedSubgraphTypes ?? possibleTypes,
+      possibleTypes,
     }),
   });
   return client;
@@ -163,7 +185,9 @@ export const createQuery =
   (query: DocumentNode, path?: string, network?: string, isOracle?: boolean): Function =>
   <A, R>(variables: A): Promise<QueryResponse<R>> =>
     new Promise(async (resolve, reject) => {
+      // const client = isOracle ? getPriceFeedClient() : await getClient(network!);
       const client = isOracle ? getPriceFeedClient() : getClient(network!);
+      console.log('Graph QL Client - gql/index - url: ', client.link);
       client
         .query({ query, variables })
         .then((result: QueryResult) => {

@@ -14,6 +14,7 @@ import {
   TokenAllowance,
   GetLineArgs,
   GetLinesArgs,
+  GetLineEventsArgs,
   GetLinePageArgs,
   AddCreditProps,
   UseCreditLinesParams,
@@ -28,6 +29,7 @@ import {
   BaseLineFragResponse,
   GetLinesResponse,
   MarketPageData,
+  GetLineEventsResponse,
 } from '@types';
 import {
   formatGetLinesData,
@@ -80,7 +82,7 @@ const getLine = createAsyncThunk<{ lineData: SecuredLine | undefined }, GetLineA
   'lines/getLine',
   async (params, { getState, extra }) => {
     const { wallet } = getState();
-    const network = getNetwork(`${wallet.networkVersion}`);
+    const network = getNetwork(wallet.networkVersion);
     const { creditLineService } = extra.services;
     const lineData = await creditLineService.getLine({ network: network, ...params });
     return { lineData };
@@ -133,6 +135,18 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
   }
 );
 
+const getLineEvents = createAsyncThunk<{ lineEvents: GetLineEventsResponse | undefined }, GetLineEventsArgs, ThunkAPI>(
+  'lines/getLine',
+  async (params, { getState, extra }) => {
+    const state: RootState = getState();
+    const network = getNetwork(state.wallet.networkVersion);
+    const { creditLineService } = extra.services;
+    const lineEvents = await creditLineService.getLineEvents({ network, ...params });
+    console.log('testing line events 1: ', lineEvents);
+    return { lineEvents };
+  }
+);
+
 const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | undefined }, GetLinePageArgs, ThunkAPI>(
   'lines/getLinePage',
   async ({ id }, { getState, extra, dispatch }) => {
@@ -152,16 +166,27 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
     // query and add credit and collateral events to pre-existing line
     console.log('get line selected: ', selectedLine);
     if (selectedLine) {
-      const lineEvents = await creditLineService.getLineEvents({ network: state.network.current, id });
-      const selectedLineWithEvents = formatLineWithEvents(selectedLine, lineEvents, tokenPrices);
-      // console.log('FormatLineWithEvents  - line events: ', lineEvents);
-      // console.log('FormatLineWithEvents  - selected line: ', selectedLine);
-      // console.log('FormatLineWithEvents  - get line page data 1: ', selectedLineWithEvents);
-      return { linePageData: selectedLineWithEvents };
+      if (!selectedLine.creditEvents || !selectedLine.collateralEvents) {
+        const lineEvents = await creditLineService.getLineEvents({ network: state.network.current, id });
+        // const otherVar: any = (await dispatch(getLineEvents({ id }))).payload.lineEvents;
+
+        // store line events in state
+        // dispatch(getLineEvents({ id }));
+        // get line events with selector
+        // const lineEvents = LinesSelectors.selectSelectedLineEvents(state);
+
+        // console.log('testing line events 2: ', otherVar);
+        console.log('FormatLineWithEvents  - line events: ', lineEvents);
+        console.log('FormatLineWithEvents  - selected line: ', selectedLine);
+        const selectedLineWithEvents = formatLineWithEvents(selectedLine, lineEvents, tokenPrices);
+        console.log('FormatLineWithEvents  - get line page data 1: ', selectedLineWithEvents);
+        return { linePageData: selectedLineWithEvents };
+      }
+      return { linePageData: selectedLine };
     } else {
       try {
         const linePageData = formatLinePageData(await creditLineService.getLinePage({ network, id }), tokenPrices);
-        // console.log('get line page data 2: ', linePageData);
+        console.log('FormatLineWithEvents - get line page data 2: ', linePageData);
 
         if (!linePageData) throw new Error();
         return { linePageData };
@@ -760,6 +785,7 @@ export const LinesActions = {
   // initiateSaveLines,
   getLine,
   getLines,
+  getLineEvents,
   getLinePage,
   getUserLinePositions,
   getUserPortfolio,

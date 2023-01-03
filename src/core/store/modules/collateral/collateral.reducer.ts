@@ -1,7 +1,17 @@
 import { createReducer } from '@reduxjs/toolkit';
 import _ from 'lodash';
+import { BigNumber } from 'ethers';
 
-import { CollateralState, CollateralActionsStatusMap, CollateralModule, CollateralMap, SecuredLine } from '@types';
+import {
+  CollateralState,
+  CollateralActionsStatusMap,
+  CollateralModule,
+  CollateralMap,
+  SecuredLine,
+  CollateralEvent,
+  BaseEscrowDepositFragResponse,
+} from '@types';
+import { formatCollateralEvents, formatSpigotCollateralEvents } from '@src/utils';
 
 import { LinesActions } from '../lines/lines.actions';
 
@@ -30,7 +40,7 @@ export const collateralInitialState: CollateralState = {
   statusMap: initialCollateralActionsStatusMap,
 };
 
-const { getLines, getLinePage, getUserPortfolio } = LinesActions;
+const { getLines, getLineEvents, getLinePage, getUserPortfolio } = LinesActions;
 
 const {
   setSelectedEscrow,
@@ -106,6 +116,47 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
       );
       state.collateralMap = { ...state.collateralMap, ...map };
       // console.log('Get Lines collateral reducer collateralMap: ', state.collateralMap);
+    })
+
+    /* -------------------------------- getLineEvents ------------------------------- */
+    .addCase(getLineEvents.fulfilled, (state, { payload: { lineEventsData, id } }) => {
+      if (!lineEventsData) return;
+      console.log('get line events collateral reducer: ', lineEventsData);
+      const { escrow, spigot } = lineEventsData;
+      const spigotEvents = formatSpigotCollateralEvents(spigot.events);
+      console.log('get line events collateral reducer - spigotEvents: ', spigotEvents);
+      // const escrowEvents = lineEventsData?.escrow.deposits.reduce((acc: CollateralEvent[], deposit) => {
+      //   const events = formatCollateralEvents('escrow', deposit.token, BigNumber.from(0), deposit.events, {});
+      //   return [...acc, ...events];
+      // }, []);
+      // Get escrow collateral events
+      const escrowDeposits: BaseEscrowDepositFragResponse[] = escrow?.deposits || [];
+      const escrowEvents: CollateralEvent[] = _.flatten(
+        _.merge(
+          escrowDeposits.map((deposit) => {
+            const [totalDepositValue, depositCollateralEvents] = formatCollateralEvents(
+              'escrow',
+              deposit.token,
+              BigNumber.from(0),
+              deposit.events,
+              {}
+            );
+            return depositCollateralEvents;
+          })
+        )
+      );
+      console.log('get line events collateral reducer - escrow events:', escrowEvents);
+      // const spigotEvents =
+      // if (!line) return;
+      // let map: CollateralMap = {};
+      // if (line.escrow) map[line.escrowId!] = line.escrow;
+      // if (line.spigot) map[line.spigotId!] = line.spigot;
+      // state.collateralMap = { ...state.collateralMap, ...map };
+      // const combinedCollateralEvents = [...(line.escrow?.events ?? []), ...(line.spigot?.events ?? [])];
+      const combinedCollateralEvents = [...escrowEvents, ...spigotEvents];
+      // state.eventsMap = { ...state.eventsMap, [id]: combinedCollateralEvents };
+      // console.log('Get Line Page collateral reducer collateralMap: ', map);
+      console.log('get line events collateral reducer - eventsMap: ', combinedCollateralEvents);
     })
 
     /* -------------------------------- getLinePage ------------------------------- */

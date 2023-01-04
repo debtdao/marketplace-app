@@ -112,8 +112,8 @@ const selectCollateralEventsForSelectedLine = createSelector(
   (events, collateral) => {
     console.log('select collaterap events map: ', events);
     console.log('select collaterap: ', collateral);
-    const escrowEvents = events[collateral.escrow?.id ?? ''] ?? [];
-    const spigotEvents = events[collateral.spigot?.id ?? ''] ?? [];
+    const escrowEvents = events[collateral.escrow?.id] ?? [];
+    const spigotEvents = events[collateral.spigot?.id] ?? [];
     return { collateralEvents: _.concat(escrowEvents, spigotEvents) };
   }
 );

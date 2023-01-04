@@ -8,7 +8,7 @@ import { Container } from '@container';
 import { getStore } from '@frameworks/redux';
 import { AppContextProvider, NavSideMenuContextProvider } from '@context';
 import { getClient, createClient, getGraphURL } from '@core/frameworks/gql';
-import { possibleTypes } from '@core/frameworks/gql/possibleTypes.js';
+// import { possibleTypes } from '@core/frameworks/gql/possibleTypes.js';
 import { Routes } from '@routes';
 import { Themable } from '@containers';
 import { getEnv } from '@src/config/env';

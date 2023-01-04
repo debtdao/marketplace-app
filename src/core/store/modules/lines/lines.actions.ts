@@ -144,7 +144,6 @@ const getLineEvents = createAsyncThunk<
   const network = getNetwork(state.wallet.networkVersion);
   const { creditLineService } = extra.services;
   const lineEventsData = await creditLineService.getLineEvents({ network, id });
-  console.log('testing line events 1: ', lineEventsData);
   return { lineEventsData, id };
 });
 
@@ -161,23 +160,19 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
     // query and add credit and collateral events to pre-existing line
     console.log('get line selected: ', selectedLine);
     if (selectedLine) {
-      // if (!selectedLine.creditEvents || !selectedLine.collateralEvents) {
-      const lineEvents = await creditLineService.getLineEvents({ network: state.network.current, id });
-      // const otherVar: any = (await dispatch(getLineEvents({ id }))).payload.lineEvents;
-
-      // store line events in state
-      dispatch(getLineEvents({ id }));
-      // get line events with selector
-      // const lineEvents = LinesSelectors.selectSelectedLineEvents(state);
-
-      // console.log('testing line events 2: ', otherVar);
-      console.log('FormatLineWithEvents  - line events: ', lineEvents);
-      console.log('FormatLineWithEvents  - selected line: ', selectedLine);
-      const selectedLineWithEvents = formatLineWithEvents(selectedLine, lineEvents, tokenPrices);
-      console.log('FormatLineWithEvents  - get line page data 1: ', selectedLineWithEvents);
-      return { linePageData: selectedLineWithEvents };
-      // }
-      // return { linePageData: selectedLine };
+      if (selectedLine.creditEvents.length === 0) {
+        // const lineEvents = await creditLineService.getLineEvents({ network: state.network.current, id });
+        // store line events in state
+        const lineEvents: GetLineEventsResponse | undefined = await dispatch(getLineEvents({ id })).then(
+          (res: any) => res.payload?.lineEventsData ?? undefined
+        );
+        console.log('FormatLineWithEvents - 2: ', lineEvents);
+        const selectedLineWithEvents = formatLineWithEvents(selectedLine, lineEvents, tokenPrices);
+        console.log('FormatLineWithEvents  - get line page data 1: ', selectedLineWithEvents);
+        return { linePageData: selectedLineWithEvents };
+      }
+      console.log('FormatLineWithEvents - hello! ', selectedLine);
+      return { linePageData: selectedLine };
     } else {
       try {
         const linePageData = formatLinePageData(await creditLineService.getLinePage({ network, id }), tokenPrices);

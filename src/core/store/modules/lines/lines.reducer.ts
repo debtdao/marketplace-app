@@ -212,6 +212,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
           return { id, __typename, timestamp, amount, token: position.token.id } as CreditEvent;
         });
         state.eventsMap = { ...state.eventsMap, [id]: creditEvents };
+        console.log('FormatLineWithEvents - lineEvents reducer: ', state.eventsMap);
         // we also update state.collateral on this action being fullfilled in collateral.reducer.ts
       }
       state.statusMap.getLineEvents = {};

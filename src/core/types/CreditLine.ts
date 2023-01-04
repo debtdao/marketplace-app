@@ -77,7 +77,7 @@ export interface Item extends SecuredLine {
   onAction?: () => void;
 }
 // data that isnt included in SecuredLine that we need to fetch for full SecuredLineWithEvents dattype
-// gets merged into existing AggregatedCredit to form LinePageData
+// gets merged into existing SecuredLine to form SecuredLineWithEvents
 export interface LineEvents {
   collateralEvents: CollateralEvent[];
   creditEvents: CreditEvent[];
@@ -154,8 +154,8 @@ export interface EscrowDeposit extends Collateral {
   amount: string;
   value: string;
   enabled: boolean;
-
   displayIcon?: string; // url to token icon
+  events?: CollateralEvent[];
 }
 
 export interface EscrowDepositMap {
@@ -167,6 +167,9 @@ export interface AggregatedEscrow extends BaseEscrow {
   cratio: string;
   minCRatio: string;
   collateralValue: string;
+  type: CollateralTypes;
+  line: string;
+  events?: CollateralEvent[];
   deposits?: EscrowDepositMap;
 }
 
@@ -186,6 +189,7 @@ export interface AggregatedSpigot extends BaseCollateralModule {
   id: Address;
   // aggregated revenue in USD by token across all spigots
   revenueSummary: RevenueSummaryMap;
+  events?: CollateralEvent[];
 }
 
 export interface MarketLines {
@@ -210,7 +214,6 @@ export interface RevenueContract {
   startTime: number;
   ownerSplit: number;
   token: TokenView;
-
   events?: SpigotEvents[];
 }
 
@@ -240,9 +243,9 @@ export type ModuleNames = SPIGOT_NAME | CREDIT_NAME | ESCROW_NAME;
 export interface EventWithValue {
   __typename?: string;
   timestamp: number;
-  amount?: number;
-  value?: number;
-  valueNow?: number;
+  amount?: string;
+  value?: string;
+  valueNow?: string;
   [key: string]: any;
 }
 
@@ -252,9 +255,9 @@ export interface CreditEvent extends EventWithValue {
   id: string; // position id
   token?: string;
   timestamp: number;
-  amount: number;
-  valueAtTime?: number;
-  valueNow?: number;
+  amount: string;
+  valueAtTime?: string;
+  valueNow?: string;
 }
 
 export interface SetRateEvent {
@@ -270,8 +273,8 @@ export interface CollateralEvent extends EventWithValue {
   type: CollateralTypes;
   id: Address; // token earned as revenue or used as collateral
   timestamp: number;
-  amount: number;
-  value?: number;
+  amount: string;
+  value?: string;
 }
 
 // Spigot Events
@@ -279,8 +282,8 @@ type SpigotEvents = ClaimRevenueEvent;
 
 export interface ClaimRevenueEvent extends CollateralEvent {
   revenueToken: TokenView;
-  escrowed: number;
-  netIncome: number;
+  escrowed: string;
+  netIncome: string;
 }
 
 // Redux State

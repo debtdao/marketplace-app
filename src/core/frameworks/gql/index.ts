@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, DocumentNode, QueryResult, HttpLink } from '@apollo/client';
+import { ApolloClient, InMemoryCache, DocumentNode, QueryResult } from '@apollo/client';
 import { at } from 'lodash';
 
 import { getEnv } from '@config/env';
@@ -8,12 +8,15 @@ import {
   GetLineArgs,
   GetLinePageArgs,
   GetLinesArgs,
+  GetLineEventsArgs,
   GetUserPortfolioArgs,
   GetUserPortfolioResponse,
   QueryResponse,
   QueryCreator,
   GetLinePageResponse,
   GetLinesResponse,
+  LineEventFragResponse,
+  GetLineEventsResponse,
   SupportedOracleTokenResponse,
   CreditPosition,
   Network,
@@ -22,11 +25,14 @@ import {
 import {
   GET_LINE_QUERY,
   GET_LINE_PAGE_QUERY,
-  GET_LINE_PAGE_AUX_QUERY,
+  GET_LINE_EVENTS_QUERY,
   GET_LINES_QUERY,
   GET_SUPPORTED_ORACLE_TOKENS_QUERY,
   GET_USER_PORTFOLIO_QUERY,
 } from './queries';
+import { possibleTypes } from './possibleTypes.js';
+
+const fetch = require('cross-fetch');
 
 // TODO: GRAPH_CHAINLINK_FEED_REGISTRY_API_URL
 const { GRAPH_API_URL, GRAPH_TEST_API_URL, GRAPH_CHAINLINK_FEED_REGISTRY_API_URL } = getEnv();
@@ -34,21 +40,24 @@ const { BLACKLISTED_LINES: blacklist } = getConstants();
 
 // utility function get GRAPH_API_URL based on network parameter
 const getGraphURL = (network: string) => {
-  let link: any;
+  let url = '';
   if (network === 'mainnet') {
-    link = new HttpLink({ uri: GRAPH_API_URL! });
+    url = GRAPH_API_URL!;
   } else if (network === 'goerli') {
-    link = new HttpLink({ uri: GRAPH_TEST_API_URL! });
+    url = GRAPH_TEST_API_URL!;
   }
-  return link;
+  return url;
 };
 
 let client: any;
 export const getClient = (network: string) => (client ? client : createClient(network));
-const createClient = (network: string): typeof ApolloClient => {
+const createClient = (network: string): ApolloClient<{}> => {
+  const graphApiUrL = getGraphURL(network);
   client = new ApolloClient({
-    link: getGraphURL(network),
-    cache: new InMemoryCache(),
+    uri: graphApiUrL,
+    cache: new InMemoryCache({
+      possibleTypes,
+    }),
   });
   return client;
 };
@@ -110,6 +119,14 @@ const getLinesQuery = createQuery(GET_LINES_QUERY, 'lineOfCredits');
 export const getLines: QueryCreator<GetLinesArgs, GetLinesResponse[]> = <GetLinesArgs, GetLinesResponse>(
   arg: GetLinesArgs
 ): QueryResponse<GetLinesResponse[]> => getLinesQuery({ ...arg, blacklist });
+
+const getLineEventsQuery = createQuery(GET_LINE_EVENTS_QUERY, 'lineOfCredit');
+export const getLineEvents: QueryCreator<GetLineEventsArgs, GetLineEventsResponse> = <
+  GetLineEventsArgs,
+  GetLineEventsResponse
+>(
+  arg: GetLineEventsArgs
+): QueryResponse<GetLineEventsResponse> => getLineEventsQuery(arg);
 
 const getSupportedOracleTokensQuery = createQuery(GET_SUPPORTED_ORACLE_TOKENS_QUERY, undefined, undefined, true);
 export const getSupportedOracleTokens: QueryCreator<

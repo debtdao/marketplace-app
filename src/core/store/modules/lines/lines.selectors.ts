@@ -17,7 +17,8 @@ import {
   ARBITER_POSITION_ROLE,
   LineEvents,
   AggregatedEscrow,
-  AggregatedSpigot, // prev. GeneralVaultView, Super indepth data, SecuredLineWithEvents is most similar atm
+  AggregatedSpigot,
+  CollateralEvent, // prev. GeneralVaultView, Super indepth data, SecuredLineWithEvents is most similar atm
 } from '@types';
 import { toBN, unnullify } from '@utils';
 import { getConstants } from '@src/config/constants';
@@ -79,12 +80,12 @@ const selectSelectedPosition = createSelector(
 );
 const selectPositionsForSelectedLine = createSelector(
   [selectPositionsMap, selectSelectedLineAddress],
-  (positions, line): PositionMap => {
+  (positionsMap, line): PositionMap => {
     if (!line) {
       return {};
     } else {
       // Create and return PositionMap of only positions for a given line
-      const linePositions = _.values(positions).filter((p) => p.line === line);
+      const linePositions = _.values(positionsMap).filter((p) => p.line === line);
       const linePositionsObj = _.transform(
         linePositions,
         function (result, position) {
@@ -108,21 +109,20 @@ const selectCollateralForSelectedLine = createSelector(
 );
 
 const selectCollateralEventsForSelectedLine = createSelector(
-  [selectCollateralEventsMap, selectCollateralForSelectedLine],
-  (events, collateral) => {
-    const escrowEvents = events[collateral.escrow?.id ?? ''] ?? [];
-    const spigotEvents = events[collateral.spigot?.id ?? ''] ?? [];
-    return { collateralEvents: _.concat(escrowEvents, spigotEvents) };
+  [selectCollateralEventsMap, selectSelectedLineAddress, selectCollateralForSelectedLine],
+  (events, lineAddress, collateral) => {
+    if (!lineAddress) return { collateralEvents: [] };
+    return { collateralEvents: events[lineAddress] ?? [] };
   }
 );
 
 const selectCreditEventsForSelectedLine = createSelector(
   [selectCreditEventsMap, selectSelectedLineAddress],
-  (events, line = '') => ({ creditEvents: events[line] })
+  (events, line = '') => ({ creditEvents: events[line] ?? [] })
 );
 
 const selectEventsForLine = createSelector(
-  [selectCreditEventsForSelectedLine, selectCollateralEventsForSelectedLine], // selectCollateralEvents, - from collateral state
+  [selectCreditEventsForSelectedLine, selectCollateralEventsForSelectedLine],
   (creditEvents, collateralEvents): LineEvents => {
     // @TODO return xhecksum address
     return { ...creditEvents, ...collateralEvents };
@@ -132,10 +132,6 @@ const selectEventsForLine = createSelector(
 const selectSelectedLinePage = createSelector(
   [selectSelectedLine, selectPositionsForSelectedLine, selectCollateralForSelectedLine, selectEventsForLine],
   (line, positions, collateral, events): SecuredLineWithEvents | undefined => {
-    // console.log('User Portfolio actions selectedLine line: ', line);
-    // console.log('User Portfolio actions selectedLine line positions: ', positions);
-    // console.log('User Portfolio actions selectedLine line collateral: ', collateral);
-    // console.log('User Portfolio actions selectedLine line events: ', events);
     if (!line) return undefined;
     return { ...line, positions, ...collateral, ...events };
   }

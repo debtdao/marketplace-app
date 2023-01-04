@@ -135,17 +135,18 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
   }
 );
 
-const getLineEvents = createAsyncThunk<
-  { lineEventsData: GetLineEventsResponse | undefined; id: string },
-  GetLineEventsArgs,
-  ThunkAPI
->('lines/getLineEvents', async ({ id }, { getState, extra }) => {
-  const state: RootState = getState();
-  const network = getNetwork(state.wallet.networkVersion);
-  const { creditLineService } = extra.services;
-  const lineEventsData = await creditLineService.getLineEvents({ network, id });
-  return { lineEventsData, id };
-});
+// TODO: Remove redundant and unnecessary code.
+// const getLineEvents = createAsyncThunk<
+//   { lineEventsData: GetLineEventsResponse | undefined; id: string },
+//   GetLineEventsArgs,
+//   ThunkAPI
+// >('lines/getLineEvents', async ({ id }, { getState, extra }) => {
+//   const state: RootState = getState();
+//   const network = getNetwork(state.wallet.networkVersion);
+//   const { creditLineService } = extra.services;
+//   const lineEventsData = await creditLineService.getLineEvents({ network, id });
+//   return { lineEventsData, id };
+// });
 
 const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | undefined }, GetLinePageArgs, ThunkAPI>(
   'lines/getLinePage',
@@ -158,13 +159,14 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
     const network = getNetwork(state.wallet.networkVersion);
 
     // query and add credit and collateral events to pre-existing line
-    console.log('get line selected: ', selectedLine);
+    console.log('FormatLineWithEvents - get line selected: ', selectedLine);
     if (selectedLine) {
       if (selectedLine.creditEvents.length === 0) {
         // dispatch getLineEvents action to store line events in state
-        const lineEvents: GetLineEventsResponse | undefined = await dispatch(getLineEvents({ id })).then(
-          (res: any) => res.payload?.lineEventsData ?? undefined
-        );
+        // const lineEvents: GetLineEventsResponse | undefined = await dispatch(getLineEvents({ id })).then(
+        //   (res: any) => res.payload?.lineEventsData ?? undefined
+        // );
+        const lineEvents = await creditLineService.getLineEvents({ network, id });
         console.log('FormatLineWithEvents: ', lineEvents);
         const selectedLineWithEvents = formatLineWithEvents(selectedLine, lineEvents, tokenPrices);
         console.log('FormatLineWithEvents  - get line page data 1: ', selectedLineWithEvents);
@@ -774,7 +776,7 @@ export const LinesActions = {
   // initiateSaveLines,
   getLine,
   getLines,
-  getLineEvents,
+  // getLineEvents,
   getLinePage,
   getUserLinePositions,
   getUserPortfolio,

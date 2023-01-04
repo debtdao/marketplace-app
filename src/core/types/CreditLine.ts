@@ -243,9 +243,9 @@ export type ModuleNames = SPIGOT_NAME | CREDIT_NAME | ESCROW_NAME;
 export interface EventWithValue {
   __typename?: string;
   timestamp: number;
-  amount?: number;
-  value?: number;
-  valueNow?: number;
+  amount?: string;
+  value?: string;
+  valueNow?: string;
   [key: string]: any;
 }
 
@@ -255,9 +255,9 @@ export interface CreditEvent extends EventWithValue {
   id: string; // position id
   token?: string;
   timestamp: number;
-  amount: number;
-  valueAtTime?: number;
-  valueNow?: number;
+  amount: string;
+  valueAtTime?: string;
+  valueNow?: string;
 }
 
 export interface SetRateEvent {
@@ -273,8 +273,8 @@ export interface CollateralEvent extends EventWithValue {
   type: CollateralTypes;
   id: Address; // token earned as revenue or used as collateral
   timestamp: number;
-  amount: number;
-  value?: number;
+  amount: string;
+  value?: string;
 }
 
 // Spigot Events
@@ -282,8 +282,8 @@ type SpigotEvents = ClaimRevenueEvent;
 
 export interface ClaimRevenueEvent extends CollateralEvent {
   revenueToken: TokenView;
-  escrowed: number;
-  netIncome: number;
+  escrowed: string;
+  netIncome: string;
 }
 
 // Redux State

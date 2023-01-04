@@ -121,7 +121,7 @@ export interface CreditLineState {
   statusMap: {
     getLines: Status;
     getLine: Status;
-    getLineEvents: Status;
+    // getLineEvents: Status;
     getLinePage: Status;
     getAllowances: Status;
     getUserPortfolio: Status;

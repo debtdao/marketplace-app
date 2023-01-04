@@ -146,8 +146,8 @@ export interface LineEventFragResponse {
     token: TokenFragRepsonse;
   };
   // events with value
-  value?: number;
-  amount?: number;
+  value?: string;
+  amount?: string;
   // events with rates
   dRate?: string;
   fRate?: string;

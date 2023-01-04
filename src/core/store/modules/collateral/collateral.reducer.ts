@@ -40,7 +40,7 @@ export const collateralInitialState: CollateralState = {
   statusMap: initialCollateralActionsStatusMap,
 };
 
-const { getLines, getLineEvents, getLinePage, getUserPortfolio } = LinesActions;
+const { getLines, getLinePage, getUserPortfolio } = LinesActions;
 
 const {
   setSelectedEscrow,
@@ -119,45 +119,33 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
     })
 
     /* -------------------------------- getLineEvents ------------------------------- */
-    .addCase(getLineEvents.fulfilled, (state, { payload: { lineEventsData, id } }) => {
-      if (!lineEventsData) return;
-      console.log('get line events collateral reducer: ', lineEventsData);
-      const { escrow, spigot } = lineEventsData;
-      const spigotEvents = formatSpigotCollateralEvents(spigot.events);
-      console.log('get line events collateral reducer - spigotEvents: ', spigotEvents);
-      // const escrowEvents = lineEventsData?.escrow.deposits.reduce((acc: CollateralEvent[], deposit) => {
-      //   const events = formatCollateralEvents('escrow', deposit.token, BigNumber.from(0), deposit.events, {});
-      //   return [...acc, ...events];
-      // }, []);
-      // Get escrow collateral events
-      const escrowDeposits: BaseEscrowDepositFragResponse[] = escrow?.deposits || [];
-      const escrowEvents: CollateralEvent[] = _.flatten(
-        _.merge(
-          escrowDeposits.map((deposit) => {
-            const [totalDepositValue, depositCollateralEvents] = formatCollateralEvents(
-              'escrow',
-              deposit.token,
-              BigNumber.from(0),
-              deposit.events,
-              {}
-            );
-            return depositCollateralEvents;
-          })
-        )
-      );
-      console.log('get line events collateral reducer - escrow events:', escrowEvents);
-      // const spigotEvents =
-      // if (!line) return;
-      // let map: CollateralMap = {};
-      // if (line.escrow) map[line.escrowId!] = line.escrow;
-      // if (line.spigot) map[line.spigotId!] = line.spigot;
-      // state.collateralMap = { ...state.collateralMap, ...map };
-      // const combinedCollateralEvents = [...(line.escrow?.events ?? []), ...(line.spigot?.events ?? [])];
-      const combinedCollateralEvents = [...escrowEvents, ...spigotEvents];
-      // state.eventsMap = { ...state.eventsMap, [id]: combinedCollateralEvents };
-      // console.log('Get Line Page collateral reducer collateralMap: ', map);
-      console.log('get line events collateral reducer - eventsMap: ', combinedCollateralEvents);
-    })
+    // TODO: Delete redundant and unnecessary code block.
+    // .addCase(getLineEvents.fulfilled, (state, { payload: { lineEventsData, id } }) => {
+    //   if (!lineEventsData) return;
+    //   console.log('get line events collateral reducer: ', lineEventsData);
+    //   const { escrow, spigot } = lineEventsData;
+    //   const spigotEvents = formatSpigotCollateralEvents(spigot.events);
+    //   const escrowDeposits: BaseEscrowDepositFragResponse[] = escrow?.deposits || [];
+    //   const escrowEvents: CollateralEvent[] = _.flatten(
+    //     _.merge(
+    //       escrowDeposits.map((deposit) => {
+    //         const [totalDepositValue, depositCollateralEvents] = formatCollateralEvents(
+    //           'escrow',
+    //           deposit.token,
+    //           BigNumber.from(0),
+    //           deposit.events,
+    //           {}
+    //         );
+    //         return depositCollateralEvents;
+    //       })
+    //     )
+    //   );
+    //   console.log('get line events collateral reducer - escrow events:', escrowEvents);
+    //   const combinedCollateralEvents = [...escrowEvents, ...spigotEvents];
+    //   // state.eventsMap = { ...state.eventsMap, [id]: combinedCollateralEvents };
+    //   // console.log('Get Line Page collateral reducer collateralMap: ', map);
+    //   console.log('get line events collateral reducer - eventsMap: ', combinedCollateralEvents);
+    // })
 
     /* -------------------------------- getLinePage ------------------------------- */
     .addCase(getLinePage.fulfilled, (state, { payload: { linePageData: line } }) => {

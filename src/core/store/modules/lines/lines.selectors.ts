@@ -115,10 +115,9 @@ const selectCollateralEventsForSelectedLine = createSelector(
     // const escrowEvents = events[collateral.escrow?.line] ?? [];
     // const spigotEvents = events[collateral.spigot?.line] ?? [];
     // const collateralEvents = events[collateral.escrow?.line] ?? [];
-    const collateralEvents = events[lineAddress] ?? [];
     // console.log('select collaterap events: ', _.concat(escrowEvents, spigotEvents));
     // return { collateralEvents: _.concat(escrowEvents, spigotEvents) };
-    return { collateralEvents };
+    return { collateralEvents: events[lineAddress] ?? [] };
   }
 );
 
@@ -128,7 +127,7 @@ const selectCreditEventsForSelectedLine = createSelector(
 );
 
 const selectEventsForLine = createSelector(
-  [selectCreditEventsForSelectedLine, selectCollateralEventsForSelectedLine], // selectCollateralEvents, - from collateral state
+  [selectCreditEventsForSelectedLine, selectCollateralEventsForSelectedLine],
   (creditEvents, collateralEvents): LineEvents => {
     // @TODO return xhecksum address
     return { ...creditEvents, ...collateralEvents };

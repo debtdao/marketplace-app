@@ -98,40 +98,42 @@ export const formatCollateralEvents = (
   let totalVal = 0;
   if (!events) return [totalVal, []];
   // TODO promise.all token price fetching for better performance
-  const newEvents: (CollateralEvent | undefined)[] = events?.map((event: any): CollateralEvent | undefined => {
-    const { __typename, timestamp, amount, value = unnullify(0, true) } = event;
-    if (!timestamp || !amount) return undefined;
-    // const valueNow = unnullify(price.toString(), true).times(unnullify((amount.toString(), true)));
-    const valueNow = 0;
-    let collatType;
-    switch (type) {
-      case SPIGOT_MODULE_NAME:
-        // aggregate token revenue. not needed for escrow bc its already segmented by token
-        // use price at time of revenue for more accuracy
-        tokenRevenue[token.symbol] += parseUnits(unnullify(tokenRevenue[token.symbol], true), 'ether')
-          .add(value)
-          .toString();
-        collatType = COLLATERAL_TYPE_REVENUE;
-        break;
-      case ESCROW_MODULE_NAME:
-        collatType = COLLATERAL_TYPE_ASSET;
-        break;
-      default:
-        break;
+  const newEvents: (CollateralEvent | undefined)[] = events?.map(
+    (event: EscrowEventFragResponse): CollateralEvent | undefined => {
+      const { __typename, timestamp, amount, value = unnullify(0, true) } = event;
+      if (!timestamp || !amount) return undefined;
+      // const valueNow = unnullify(price.toString(), true).times(unnullify((amount.toString(), true)));
+      const valueNow = 0;
+      let collatType;
+      switch (type) {
+        case SPIGOT_MODULE_NAME:
+          // aggregate token revenue. not needed for escrow bc its already segmented by token
+          // use price at time of revenue for more accuracy
+          tokenRevenue[token.symbol] += parseUnits(unnullify(tokenRevenue[token.symbol], true), 'ether')
+            .add(value)
+            .toString();
+          collatType = COLLATERAL_TYPE_REVENUE;
+          break;
+        case ESCROW_MODULE_NAME:
+          collatType = COLLATERAL_TYPE_ASSET;
+          break;
+        default:
+          break;
+      }
+
+      totalVal += valueNow;
+
+      return {
+        type: collatType,
+        __typename,
+        timestamp,
+        amount,
+        value: String(value),
+        valueNow: String(valueNow),
+        id: token?.id,
+      };
     }
-
-    totalVal += valueNow;
-
-    return {
-      type: collatType,
-      __typename,
-      timestamp,
-      amount,
-      value,
-      valueNow,
-      id: token?.id,
-    };
-  });
+  );
   const validEvents = newEvents.filter((x) => !!x) as CollateralEvent[];
   return [totalVal, validEvents];
 };
@@ -147,8 +149,8 @@ export const formatSpigotCollateralEvents = (events: SpigotEventFragResponse[] |
         id: revenueToken.id as Address,
         type: 'revenue' as CollateralTypes,
         timestamp,
-        amount: Number(amount),
-        value: Number(value),
+        amount,
+        value,
       };
     });
   return spigotEvents;
@@ -395,7 +397,7 @@ export const formatLineWithEvents = (
     ...rest
   } = selectedLine;
   const { events: creditEvents } = lineEvents;
-
+  console.log('Type Checking - lineEvents: ', lineEvents);
   // Create new aggregated escrow object
   const [collateralValue, deposits]: [BigNumber, EscrowDepositMap] = lineEvents.escrow.deposits.reduce(
     (agg, collateralDeposit) => {

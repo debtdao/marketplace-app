@@ -89,8 +89,8 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const [transactionApproved, setTransactionApproved] = useState(true);
   const [transactionLoading, setLoading] = useState(false);
   const [targetTokenAmount, setTargetTokenAmount] = useState('0');
-  const [drate, setDrate] = useState('');
-  const [frate, setFrate] = useState('');
+  const [drate, setDrate] = useState('0');
+  const [frate, setFrate] = useState('0');
   const [lenderAddress, setLenderAddress] = useState(walletAddress ? walletAddress : '');
   const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
   const [transactionType, setTransactionType] = useState('propose');
@@ -161,7 +161,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
     dispatch(TokensActions.setSelectedTokenAddress({ tokenAddress }));
   };
 
-  const approveCreditPosition = () => {
+  const approveToken = () => {
     setLoading(true);
     if (!selectedCredit?.id) {
       setLoading(false);
@@ -174,7 +174,6 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       lineAddress: selectedCredit.id,
       network: walletNetwork!,
     };
-    console.log('aprrove token for lender', approvalOBj);
     dispatch(LinesActions.approveDeposit(approvalOBj)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionApproved(transactionApproved);
@@ -229,7 +228,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
 
     dispatch(LinesActions.addCredit(transactionObj)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
-        setTransactionCompleted(2);
+        setTransactionApproved(transactionApproved);
         setLoading(false);
       }
       if (res.meta.requestStatus === 'fulfilled' && transactionType === 'accept') {
@@ -267,7 +266,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       : [
           {
             label: t('components.transaction.approve'),
-            onAction: approveCreditPosition,
+            onAction: approveToken,
             status: true,
             disabled: !transactionApproved,
             contrast: false,

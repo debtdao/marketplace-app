@@ -51,7 +51,6 @@ const BASE_POSITION_FRAGMENT = gql`
   }
 `;
 
-// lewv = line event with value
 const LINE_EVENT_FRAGMENT = gql`
   ${TOKEN_FRAGMENT}
   fragment LineEventFrag on LineEventWithValue {
@@ -115,21 +114,6 @@ const SPIGOT_EVENT_FRAGMENT = gql`
 
 // Escrow Frags
 
-const ESCROW_FRAGMENT = gql`
-  ${TOKEN_FRAGMENT}
-  fragment EscrowFrag on Escrow {
-    id
-    minCRatio
-    deposits {
-      amount
-      enabled
-      token {
-        ...TokenFrag
-      }
-    }
-  }
-`;
-
 const ESCROW_EVENT_FRAGMENT = gql`
   fragment EscrowEventFrag on EscrowEvent {
     __typename
@@ -141,6 +125,25 @@ const ESCROW_EVENT_FRAGMENT = gql`
     ... on RemoveCollateralEvent {
       amount
       value
+    }
+  }
+`;
+
+const ESCROW_FRAGMENT = gql`
+  ${TOKEN_FRAGMENT}
+  ${ESCROW_EVENT_FRAGMENT}
+  fragment EscrowFrag on Escrow {
+    id
+    minCRatio
+    deposits {
+      amount
+      enabled
+      token {
+        ...TokenFrag
+      }
+      events {
+        ...EscrowEventFrag
+      }
     }
   }
 `;
@@ -226,18 +229,33 @@ export const GET_LINE_PAGE_QUERY = gql`
   }
 `;
 
-export const GET_LINE_PAGE_AUX_QUERY = gql`
+export const GET_LINE_EVENTS_QUERY = gql`
   ${LINE_EVENT_FRAGMENT}
+  ${TOKEN_FRAGMENT}
+  ${ESCROW_EVENT_FRAGMENT}
   ${SPIGOT_EVENT_FRAGMENT}
 
-  query getLinePageAux($id: ID) {
+  query getLineEvents($id: ID) {
     lineOfCredit(id: $id) {
-      events(first: 20) {
+      events {
         ...LineEventFrag
       }
 
+      escrow {
+        deposits {
+          amount
+          enabled
+          token {
+            ...TokenFrag
+          }
+          events {
+            ...EscrowEventFrag
+          }
+        }
+      }
+
       spigot {
-        events(first: 20) {
+        events {
           ...SpigotEventFrag
         }
       }

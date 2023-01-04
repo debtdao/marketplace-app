@@ -13,6 +13,7 @@ import {
   Address,
   LinesByRole,
   PositionMap,
+  CreditEvent,
 } from '@types';
 import { getNetworkId } from '@src/utils';
 
@@ -184,13 +185,11 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
           // update positions for each line
           const linePositionMap = _.zipObject(_.values(l.positionIds), _.values(l.positions));
           positions = { ...positions, ...linePositionMap };
-
           state.statusMap.user.linesActionsStatusMap[l.id] = initialLineActionsStatusMap;
           // save line id to category for reference
           categories[category] = [...(categories[category] || []), l.id];
         })
       );
-      // console.log('User Portfolio get line positions: ', positions);
       state.linesMap = { ...state.linesMap, ...lines };
       state.positionsMap = { ...state.positionsMap, ...positions };
       state.categories = { ...state.categories, ...categories };
@@ -205,7 +204,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(getLinePage.fulfilled, (state, { payload: { linePageData } }) => {
       if (linePageData) {
         // overwrite actual positions with referential ids
-        const { positions, collateralEvents, creditEvents, ...metadata } = linePageData;
+        const { positions, creditEvents, ...metadata } = linePageData;
         state.linesMap = { ...state.linesMap, [linePageData.id]: { ...metadata } };
         state.positionsMap = { ...state.positionsMap, ...positions };
         state.eventsMap = { ...state.eventsMap, [metadata.id]: creditEvents };

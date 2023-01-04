@@ -4,9 +4,12 @@ import { AppDispatch, ThunkAPI } from '@frameworks/redux';
 import { getEthersProvider, ExternalProvider } from '@frameworks/ethers';
 import { Theme, RootState, DIContainer, Subscriptions, Network, EVENT_LOGIN } from '@types';
 import { isValidAddress, getProviderType, getNetwork, getNetworkId } from '@utils';
+import { useAppSelector } from '@src/client/hooks';
 
 import { NetworkActions } from '../network/network.actions';
 import { AppActions } from '../app/app.actions';
+import { TokensSelectors } from '../tokens/tokens.selectors';
+import { TokensActions } from '../tokens/tokens.actions';
 
 const walletChange = createAction<{ walletName: string }>('wallet/walletChange');
 const addressChange = createAction<{ address: string }>('wallet/addressChange');
@@ -116,6 +119,9 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
       })
     );
 
+    // Generate User Tokens Map in state with supported tokens from subgraph
+    const supportedTokens = TokensSelectors.selectSupportedTokens(getState());
+    dispatch(TokensActions.getUserTokens({ addresses: supportedTokens }));
     return { isConnected };
   }
 );

@@ -7,7 +7,7 @@ import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
 import { WalletSelectors, LinesActions, LinesSelectors, AlertsActions } from '@store';
 import { SummaryCard, ViewContainer } from '@components/app';
 import { isValidAddress } from '@utils';
-import { LENDER_POSITION_ROLE, BORROWER_POSITION_ROLE, CreditPosition } from '@src/core/types';
+import { LENDER_POSITION_ROLE, BORROWER_POSITION_ROLE, CreditPosition, SecuredLine } from '@src/core/types';
 import { PositionsTable } from '@src/client/components/app/LineDetailsDisplay/PositionsTable';
 import { device } from '@themes/default';
 
@@ -103,7 +103,7 @@ export const Portfolio = () => {
   // Get an array of borrowerPositions by flattening
   // an array of Position arrays from borrowerLineOfCredits map
   const borrowerPositions: CreditPosition[] = _.flatten(
-    _.merge(borrowerLineOfCredits.map((loc) => _.values(loc.positions)))
+    _.merge(borrowerLineOfCredits.map((loc: SecuredLine) => _.values(loc.positions)))
   );
 
   useEffect(() => {

@@ -6,6 +6,7 @@ import { TokenIcon } from '@components/app';
 import { useAppTranslation } from '@hooks';
 import { Text, Icon, Button, SearchList, ChailinkIcon, ZapIcon, SearchListItem } from '@components/common';
 import { humanize } from '@utils';
+import { TokenView } from '@src/core/types';
 
 const MaxButton = styled(Button)`
   border-radius: ${({ theme }) => theme.globalRadius};
@@ -185,6 +186,7 @@ interface Token {
   icon?: string;
   balance?: string;
   balanceUsdc?: string;
+  priceUsdc?: string;
   yield?: string;
 }
 
@@ -239,21 +241,18 @@ export const TxTokenInput: FC<TxTokenInputProps> = ({
     id: selectedToken.address,
     icon: selectedToken.icon,
     label: selectedToken.symbol,
-    value: selectedToken.yield ?? humanize('usd', selectedToken.balanceUsdc),
+    value: humanize('usd', selectedToken.priceUsdc),
   };
 
   if (tokenOptions && tokenOptions.length > 1) {
-    listItems = tokenOptions
-      .map((item) => {
-        return {
-          id: item.address,
-          icon: item.icon,
-          label: item.symbol,
-          value: item.yield ?? humanize('usd', item.balanceUsdc),
-        };
-      })
-      .sort((a, b) => amountToNumber(b.value) - amountToNumber(a.value));
-    listItems.sort((a, b) => (a.id === selectedItem.id ? -1 : 1));
+    listItems = tokenOptions.map((item) => {
+      return {
+        id: item.address,
+        icon: item.icon,
+        label: item.symbol,
+        value: humanize('usd', item.priceUsdc),
+      };
+    });
   }
 
   const openSearchList = () => {

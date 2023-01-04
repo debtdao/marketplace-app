@@ -118,35 +118,6 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
       // console.log('Get Lines collateral reducer collateralMap: ', state.collateralMap);
     })
 
-    /* -------------------------------- getLineEvents ------------------------------- */
-    // TODO: Delete redundant and unnecessary code block.
-    // .addCase(getLineEvents.fulfilled, (state, { payload: { lineEventsData, id } }) => {
-    //   if (!lineEventsData) return;
-    //   console.log('get line events collateral reducer: ', lineEventsData);
-    //   const { escrow, spigot } = lineEventsData;
-    //   const spigotEvents = formatSpigotCollateralEvents(spigot.events);
-    //   const escrowDeposits: BaseEscrowDepositFragResponse[] = escrow?.deposits || [];
-    //   const escrowEvents: CollateralEvent[] = _.flatten(
-    //     _.merge(
-    //       escrowDeposits.map((deposit) => {
-    //         const [totalDepositValue, depositCollateralEvents] = formatCollateralEvents(
-    //           'escrow',
-    //           deposit.token,
-    //           BigNumber.from(0),
-    //           deposit.events,
-    //           {}
-    //         );
-    //         return depositCollateralEvents;
-    //       })
-    //     )
-    //   );
-    //   console.log('get line events collateral reducer - escrow events:', escrowEvents);
-    //   const combinedCollateralEvents = [...escrowEvents, ...spigotEvents];
-    //   // state.eventsMap = { ...state.eventsMap, [id]: combinedCollateralEvents };
-    //   // console.log('Get Line Page collateral reducer collateralMap: ', map);
-    //   console.log('get line events collateral reducer - eventsMap: ', combinedCollateralEvents);
-    // })
-
     /* -------------------------------- getLinePage ------------------------------- */
     .addCase(getLinePage.fulfilled, (state, { payload: { linePageData: line } }) => {
       if (!line) return;

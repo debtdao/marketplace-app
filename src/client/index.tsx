@@ -1,14 +1,13 @@
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense } from 'react';
 import { Provider } from 'react-redux';
 import { createGlobalStyle } from 'styled-components';
-import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client';
+import { ApolloProvider } from '@apollo/client';
 import '@i18n';
 
 import { Container } from '@container';
 import { getStore } from '@frameworks/redux';
 import { AppContextProvider, NavSideMenuContextProvider } from '@context';
 import { getClient } from '@core/frameworks/gql';
-// import { possibleTypes } from '@core/frameworks/gql/possibleTypes.js';
 import { Routes } from '@routes';
 import { Themable } from '@containers';
 

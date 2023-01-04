@@ -57,7 +57,6 @@ export const linesInitialState: CreditLineState = {
   statusMap: {
     getLines: initialStatus,
     getLine: initialStatus,
-    // getLineEvents: initialStatus,
     getLinePage: initialStatus,
     getAllowances: initialStatus,
     getUserPortfolio: initialStatus,
@@ -75,7 +74,6 @@ const {
   withdrawLine,
   // migrateLine,
   getLine,
-  // getLineEvents,
   getLinePage,
   getLines,
   deploySecuredLine,
@@ -200,27 +198,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(getLines.rejected, (state, { error }) => {
       state.statusMap.getLines = { error: error.message };
     })
-    /* -------------------------------- getLineEvents ------------------------------- */
-    // TODO: Delete redundant and unnecessary code block.
-    // .addCase(getLineEvents.pending, (state) => {
-    //   state.statusMap.getLineEvents = { loading: true };
-    // })
-    // .addCase(getLineEvents.fulfilled, (state, { payload: { lineEventsData, id } }) => {
-    //   if (lineEventsData) {
-    //     const { events } = lineEventsData;
-    //     const creditEvents = events.map((event) => {
-    //       const { id, __typename, timestamp, amount, position } = event;
-    //       return { id, __typename, timestamp, amount, token: position.token.id } as CreditEvent;
-    //     });
-    //     state.eventsMap = { ...state.eventsMap, [id]: creditEvents };
-    //     console.log('FormatLineWithEvents - lineEvents reducer: ', state.eventsMap);
-    //     // we also update state.collateral on this action being fullfilled in collateral.reducer.ts
-    //   }
-    //   state.statusMap.getLineEvents = {};
-    // })
-    // .addCase(getLineEvents.rejected, (state, { error }) => {
-    //   state.statusMap.getLineEvents = { error: error.message };
-    // })
     /* -------------------------------- getLinePage ------------------------------- */
     .addCase(getLinePage.pending, (state) => {
       state.statusMap.getLinePage = { loading: true };
@@ -233,7 +210,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
         state.positionsMap = { ...state.positionsMap, ...positions };
         state.eventsMap = { ...state.eventsMap, [metadata.id]: creditEvents };
         // we also update state.collateral on this action  being fullfilled in collateral.reducer.ts
-        console.log('line page reducer: ', state.linesMap);
       }
 
       state.statusMap.getLinePage = {};

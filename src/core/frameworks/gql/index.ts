@@ -52,10 +52,6 @@ export const getGraphURL = (network: string) => {
   return url;
 };
 
-type PossibleTypeMap = {
-  [supertype: string]: string[];
-};
-
 let client: any;
 export const getClient = (network: string) => (client ? client : createClient(network));
 export const createClient = (network: string): ApolloClient<{}> => {
@@ -96,9 +92,7 @@ export const createQuery =
   (query: DocumentNode, path?: string, network?: string, isOracle?: boolean): Function =>
   <A, R>(variables: A): Promise<QueryResponse<R>> =>
     new Promise(async (resolve, reject) => {
-      // const client = isOracle ? getPriceFeedClient() : await getClient(network!);
       const client = isOracle ? getPriceFeedClient() : getClient(network!);
-      console.log('Graph QL Client - gql/index - url: ', client.link);
       client
         .query({ query, variables })
         .then((result: QueryResult) => {

@@ -189,7 +189,6 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
   const onClaimFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
     const hashedSigFunc = generateSig(newFunc.label, contractABI[revContract]!);
     setClaimData(hashedSigFunc);
-    console.log(hashedSigFunc);
     setClaimFuncType(newFunc);
   };
 

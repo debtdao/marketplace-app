@@ -17,7 +17,8 @@ import {
   ARBITER_POSITION_ROLE,
   LineEvents,
   AggregatedEscrow,
-  AggregatedSpigot, // prev. GeneralVaultView, Super indepth data, SecuredLineWithEvents is most similar atm
+  AggregatedSpigot,
+  CollateralEvent, // prev. GeneralVaultView, Super indepth data, SecuredLineWithEvents is most similar atm
 } from '@types';
 import { toBN, unnullify } from '@utils';
 import { getConstants } from '@src/config/constants';
@@ -108,13 +109,16 @@ const selectCollateralForSelectedLine = createSelector(
 );
 
 const selectCollateralEventsForSelectedLine = createSelector(
-  [selectCollateralEventsMap, selectCollateralForSelectedLine],
-  (events, collateral) => {
-    console.log('select collaterap events map: ', events);
-    console.log('select collaterap: ', collateral);
-    const escrowEvents = events[collateral.escrow?.id] ?? [];
-    const spigotEvents = events[collateral.spigot?.id] ?? [];
-    return { collateralEvents: _.concat(escrowEvents, spigotEvents) };
+  [selectCollateralEventsMap, selectSelectedLineAddress, selectCollateralForSelectedLine],
+  (events, lineAddress, collateral) => {
+    if (!lineAddress) return { collateralEvents: [] };
+    // const escrowEvents = events[collateral.escrow?.line] ?? [];
+    // const spigotEvents = events[collateral.spigot?.line] ?? [];
+    // const collateralEvents = events[collateral.escrow?.line] ?? [];
+    const collateralEvents = events[lineAddress] ?? [];
+    // console.log('select collaterap events: ', _.concat(escrowEvents, spigotEvents));
+    // return { collateralEvents: _.concat(escrowEvents, spigotEvents) };
+    return { collateralEvents };
   }
 );
 

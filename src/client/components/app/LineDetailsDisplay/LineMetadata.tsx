@@ -224,13 +224,11 @@ export const LineMetadata = (props: LineMetadataProps) => {
         return 'liquidate';
       case BORROWER_POSITION_ROLE:
       default:
-        console.log('add collateral action selected for buuton');
         return 'add-collateral';
     }
   };
 
-  console.log('all collateral', allCollateral);
-  const formattedCollataralData = allCollateral.map((c) => ({
+  const formattedCollateralData = allCollateral.map((c) => ({
     ...c,
     key: c.type + c.token.toString(),
     // header: c.type + c.token.toString(),
@@ -251,7 +249,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
     : `${t('components.connect-button.connect')}`;
 
   const getCollateralTableActions = () => {
-    console.log('get collateral table actions', userPositionMetadata.role);
     switch (userPositionMetadata.role) {
       case BORROWER_POSITION_ROLE:
         return <Button onClick={depositHandler}>{depositCollateralText} </Button>;
@@ -356,7 +353,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
               grow: '1',
             },
           ]}
-          data={formattedCollataralData ? formattedCollataralData : []}
+          data={formattedCollateralData ? formattedCollateralData : []}
           SearchBar={getCollateralTableActions()}
           searching={false}
           onAction={undefined}

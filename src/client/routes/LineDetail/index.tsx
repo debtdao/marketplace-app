@@ -92,7 +92,6 @@ export const LineDetail = () => {
     getLinePageStatus.loading ||
     tokensStatus.loading ||
     (isMounting && (!tokensInitialized || !linesInitialized));
-  console.log('genewral linedetails loading', generalLoading);
 
   // TODO: 0xframe also supports this
   //const displayAddToken = walletIsConnected && walletName.name === 'MetaMask';

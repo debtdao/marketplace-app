@@ -95,7 +95,6 @@ export const Market = () => {
     if (shouldFetch) {
       fetchMarketData();
     }
-    console.log('search', search);
   }, []);
 
   const onLenderCtaClick = () => {

@@ -38,6 +38,14 @@ export interface GetLineArgs {
 }
 
 /**
+ * @typedef {object} GetLineEventsArgs
+ * @property {Address} GetLineEventsArgs.id - address of line contract
+ */
+export interface GetLineEventsArgs {
+  id: Address;
+}
+
+/**
  * @typedef {object} GetLinePageArgs
  * @property {Address} GetLinePageArgs.id - address of line contract
  */
@@ -130,11 +138,12 @@ export interface BasePositionFragResponse {
 }
 
 export interface LineEventFragResponse {
+  id: Address;
   __typename: string;
-  id: string;
   timestamp: number;
   position: {
-    id: string;
+    id: Address;
+    token: TokenFragRepsonse;
   };
   // events with value
   value?: string;
@@ -142,8 +151,6 @@ export interface LineEventFragResponse {
   // events with rates
   dRate?: string;
   fRate?: string;
-
-  token: TokenFragRepsonse;
 }
 
 export interface SpigotRevenueSummaryFragResponse {
@@ -166,6 +173,15 @@ export interface BaseEscrowDepositFragResponse {
   enabled: boolean;
   amount: string;
   token: TokenFragRepsonse;
+  events?: EscrowEventFragResponse[];
+}
+
+export interface EscrowEventFragResponse {
+  __typename: string;
+  timestamp: number;
+  // only on add/remove collateral
+  amount?: string;
+  value?: string;
 }
 
 export interface BaseEscrowFragResponse {
@@ -186,6 +202,22 @@ export interface GetLinesResponse {
         timeOfLastIncome: number;
       };
     };
+  };
+}
+
+export interface GetLineEventsResponse {
+  events: LineEventFragResponse[];
+  escrow: BaseEscrowFragResponse & {
+    events: {
+      __typename: string;
+      timestamp: number;
+      // only on add/remove collateral
+      amount?: string;
+      value?: string;
+    };
+  };
+  spigot: {
+    events?: SpigotEventFragResponse[];
   };
 }
 

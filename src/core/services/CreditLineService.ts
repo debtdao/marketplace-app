@@ -30,11 +30,14 @@ import {
   Network,
   GetUserPortfolioProps,
   GetUserPortfolioResponse,
+  GetLineEventsProps,
+  GetLineEventsResponse,
+  LineEventFragResponse,
 } from '@types';
 import { getConfig } from '@config';
 import { SecuredLineABI } from '@services/contracts';
 import { getContract } from '@frameworks/ethers';
-import { getLinePage, getLines, getUserPortfolio } from '@frameworks/gql';
+import { getLineEvents, getLinePage, getLines, getUserPortfolio } from '@frameworks/gql';
 
 const { GRAPH_API_URL } = getConfig();
 
@@ -392,14 +395,24 @@ export class CreditLineServiceImpl implements CreditLineService {
     return response;
   }
 
-  // TODO
+  public async getLineEvents(prop: GetLineEventsProps): Promise<GetLineEventsResponse | undefined> {
+    const response = getLineEvents(prop)
+      .then((data) => data)
+      .catch((err) => {
+        console.log('CreditLineService: error fetching line events', err);
+        return undefined;
+      });
+    return response;
+  }
+
   public async getLinePage(prop: GetLinePageProps): Promise<GetLinePageResponse | undefined> {
     const response = getLinePage(prop)
       .then((data) => data)
       .catch((err) => {
-        console.log('CreditLineService: error fetching lines', err);
+        console.log('CreditLineService: error fetching line page data', err);
         return undefined;
       });
+
     return response;
   }
 

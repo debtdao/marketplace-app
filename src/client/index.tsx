@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense } from 'react';
 import { Provider } from 'react-redux';
 import { createGlobalStyle } from 'styled-components';
 import { ApolloProvider } from '@apollo/client';

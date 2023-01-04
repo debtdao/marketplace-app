@@ -88,7 +88,6 @@ const AssetsListCard = styled(DetailCard)`
     }
   }
 ` as typeof DetailCard;
-
 interface LineMetadataProps {
   principal: string;
   deposit: string;
@@ -288,8 +287,9 @@ export const LineMetadata = (props: LineMetadataProps) => {
       </ThreeColumnLayout>
 
       <ViewContainer>
+        <SectionHeader>{t('lineDetails:metadata.escrow.assets-list.title')}</SectionHeader>
         <AssetsListCard
-          header={t('lineDetails:metadata.escrow.assets-list.title')}
+          header={' '} //{t('lineDetails:metadata.escrow.assets-list.title')}
           data-testid="line-assets-list"
           metadata={[
             {

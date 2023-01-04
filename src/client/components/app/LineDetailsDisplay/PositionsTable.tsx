@@ -220,7 +220,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
       <ViewContainer>
         <PositionsCard
-          header={t('components.positions-card.positions')}
+          header={''} //{t('components.positions-card.positions')}
           data-testid="vaults-opportunities-list"
           metadata={[
             {
@@ -249,7 +249,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
               key: 'token',
               header: t('components.positions-card.token'),
               sortable: true,
-              width: '10rem',
+              width: '8rem',
               className: 'col-available',
             },
             {
@@ -270,7 +270,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
               key: 'interest',
               header: t('components.positions-card.interest'),
               sortable: true,
-              width: '10rem',
+              width: '8rem',
               className: 'col-assets',
             },
             {

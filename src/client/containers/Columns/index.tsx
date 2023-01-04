@@ -11,7 +11,7 @@ const StyledLayout = styled.div`
   grid-template-columns: repeat(3, 1fr);
   column-gap: ${({ theme }) => theme.spacing.xl};
   justify-content: flex-start;
-  overflow: scroll;
+  // overflow: scroll;
 
   flex: 1;
 

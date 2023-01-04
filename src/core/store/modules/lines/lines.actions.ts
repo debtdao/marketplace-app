@@ -161,7 +161,7 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
     // query and add credit and collateral events to pre-existing line
     console.log('FormatLineWithEvents - get line selected: ', selectedLine);
     if (selectedLine) {
-      if (selectedLine.creditEvents.length === 0) {
+      if (selectedLine.creditEvents.length === 0 && selectedLine.collateralEvents.length === 0) {
         // dispatch getLineEvents action to store line events in state
         // const lineEvents: GetLineEventsResponse | undefined = await dispatch(getLineEvents({ id })).then(
         //   (res: any) => res.payload?.lineEventsData ?? undefined

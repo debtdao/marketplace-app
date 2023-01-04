@@ -112,11 +112,6 @@ const selectCollateralEventsForSelectedLine = createSelector(
   [selectCollateralEventsMap, selectSelectedLineAddress, selectCollateralForSelectedLine],
   (events, lineAddress, collateral) => {
     if (!lineAddress) return { collateralEvents: [] };
-    // const escrowEvents = events[collateral.escrow?.line] ?? [];
-    // const spigotEvents = events[collateral.spigot?.line] ?? [];
-    // const collateralEvents = events[collateral.escrow?.line] ?? [];
-    // console.log('select collaterap events: ', _.concat(escrowEvents, spigotEvents));
-    // return { collateralEvents: _.concat(escrowEvents, spigotEvents) };
     return { collateralEvents: events[lineAddress] ?? [] };
   }
 );
@@ -138,11 +133,6 @@ const selectSelectedLinePage = createSelector(
   [selectSelectedLine, selectPositionsForSelectedLine, selectCollateralForSelectedLine, selectEventsForLine],
   (line, positions, collateral, events): SecuredLineWithEvents | undefined => {
     if (!line) return undefined;
-    console.log('selectedLine - line: ', line);
-    console.log('selectedLine - positions: ', positions);
-    console.log('selectedLine - collateral: ', collateral);
-    console.log('selectedLine - events: ', events);
-    console.log('selectedLine - full object; ', { ...line, positions, ...collateral, ...events });
     return { ...line, positions, ...collateral, ...events };
   }
 );

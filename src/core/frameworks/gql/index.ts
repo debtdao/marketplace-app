@@ -1,6 +1,3 @@
-import * as fs from 'fs';
-import * as path from 'path';
-
 import { ApolloClient, InMemoryCache, DocumentNode, QueryResult } from '@apollo/client';
 import { at } from 'lodash';
 
@@ -42,7 +39,7 @@ const { GRAPH_API_URL, GRAPH_TEST_API_URL, GRAPH_CHAINLINK_FEED_REGISTRY_API_URL
 const { BLACKLISTED_LINES: blacklist } = getConstants();
 
 // utility function get GRAPH_API_URL based on network parameter
-export const getGraphURL = (network: string) => {
+const getGraphURL = (network: string) => {
   let url = '';
   if (network === 'mainnet') {
     url = GRAPH_API_URL!;
@@ -54,7 +51,7 @@ export const getGraphURL = (network: string) => {
 
 let client: any;
 export const getClient = (network: string) => (client ? client : createClient(network));
-export const createClient = (network: string): ApolloClient<{}> => {
+const createClient = (network: string): ApolloClient<{}> => {
   const graphApiUrL = getGraphURL(network);
   client = new ApolloClient({
     uri: graphApiUrL,

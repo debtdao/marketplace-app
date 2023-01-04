@@ -198,7 +198,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
 
     //If user is lender, and line has amount to withdraw, return withdraw action
     if (
-      getAddress(position.lender) == userWallet &&
+      getAddress(position.lender) === userWallet &&
       BigNumber.from(position.deposit).gt(BigNumber.from(position.principal))
     ) {
       return [
@@ -235,7 +235,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
               hide: !displayLine,
               header: t('components.positions-card.line'),
               sortable: true,
-              width: '8rem',
+              width: '13rem',
               className: 'col-apy',
             },
             {
@@ -256,14 +256,14 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
               key: 'deposit',
               header: t('components.positions-card.total-deposits'),
               sortable: true,
-              width: '10rem',
+              width: '13rem',
               className: 'col-assets',
             },
             {
               key: 'principal',
               header: t('components.positions-card.principal'),
               sortable: true,
-              width: '10rem',
+              width: '13rem',
               className: 'col-assets',
             },
             {
@@ -277,14 +277,14 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
               key: 'drate',
               header: t('components.positions-card.drate'),
               sortable: true,
-              width: '7rem',
+              width: '10rem',
               className: 'col-assets',
             },
             {
               key: 'frate',
               header: t('components.positions-card.frate'),
               sortable: true,
-              width: '7rem',
+              width: '10rem',
               className: 'col-assets',
             },
             {
@@ -301,7 +301,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
             frate: `${normalizeAmount(position.fRate, 2)} %`,
             line: (
               <RouterLink to={`/lines/${currentNetwork}/${position.line}`} key={position.line} selected={false}>
-                {position.line}
+                {formatAddress(position.line)}
                 <RedirectLinkIcon />
               </RouterLink>
             ),
@@ -325,20 +325,21 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
             ),
             actions: <ActionButtons value={position.id} actions={getUserPositionActions(position)} />,
           }))}
-          SearchBar={
-            <>
-              <Input
-                value={''}
-                onChange={(e) => console.log(e)}
-                placeholder={t('components.search-input.search')}
-                Icon={SearchIcon}
-              />
+          // TODO: Add search bar back when there is a need for it.
+          // SearchBar={
+          //   <>
+          //     <Input
+          //       value={''}
+          //       onChange={(e) => console.log(e)}
+          //       placeholder={t('components.search-input.search')}
+          //       Icon={SearchIcon}
+          //     />
 
-              {userRoleMetadata.role === LENDER_POSITION_ROLE && (
-                <Button onClick={depositHandler}>{ctaButtonText}</Button>
-              )}
-            </>
-          }
+          //     {userRoleMetadata.role === LENDER_POSITION_ROLE && (
+          //       <Button onClick={depositHandler}>{ctaButtonText}</Button>
+          //     )}
+          //   </>
+          // }
           searching={false}
           filterLabel="Show 0% APY"
           initialSortBy="deposit"

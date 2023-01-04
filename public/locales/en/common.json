@@ -17,13 +17,13 @@
     "positions-card": {
       "line": "Line",
       "positions": "Positions",
-      "drate": "dRate",
-      "frate": "fRate",
+      "drate": "Draw Down Rate",
+      "frate": "Facility Rate",
       "total-deposits": "Supplied",
       "token": "Token",
       "status": "Status",
       "principal": "Borrowed",
-      "interest": "Interest",
+      "interest": "Interest Accrued",
       "lender": "Lender"
     },
     "list-card": {

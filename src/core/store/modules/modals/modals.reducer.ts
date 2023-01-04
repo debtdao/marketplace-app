@@ -15,6 +15,7 @@ const modalsReducer = createReducer(modalsInitialState, (builder) => {
   builder.addCase(openModal, (state, { payload: { modalName, modalProps } }) => {
     state.activeModal = modalName;
     state.modalProps = modalProps || {};
+    console.log('hello I opened a modal');
 
     // // TODO Move scroll lock into the actions or an effect watcher in react component
     document.body.style.top = `-${window.scrollY}px`;

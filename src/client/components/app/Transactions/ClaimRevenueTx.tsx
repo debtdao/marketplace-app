@@ -23,6 +23,7 @@ import {
   CollateralActions,
   WalletSelectors,
   OnchainMetaDataSelector,
+  OnchainMetaDataActions,
 } from '@store';
 
 import { TxContainer } from './components/TxContainer';
@@ -55,11 +56,11 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const [claimData, setClaimData] = useState('');
   const [revContract, setRevContract] = useState(selectedRevenueContract ?? '');
-  const [revenueContractAddy, setRevenueContractAdd] = useState<string>('');
   const contractABI = useAppSelector(OnchainMetaDataSelector.selectABI);
   const selectedContractFunctions = useAppSelector(OnchainMetaDataSelector.selectFunctions);
   const [claimFuncType, setClaimFuncType] = useState({ id: '', label: '', value: '' });
   const [claimFunc, setClaimFunc] = useState<string>('');
+  const [didFetchAbi, setDidFetchABI] = useState<boolean>(false);
 
   const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
   const initialToken: string = selectedSellTokenAddress || ETH;
@@ -89,7 +90,14 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
       setSelectedTokenAddress(selectedSellToken.address);
     }
   }, [selectedSellToken, selectedTokenAddress]);
-  console.log('selected tokens #2', selectedSellToken, selectedSellTokenAddress);
+
+  useEffect(() => {
+    if (isValidAddress(revContract)) {
+      dispatch(OnchainMetaDataActions.getABI(revContract));
+    }
+  }, [revContract, didFetchAbi]);
+
+  //console.log('selected tokens #2', selectedSellToken, selectedSellTokenAddress);
 
   const onSelectedSellTokenChange = (tokenAddress: string) => {
     console.log('set token', tokenAddress);
@@ -133,22 +141,23 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
       console.log('claim rev modal: claimRevenue() - no rev token selected');
       return;
     }
+    console.log(selectedSpigot.id, selectedRevenueContract, selectedSellTokenAddress, claimData, walletNetwork);
 
-    dispatch(
-      CollateralActions.claimRevenue({
-        spigotAddress: selectedSpigot.id,
-        revenueContract: selectedRevenueContract,
-        token: selectedSellTokenAddress,
-        claimData, // default to null claimdata
-        network: walletNetwork,
-      })
-    )
-      .then((res) => {
-        console.log('claim rev success', res);
-      })
-      .catch((err) => {
-        console.log('claim rev fail', err);
-      });
+    // dispatch(
+    //   CollateralActions.claimRevenue({
+    //     spigotAddress: selectedSpigot.id,
+    //     revenueContract: selectedRevenueContract,
+    //     token: selectedSellTokenAddress,
+    //     claimData, // default to null claimdata
+    //     network: walletNetwork,
+    //   })
+    // )
+    //   .then((res) => {
+    //     console.log('claim rev success', res);
+    //   })
+    //   .catch((err) => {
+    //     console.log('claim rev fail', err);
+    //   });
   };
 
   if (transactionCompleted === 1) {
@@ -178,20 +187,21 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
   if (!selectedSellToken && !selectedTokenAddress) return null;
 
   const onClaimFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
-    const hashedSigFunc = generateSig(newFunc.label, contractABI[revenueContractAddy]!);
-    setClaimFunc(hashedSigFunc);
+    const hashedSigFunc = generateSig(newFunc.label, contractABI[revContract]!);
+    setClaimData(hashedSigFunc);
+    console.log(hashedSigFunc);
     setClaimFuncType(newFunc);
   };
 
   const isVerifiedContract =
-    isValidAddress(revenueContractAddy) &&
+    isValidAddress(revContract) &&
     contractABI &&
-    selectedContractFunctions[revenueContractAddy] !== undefined &&
-    selectedContractFunctions[revenueContractAddy]!.length !== 0;
+    selectedContractFunctions[revContract] !== undefined &&
+    selectedContractFunctions[revContract]!.length !== 0;
 
-  const funcOptions = !selectedContractFunctions[revenueContractAddy]
+  const funcOptions = !selectedContractFunctions[revContract]
     ? []
-    : selectedContractFunctions[revenueContractAddy].map((func, i) => ({ id: i.toString(), label: func, value: '' }));
+    : selectedContractFunctions[revContract].map((func, i) => ({ id: i.toString(), label: func, value: '' }));
 
   // return (
   //   <StyledTransaction onClose={onClose} header={header || t('components.transaction.claim-revenue.title')}>
@@ -235,8 +245,16 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
     <StyledTransaction onClose={onClose} header={header}>
       <TxAddressInput
         headerText={t('components.transaction.enable-spigot.revenue-contract')}
-        address={revenueContractAddy}
-        onAddressChange={setRevenueContractAdd}
+        address={revContract}
+        onAddressChange={onRevContractChange}
+      />
+      <TxTokenInput
+        headerText={t('components.transaction.claim-revenue.rev-token-input-header')}
+        selectedToken={selectedSellToken!}
+        onSelectedTokenChange={onSelectedSellTokenChange}
+        tokenOptions={sourceAssetOptions}
+        amount="0" // todo simulate how many tokens will be claimed and add value here
+        readOnly={true}
       />
 
       {isVerifiedContract ? (

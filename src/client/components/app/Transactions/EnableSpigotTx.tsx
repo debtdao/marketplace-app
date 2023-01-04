@@ -163,12 +163,12 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     );
   }
 
-  console.log(
-    'enable spig modal contract ahs funcs?',
-    selectedContractFunctions[revenueContractAddy]?.length == 0,
-    selectedContractFunctions[revenueContractAddy] !== undefined &&
-      selectedContractFunctions[revenueContractAddy]!.length !== 0
-  );
+  // console.log(
+  //   'enable spig modal contract ahs funcs?',
+  //   selectedContractFunctions[revenueContractAddy]?.length == 0,
+  //   selectedContractFunctions[revenueContractAddy] !== undefined &&
+  //     selectedContractFunctions[revenueContractAddy]!.length !== 0
+  // );
   const isVerifiedContract =
     isValidAddress(revenueContractAddy) &&
     contractABI &&

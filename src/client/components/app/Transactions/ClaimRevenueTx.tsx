@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { getAddress } from '@ethersproject/address';
 import { BytesLike, ethers } from 'ethers';
 
-import { formatAmount, normalizeAmount } from '@utils';
+import { formatAmount, generateSig, isValidAddress, normalizeAmount } from '@utils';
 import {
   useAppTranslation,
   useAppDispatch,
@@ -22,6 +22,7 @@ import {
   CollateralSelectors,
   CollateralActions,
   WalletSelectors,
+  OnchainMetaDataSelector,
 } from '@store';
 
 import { TxContainer } from './components/TxContainer';
@@ -31,6 +32,7 @@ import { TxActionButton, TxActions } from './components/TxActions';
 import { TxStatus } from './components/TxStatus';
 import { TxAddressInput } from './components/TxAddressInput';
 import { TxByteInput } from './components/TxByteInput';
+import { TxFuncSelector } from './components/TxFuncSelector';
 
 const {
   CONTRACT_ADDRESSES: { ETH },
@@ -53,6 +55,11 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const [claimData, setClaimData] = useState('');
   const [revContract, setRevContract] = useState(selectedRevenueContract ?? '');
+  const [revenueContractAddy, setRevenueContractAdd] = useState<string>('');
+  const contractABI = useAppSelector(OnchainMetaDataSelector.selectABI);
+  const selectedContractFunctions = useAppSelector(OnchainMetaDataSelector.selectFunctions);
+  const [claimFuncType, setClaimFuncType] = useState({ id: '', label: '', value: '' });
+  const [claimFunc, setClaimFunc] = useState<string>('');
 
   const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
   const initialToken: string = selectedSellTokenAddress || ETH;
@@ -170,28 +177,90 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
 
   if (!selectedSellToken && !selectedTokenAddress) return null;
 
+  const onClaimFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
+    const hashedSigFunc = generateSig(newFunc.label, contractABI[revenueContractAddy]!);
+    setClaimFunc(hashedSigFunc);
+    setClaimFuncType(newFunc);
+  };
+
+  const isVerifiedContract =
+    isValidAddress(revenueContractAddy) &&
+    contractABI &&
+    selectedContractFunctions[revenueContractAddy] !== undefined &&
+    selectedContractFunctions[revenueContractAddy]!.length !== 0;
+
+  const funcOptions = !selectedContractFunctions[revenueContractAddy]
+    ? []
+    : selectedContractFunctions[revenueContractAddy].map((func, i) => ({ id: i.toString(), label: func, value: '' }));
+
+  // return (
+  //   <StyledTransaction onClose={onClose} header={header || t('components.transaction.claim-revenue.title')}>
+  //     <TxAddressInput
+  //       address={revContract}
+  //       onAddressChange={onRevContractChange}
+  //       inputText={t('components.transaction.claim-revenue.rev-contract-input')}
+  //     />
+  //     <TxTokenInput
+  //       headerText={t('components.transaction.claim-revenue.rev-token-input-header')}
+  //       selectedToken={selectedSellToken!}
+  //       onSelectedTokenChange={onSelectedSellTokenChange}
+  //       tokenOptions={sourceAssetOptions}
+  //       amount="0" // todo simulate how many tokens will be claimed and add value here
+  //       readOnly={true}
+  //     />
+  //     <TxByteInput
+  //       byteCode={claimData}
+  //       onByteCodeChange={setClaimData}
+  //       headerText={t('components.transaction.claim-revenue.claim-data-header')}
+  //       inputText={t('components.transaction.claim-revenue.claim-data-input')}
+  //     />
+  //     {/* need to fetch revContract ABI from etherscan and try to configure content that way. */}
+
+  //     <TxActions>
+  //       <TxActionButton
+  //         data-testid={`modal-action-claim-revenue`}
+  //         onClick={claimRevenue}
+  //         disabled={false}
+  //         contrast={true}
+  //         isLoading={transactionLoading}
+  //       >
+  //         {t('components.transaction.claim-revenue.cta')}
+  //       </TxActionButton>
+  //     </TxActions>
+  //   </StyledTransaction>
+  // );
+
   return (
-    <StyledTransaction onClose={onClose} header={header || t('components.transaction.claim-revenue.title')}>
+    // <div />
+    <StyledTransaction onClose={onClose} header={header}>
       <TxAddressInput
-        address={revContract}
-        onAddressChange={onRevContractChange}
-        inputText={t('components.transaction.claim-revenue.rev-contract-input')}
+        headerText={t('components.transaction.enable-spigot.revenue-contract')}
+        address={revenueContractAddy}
+        onAddressChange={setRevenueContractAdd}
       />
-      <TxTokenInput
-        headerText={t('components.transaction.claim-revenue.rev-token-input-header')}
-        selectedToken={selectedSellToken!}
-        onSelectedTokenChange={onSelectedSellTokenChange}
-        tokenOptions={sourceAssetOptions}
-        amount="0" // todo simulate how many tokens will be claimed and add value here
-        readOnly={true}
-      />
-      <TxByteInput
-        byteCode={claimData}
-        onByteCodeChange={setClaimData}
-        headerText={t('components.transaction.claim-revenue.claim-data-header')}
-        inputText={t('components.transaction.claim-revenue.claim-data-input')}
-      />
-      {/* need to fetch revContract ABI from etherscan and try to configure content that way. */}
+
+      {isVerifiedContract ? (
+        <>
+          <TxFuncSelector
+            headerText={t('components.transaction.enable-spigot.function-revenue')}
+            typeOptions={funcOptions}
+            selectedType={claimFuncType}
+            onSelectedTypeChange={onClaimFuncSelection}
+          />
+        </>
+      ) : (
+        // if no ABI, input bytecode manually
+        <>
+          <TxByteInput
+            headerText={t('components.transaction.enable-spigot.function-revenue')}
+            inputText={' '}
+            inputError={false}
+            byteCode={claimFunc}
+            onByteCodeChange={setClaimFunc}
+            readOnly={false}
+          />
+        </>
+      )}
 
       <TxActions>
         <TxActionButton

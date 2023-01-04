@@ -4,16 +4,14 @@
 
 // Source Documentation: https://www.apollographql.com/docs/react/data/fragments/#using-fragments-with-unions-and-interfaces
 
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'fs';
+import * as path from 'path';
 
 const fetch = require('cross-fetch');
 
 const GRAPH_API_URL = process.env.GRAPH_API_URL;
 
 const homeDirectory = path.resolve(process.cwd());
-// const destinationDirectoryJSON = '/src/core/frameworks/gql/possibleTypes.json';
-// const destinationPathJSON = path.join(homeDirectory, destinationDirectoryJSON);
 const destinationDirectoryJS = '/src/core/frameworks/gql/possibleTypes.js';
 const destinationPathJS = path.join(homeDirectory, destinationDirectoryJS);
 
@@ -40,31 +38,15 @@ fetch(`${GRAPH_API_URL}`, {
     `,
   }),
 })
-  .then((result) => result.json())
-  .then((result) => {
-    const possibleTypes = {};
+  .then((result: Response) => result.json())
+  .then((result: any) => {
+    const possibleTypes: { [key: string]: string[] } = {};
 
-    result.data.__schema.types.forEach((supertype) => {
+    result.data.__schema.types.forEach((supertype: any) => {
       if (supertype.possibleTypes) {
-        possibleTypes[supertype.name] = supertype.possibleTypes.map((subtype) => subtype.name);
+        possibleTypes[supertype.name] = supertype.possibleTypes.map((subtype: any) => subtype.name);
       }
     });
-
-    // fs.writeFile(destinationPath, JSON.stringify(possibleTypes), (err) => {
-    //   if (err) {
-    //     console.error('Error writing possibleTypes.json', err);
-    //   } else {
-    //     console.log('Fragment types successfully extracted!');
-    //   }
-    // });
-
-    // fs.writeFile(destinationPathJSON, JSON.stringify(possibleTypes), (err) => {
-    //   if (err) {
-    //     console.error('Error writing possibleTypes.json', err);
-    //   } else {
-    //     console.log('Fragment types successfully extracted!');
-    //   }
-    // });
 
     fs.writeFile(
       destinationPathJS,
@@ -73,7 +55,7 @@ fetch(`${GRAPH_API_URL}`, {
       )};`,
       (err) => {
         if (err) {
-          console.error('Error writing possibleTypes.tsx', err);
+          console.error('Error writing possibleTypes.ts', err);
         } else {
           console.log('Fragment types successfully extracted!');
         }

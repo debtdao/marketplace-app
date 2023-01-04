@@ -204,8 +204,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       <TxAddressInput
         key={'credit-input'}
         headerText={t('components.transaction.deploy-line.select-borrower')}
-        // inputText={t('components.transaction.deploy-line.select-borrower')}
-        inputText={''}
+        inputText={'Borrower Address'}
         onAddressChange={onBorrowerAddressChange}
         address={borrowerAddress}
         // creditOptions={sourceCreditOptions}

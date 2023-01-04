@@ -197,9 +197,9 @@
         "select-ttl": "2. Insert a deadline for the line",
         "time-to-live": "Time this line will remain active for (in days):",
         "cratio": "3. Select a Collateralization Ratio",
-        "cratio-input": "Your Cratio",
+        "cratio-input": "Collaterization Ratio",
         "revenue-split": "4. Select a Revenue Split",
-        "revenue-split-input": "Your revenue split"
+        "revenue-split-input": "Revenue Split"
       },
       "borrow-credit": {
         "header": "Borrow",

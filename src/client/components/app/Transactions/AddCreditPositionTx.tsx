@@ -359,7 +359,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         maxAmount={acceptingOffer ? targetTokenAmount : targetBalance}
         selectedToken={positionToken}
         onSelectedTokenChange={onSelectedSellTokenChange}
-        tokenOptions={sourceAssetOptions}
+        tokenOptions={acceptingOffer ? [] : sourceAssetOptions}
         readOnly={acceptingOffer}
       />
 

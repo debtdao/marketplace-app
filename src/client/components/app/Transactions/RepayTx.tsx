@@ -50,6 +50,10 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
   const initialToken: string = selectedSellTokenAddress || DAI;
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
 
+  console.log('Repay Modal - selected position: ', selectedPosition);
+
+  // setTargetAmount(String(Number(selectedPosition?.principal ?? '0') + Number(selectedPosition?.interestAccrued)));
+
   const repaymentOptions = [
     { id: '1', label: 'Repay from:', value: 'Wallet' },
     { id: '2', label: 'Repay from:', value: 'Claim' },
@@ -61,6 +65,9 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
     selectedVaultOrLab: useAppSelector(VaultsSelectors.selectRecommendations)[0],
     allowTokenSelect: true,
   });
+
+  console.log('Repay Modal - Selected Sell Token Address: ', selectedSellTokenAddress);
+  console.log('Repay Modal - Selected Sell Token: ', selectedSellToken);
 
   useEffect(() => {
     console.log('repay type', repayType);
@@ -380,9 +387,9 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
         amountValue={String(10000000 * Number(targetAmount))}
         maxAmount={getMaxRepay()}
         selectedToken={selectedSellToken}
-        onSelectedTokenChange={onSelectedSellTokenChange}
+        // onSelectedTokenChange={onSelectedSellTokenChange}
         // @cleanup TODO
-        tokenOptions={walletNetwork === 'goerli' ? testTokens : sourceAssetOptions}
+        // tokenOptions={walletNetwork === 'goerli' ? testTokens : sourceAssetOptions}
         // inputError={!!sourceStatus.error}
         readOnly={acceptingOffer}
         // displayGuidance={displaySourceGuidance}

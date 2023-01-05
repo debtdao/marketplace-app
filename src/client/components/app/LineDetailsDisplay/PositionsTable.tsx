@@ -17,9 +17,8 @@ import { device } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer } from '@components/app';
 import { Input, SearchIcon, Button, RedirectIcon, Link } from '@components/common';
 import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, CreditPosition } from '@src/core/types';
-import { humanize, formatAddress, normalizeAmount } from '@src/utils';
+import { humanize, formatAddress, normalizeAmount, getENS } from '@src/utils';
 import { getEnv } from '@config/env';
-import { getENS } from '@src/utils';
 
 const PositionsCard = styled(DetailCard)`
   max-width: ${({ theme }) => theme.globalMaxWidth};

@@ -327,20 +327,20 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
             actions: <ActionButtons value={position.id} actions={getUserPositionActions(position)} />,
           }))}
           // TODO: Add search bar back when there is a need for it.
-          // SearchBar={
-          //   <>
-          //     <Input
-          //       value={''}
-          //       onChange={(e) => console.log(e)}
-          //       placeholder={t('components.search-input.search')}
-          //       Icon={SearchIcon}
-          //     />
+          SearchBar={
+            <>
+              {/* <Input
+                value={''}
+                onChange={(e) => console.log(e)}
+                placeholder={t('components.search-input.search')}
+                Icon={SearchIcon}
+              /> */}
 
-          //     {userRoleMetadata.role === LENDER_POSITION_ROLE && (
-          //       <Button onClick={depositHandler}>{ctaButtonText}</Button>
-          //     )}
-          //   </>
-          // }
+              {userRoleMetadata.role === LENDER_POSITION_ROLE && (
+                <Button onClick={depositHandler}>{ctaButtonText}</Button>
+              )}
+            </>
+          }
           searching={false}
           filterLabel="Show 0% APY"
           initialSortBy="deposit"

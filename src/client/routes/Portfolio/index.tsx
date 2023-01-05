@@ -109,7 +109,6 @@ export const Portfolio = () => {
 
   useEffect(() => {
     if (userPortfolio) {
-      console.log('Portfolio Page - selectedRole: ', selectedRole);
       if (selectedRole === BORROWER_POSITION_ROLE) {
         if (borrowerLineOfCredits && borrowerLineOfCredits[0]) {
           const lineAddress = borrowerLineOfCredits[0].id;

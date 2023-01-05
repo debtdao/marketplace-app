@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { format, differenceInDays } from 'date-fns';
 
 import { prettyNumbers, formatAddress, unnullify } from '@utils';
 import { Card, CardHeader, CardContent, Text, Icon, ChevronRightIcon } from '@components/common';
@@ -111,6 +112,7 @@ const Metric = styled.span`
 
 const MetricsText = styled.span`
   font-size: 1.6rem;
+  font-weight: normal;
 `;
 
 interface RecommendationsProps {
@@ -126,53 +128,78 @@ export const RecommendationsCard = ({ header, subHeader, items, ...props }: Reco
     return null;
   }
   // todo handle loading of principal/deposit vals with spinner or something
+  console.log('Recommendations card items: ', items);
   return (
     <ContainerCard {...props}>
       <CardHeader header={header} subHeader={subHeader} />
 
       <StyledCardContent>
-        {items.map((item, i) => (
-          <ItemCard key={`${i}-${item.borrower}`} variant="primary" onClick={item.onAction ? item.onAction : undefined}>
-            {item.header && <ItemHeader>{item.header}</ItemHeader>}
+        {items.map((item, i) => {
+          const startDate = new Date(item.start * 1000);
+          const endDate = new Date(item.end * 1000);
+          const startDateHumanized = format(startDate, 'MMMM dd, yyyy');
+          const endDateHumanized = format(endDate, 'MMMM dd, yyyy');
+          const daysDiff = differenceInDays(endDate, startDate);
+          const timeToLive = daysDiff === 1 ? `${daysDiff} day` : `${daysDiff} days`;
+          return (
+            <ItemCard
+              key={`${i}-${item.borrower}`}
+              variant="primary"
+              onClick={item.onAction ? item.onAction : undefined}
+            >
+              {item.header && <ItemHeader>{item.header}</ItemHeader>}
 
-            <TopIcon>
-              <TokenIcon symbol={''} icon={item.icon} size="xxBig" />
-            </TopIcon>
+              <TopIcon>
+                <TokenIcon symbol={''} icon={item.icon} size="xxBig" />
+              </TopIcon>
 
-            <ItemInfo>
-              <ItemName>
-                {' '}
-                {t('components.line-card.borrower')}: {formatAddress(getENS(item.borrower, ensMap)!)}
-              </ItemName>
-              <Divider />
-              <Metric>
-                ${prettyNumbers(unnullify('0'))} / $ {/*TODO: Need to add this functionality*/}
-                {prettyNumbers(item.deposit)}
-              </Metric>
-              <MetricsTextContainer>
-                <MetricsText>
+              <ItemInfo>
+                <ItemName>
                   {' '}
-                  {t('components.line-card.total-debt')} / {t('components.line-card.total-credit')}{' '}
-                </MetricsText>
-              </MetricsTextContainer>
-              <Divider />
+                  {t('components.line-card.borrower')}: {formatAddress(getENS(item.borrower, ensMap)!)}
+                </ItemName>
+                <Divider />
 
-              <ItemInfoLabel>{t('components.line-card.secured-by')}:</ItemInfoLabel>
-              <Metric>
-                ${prettyNumbers(unnullify(item?.escrow?.collateralValue))} / ${' '}
-                {/*TODO: Need to add this functionality*/}
-                {prettyNumbers(unnullify('0'))}
-              </Metric>
-              <MetricsTextContainer>
-                <MetricsText>
-                  {' '}
-                  {t('components.line-card.collateral')} / {t('components.line-card.revenue')}{' '}
-                </MetricsText>
-              </MetricsTextContainer>
-            </ItemInfo>
-            {item.onAction && <TokenListIcon Component={ChevronRightIcon} />}
-          </ItemCard>
-        ))}
+                <Metric>
+                  ${prettyNumbers(unnullify('0'))} / $ {/*TODO: Need to add this functionality*/}
+                  {prettyNumbers(item.deposit)}
+                </Metric>
+                <MetricsTextContainer>
+                  <MetricsText>
+                    {' '}
+                    {t('components.line-card.total-debt')} / {t('components.line-card.total-credit')}{' '}
+                  </MetricsText>
+                </MetricsTextContainer>
+                <Divider />
+
+                <ItemInfoLabel>{t('components.line-card.secured-by')}:</ItemInfoLabel>
+                <Metric>
+                  ${prettyNumbers(unnullify(item?.escrow?.collateralValue))} / ${' '}
+                  {/*TODO: Need to add this functionality*/}
+                  {prettyNumbers(unnullify('0'))}
+                </Metric>
+                <MetricsTextContainer>
+                  <MetricsText>
+                    {' '}
+                    {t('components.line-card.collateral')} / {t('components.line-card.revenue')}{' '}
+                  </MetricsText>
+                </MetricsTextContainer>
+                <Divider />
+
+                <ItemInfoLabel>
+                  <span>
+                    {t('components.line-card.start')}: <MetricsText>{startDateHumanized}</MetricsText>
+                  </span>
+                </ItemInfoLabel>
+                <ItemInfoLabel>
+                  {t('components.line-card.end')}: <MetricsText>{endDateHumanized}</MetricsText>
+                </ItemInfoLabel>
+                <Divider />
+              </ItemInfo>
+              {item.onAction && <TokenListIcon Component={ChevronRightIcon} />}
+            </ItemCard>
+          );
+        })}
       </StyledCardContent>
     </ContainerCard>
   );

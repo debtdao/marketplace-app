@@ -58,8 +58,9 @@
       "total-debt": "Outstanding Debt",
       "total-credit": "Total Credit",
       "collateral": "Collateral",
-      "start": "Start Time",
-      "end": "End Time",
+      "start": "Origination",
+      "end": "Maturity",
+      "time-to-live": "Days To Maturity",
       "line": "Line Id",
       "revenue": "Spigoted Revenue"
     },

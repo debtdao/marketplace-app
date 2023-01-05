@@ -306,10 +306,10 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
   }
 
   return (
-    <StyledTransaction onClose={onClose} header={header || t('components.transaction.title')}>
+    <StyledTransaction onClose={onClose} header={t('components.transaction.deposit-collateral.header')}>
       <TxTokenInput
         key={'token-input'}
-        headerText={t('components.transaction.add-credit.select-token')}
+        headerText={t('components.transaction.deposit-collateral.select-token')}
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
         amountValue={String(10000000 * Number(targetTokenAmount))}

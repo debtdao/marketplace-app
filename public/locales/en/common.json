@@ -186,6 +186,10 @@
           "enable-cta": "Enable token"
         }
       },
+      "deposit-collateral": {
+        "header": "Deposit Collateral",
+        "select-token": "The Token Used As Collateral"
+      },
       "arbiter-liquidate": {
         "header": "Liquidate Borrowers",
         "select-credit": "1. Select a borrower to liquidate",

@@ -138,6 +138,8 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
   };
 
   const withdrawHandler = (position?: string) => {
+    console.log('withdraw handler position: ', position);
+    console.log('withdraw handler selectedLine: ', selectedLine);
     if (!position) return;
     dispatch(LinesActions.setSelectedLinePosition({ position }));
     dispatch(ModalsActions.openModal({ modalName: 'withdraw' }));

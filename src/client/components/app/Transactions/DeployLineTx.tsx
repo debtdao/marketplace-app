@@ -123,7 +123,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
         })
       ).then((res) => {
         if (res.meta.requestStatus === 'rejected') {
-          setTransactionCompleted(2);
+          // setTransactionCompleted(2);
           setLoading(false);
         }
         if (res.meta.requestStatus === 'fulfilled') {
@@ -162,7 +162,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
         })
       ).then((res) => {
         if (res.meta.requestStatus === 'rejected') {
-          setTransactionCompleted(2);
+          // setTransactionCompleted(2);
           setLoading(false);
         }
         if (res.meta.requestStatus === 'fulfilled') {

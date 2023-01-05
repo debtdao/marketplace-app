@@ -145,7 +145,6 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
 
   const borrowHandler = (position?: string) => {
     if (!position) return;
-    console.log('borrow', position);
     dispatch(LinesActions.setSelectedLinePosition({ position }));
     dispatch(ModalsActions.openModal({ modalName: 'borrow' }));
   };

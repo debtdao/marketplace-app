@@ -1,6 +1,7 @@
 import { isEmpty } from 'lodash';
 import { BigNumber } from 'ethers';
 import styled from 'styled-components';
+import { format } from 'date-fns';
 
 import { device } from '@themes/default';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
@@ -137,7 +138,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const { NETWORK } = getEnv();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
-  const { principal, deposit, totalInterestPaid, revenue, deposits } = props;
+  const { principal, deposit, totalInterestPaid, revenue, deposits, startTime, endTime } = props;
   const modules = [revenue && 'revenue', deposits && 'escrow'].filter((x) => !!x);
   const totalRevenue = isEmpty(revenue)
     ? ''
@@ -264,6 +265,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
     }
   };
 
+  const startDateHumanized = format(new Date(startTime * 1000), 'MMMM dd, yyyy');
+  const endDateHumanized = format(new Date(endTime * 1000), 'MMMM dd, yyyy');
   return (
     <>
       <ThreeColumnLayout>
@@ -273,6 +276,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
           title={t('lineDetails:metadata.totalInterestPaid')}
           data={`$ ${prettyNumbers(totalInterestPaid)}`}
         />
+        <MetricDataDisplay title={t('lineDetails:metadata.start')} data={startDateHumanized} />
+        <MetricDataDisplay title={t('lineDetails:metadata.end')} data={endDateHumanized} />
       </ThreeColumnLayout>
       <SectionHeader>
         {t('lineDetails:metadata.secured-by')}

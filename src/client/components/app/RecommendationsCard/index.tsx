@@ -128,7 +128,6 @@ export const RecommendationsCard = ({ header, subHeader, items, ...props }: Reco
     return null;
   }
   // todo handle loading of principal/deposit vals with spinner or something
-  console.log('Recommendations card items: ', items);
   return (
     <ContainerCard {...props}>
       <CardHeader header={header} subHeader={subHeader} />
@@ -141,6 +140,7 @@ export const RecommendationsCard = ({ header, subHeader, items, ...props }: Reco
           const endDateHumanized = format(endDate, 'MMMM dd, yyyy');
           const daysDiff = differenceInDays(endDate, startDate);
           const timeToLive = daysDiff === 1 ? `${daysDiff} day` : `${daysDiff} days`;
+          console.log('Market Page - line card: ', item);
           return (
             <ItemCard
               key={`${i}-${item.borrower}`}

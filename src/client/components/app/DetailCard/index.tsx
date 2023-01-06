@@ -85,7 +85,6 @@ const StyledCardHeader = styled(CardHeader)`
 const StyledCard = styled(Card)`
   padding: ${({ theme }) => theme.card.padding} 0;
   width: 100%;
-  ${({ theme }) => theme.colors.background};
 `;
 
 const SectionContent = styled.div`

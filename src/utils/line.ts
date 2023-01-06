@@ -242,9 +242,16 @@ export const formatSecuredLineData = (
   const principal = BigNumber.from(0);
   const deposit = BigNumber.from(0);
 
+  console.log('Formatting secured line data - positions: ', positionFrags);
   const credit = positionFrags.reduce(
     (agg: any, c) => {
-      const price = tokenPrices[c.token?.id] || BigNumber.from(0);
+      console.log('Formatting secured line data - c: ', c);
+      const checkSumAddress = ethers.utils.getAddress(c.token?.id);
+      const price = tokenPrices[checkSumAddress] || BigNumber.from(0);
+      // const price = BigNumber.from(0);
+      console.log('Formatting secured line data - tokenPrices: ', tokenPrices);
+      console.log('Formatting secured line data - price: ', price);
+      console.log('Formatting secured line data - price math: ', price.mul(unnullify(c.principal, true)).toString());
       // const highestApy = BigNumber.from(c.dRate).gt(BigNumber.from(agg.highestApy[2]))
       //   ? [c.id, c.token?.id, c.dRate]
       //   : agg.highestApy;

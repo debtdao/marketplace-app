@@ -9,8 +9,8 @@
     "totalInterestPaid": "Lifetime Interest Paid",
     "secured-by": "Secured By ",
     "unsecured": "This is an unsecured line of credit. You MUST trust the borrower.",
-    "start": "Origination",
-    "end": "Maturity",
+    "start": "Deployment",
+    "end": "Deadline",
     "revenue": {
       "title": "Revenue",
       "per-month": "/ month",

@@ -119,7 +119,9 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
         if (!promises[i]) {
           return { linesData, allBorrowers };
         } else {
+          console.log('Lines Data - Promises: ', promises[i]!);
           const categoryLines = formatGetLinesData(promises[i]!, tokenPrices);
+          console.log('Lines Data - categoryLines: ', categoryLines);
           return {
             linesData: { ...linesData, [category]: categoryLines },
             allBorrowers: [...allBorrowers, ...categoryLines.map((line) => line.borrower)],

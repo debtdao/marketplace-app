@@ -138,6 +138,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const { NETWORK } = getEnv();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
+  console.log('Line Metadata props: ', props);
   const { principal, deposit, totalInterestPaid, revenue, deposits, startTime, endTime } = props;
   const modules = [revenue && 'revenue', deposits && 'escrow'].filter((x) => !!x);
   const totalRevenue = isEmpty(revenue)

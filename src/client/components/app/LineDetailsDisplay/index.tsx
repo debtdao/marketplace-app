@@ -113,6 +113,7 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
         totalInterestPaid={'0'}
         startTime={start}
         endTime={end}
+        spigots={spigot?.spigots}
         lineNetwork={props.lineNetwork}
       />
 

@@ -140,6 +140,14 @@ export interface Collateral {
   amount: string;
   value: string;
 }
+// id: Address;
+// active: boolean;
+// contract: Address;
+// startTime: number;
+// ownerSplit: number;
+// escrowed: string;
+// totalVolumeUsd: string;
+// events?: SpigotEvents[];
 
 export interface BaseEscrow extends BaseCollateralModule {
   id: Address;
@@ -160,6 +168,10 @@ export interface EscrowDeposit extends Collateral {
 
 export interface EscrowDepositMap {
   [token: string]: EscrowDeposit;
+}
+
+export interface SpigotRevenueContractMap {
+  [address: string]: SpigotRevenueContract;
 }
 
 export interface AggregatedEscrow extends BaseEscrow {
@@ -190,6 +202,7 @@ export interface AggregatedSpigot extends BaseCollateralModule {
   // aggregated revenue in USD by token across all spigots
   revenueSummary: RevenueSummaryMap;
   events?: CollateralEvent[];
+  spigots?: { [address: string]: SpigotRevenueContract };
 }
 
 export interface MarketLines {
@@ -201,19 +214,21 @@ export interface MarketPageData {
   allBorrowers: string[];
 }
 
-export interface LinePageSpigot extends AggregatedSpigot {
-  spigots?: { [address: string]: RevenueContract };
-}
+// export interface LinePageSpigot extends AggregatedSpigot {
+//   spigots?: { [address: string]: SpigotRevenueContract };
+// }
 
 export type CollateralModule = AggregatedEscrow | AggregatedSpigot;
 export type CollateralMap = { [address: string]: CollateralModule };
-
-export interface RevenueContract {
+export interface SpigotRevenueContract extends Collateral {
+  id: Address;
+  type: CollateralTypeRevenue;
   active: boolean;
   contract: Address;
   startTime: number;
   ownerSplit: number;
-  token: TokenView;
+  escrowed: string;
+  totalVolumeUsd: string;
   events?: SpigotEvents[];
 }
 

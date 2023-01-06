@@ -75,6 +75,8 @@ const BASE_SPIGOT_FRAGMENT = gql`
     active
     contract
     startTime
+    ownerSplit
+    escrowed
     totalVolumeUsd
   }
 `;

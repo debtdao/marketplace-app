@@ -15,6 +15,7 @@ import {
   LENDER_POSITION_ROLE,
   Network,
   RevenueSummary,
+  SpigotRevenueContractMap,
   TokenView,
 } from '@src/core/types';
 import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
@@ -108,6 +109,7 @@ interface LineMetadataProps {
   endTime: number;
   revenue?: { [token: string]: RevenueSummary };
   deposits?: EscrowDepositMap;
+  spigots?: SpigotRevenueContractMap;
   lineNetwork: Network;
 }
 
@@ -151,7 +153,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const { NETWORK } = getEnv();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
-  const { lineNetwork, principal, deposit, totalInterestPaid, revenue, deposits } = props;
+  const { lineNetwork, principal, deposit, totalInterestPaid, revenue, deposits, spigots } = props;
   const totalRevenue = isEmpty(revenue)
     ? ''
     : Object.values(revenue!)
@@ -219,6 +221,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
   };
 
   const allCollateral: Collateral[] = [...Object.values(deposits ?? {}), ...Object.values(revenue ?? {})];
+  // const allCollateral: Collateral[] = [...Object.values(deposits ?? {}), ...Object.values(spigots ?? {})];
 
   const getCollateralRowActionForRole = (role: string) => {
     switch (role) {

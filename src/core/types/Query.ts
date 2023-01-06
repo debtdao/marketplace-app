@@ -1,6 +1,6 @@
 import { PopulatedTransaction } from 'ethers';
 
-import { LineStatusTypes, PositionStatusTypes } from './CreditLine';
+import { LineStatusTypes, PositionStatusTypes, SpigotRevenueContract } from './CreditLine';
 import { Address, Network } from './Blockchain';
 
 // 0x API
@@ -190,6 +190,17 @@ export interface SpigotRevenueSummaryFragResponse {
   timeOfFirstIncome: number;
   timeOfLastIncome: number;
 }
+
+export interface SpigotRevenueContractFragResponse {
+  id: Address;
+  active: boolean;
+  contract: Address;
+  startTime: number;
+  ownerSplit: number;
+  escrowed: string;
+  totalVolumeUsd: string;
+}
+
 export interface SpigotEventFragResponse {
   __typename: 'ClaimRevenueEvent';
   timestamp: number;
@@ -258,11 +269,12 @@ export interface GetLinePageResponse extends BaseLineFragResponse {
   spigot?: {
     id: Address;
     summaries: SpigotRevenueSummaryFragResponse[];
-    spigots: {
-      contract: Address;
-      active: boolean;
-      startTime: number;
-    };
+    spigots: SpigotRevenueContractFragResponse[];
+    // spigots: {
+    //   contract: Address;
+    //   active: boolean;
+    //   startTime: number;
+    // };
     events?: SpigotEventFragResponse[];
   };
   escrow?: BaseEscrowFragResponse & {
@@ -292,11 +304,12 @@ export interface LineOfCreditsResponse extends BaseLineFragResponse {
   spigot?: {
     id: Address;
     summaries: SpigotRevenueSummaryFragResponse[];
-    spigots: {
-      contract: Address;
-      active: boolean;
-      startTime: number;
-    };
+    spigots: SpigotRevenueContractFragResponse[];
+    // spigots: {
+    //   contract: Address;
+    //   active: boolean;
+    //   startTime: number;
+    // };
     events?: SpigotEventFragResponse[];
   };
 

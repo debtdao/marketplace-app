@@ -39,6 +39,10 @@ import {
   RevenueSummaryMap,
   AggregatedSpigot,
   SpigotEventFragResponse,
+  SpigotRevenueContractFragResponse,
+  // LinePageSpigot,
+  SpigotRevenueContract,
+  SpigotRevenueContractMap,
 } from '@types';
 
 import { humanize, normalizeAmount, normalize } from './format';
@@ -236,6 +240,7 @@ export const formatSecuredLineData = (
   // derivative or aggregated data we need to compute and store while mapping position data
   const collateralDeposits: BaseEscrowDepositFragResponse[] = escrow?.deposits || [];
   const revenues: SpigotRevenueSummaryFragResponse[] = spigot?.summaries || [];
+  const spigots: SpigotRevenueContractFragResponse[] = spigot.spigots || [];
 
   // position id, token address, APY
   const highestApy: [string, string, string] = ['', '', '0'];
@@ -258,6 +263,7 @@ export const formatSecuredLineData = (
     { principal, deposit, highestApy }
   );
 
+  // Sum value of deposits and create deposits map
   const [collateralValue, deposits]: [BigNumber, EscrowDepositMap] = collateralDeposits.reduce(
     (agg, collateralDeposit) => {
       const price = unnullify(tokenPrices[collateralDeposit.token.id], true);
@@ -277,6 +283,24 @@ export const formatSecuredLineData = (
     },
     [BigNumber.from(0), {}]
   );
+
+  // Create spigots map
+  console.log('Spigots 1: ', spigots);
+  const spigotRevenueContracts: SpigotRevenueContractMap = spigots.reduce(
+    (revenueContractMap: SpigotRevenueContractMap, revenueContract: SpigotRevenueContractFragResponse) => {
+      const { contract, ...rest } = revenueContract;
+      return {
+        ...revenueContractMap,
+        [contract]: {
+          type: COLLATERAL_TYPE_REVENUE,
+          // token: _createTokenView(contract, BigNumber.from(0)),
+          // ...rest,
+        } as SpigotRevenueContract,
+      };
+    },
+    {} as SpigotRevenueContractMap
+  );
+  console.log('Spigots 2: ', spigotRevenueContracts);
 
   // Get escrow collateral events
   const escrowCollateralEvents: CollateralEvent[] = _.flatten(
@@ -313,6 +337,7 @@ export const formatSecuredLineData = (
   };
 
   // aggregated revenue in USD by token across all spigots
+  console.log('Revenue Summary - revenues: ', revenues);
   const revenueSummary: RevenueSummaryMap = revenues.reduce<any>(
     (summaries, { token, totalVolume, totalVolumeUsd, ...summary }) => {
       console.log('rev', summaries, { ...summary, totalVolume, totalVolumeUsd });
@@ -343,6 +368,7 @@ export const formatSecuredLineData = (
     line,
     revenueSummary,
     events: spigotEvents,
+    spigots: spigotRevenueContracts,
   };
 
   const positions = positionFrags.reduce((obj: any, c: BasePositionFragResponse): PositionMap => {
@@ -455,7 +481,7 @@ export const formatLineWithEvents = (
   // Add events to spigot object
   const aggregatedSpigot: AggregatedSpigot = {
     id: spigot!.id,
-    type: COLLATERAL_TYPE_ASSET,
+    type: COLLATERAL_TYPE_REVENUE,
     line: spigot!.line,
     revenueSummary: spigot!.revenueSummary,
     events: spigotEvents,
@@ -477,6 +503,7 @@ export const formatLinePageData = (
   tokenPrices: { [token: string]: BigNumber }
 ): SecuredLineWithEvents | undefined => {
   if (!lineData) return undefined;
+  console.log('selected line with events - raw data: ', lineData);
   // add token Prices as arg
   console.log('FormatLineWithEvents - get line page data 1 - 2: ', lineData);
   const {
@@ -506,6 +533,8 @@ export const formatLinePageData = (
     tokenPrices
   );
 
+  console.log('selected line with events - spigot data 1: ', spigot);
+  console.log('selected line with events - spigot data 2: ', spigotData);
   const pageData: SecuredLineWithEvents = {
     // metadata
     ...metadata,

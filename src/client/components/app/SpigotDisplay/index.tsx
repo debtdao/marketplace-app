@@ -17,6 +17,9 @@ import { getENS } from '@src/utils';
 import { useExplorerURL } from '@src/client/hooks/useExplorerURL';
 
 import { ActionButtons } from '../ActionButtons';
+import { BorrowerName } from '../LineDetailsDisplay';
+
+import { SpigotMetadata } from './SpigotMetadata';
 
 interface SpigotDisplayProps {}
 
@@ -69,44 +72,54 @@ const SpigotAddy = styled(Text)`
   max-width: 100%;
 `;
 
-export const SpigotDisplay = (props: SpigotDisplayProps) => {
+export const SpigotDisplay = () => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
-
+  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const explorerUrl = useExplorerURL(walletNetwork);
+  const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
+  const [borrowerID, setBorrowerId] = useState('');
+
+  console.log('selected line - selected spigot: ', selectedSpigot);
+
+  //TODO: if !selectedLine, dispatch action getting selectedLine data
+  useEffect(() => {
+    const ensName = getENS(selectedLine?.borrower!, ensMap);
+    console.log('selected line - spigot display: ', selectedLine);
+    if (!ensName) {
+      setBorrowerId(selectedLine?.borrower!);
+    } else {
+      setBorrowerId(ensName);
+    }
+  }, [selectedLine, ensMap]);
 
   // allow passing in core data first if we have it already and let Page data render once returned
   // if we have all data render full UI
 
   if (!selectedSpigot) return null;
 
-  const claimRev = {
-    name: t('spigot:claim-revenue'),
-    handler: () => {
-      dispatch(ModalsActions.openModal({ modalName: 'claimRevenue' }));
-      // open modal, dispatch action inside modal
-      // dispatch(
-      //   CollateralActions.claimRevenue({
-      //     spigotAddress: selectedSpigot.id,
-      //     revenueContract: selectedRevenueContract
-      //   })
-      // )
-    },
-  };
-
   return (
     <Container>
       <Header>
-        <Link to={`${explorerUrl}/address/${selectedSpigot.id}`}>
-          <SpigotAddy>
+        {/* <BorrowerName>
+          {t('lineDetails:metadata.borrower')} {'  :  '} {borrowerID}
+          <Redirect />
+        </BorrowerName> */}
+        <RouterLink to={`${explorerUrl}/address/${selectedSpigot.id}`} key={borrowerID} selected={false}>
+          <BorrowerName>
+            {t('lineDetails:metadata.borrower')} {'  :  '} {borrowerID}
+            <Redirect />
+          </BorrowerName>
+          {/* <SpigotAddy>
             {selectedSpigot.id}
             <Redirect />
-          </SpigotAddy>
-        </Link>
+          </SpigotAddy> */}
+        </RouterLink>
       </Header>
-      <ActionButtons actions={[claimRev]} />
+      <Header>Revenue Contracts</Header>
+      <SpigotMetadata />
     </Container>
   );
 };

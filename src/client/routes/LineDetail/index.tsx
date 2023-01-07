@@ -65,9 +65,10 @@ export const LineDetail = () => {
 
     dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineAddress }));
     dispatch(LinesActions.getLinePage({ id: lineAddress }));
-    return () => {
-      dispatch(LinesActions.clearSelectedLine());
-    };
+    // TODO: Why did Kiba put this here? It makes it so you cannot grab the selectedLine when you switch to a new page.
+    // return () => {
+    //   dispatch(LinesActions.clearSelectedLine());
+    // };
   }, []);
 
   const [firstTokensFetch, setFirstTokensFetch] = useState(true);

@@ -5,18 +5,25 @@ import styled from 'styled-components';
 import { device } from '@themes/default';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
-import { prettyNumbers } from '@src/utils';
+import { formatAddress, prettyNumbers, getENS, humanize } from '@src/utils';
 import {
   ARBITER_POSITION_ROLE,
   BORROWER_POSITION_ROLE,
   LENDER_POSITION_ROLE,
   RevenueSummary,
+  SpigotRevenueContract,
   TokenView,
 } from '@src/core/types';
-import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
+import { DetailCard, ActionButtons, TokenIcon, ViewContainer, Container } from '@components/app';
 import { Button, Text, RedirectIcon } from '@components/common';
-import { LinesSelectors, ModalsActions, WalletSelectors, WalletActions, CollateralActions } from '@src/core/store';
-import { humanize } from '@src/utils';
+import {
+  LinesSelectors,
+  ModalsActions,
+  WalletSelectors,
+  WalletActions,
+  CollateralActions,
+  OnchainMetaDataSelector,
+} from '@src/core/store';
 import { getEnv } from '@config/env';
 
 const SectionHeader = styled.h3`
@@ -125,28 +132,14 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
   const { t } = useAppTranslation(['common', 'spigot']);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
+  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const dispatch = useAppDispatch();
+  const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const { NETWORK } = getEnv();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
-  const { revenue } = props;
-  const totalRevenue = isEmpty(revenue)
-    ? ''
-    : Object.values(revenue!)
-        .reduce((sum, rev) => sum.add(BigNumber.from(rev)), BigNumber.from('0'))
-        .div(BigNumber.from(1)) // scale to usd decimals
-        .toString();
-
-  const renderSpigotMetadata = () => {
-    if (!revenue) return null;
-    if (!totalRevenue)
-      return (
-        <MetricDataDisplay title={t('spigot:metadata.revenue.no-revenue')} data={`$ ${prettyNumbers(totalRevenue)}`} />
-      );
-    return (
-      <MetricDataDisplay title={t('spigot:metadata.revenue.per-month')} data={`$ ${prettyNumbers(totalRevenue)}`} />
-    );
-  };
+  if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
+  const { spigot } = selectedLine;
 
   const addSpigotHandler = (token: TokenView) => {
     if (!walletIsConnected) {
@@ -158,37 +151,86 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
   };
 
   const enableSpigotText = walletIsConnected
-    ? `${t('spigot:metadata.collateral-table.enable-spigot')}`
+    ? `${t('spigot:metadata.add-revenue-contract')}`
     : `${t('components.connect-button.connect')}`;
 
   const getCollateralTableActions = () => {
-    console.log('get collateral table actions', userPositionMetadata.role);
-    switch (userPositionMetadata.role) {
-      // case BORROWER_POSITION_ROLE:
-      //   return <Button onClick={depositHandler}>{depositCollateralText} </Button>;
-      // case ARBITER_POSITION_ROLE:
-      // case LENDER_POSITION_ROLE: // for testing
-      //   return (
-      //     <>
-      //       <Button onClick={addSpigotHandler}>{enableSpigotText}</Button>
-      //       <Button onClick={enableAssetHandler}>{enableCollateralText}</Button>
-      //     </>
-      //   );
-      default:
-        return null;
-    }
+    return <Button onClick={addSpigotHandler}>{enableSpigotText}</Button>;
   };
 
+  const claimRev = {
+    name: t('spigot:claim-revenue'),
+    handler: () => {
+      dispatch(ModalsActions.openModal({ modalName: 'claimRevenue' }));
+      // open modal, dispatch action inside modal
+      // dispatch(
+      //   CollateralActions.claimRevenue({
+      //     spigotAddress: selectedSpigot.id,
+      //     revenueContract: selectedRevenueContract
+      //   })
+      // )
+    },
+  };
+
+  const allSpigots: SpigotRevenueContract[] = [...Object.values(spigot?.spigots ?? {})];
+  const formattedSpigots = allSpigots.map((c) => ({
+    ...c,
+    key: c.contract,
+    // header: c.type + c.token.toString(),
+    align: 'flex-start',
+    actions: 'claim-revenue',
+  }));
+  console.log('formatted spigots: ', formattedSpigots);
   return (
     <>
-      <ThreeColumnLayout>
-        <MetricDataDisplay title={t('spigot:metadata.lifetime-revenue')} data={`$ ${prettyNumbers(totalRevenue)}`} />
-        <MetricDataDisplay title={t('spigot:metadata.30d-revenue')} data={`$ ${prettyNumbers(totalRevenue)}`} />
-        <MetricDataDisplay title={t('spigot:metadata.account-surplus')} data={`$ ${prettyNumbers(totalRevenue)}`} />
-      </ThreeColumnLayout>
-      <SectionHeader>{t('spigot:metadata.spigot-')}</SectionHeader>
-
-      <ThreeColumnLayout>{renderSpigotMetadata()}</ThreeColumnLayout>
+      <ViewContainer>
+        <AssetsListCard
+          header={' '} //{t('lineDetails:metadata.escrow.assets-list.title')}
+          data-testid="line-assets-list"
+          metadata={[
+            {
+              key: 'contract',
+              header: 'Contract Address', //t('lineDetails:metadata.escrow.assets-list.contract'),
+              transform: ({ contract }) => (
+                <>
+                  <Text>{formatAddress(getENS(contract, ensMap)!)}</Text>
+                </>
+              ),
+              width: '13rem',
+              sortable: true,
+              className: 'col-type',
+            },
+            // {
+            //   key: 'token',
+            //   header: t('lineDetails:metadata.escrow.assets-list.symbol'),
+            //   transform: ({ token: { symbol, icon, address } }) => (
+            //     //change to etherscan on launch
+            //     <a href={`https://goerli.etherscan.io/address/${address}`} target={'_blank'} rel={'noreferrer'}>
+            //       {icon && <TokenIcon icon={icon} symbol={symbol} />}
+            //       <Text>{symbol}</Text>
+            //       <RedirectLinkIcon />
+            //     </a>
+            //   ),
+            //   width: '15rem',
+            //   sortable: true,
+            //   className: 'col-symbol',
+            // },
+            {
+              key: 'actions',
+              transform: ({ token }) => <ActionButtons actions={[claimRev]} />,
+              align: 'flex-end',
+              width: 'auto',
+              grow: '1',
+            },
+          ]}
+          data={formattedSpigots ? formattedSpigots : []}
+          SearchBar={getCollateralTableActions()}
+          searching={false}
+          onAction={undefined}
+          initialSortBy="value"
+          wrap
+        />
+      </ViewContainer>
 
       {/* TODO: dope data viz */}
     </>

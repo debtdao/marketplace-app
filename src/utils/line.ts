@@ -292,9 +292,8 @@ export const formatSecuredLineData = (
       return {
         ...revenueContractMap,
         [contract]: {
-          type: COLLATERAL_TYPE_REVENUE,
-          // token: _createTokenView(contract, BigNumber.from(0)),
-          // ...rest,
+          contract,
+          ...rest,
         } as SpigotRevenueContract,
       };
     },

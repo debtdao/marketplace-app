@@ -16,7 +16,7 @@ interface LineDetailsProps {
   lineNetwork: Network;
 }
 
-const Container = styled.div`
+export const Container = styled.div`
   margin: 0;
   padding: 1em;
   width: 100%;
@@ -61,7 +61,7 @@ const RouterLink = styled(Link)<{ selected: boolean }>`
   `}
 `;
 
-const BorrowerName = styled(Text)`
+export const BorrowerName = styled(Text)`
   max-width: 100%;
 `;
 
@@ -72,6 +72,8 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const [borrowerID, setBorrowerId] = useState('');
+
+  console.log('selected line - line page: ', selectedLine);
 
   useEffect(() => {
     dispatch(OnchainMetaDataActions.getENS(selectedLine?.borrower!));

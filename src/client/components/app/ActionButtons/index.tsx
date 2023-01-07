@@ -30,7 +30,7 @@ const ActionButton = styled(Button)<{ hide?: boolean }>`
   color: ${({ theme }) => theme.colors.vaultActionButton.color};
   border: 2px solid ${({ theme }) => theme.colors.vaultActionButton.borderColor};
   padding: 0 1.6rem;
-  width: 9.6rem;
+  // width: 9.6rem;
 
   ${({ hide }) => hide && `visibility: hidden;`}
 

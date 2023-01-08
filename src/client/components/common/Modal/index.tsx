@@ -40,6 +40,7 @@ const StyledModal = styled.div`
 export interface ModalProps {
   className?: string;
   header?: string;
+  //address?: string;
   onClose?: () => void;
 }
 

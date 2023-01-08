@@ -158,18 +158,22 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
     return <Button onClick={addSpigotHandler}>{enableSpigotText}</Button>;
   };
 
-  const claimRev = {
-    name: t('spigot:claim-revenue'),
-    handler: () => {
-      dispatch(ModalsActions.openModal({ modalName: 'claimRevenue' }));
-      // open modal, dispatch action inside modal
-      // dispatch(
-      //   CollateralActions.claimRevenue({
-      //     spigotAddress: selectedSpigot.id,
-      //     revenueContract: selectedRevenueContract
-      //   })
-      // )
-    },
+  const claimRev = (contract: string) => {
+    return {
+      name: t('spigot:claim-revenue'),
+      handler: () => {
+        dispatch(
+          ModalsActions.openModal({ modalName: 'claimRevenue', modalProps: { revenueContractAddress: contract } })
+        );
+        // open modal, dispatch action inside modal
+        // dispatch(
+        //   CollateralActions.claimRevenue({
+        //     spigotAddress: selectedSpigot.id,
+        //     revenueContract: selectedRevenueContract
+        //   })
+        // )
+      },
+    };
   };
 
   const allSpigots: SpigotRevenueContract[] = [...Object.values(spigot?.spigots ?? {})];
@@ -217,7 +221,7 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
             // },
             {
               key: 'actions',
-              transform: ({ token }) => <ActionButtons actions={[claimRev]} />,
+              transform: ({ contract }) => <ActionButtons actions={[claimRev(contract)]} />,
               align: 'flex-end',
               width: 'auto',
               grow: '1',

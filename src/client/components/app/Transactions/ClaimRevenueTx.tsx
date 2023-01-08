@@ -1,7 +1,9 @@
+import React from 'react';
 import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { getAddress } from '@ethersproject/address';
 import { BytesLike, ethers } from 'ethers';
+import { ParamType } from '@ethersproject/abi';
 
 import { formatAmount, generateSig, isValidAddress, normalizeAmount } from '@utils';
 import {
@@ -13,11 +15,13 @@ import {
   useSelectedSellToken,
 } from '@hooks';
 import { getConstants } from '@src/config/constants';
+import { generateClaimFuncInputs } from '@src/utils/generateFuncInputs';
 import {
   TokensActions,
   TokensSelectors,
   VaultsSelectors,
   LinesSelectors,
+  ModalSelectors,
   LinesActions,
   CollateralSelectors,
   CollateralActions,
@@ -33,7 +37,9 @@ import { TxActionButton, TxActions } from './components/TxActions';
 import { TxStatus } from './components/TxStatus';
 import { TxAddressInput } from './components/TxAddressInput';
 import { TxByteInput } from './components/TxByteInput';
-import { TxFuncSelector } from './components/TxFuncSelector';
+import { Header, TxFuncSelector } from './components/TxFuncSelector';
+import { TxNumberInput } from './components/TxNumberInput';
+import { GenerateClaimRevenueInputs } from './components/GenerateClaimRevenueInputs';
 
 const {
   CONTRACT_ADDRESSES: { ETH },
@@ -49,17 +55,25 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
   const { header, onClose } = props;
-
   const [targetTokenAmount, setTargetTokenAmount] = useState('10000000');
   const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
-  const selectedRevenueContract = useAppSelector(CollateralSelectors.selectSelectedRevenueContractAddress);
+  // const selectedRevenueContract = useAppSelector(CollateralSelectors.selectSelectedRevenueContractAddress);
+
+  // TODO: Comment out hard-coded DPI revenue contract address
+  // const { revenueContractAddress: selectedRevenueContract } = useAppSelector(ModalSelectors.selectActiveModalProps);
+  const selectedRevenueContract = '0x1494ca1f11d487c2bbe4543e90080aeba4ba3c2b';
+
+  console.log('ClaimRevenueTx - selectedRevenueContract: ', selectedRevenueContract);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const [claimData, setClaimData] = useState('');
-  const [revContract, setRevContract] = useState(selectedRevenueContract ?? '');
+  //const [revContract, setRevContract] = useState(selectedRevenueContract ?? '');
   const contractABI = useAppSelector(OnchainMetaDataSelector.selectABI);
   const selectedContractFunctions = useAppSelector(OnchainMetaDataSelector.selectFunctions);
   const [claimFuncType, setClaimFuncType] = useState({ id: '', label: '', value: '' });
   const [claimFunc, setClaimFunc] = useState<string>('');
+  const [funcInputs, setFuncInputs] = useState<ParamType[]>([]);
+  const [userFuncInputs, setUserFuncInputs] = useState<{ [name: string]: any }>({});
+
   const [didFetchAbi, setDidFetchABI] = useState<boolean>(false);
 
   const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
@@ -92,10 +106,10 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
   }, [selectedSellToken, selectedTokenAddress]);
 
   useEffect(() => {
-    if (isValidAddress(revContract)) {
-      dispatch(OnchainMetaDataActions.getABI(revContract));
+    if (isValidAddress(selectedRevenueContract)) {
+      dispatch(OnchainMetaDataActions.getABI(selectedRevenueContract));
     }
-  }, [revContract, didFetchAbi]);
+  }, [selectedRevenueContract, didFetchAbi]);
 
   //console.log('selected tokens #2', selectedSellToken, selectedSellTokenAddress);
 
@@ -105,14 +119,14 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
     dispatch(TokensActions.setSelectedTokenAddress({ tokenAddress }));
   };
 
-  const onRevContractChange = (address: string) => {
-    console.log('on rev cont chng', address);
+  // const onRevContractChange = (address: string) => {
+  //   console.log('on rev cont chng', address);
 
-    setRevContract(address);
-    if (address?.length == 42 && getAddress(address)) {
-      dispatch(CollateralActions.setSelectedRevenueContract({ contractAddress: getAddress(address) }));
-    }
-  };
+  //   setRevContract(address);
+  //   if (address?.length == 42 && getAddress(address)) {
+  //     dispatch(CollateralActions.setSelectedRevenueContract({ contractAddress: getAddress(address) }));
+  //   }
+  // };
 
   // Event Handlers
 
@@ -187,20 +201,84 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
   if (!selectedSellToken && !selectedTokenAddress) return null;
 
   const onClaimFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
-    const hashedSigFunc = generateSig(newFunc.label, contractABI[revContract]!);
-    setClaimData(hashedSigFunc);
+    const funcInputs = generateClaimFuncInputs(newFunc.label, contractABI[selectedRevenueContract]!);
+    console.log('Func Inputs: ', funcInputs);
+    setFuncInputs(funcInputs);
+    const hashedSigFunc = generateSig(newFunc.label, contractABI[selectedRevenueContract]!);
+    setClaimFunc(hashedSigFunc);
     setClaimFuncType(newFunc);
+
+    // generateClaimFuncInputs - setSlaimFuncInputs into component state
+    // add input fields to modal
   };
 
   const isVerifiedContract =
-    isValidAddress(revContract) &&
+    isValidAddress(selectedRevenueContract) &&
     contractABI &&
-    selectedContractFunctions[revContract] !== undefined &&
-    selectedContractFunctions[revContract]!.length !== 0;
+    selectedContractFunctions[selectedRevenueContract] !== undefined &&
+    selectedContractFunctions[selectedRevenueContract]!.length !== 0;
 
-  const funcOptions = !selectedContractFunctions[revContract]
+  const funcOptions = !selectedContractFunctions[selectedRevenueContract]
     ? []
-    : selectedContractFunctions[revContract].map((func, i) => ({ id: i.toString(), label: func, value: '' }));
+    : selectedContractFunctions[selectedRevenueContract].map((func, i) => ({
+        id: i.toString(),
+        label: func,
+        value: '',
+      }));
+
+  const handleInputChange = (name: string, value: any) => {
+    console.log('handle input change', name, value);
+    let newUserFuncInputs = { ...userFuncInputs };
+    newUserFuncInputs[name] = value;
+    setUserFuncInputs(newUserFuncInputs);
+    console.log('handle input change: ', userFuncInputs);
+  };
+
+  const generateInputFields = () => {
+    if (funcInputs.length === 0) {
+      return <></>;
+    }
+    const inputFieldsHTML = [];
+    for (let i = 0; i < funcInputs.length; i++) {
+      const input = funcInputs[i];
+      if (input.type.includes('int')) {
+        inputFieldsHTML.push(
+          <TxNumberInput
+            headerText={input.name}
+            amount={userFuncInputs[input.name] ?? ''}
+            placeholder={'0'}
+            onInputChange={(e: any) => handleInputChange(input.name, e)}
+          />
+        );
+      }
+      if (input.type === 'address') {
+        inputFieldsHTML.push(
+          <TxAddressInput
+            headerText={input.name}
+            address={userFuncInputs[input.name] ?? ''}
+            onAddressChange={(e: any) => handleInputChange(input.name, e)}
+          />
+        );
+      }
+      if (input.type === 'bytes') {
+        inputFieldsHTML.push(
+          <TxByteInput
+            headerText={input.name}
+            byteCode={userFuncInputs[input.name] ?? ''}
+            onByteCodeChange={(e: any) => handleInputChange(input.name, e)}
+          />
+        );
+      }
+    }
+
+    const mergedInputFieldsHTML = (
+      <React.Fragment>
+        <Header>{t('components.transaction.claim-revenue.rev-contract-inputs')}</Header>
+        {inputFieldsHTML}
+      </React.Fragment>
+    );
+    return mergedInputFieldsHTML;
+  };
 
   // return (
   //   <StyledTransaction onClose={onClose} header={header || t('components.transaction.claim-revenue.title')}>
@@ -244,8 +322,8 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
     <StyledTransaction onClose={onClose} header={header}>
       <TxAddressInput
         headerText={t('components.transaction.enable-spigot.revenue-contract')}
-        address={revContract}
-        onAddressChange={onRevContractChange}
+        address={selectedRevenueContract}
+        //onAddressChange={onRevContractChange}
       />
       <TxTokenInput
         headerText={t('components.transaction.claim-revenue.rev-token-input-header')}
@@ -278,7 +356,8 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
           />
         </>
       )}
-
+      {generateInputFields()}
+      {/* <GenerateClaimRevenueInputs funcInputs={funcInputs} /> */}
       <TxActions>
         <TxActionButton
           data-testid={`modal-action-claim-revenue`}

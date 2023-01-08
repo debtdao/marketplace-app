@@ -265,6 +265,7 @@
         "header": "Claim Revenue via Spigot",
         "rev-contract-input": "Contract to claim from",
         "rev-token-input-header": "Revenue token to claim",
+        "rev-contract-inputs": "4. Fill Function Input Values",
         "claim-data-header": "Transaction data to call on revenue contract",
         "claim-data-input": "Hexcode (0xdebfda05....)",
         "cta": "Claim"

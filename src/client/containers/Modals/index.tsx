@@ -195,7 +195,7 @@ export const Modals = () => {
 
       {activeModal === 'claimRevenue' && (
         <CSSTransition key={'claimRevenue'} timeout={modalTimeout} classNames="slideBottom">
-          <ClaimRevenueTxModal onClose={closeModal} />
+          <ClaimRevenueTxModal revenueContractAddress={''} onClose={closeModal} />
         </CSSTransition>
       )}
 

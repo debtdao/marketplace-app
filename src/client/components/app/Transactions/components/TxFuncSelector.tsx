@@ -37,7 +37,7 @@ const StyledSearchList = styled(SearchList)`
   transform-origin: bottom left;
 `;
 
-const Header = styled.div`
+export const Header = styled.div`
   font-size: 1.6rem;
   text-transform: capitalize;
   color: ${({ theme }) => theme.colors.txModalColors.text};

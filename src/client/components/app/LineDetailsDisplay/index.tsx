@@ -73,8 +73,6 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const [borrowerID, setBorrowerId] = useState('');
 
-  console.log('selected line - line page: ', selectedLine);
-
   useEffect(() => {
     dispatch(OnchainMetaDataActions.getENS(selectedLine?.borrower!));
   }, [selectedLine]);

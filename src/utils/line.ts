@@ -285,7 +285,6 @@ export const formatSecuredLineData = (
   );
 
   // Create spigots map
-  console.log('Spigots 1: ', spigots);
   const spigotRevenueContracts: SpigotRevenueContractMap = spigots.reduce(
     (revenueContractMap: SpigotRevenueContractMap, revenueContract: SpigotRevenueContractFragResponse) => {
       const { contract, ...rest } = revenueContract;
@@ -299,7 +298,6 @@ export const formatSecuredLineData = (
     },
     {} as SpigotRevenueContractMap
   );
-  console.log('Spigots 2: ', spigotRevenueContracts);
 
   // Get escrow collateral events
   const escrowCollateralEvents: CollateralEvent[] = _.flatten(
@@ -424,7 +422,8 @@ export const formatLineWithEvents = (
   } = selectedLine;
   const { events: creditEvents } = lineEvents;
   console.log('Type Checking - lineEvents: ', lineEvents);
-  // Create new aggregated escrow object
+
+  // Create deposit map for aggregated escrow object
   const [collateralValue, deposits]: [BigNumber, EscrowDepositMap] = lineEvents.escrow.deposits.reduce(
     (agg, collateralDeposit) => {
       const price = unnullify(tokenPrices[collateralDeposit.token.id], true);
@@ -443,6 +442,21 @@ export const formatLineWithEvents = (
           ];
     },
     [BigNumber.from(0), {}]
+  );
+
+  // Create spigots map for aggregated spigot object
+  const spigotRevenueContracts: SpigotRevenueContractMap = lineEvents.spigot.spigots.reduce(
+    (revenueContractMap: SpigotRevenueContractMap, revenueContract: SpigotRevenueContractFragResponse) => {
+      const { contract, ...rest } = revenueContract;
+      return {
+        ...revenueContractMap,
+        [contract]: {
+          contract,
+          ...rest,
+        } as SpigotRevenueContract,
+      };
+    },
+    {} as SpigotRevenueContractMap
   );
 
   // Get escrow collateral events
@@ -484,6 +498,7 @@ export const formatLineWithEvents = (
     line: spigot!.line,
     revenueSummary: spigot!.revenueSummary,
     events: spigotEvents,
+    spigots: spigotRevenueContracts,
   };
 
   // Add collateralEvents and creditEvents to SecuredLine
@@ -502,9 +517,7 @@ export const formatLinePageData = (
   tokenPrices: { [token: string]: BigNumber }
 ): SecuredLineWithEvents | undefined => {
   if (!lineData) return undefined;
-  console.log('selected line with events - raw data: ', lineData);
   // add token Prices as arg
-  console.log('FormatLineWithEvents - get line page data 1 - 2: ', lineData);
   const {
     spigot,
     escrow,
@@ -532,8 +545,6 @@ export const formatLinePageData = (
     tokenPrices
   );
 
-  console.log('selected line with events - spigot data 1: ', spigot);
-  console.log('selected line with events - spigot data 2: ', spigotData);
   const pageData: SecuredLineWithEvents = {
     // metadata
     ...metadata,

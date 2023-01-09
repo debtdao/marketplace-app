@@ -149,16 +149,17 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
     if (selectedLine) {
       if (selectedLine.creditEvents.length === 0 && selectedLine.collateralEvents.length === 0) {
         const lineEvents = await creditLineService.getLineEvents({ network, id });
+        console.log('selected line events: ', lineEvents);
         // TODO: Add spigot.spigots into formatLineWithEvents function
         const selectedLineWithEvents = formatLineWithEvents(selectedLine, lineEvents, tokenPrices);
-        console.log('selected line with events: ', selectedLineWithEvents);
+        console.log('selected line with events 1: ', selectedLineWithEvents);
         return { linePageData: selectedLineWithEvents };
       }
       return { linePageData: selectedLine };
     } else {
       try {
         const linePageData = formatLinePageData(await creditLineService.getLinePage({ network, id }), tokenPrices);
-        console.log('selected line with events: ', linePageData);
+        console.log('selected line with events 2: ', linePageData);
         if (!linePageData) throw new Error();
         return { linePageData };
       } catch (e) {

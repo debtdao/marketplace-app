@@ -230,7 +230,6 @@ export interface BaseEscrowFragResponse {
   minCRatio: string;
   deposits: BaseEscrowDepositFragResponse[];
 }
-
 export interface GetLinesResponse {
   lines: BaseLineFragResponse & {
     positions: BasePositionFragResponse[];
@@ -259,6 +258,7 @@ export interface GetLineEventsResponse {
   };
   spigot: {
     events?: SpigotEventFragResponse[];
+    spigots: SpigotRevenueContractFragResponse[];
   };
 }
 

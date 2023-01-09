@@ -56,7 +56,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
   const [timeToLive, setTimeToLive] = useState('0');
 
   // Deploy Line with config state
-  const [advancedMode, setAdvancedMode] = useState(false);
+  const [advancedMode, setAdvancedMode] = useState(true);
   const [cratio, setCratio] = useState('0');
   const [revenueSplit, setRevenueSplit] = useState('0');
 
@@ -258,7 +258,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       ) : (
         <h6>You should not deploy a line without discussing terms.</h6>
       )}
-      <SectionContent>
+      {/* <SectionContent>
         <>
           Advanced Mode
           <ToggleButton
@@ -271,7 +271,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
             ariaLabel=""
           />
         </>
-      </SectionContent>
+      </SectionContent> */}
 
       <TxActions>
         <TxActionButton

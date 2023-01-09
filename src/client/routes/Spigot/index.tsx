@@ -74,6 +74,13 @@ export const Spigot = () => {
     };
   }, [spigotAddress]);
 
+  // TODO: Add line to route params
+  // useEffect(() => {
+  //   if (spigotAddress && !selectedSpigot) {
+  //     dispatch(LinesActions.getLinePage( id ));
+  //   }
+  // }, [selectedSpigot]);
+
   if (!selectedSpigot) return null;
 
   const generalLoading = appStatus.loading;

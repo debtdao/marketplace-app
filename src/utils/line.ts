@@ -421,7 +421,6 @@ export const formatLineWithEvents = (
     ...rest
   } = selectedLine;
   const { events: creditEvents } = lineEvents;
-  console.log('Type Checking - lineEvents: ', lineEvents);
 
   // Create deposit map for aggregated escrow object
   const [collateralValue, deposits]: [BigNumber, EscrowDepositMap] = lineEvents.escrow.deposits.reduce(

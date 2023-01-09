@@ -259,6 +259,7 @@ export interface GetLineEventsResponse {
   spigot: {
     events?: SpigotEventFragResponse[];
     spigots: SpigotRevenueContractFragResponse[];
+    summaries: SpigotRevenueSummaryFragResponse[];
   };
 }
 
@@ -270,11 +271,6 @@ export interface GetLinePageResponse extends BaseLineFragResponse {
     id: Address;
     summaries: SpigotRevenueSummaryFragResponse[];
     spigots: SpigotRevenueContractFragResponse[];
-    // spigots: {
-    //   contract: Address;
-    //   active: boolean;
-    //   startTime: number;
-    // };
     events?: SpigotEventFragResponse[];
   };
   escrow?: BaseEscrowFragResponse & {
@@ -305,11 +301,6 @@ export interface LineOfCreditsResponse extends BaseLineFragResponse {
     id: Address;
     summaries: SpigotRevenueSummaryFragResponse[];
     spigots: SpigotRevenueContractFragResponse[];
-    // spigots: {
-    //   contract: Address;
-    //   active: boolean;
-    //   startTime: number;
-    // };
     events?: SpigotEventFragResponse[];
   };
 

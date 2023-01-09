@@ -459,6 +459,29 @@ export const formatLineWithEvents = (
     {} as SpigotRevenueContractMap
   );
 
+  // aggregated revenue in USD by token across all spigots
+  const revenues: SpigotRevenueSummaryFragResponse[] = lineEvents.spigot.summaries || [];
+  const revenueSummary: RevenueSummaryMap = revenues.reduce<any>(
+    (summaries, { token, totalVolume, totalVolumeUsd, ...summary }) => {
+      console.log('rev', summaries, { ...summary, totalVolume, totalVolumeUsd });
+      return {
+        ...summaries,
+        [getAddress(token.id)]: {
+          ...summary,
+          type: COLLATERAL_TYPE_REVENUE,
+          token: _createTokenView(
+            token,
+            BigNumber.from(totalVolume),
+            BigNumber.from(totalVolumeUsd).div(BigNumber.from(totalVolume))
+          ), // use avg price at time of revenue
+          amount: totalVolume,
+          value: (totalVolumeUsd ?? '0').toString(),
+        },
+      };
+    },
+    {} as RevenueSummaryMap
+  );
+
   // Get escrow collateral events
   const escrowCollateralEvents: CollateralEvent[] = _.flatten(
     _.merge(
@@ -496,7 +519,7 @@ export const formatLineWithEvents = (
     id: spigot!.id,
     type: COLLATERAL_TYPE_REVENUE,
     line: spigot!.line,
-    revenueSummary: spigot!.revenueSummary,
+    revenueSummary: revenueSummary,
     events: spigotEvents,
     spigots: spigotRevenueContracts,
   };

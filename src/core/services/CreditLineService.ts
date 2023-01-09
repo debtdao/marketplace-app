@@ -452,7 +452,10 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   public async getLineEvents(prop: GetLineEventsProps): Promise<GetLineEventsResponse | undefined> {
     const response = getLineEvents(prop)
-      .then((data) => data)
+      .then((data) => {
+        console.log('line events: ', data);
+        return data;
+      })
       .catch((err) => {
         console.log('CreditLineService: error fetching line events', err);
         return undefined;

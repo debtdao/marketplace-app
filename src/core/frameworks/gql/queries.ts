@@ -235,6 +235,7 @@ export const GET_LINE_EVENTS_QUERY = gql`
   ${LINE_EVENT_FRAGMENT}
   ${TOKEN_FRAGMENT}
   ${BASE_SPIGOT_FRAGMENT}
+  ${SPIGOT_SUMMARY_FRAGMENT}
   ${ESCROW_EVENT_FRAGMENT}
   ${SPIGOT_EVENT_FRAGMENT}
 
@@ -263,6 +264,9 @@ export const GET_LINE_EVENTS_QUERY = gql`
         }
         spigots {
           ...BaseSpigotFrag
+        }
+        summaries {
+          ...SpigotSummaryFrag
         }
       }
     }

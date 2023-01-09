@@ -54,16 +54,17 @@ export const Spigot = () => {
   const isMounting = useIsMounting();
   const { network, spigotAddress } = useParams<SpigotRouteParams>();
   const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
+  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLineAddress);
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
 
-  console.log('spigot page addy', spigotAddress, selectedSpigot);
+  console.log('spigot page addy', spigotAddress, selectedSpigot, selectedLine);
   useEffect(() => {
     if (!spigotAddress || !isValidAddress(spigotAddress)) {
       dispatch(AlertsActions.openAlert({ message: 'INVALID_ADDRESS', type: 'error' }));
       history.push('/market');
       return;
     }
-
+    console.log('spigot page addy 2');
     dispatch(CollateralActions.setSelectedSpigot({ spigotAddress: spigotAddress }));
     // TODO implement getSpigot gql query
     // dispatch(CollateralActions.getSpigotPage({ id: spigotAddress }));
@@ -77,7 +78,7 @@ export const Spigot = () => {
 
   const generalLoading = appStatus.loading;
   const { id, line, revenueSummary } = selectedSpigot;
-  console.log('spiggy rev summy', revenueSummary);
+  console.log('spigot page addy - line address: ', line);
   // getSpigotPageStatus.loading ||
   // tokensStatus.loading;
 

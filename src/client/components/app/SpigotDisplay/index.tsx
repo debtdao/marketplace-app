@@ -83,18 +83,17 @@ export const SpigotDisplay = () => {
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const [borrowerID, setBorrowerId] = useState('');
 
-  //TODO: if !selectedLine, dispatch action getting selectedLine data
-  // useEffect(() => {
-  //   if (!selectedLine) {
-  //     dispatch(LinesActions.getLinePage({ id: selectedSpigot.line }));
-  //     console.log('selected line - selected line: ', selectedLine);
-  //     console.log('selected line - selected spigot: ', selectedSpigot);
-  //   }
-  // }, []);
-
   useEffect(() => {
+    // TODO: replace with a more efficient way to get the ENS name
+    // if (Object.keys(ensMap).length === 0) {
+    //   console.log('selected line - ensMap 1: ', ensMap);
+    //   dispatch(OnchainMetaDataActions.getENS(selectedLine?.borrower!));
+    // }
+    dispatch(OnchainMetaDataActions.getENS(selectedLine?.borrower!));
     const ensName = getENS(selectedLine?.borrower!, ensMap);
     console.log('selected line - spigot display: ', selectedLine);
+    console.log('selected line - ensMap 2: ', ensMap);
+    console.log('selected line - ensName: ', ensName);
     if (!ensName) {
       setBorrowerId(selectedLine?.borrower!);
     } else {

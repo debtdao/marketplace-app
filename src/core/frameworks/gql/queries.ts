@@ -74,6 +74,8 @@ const BASE_SPIGOT_FRAGMENT = gql`
     id
     active
     contract
+    claimFunc
+    transferFunc
     startTime
     ownerSplit
     escrowed

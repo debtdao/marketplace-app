@@ -195,6 +195,8 @@ export interface SpigotRevenueContractFragResponse {
   id: Address;
   active: boolean;
   contract: Address;
+  claimFunc: string;
+  transferFunc: string;
   startTime: number;
   ownerSplit: number;
   escrowed: string;

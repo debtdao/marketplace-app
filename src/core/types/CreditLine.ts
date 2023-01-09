@@ -225,6 +225,8 @@ export interface SpigotRevenueContract extends Collateral {
   type: CollateralTypeRevenue;
   active: boolean;
   contract: Address;
+  claimFunc: string;
+  transferFunc: string;
   startTime: number;
   ownerSplit: number;
   escrowed: string;

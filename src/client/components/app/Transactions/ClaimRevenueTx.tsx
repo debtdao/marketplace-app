@@ -60,8 +60,9 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
   // const selectedRevenueContract = useAppSelector(CollateralSelectors.selectSelectedRevenueContractAddress);
 
   // TODO: Comment out hard-coded DPI revenue contract address
-  // const { revenueContractAddress: selectedRevenueContract } = useAppSelector(ModalSelectors.selectActiveModalProps);
-  const selectedRevenueContract = '0x1494ca1f11d487c2bbe4543e90080aeba4ba3c2b';
+  const { revenueContractAddress: selectedRevenueContract } = useAppSelector(ModalSelectors.selectActiveModalProps);
+  // DPI revenue contract
+  // const selectedRevenueContract = '0x1494ca1f11d487c2bbe4543e90080aeba4ba3c2b';
 
   console.log('ClaimRevenueTx - selectedRevenueContract: ', selectedRevenueContract);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
@@ -155,23 +156,30 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
       console.log('claim rev modal: claimRevenue() - no rev token selected');
       return;
     }
-    console.log(selectedSpigot.id, selectedRevenueContract, selectedSellTokenAddress, claimData, walletNetwork);
+    console.log(
+      'Claim Rev Data',
+      selectedSpigot.id,
+      selectedRevenueContract,
+      selectedSellTokenAddress,
+      claimFunc,
+      walletNetwork
+    );
 
-    // dispatch(
-    //   CollateralActions.claimRevenue({
-    //     spigotAddress: selectedSpigot.id,
-    //     revenueContract: selectedRevenueContract,
-    //     token: selectedSellTokenAddress,
-    //     claimData, // default to null claimdata
-    //     network: walletNetwork,
-    //   })
-    // )
-    //   .then((res) => {
-    //     console.log('claim rev success', res);
-    //   })
-    //   .catch((err) => {
-    //     console.log('claim rev fail', err);
-    //   });
+    dispatch(
+      CollateralActions.claimRevenue({
+        spigotAddress: selectedSpigot.id,
+        revenueContract: selectedRevenueContract,
+        token: selectedSellTokenAddress,
+        claimData: claimFunc, // default to null claimdata
+        network: walletNetwork,
+      })
+    )
+      .then((res) => {
+        console.log('claim rev success', res);
+      })
+      .catch((err) => {
+        console.log('claim rev fail', err);
+      });
   };
 
   if (transactionCompleted === 1) {
@@ -226,7 +234,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
         value: '',
       }));
 
-  const handleInputChange = (name: string, value: any) => {
+  const handleInputChange = (name: string, type: string, value: any) => {
     console.log('handle input change', name, value);
     let newUserFuncInputs = { ...userFuncInputs };
     newUserFuncInputs[name] = value;
@@ -247,7 +255,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
             headerText={input.name}
             amount={userFuncInputs[input.name] ?? ''}
             placeholder={'0'}
-            onInputChange={(e: any) => handleInputChange(input.name, e)}
+            onInputChange={(e: any) => handleInputChange(input.name, input.type, e)}
           />
         );
       }
@@ -256,7 +264,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
           <TxAddressInput
             headerText={input.name}
             address={userFuncInputs[input.name] ?? ''}
-            onAddressChange={(e: any) => handleInputChange(input.name, e)}
+            onAddressChange={(e: any) => handleInputChange(input.name, input.type, e)}
           />
         );
       }
@@ -265,7 +273,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
           <TxByteInput
             headerText={input.name}
             byteCode={userFuncInputs[input.name] ?? ''}
-            onByteCodeChange={(e: any) => handleInputChange(input.name, e)}
+            onByteCodeChange={(e: any) => handleInputChange(input.name, input.type, e)}
           />
         );
       }

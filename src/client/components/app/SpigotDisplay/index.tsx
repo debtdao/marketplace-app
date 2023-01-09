@@ -85,21 +85,14 @@ export const SpigotDisplay = () => {
 
   useEffect(() => {
     // TODO: replace with a more efficient way to get the ENS name
-    // if (Object.keys(ensMap).length === 0) {
-    //   console.log('selected line - ensMap 1: ', ensMap);
-    //   dispatch(OnchainMetaDataActions.getENS(selectedLine?.borrower!));
-    // }
     dispatch(OnchainMetaDataActions.getENS(selectedLine?.borrower!));
     const ensName = getENS(selectedLine?.borrower!, ensMap);
-    console.log('selected line - spigot display: ', selectedLine);
-    console.log('selected line - ensMap 2: ', ensMap);
-    console.log('selected line - ensName: ', ensName);
     if (!ensName) {
       setBorrowerId(selectedLine?.borrower!);
     } else {
       setBorrowerId(ensName);
     }
-  }, [selectedLine, ensMap]);
+  }, [selectedLine]);
 
   // allow passing in core data first if we have it already and let Page data render once returned
   // if we have all data render full UI

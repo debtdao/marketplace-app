@@ -12,6 +12,7 @@ import {
   WalletSelectors,
   CollateralActions,
   ModalsActions,
+  LinesActions,
 } from '@store';
 import { getENS } from '@src/utils';
 import { useExplorerURL } from '@src/client/hooks/useExplorerURL';
@@ -82,9 +83,15 @@ export const SpigotDisplay = () => {
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const [borrowerID, setBorrowerId] = useState('');
 
-  console.log('selected line - selected spigot: ', selectedSpigot);
-
   //TODO: if !selectedLine, dispatch action getting selectedLine data
+  // useEffect(() => {
+  //   if (!selectedLine) {
+  //     dispatch(LinesActions.getLinePage({ id: selectedSpigot.line }));
+  //     console.log('selected line - selected line: ', selectedLine);
+  //     console.log('selected line - selected spigot: ', selectedSpigot);
+  //   }
+  // }, []);
+
   useEffect(() => {
     const ensName = getENS(selectedLine?.borrower!, ensMap);
     console.log('selected line - spigot display: ', selectedLine);
@@ -103,19 +110,11 @@ export const SpigotDisplay = () => {
   return (
     <Container>
       <Header>
-        {/* <BorrowerName>
-          {t('lineDetails:metadata.borrower')} {'  :  '} {borrowerID}
-          <Redirect />
-        </BorrowerName> */}
-        <RouterLink to={`${explorerUrl}/address/${selectedSpigot.id}`} key={borrowerID} selected={false}>
+        <RouterLink to={`${explorerUrl}/address/${borrowerID}`} key={borrowerID} selected={false}>
           <BorrowerName>
             {t('lineDetails:metadata.borrower')} {'  :  '} {borrowerID}
             <Redirect />
           </BorrowerName>
-          {/* <SpigotAddy>
-            {selectedSpigot.id}
-            <Redirect />
-          </SpigotAddy> */}
         </RouterLink>
       </Header>
       <Header>Revenue Contracts</Header>

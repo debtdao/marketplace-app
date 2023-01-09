@@ -23,6 +23,7 @@ import {
   WalletActions,
   CollateralActions,
   OnchainMetaDataSelector,
+  CollateralSelectors,
 } from '@src/core/store';
 import { getEnv } from '@config/env';
 
@@ -132,14 +133,16 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
   const { t } = useAppTranslation(['common', 'spigot']);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
-  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
+  // const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
+  const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
   const dispatch = useAppDispatch();
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const { NETWORK } = getEnv();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
 
-  if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
-  const { spigot } = selectedLine;
+  // if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
+  if (!selectedSpigot) return <Container>{t('lineDetails:line.no-data')}</Container>;
+  // const { spigot } = selectedLine;
 
   const addSpigotHandler = (token: TokenView) => {
     if (!walletIsConnected) {
@@ -176,7 +179,7 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
     };
   };
 
-  const allSpigots: SpigotRevenueContract[] = [...Object.values(spigot?.spigots ?? {})];
+  const allSpigots: SpigotRevenueContract[] = [...Object.values(selectedSpigot?.spigots ?? {})];
   const formattedSpigots = allSpigots.map((c) => ({
     ...c,
     key: c.contract,

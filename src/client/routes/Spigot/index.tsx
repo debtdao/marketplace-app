@@ -43,6 +43,7 @@ const SpigotView = styled(ViewContainer)`
 `;
 
 export interface SpigotRouteParams {
+  lineAddress: string;
   spigotAddress: string;
   network: string;
 }
@@ -52,40 +53,34 @@ export const Spigot = () => {
   const dispatch = useAppDispatch();
   const history = useHistory();
   const isMounting = useIsMounting();
-  const { network, spigotAddress } = useParams<SpigotRouteParams>();
+  const { network, spigotAddress, lineAddress } = useParams<SpigotRouteParams>();
   const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
-  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLineAddress);
+  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
 
-  console.log('spigot page addy', spigotAddress, selectedSpigot, selectedLine);
   useEffect(() => {
     if (!spigotAddress || !isValidAddress(spigotAddress)) {
       dispatch(AlertsActions.openAlert({ message: 'INVALID_ADDRESS', type: 'error' }));
       history.push('/market');
       return;
     }
-    console.log('spigot page addy 2');
     dispatch(CollateralActions.setSelectedSpigot({ spigotAddress: spigotAddress }));
-    // TODO implement getSpigot gql query
+    // TODO: implement getSpigot gql query and replace dispatch to getLinePage
     // dispatch(CollateralActions.getSpigotPage({ id: spigotAddress }));
+    if (spigotAddress && !selectedSpigot) {
+      dispatch(LinesActions.getLinePage({ id: lineAddress }));
+      dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
+    }
 
     return () => {
       // dispatch(CollateralActions.clearSelectedSpigot()); // TODO
     };
   }, [spigotAddress]);
 
-  // TODO: Add line to route params
-  // useEffect(() => {
-  //   if (spigotAddress && !selectedSpigot) {
-  //     dispatch(LinesActions.getLinePage( id ));
-  //   }
-  // }, [selectedSpigot]);
-
   if (!selectedSpigot) return null;
 
   const generalLoading = appStatus.loading;
   const { id, line, revenueSummary } = selectedSpigot;
-  console.log('spigot page addy - line address: ', line);
   // getSpigotPageStatus.loading ||
   // tokensStatus.loading;
 

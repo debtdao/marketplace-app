@@ -23,8 +23,12 @@ const routes = [
     path: `/lines/:network/:lineAddress`,
     component: LineDetail,
   },
+  // {
+  //   path: '/spigots/:network/:spigotAddress',
+  //   component: Spigot,
+  // },
   {
-    path: '/spigots/:network/:spigotAddress',
+    path: '/lines/:network/:lineAddress/spigots/:spigotAddress',
     component: Spigot,
   },
   {

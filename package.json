@@ -58,6 +58,7 @@
     "cross-env": "7.0.3",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-prettier": "4.0.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "ethers": "5.4.5",
     "framer-motion": "4.1.17",
     "graphql": "^16.5.0",
@@ -96,7 +97,8 @@
   "eslintConfig": {
     "extends": [
       "react-app",
-      "react-app/jest"
+      "react-app/jest",
+      "plugin:react-hooks/recommended"
     ]
   },
   "lint-staged": {

@@ -156,7 +156,7 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
       const revenueContract = spigots[id].contract;
       dispatch(OnchainMetaDataActions.getABI(revenueContract));
     }
-  }, [selectedSpigot, dispatch]);
+  }, [selectedSpigot]);
 
   // if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
   if (!selectedSpigot) return <Container>{t('lineDetails:line.no-data')}</Container>;

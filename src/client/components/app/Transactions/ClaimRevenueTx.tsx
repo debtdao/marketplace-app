@@ -97,6 +97,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
 
   useEffect(() => {
     // @cleanup would be great to just do this inside the selectors so we dont have hooks everywhere for same thing
+    console.log('how many renders');
     console.log('use effct #1', selectedTokenAddress, selectedSellToken);
     if (!selectedSellToken) {
       dispatch(
@@ -110,17 +111,18 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
       console.log('set tkn addr', selectedSellToken);
       setSelectedTokenAddress(selectedSellToken.address);
     }
+    // }, [dispatch, selectedSellToken, selectedTokenAddress, sourceAssetOptions]);
   }, [selectedSellToken, selectedTokenAddress]);
 
   console.log('selected revenue contract: ', selectedRevenueContract);
-  useEffect(() => {
-    console.log('am I here 1?');
-    if (isValidAddress(selectedRevenueContract)) {
-      console.log('am I here 2?');
-      dispatch(OnchainMetaDataActions.getABI(selectedRevenueContract));
-      // change state of something
-    }
-  }, []);
+  // useEffect(() => {
+  //   console.log('am I here 1?');
+  //   if (isValidAddress(selectedRevenueContract)) {
+  //     console.log('am I here 2?');
+  //     dispatch(OnchainMetaDataActions.getABI(selectedRevenueContract));
+  //     // change state of something
+  //   }
+  // }, []);
   // }, [selectedRevenueContract, didFetchAbi]);
   // console.log('am I here selected revenue contract?');
 
@@ -177,21 +179,21 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
       walletNetwork
     );
 
-    // dispatch(
-    //   CollateralActions.claimRevenue({
-    //     spigotAddress: selectedSpigot.id,
-    //     revenueContract: selectedRevenueContract,
-    //     token: selectedSellTokenAddress,
-    //     claimData: claimFunc, // default to null claimdata
-    //     network: walletNetwork,
-    //   })
-    // )
-    //   .then((res) => {
-    //     console.log('claim rev success', res);
-    //   })
-    //   .catch((err) => {
-    //     console.log('claim rev fail', err);
-    //   });
+    dispatch(
+      CollateralActions.claimRevenue({
+        spigotAddress: selectedSpigot.id,
+        revenueContract: selectedRevenueContract,
+        token: selectedSellTokenAddress,
+        claimData: claimFunc, // default to null claimdata
+        network: walletNetwork,
+      })
+    )
+      .then((res) => {
+        console.log('claim rev success', res);
+      })
+      .catch((err) => {
+        console.log('claim rev fail', err);
+      });
   };
 
   if (transactionCompleted === 1) {
@@ -302,22 +304,24 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
     return mergedInputFieldsHTML;
   };
 
+  // TODO: Fix logic to autopopulate claim revenue function within the modal.
   // Logic to successfully call claim revenue within the modal
-  console.log('Rev Contract Mapping funcs', selectedContractFunctions);
-  console.log('Rev Contract Mapping', selectedContractFunctions[selectedRevenueContract]);
-  const selectedFunc = {
-    id: '0',
-    label: 'claimPullPayment', //selectedContractFunctions[selectedRevenueContract][actualClaimFunc],
-    value: '',
-  };
-  const funcOptions2 = [selectedFunc];
+  // console.log('Rev Contract Mapping funcs', selectedContractFunctions);
+  // console.log('Rev Contract Mapping', selectedContractFunctions[selectedRevenueContract]);
+  // const selectedFunc = {
+  //   id: '0',
+  //   label: 'claimPullPayment', //selectedContractFunctions[selectedRevenueContract][actualClaimFunc],
+  //   value: '',
+  // };
+  // const funcOptions2 = [selectedFunc];
 
-  const funcInputs2 = generateClaimFuncInputs(selectedFunc.label, contractABI[selectedRevenueContract]!);
-  console.log('Func Inputs: ', funcInputs2);
-  setFuncInputs(funcInputs2);
-  const hashedSigFunc = generateSig(selectedFunc.label, contractABI[selectedRevenueContract]!);
-  setClaimFunc(hashedSigFunc);
-  setClaimFuncType(selectedFunc);
+  // const funcInputs2 = generateClaimFuncInputs(selectedFunc.label, contractABI[selectedRevenueContract]!);
+  // console.log('Func Inputs: ', funcInputs2);
+  // setFuncInputs(funcInputs2);
+  // const hashedSigFunc = generateSig(selectedFunc.label, contractABI[selectedRevenueContract]!);
+  // console.log('Rev Contract Mapping - hashedSigFunc: ', hashedSigFunc);
+  // setClaimFunc(hashedSigFunc);
+  // setClaimFuncType(selectedFunc);
 
   return (
     // <div />
@@ -340,8 +344,8 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
         <>
           <TxFuncSelector
             headerText={t('components.transaction.enable-spigot.function-revenue')}
-            typeOptions={funcOptions2}
-            selectedType={selectedFunc}
+            typeOptions={funcOptions}
+            selectedType={claimFuncType}
             onSelectedTypeChange={onClaimFuncSelection}
           />
         </>

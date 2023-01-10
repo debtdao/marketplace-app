@@ -7,13 +7,12 @@ import { ClaimRevenueTx } from '@components/app';
 
 const StyledClaimRevenueTxModal = styled(ModalTx)``;
 export interface ClaimRevenueTxModalProps {
-  revenueContractAddress?: string;
+  // revenueContractAddress?: string;
   onClose: () => void;
 }
 
 export const ClaimRevenueTxModal: FC<ClaimRevenueTxModalProps> = ({ onClose, ...props }) => {
   const { t } = useAppTranslation('common');
-
   return (
     <StyledClaimRevenueTxModal {...props}>
       <ClaimRevenueTx

@@ -14,7 +14,7 @@ import {
 } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation, useIsMounting } from '@hooks';
 import { ViewContainer, SliderCard, SpigotDisplay } from '@components/app';
-import { Link, SpinnerLoading, Text } from '@components/common';
+import { Button, Link, SpinnerLoading, Text } from '@components/common';
 import {
   // parseHistoricalEarningsUnderlying,
   // parseHistoricalEarningsUsd,
@@ -88,7 +88,11 @@ export const Spigot = () => {
   return (
     <SpigotView>
       <SpigotDisplay />
-      {line ? <Link to={`/lines/${network}/${line}`}> {t("View Spigot's owner")}</Link> : null}
+      {line ? (
+        <Button>
+          <Link to={`/lines/${network}/${line}`}>{t('Back to Line of Credit')}</Link>
+        </Button>
+      ) : null}
       {generalLoading && <SpinnerLoading flex="1" width="100%" height="20%" />}
     </SpigotView>
   );

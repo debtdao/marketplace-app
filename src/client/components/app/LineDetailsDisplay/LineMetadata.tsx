@@ -83,6 +83,14 @@ const RedirectLinkIcon = styled(RedirectIcon)`
   padding-bottom: 0.2rem;
 `;
 
+const CollateralContainer = styled.div`
+  ${({ theme }) => `
+    display: flex;
+    padding-bottom: ${theme.spacing.xl};
+    gap: ${theme.spacing.xl};
+  `}
+`;
+
 const AssetsListCard = styled(DetailCard)`
   max-width: ${({ theme }) => theme.globalMaxWidth};
   padding: ${({ theme }) => theme.card.padding};
@@ -267,10 +275,14 @@ export const LineMetadata = (props: LineMetadataProps) => {
       case ARBITER_POSITION_ROLE:
       case LENDER_POSITION_ROLE: // for testing
         return (
-          <>
-            <Button onClick={addSpigotHandler}>{enableSpigotText}</Button>
+          <CollateralContainer>
+            <Button>
+              <Link to={`/lines/${lineNetwork}/${selectedLine?.id}/spigots/${selectedLine?.spigotId}`}>
+                {enableSpigotText}
+              </Link>
+            </Button>
             <Button onClick={enableAssetHandler}>{enableCollateralText}</Button>
-          </>
+          </CollateralContainer>
         );
       default:
         return null;
@@ -290,16 +302,17 @@ export const LineMetadata = (props: LineMetadataProps) => {
       <SectionHeader>
         {t('lineDetails:metadata.secured-by')}
         {/* <CollateralTypeName to={`/spigots/${lineNetwork}/${selectedLine?.spigotId}`}> */}
-        <CollateralTypeName to={`/lines/${lineNetwork}/${selectedLine?.id}/spigots/${selectedLine?.spigotId}`}>
+        {/* <CollateralTypeName to={`/lines/${lineNetwork}/${selectedLine?.id}/spigots/${selectedLine?.spigotId}`}>
           {' '}
           {t(`lineDetails:metadata.revenue.title`)}{' '}
-        </CollateralTypeName>
-        {' + '}
+        </CollateralTypeName> */}
+        {t(`lineDetails:metadata.revenue.title`)} {' + '}
         {/* uncomment when escrow page made:
           <CollateralTypeName to={'/spigot/' + selectedLine?.escrowId}> */}{' '}
         {t(`lineDetails:metadata.escrow.title`)} {/* </CollateralTypeName> */}
       </SectionHeader>
 
+      {getCollateralTableActions()}
       {!revenue && !deposits && <MetricName>{t('lineDetails:metadata.unsecured')}</MetricName>}
 
       <ThreeColumnLayout>
@@ -374,7 +387,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
             },
           ]}
           data={formattedCollateralData ? formattedCollateralData : []}
-          SearchBar={getCollateralTableActions()}
+          // SearchBar={getCollateralTableActions()}
           searching={false}
           onAction={undefined}
           initialSortBy="value"

@@ -65,6 +65,8 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
   // const selectedRevenueContract = '0x1494ca1f11d487c2bbe4543e90080aeba4ba3c2b';
 
   console.log('ClaimRevenueTx - selectedRevenueContract: ', selectedRevenueContract);
+  // const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
+  console.log('Selected Spigot: ', selectedSpigot);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const [claimData, setClaimData] = useState('');
   //const [revContract, setRevContract] = useState(selectedRevenueContract ?? '');
@@ -72,8 +74,12 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
   const selectedContractFunctions = useAppSelector(OnchainMetaDataSelector.selectFunctions);
   const [claimFuncType, setClaimFuncType] = useState({ id: '', label: '', value: '' });
   const [claimFunc, setClaimFunc] = useState<string>('');
+  const actualClaimFunc = selectedSpigot.spigots ? selectedSpigot.spigots[selectedRevenueContract].claimFunc : '';
+  console.log('Selected Line - actual claim func: ', actualClaimFunc);
   const [funcInputs, setFuncInputs] = useState<ParamType[]>([]);
   const [userFuncInputs, setUserFuncInputs] = useState<{ [name: string]: any }>({});
+
+  console.log('User Func Inputs: ', userFuncInputs);
 
   const [didFetchAbi, setDidFetchABI] = useState<boolean>(false);
 
@@ -233,6 +239,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
         label: func,
         value: '',
       }));
+  console.log('Func Options: ', funcOptions);
 
   const handleInputChange = (name: string, type: string, value: any) => {
     console.log('handle input change', name, value);
@@ -287,43 +294,6 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
     );
     return mergedInputFieldsHTML;
   };
-
-  // return (
-  //   <StyledTransaction onClose={onClose} header={header || t('components.transaction.claim-revenue.title')}>
-  //     <TxAddressInput
-  //       address={revContract}
-  //       onAddressChange={onRevContractChange}
-  //       inputText={t('components.transaction.claim-revenue.rev-contract-input')}
-  //     />
-  //     <TxTokenInput
-  //       headerText={t('components.transaction.claim-revenue.rev-token-input-header')}
-  //       selectedToken={selectedSellToken!}
-  //       onSelectedTokenChange={onSelectedSellTokenChange}
-  //       tokenOptions={sourceAssetOptions}
-  //       amount="0" // todo simulate how many tokens will be claimed and add value here
-  //       readOnly={true}
-  //     />
-  //     <TxByteInput
-  //       byteCode={claimData}
-  //       onByteCodeChange={setClaimData}
-  //       headerText={t('components.transaction.claim-revenue.claim-data-header')}
-  //       inputText={t('components.transaction.claim-revenue.claim-data-input')}
-  //     />
-  //     {/* need to fetch revContract ABI from etherscan and try to configure content that way. */}
-
-  //     <TxActions>
-  //       <TxActionButton
-  //         data-testid={`modal-action-claim-revenue`}
-  //         onClick={claimRevenue}
-  //         disabled={false}
-  //         contrast={true}
-  //         isLoading={transactionLoading}
-  //       >
-  //         {t('components.transaction.claim-revenue.cta')}
-  //       </TxActionButton>
-  //     </TxActions>
-  //   </StyledTransaction>
-  // );
 
   return (
     // <div />

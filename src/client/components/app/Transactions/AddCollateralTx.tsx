@@ -13,7 +13,7 @@ import {
   useSelectedSellToken,
 } from '@hooks';
 import { ACTIVE_STATUS, AddCollateralProps, ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE } from '@src/core/types';
-import { getConstants } from '@src/config/constants';
+import { getConstants, testTokens } from '@src/config/constants';
 import {
   TokensActions,
   WalletSelectors,
@@ -22,6 +22,7 @@ import {
   CollateralActions,
   LinesActions,
   selectDepositTokenOptionsByAsset,
+  ModalSelectors,
 } from '@store';
 import { Button } from '@components/common';
 
@@ -34,7 +35,6 @@ import { TxStatus } from './components/TxStatus';
 const { ZERO_ADDRESS } = getConstants();
 
 const StyledTransaction = styled(TxContainer)``;
-
 interface AddCollateralTxProps {
   header: string;
   onClose: () => void;
@@ -91,9 +91,12 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedEscrow = useAppSelector(CollateralSelectors.selectSelectedEscrow);
   const allCollateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
-  const selectedCollateralAsset = useAppSelector(CollateralSelectors.selectSelectedCollateralAsset);
 
+  const { assetAddress: selectedCollateralAssetAddress } = useAppSelector(ModalSelectors.selectActiveModalProps);
   const collateralOptions = _.values(selectedEscrow?.deposits).map((d) => d.token);
+  const selectedCollateralAsset = selectedCollateralAssetAddress
+    ? selectedEscrow?.deposits![selectedCollateralAssetAddress].token
+    : undefined;
 
   useEffect(() => {
     if (!selectedEscrow && selectedLine?.escrowId) {
@@ -247,6 +250,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
   ];
   const txActions = userMetadata.role === BORROWER_POSITION_ROLE ? escrowCollateralSettings : [];
 
+  // TODO: populate selectedCollateralAsset based on row in table being clicked on
   console.log('selected collat', selectedCollateralAsset);
   if (!selectedCollateralAsset) return null;
   const tokenView = _.find(allCollateralOptions, (t) => t.address === selectedCollateralAsset.address);

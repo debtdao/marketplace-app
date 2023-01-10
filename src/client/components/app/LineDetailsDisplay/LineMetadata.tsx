@@ -198,7 +198,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
       connectWallet();
     } else {
       dispatch(CollateralActions.setSelectedCollateralAsset({ assetAddress: token.address }));
-      dispatch(ModalsActions.openModal({ modalName: 'addCollateral' }));
+      dispatch(ModalsActions.openModal({ modalName: 'addCollateral', modalProps: { assetAddress: token.address } }));
     }
   };
 

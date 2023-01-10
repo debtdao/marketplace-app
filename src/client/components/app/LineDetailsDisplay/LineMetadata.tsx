@@ -84,13 +84,13 @@ const RedirectLinkIcon = styled(RedirectIcon)`
   padding-bottom: 0.2rem;
 `;
 
-const CollateralContainer = styled.div`
-  ${({ theme }) => `
-    display: flex;
-    padding-bottom: ${theme.spacing.xl};
-    gap: ${theme.spacing.xl};
-  `}
-`;
+// const CollateralContainer = styled.div`
+//   ${({ theme }) => `
+//     display: flex;
+//     padding-bottom: ${theme.spacing.xl};
+//     gap: ${theme.spacing.xl};
+//   `}
+// `;
 
 const AssetsListCard = styled(DetailCard)`
   max-width: ${({ theme }) => theme.globalMaxWidth};
@@ -276,14 +276,14 @@ export const LineMetadata = (props: LineMetadataProps) => {
       case ARBITER_POSITION_ROLE:
       case LENDER_POSITION_ROLE: // for testing
         return (
-          <CollateralContainer>
+          <>
             <Button>
               <Link to={`/lines/${lineNetwork}/${selectedLine?.id}/spigots/${selectedLine?.spigotId}`}>
                 {enableSpigotText}
               </Link>
             </Button>
             <Button onClick={enableAssetHandler}>{enableCollateralText}</Button>
-          </CollateralContainer>
+          </>
         );
       default:
         return null;
@@ -317,7 +317,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
         {t(`lineDetails:metadata.escrow.title`)} {/* </CollateralTypeName> */}
       </SectionHeader>
 
-      {getCollateralTableActions()}
       {!revenue && !deposits && <MetricName>{t('lineDetails:metadata.unsecured')}</MetricName>}
 
       <ThreeColumnLayout>
@@ -393,7 +392,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
             },
           ]}
           data={formattedCollateralData ? formattedCollateralData : []}
-          // SearchBar={getCollateralTableActions()}
+          SearchBar={getCollateralTableActions()}
           searching={false}
           onAction={undefined}
           initialSortBy="value"

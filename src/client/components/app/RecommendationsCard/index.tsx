@@ -187,11 +187,6 @@ export const RecommendationsCard = ({ header, subHeader, items, ...props }: Reco
                 <Divider />
 
                 <ItemInfoLabel>
-                  <span>
-                    {t('components.line-card.start')}: <MetricsText>{startDateHumanized}</MetricsText>
-                  </span>
-                </ItemInfoLabel>
-                <ItemInfoLabel>
                   {t('components.line-card.end')}: <MetricsText>{endDateHumanized}</MetricsText>
                 </ItemInfoLabel>
                 <Divider />

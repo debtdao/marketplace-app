@@ -8,7 +8,7 @@ function generateClaimFuncInputs(funcName: string, contractABI: string): ParamTy
   console.log('Interface Log', iface.functions);
   for (const key in iface.functions) {
     if (funcName === iface.functions[key].name) {
-      inputs = iface.functions[key].inputs;
+      inputs = iface.functions[key].inputs ? iface.functions[key].inputs : [];
     }
   }
   console.log(inputs);

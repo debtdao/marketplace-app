@@ -239,7 +239,8 @@ export interface VaultActionsStatusMap {
 
 export interface OnchainMetaDataState {
   contractABI: { [address: string]: string };
-  contractFunctions: { [address: string]: string[] };
+  // contractFunctions: { [address: string]: Map<string, string> };
+  contractFunctions: { [address: string]: { [address: string]: string } };
   // contractFunctions: {
   //   [address: string]: {
   //     [functionName: string]: string;

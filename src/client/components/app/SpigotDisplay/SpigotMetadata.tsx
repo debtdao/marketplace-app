@@ -1,6 +1,7 @@
 import { isEmpty } from 'lodash';
 import { BigNumber } from 'ethers';
 import styled from 'styled-components';
+import { useEffect } from 'react';
 
 import { device } from '@themes/default';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
@@ -26,6 +27,7 @@ import {
   CollateralSelectors,
   NetworkSelectors,
   TokensSelectors,
+  OnchainMetaDataActions,
 } from '@src/core/store';
 import { getEnv } from '@config/env';
 
@@ -144,6 +146,17 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
   const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const etherscanUrl = getEtherscanUrlStub(network);
   const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
+
+  useEffect(() => {
+    if (!selectedSpigot || !selectedSpigot.spigots) return;
+    const spigots = selectedSpigot.spigots ?? {};
+    const spigotIds = Object.keys(selectedSpigot.spigots!) ?? [];
+    for (let i = 0; i < spigotIds.length; i++) {
+      const id = spigotIds[i];
+      const revenueContract = spigots[id].contract;
+      dispatch(OnchainMetaDataActions.getABI(revenueContract));
+    }
+  }, [selectedSpigot, dispatch]);
 
   // if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
   if (!selectedSpigot) return <Container>{t('lineDetails:line.no-data')}</Container>;

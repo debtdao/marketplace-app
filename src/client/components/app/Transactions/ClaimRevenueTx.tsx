@@ -112,11 +112,17 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
     }
   }, [selectedSellToken, selectedTokenAddress]);
 
+  console.log('selected revenue contract: ', selectedRevenueContract);
   useEffect(() => {
+    console.log('am I here 1?');
     if (isValidAddress(selectedRevenueContract)) {
+      console.log('am I here 2?');
       dispatch(OnchainMetaDataActions.getABI(selectedRevenueContract));
+      // change state of something
     }
-  }, [selectedRevenueContract, didFetchAbi]);
+  }, []);
+  // }, [selectedRevenueContract, didFetchAbi]);
+  // console.log('am I here selected revenue contract?');
 
   //console.log('selected tokens #2', selectedSellToken, selectedSellTokenAddress);
 
@@ -171,21 +177,21 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
       walletNetwork
     );
 
-    dispatch(
-      CollateralActions.claimRevenue({
-        spigotAddress: selectedSpigot.id,
-        revenueContract: selectedRevenueContract,
-        token: selectedSellTokenAddress,
-        claimData: claimFunc, // default to null claimdata
-        network: walletNetwork,
-      })
-    )
-      .then((res) => {
-        console.log('claim rev success', res);
-      })
-      .catch((err) => {
-        console.log('claim rev fail', err);
-      });
+    // dispatch(
+    //   CollateralActions.claimRevenue({
+    //     spigotAddress: selectedSpigot.id,
+    //     revenueContract: selectedRevenueContract,
+    //     token: selectedSellTokenAddress,
+    //     claimData: claimFunc, // default to null claimdata
+    //     network: walletNetwork,
+    //   })
+    // )
+    //   .then((res) => {
+    //     console.log('claim rev success', res);
+    //   })
+    //   .catch((err) => {
+    //     console.log('claim rev fail', err);
+    //   });
   };
 
   if (transactionCompleted === 1) {
@@ -214,6 +220,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
 
   if (!selectedSellToken && !selectedTokenAddress) return null;
 
+  // TODO: Get rid of this dead function.
   const onClaimFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
     const funcInputs = generateClaimFuncInputs(newFunc.label, contractABI[selectedRevenueContract]!);
     console.log('Func Inputs: ', funcInputs);
@@ -230,11 +237,11 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
     isValidAddress(selectedRevenueContract) &&
     contractABI &&
     selectedContractFunctions[selectedRevenueContract] !== undefined &&
-    selectedContractFunctions[selectedRevenueContract]!.length !== 0;
+    Array.from(Object.values(selectedContractFunctions[selectedRevenueContract]))!.length !== 0;
 
   const funcOptions = !selectedContractFunctions[selectedRevenueContract]
     ? []
-    : selectedContractFunctions[selectedRevenueContract].map((func, i) => ({
+    : Array.from(Object.values(selectedContractFunctions[selectedRevenueContract])).map((func, i) => ({
         id: i.toString(),
         label: func,
         value: '',
@@ -295,6 +302,23 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
     return mergedInputFieldsHTML;
   };
 
+  // Logic to successfully call claim revenue within the modal
+  console.log('Rev Contract Mapping funcs', selectedContractFunctions);
+  console.log('Rev Contract Mapping', selectedContractFunctions[selectedRevenueContract]);
+  const selectedFunc = {
+    id: '0',
+    label: 'claimPullPayment', //selectedContractFunctions[selectedRevenueContract][actualClaimFunc],
+    value: '',
+  };
+  const funcOptions2 = [selectedFunc];
+
+  const funcInputs2 = generateClaimFuncInputs(selectedFunc.label, contractABI[selectedRevenueContract]!);
+  console.log('Func Inputs: ', funcInputs2);
+  setFuncInputs(funcInputs2);
+  const hashedSigFunc = generateSig(selectedFunc.label, contractABI[selectedRevenueContract]!);
+  setClaimFunc(hashedSigFunc);
+  setClaimFuncType(selectedFunc);
+
   return (
     // <div />
     <StyledTransaction onClose={onClose} header={header}>
@@ -316,8 +340,8 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
         <>
           <TxFuncSelector
             headerText={t('components.transaction.enable-spigot.function-revenue')}
-            typeOptions={funcOptions}
-            selectedType={claimFuncType}
+            typeOptions={funcOptions2}
+            selectedType={selectedFunc}
             onSelectedTypeChange={onClaimFuncSelection}
           />
         </>

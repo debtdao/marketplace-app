@@ -1,6 +1,7 @@
 import { isEmpty } from 'lodash';
 import { BigNumber } from 'ethers';
 import styled from 'styled-components';
+import { format } from 'date-fns';
 
 import { device } from '@themes/default';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
@@ -115,7 +116,6 @@ const AssetsListCard = styled(DetailCard)`
     }
   }
 ` as typeof DetailCard;
-
 interface LineMetadataProps {
   principal: string;
   deposit: string;
@@ -168,7 +168,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
 
-  const { lineNetwork, principal, deposit, totalInterestPaid, revenue, deposits, spigots } = props;
+  console.log('Line Metadata props: ', props);
+  const { lineNetwork, principal, deposit, totalInterestPaid, revenue, deposits, startTime, endTime, spigots } = props;
   const totalRevenue = isEmpty(revenue)
     ? ''
     : Object.values(revenue!)
@@ -289,6 +290,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
     }
   };
 
+  const startDateHumanized = format(new Date(startTime * 1000), 'MMMM dd, yyyy');
+  const endDateHumanized = format(new Date(endTime * 1000), 'MMMM dd, yyyy');
   return (
     <>
       <ThreeColumnLayout>
@@ -298,6 +301,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
           title={t('lineDetails:metadata.totalInterestPaid')}
           data={`$ ${prettyNumbers(totalInterestPaid)}`}
         />
+        <MetricDataDisplay title={t('lineDetails:metadata.start')} data={startDateHumanized} />
+        <MetricDataDisplay title={t('lineDetails:metadata.end')} data={endDateHumanized} />
       </ThreeColumnLayout>
       <SectionHeader>
         {t('lineDetails:metadata.secured-by')}
@@ -321,8 +326,9 @@ export const LineMetadata = (props: LineMetadataProps) => {
       </ThreeColumnLayout>
 
       <ViewContainer>
+        <SectionHeader>{t('lineDetails:metadata.escrow.assets-list.title')}</SectionHeader>
         <AssetsListCard
-          header={t('lineDetails:metadata.escrow.assets-list.title')}
+          header={' '} //{t('lineDetails:metadata.escrow.assets-list.title')}
           data-testid="line-assets-list"
           metadata={[
             {

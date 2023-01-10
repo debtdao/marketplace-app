@@ -123,7 +123,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
         })
       ).then((res) => {
         if (res.meta.requestStatus === 'rejected') {
-          setTransactionCompleted(2);
+          // setTransactionCompleted(2);
           setLoading(false);
         }
         if (res.meta.requestStatus === 'fulfilled') {
@@ -162,7 +162,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
         })
       ).then((res) => {
         if (res.meta.requestStatus === 'rejected') {
-          setTransactionCompleted(2);
+          // setTransactionCompleted(2);
           setLoading(false);
         }
         if (res.meta.requestStatus === 'fulfilled') {
@@ -204,8 +204,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       <TxAddressInput
         key={'credit-input'}
         headerText={t('components.transaction.deploy-line.select-borrower')}
-        // inputText={t('components.transaction.deploy-line.select-borrower')}
-        inputText={''}
+        inputText={'Borrower Address'}
         onAddressChange={onBorrowerAddressChange}
         address={borrowerAddress}
         // creditOptions={sourceCreditOptions}

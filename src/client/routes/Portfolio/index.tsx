@@ -88,6 +88,7 @@ export const Portfolio = () => {
   const portfolioAddress = userAddress ? userAddress : userWallet;
   const allPositions = useAppSelector(LinesSelectors.selectPositionsMap);
   const [selectedRole, setRole] = useState<string>(BORROWER_POSITION_ROLE);
+  const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
 
   const availableRoles = [BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE];
 
@@ -119,12 +120,14 @@ export const Portfolio = () => {
           const position = lenderPositions[0];
           dispatch(LinesActions.clearSelectedLine());
           dispatch(LinesActions.setSelectedLinePosition({ position }));
+          dispatch(LinesActions.setSelectedLineAddress({ lineAddress: allPositions[position].line }));
         }
       }
     }
   }, [userPortfolio, selectedRole]);
 
-  console.log('portfolio page', selectedRole);
+  console.log('portfolio page - selectedRole', selectedRole);
+  console.log('portfolio page - selectedline', lineAddress);
   return (
     <StyledViewContainer>
       <PortfolioHeader>

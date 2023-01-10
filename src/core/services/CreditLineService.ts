@@ -442,7 +442,10 @@ export class CreditLineServiceImpl implements CreditLineService {
   public async getLines(prop: GetLinesProps): Promise<GetLinesResponse[] | undefined> {
     // todo get all token prices from yearn add update store with values
     const response = getLines(prop)
-      .then((data) => data)
+      .then((data) => {
+        console.log('Get Lines Raw: ', data);
+        return data;
+      })
       .catch((err) => {
         console.log('CreditLineService: error fetching lines', err);
         return undefined;

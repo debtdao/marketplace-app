@@ -6,8 +6,9 @@ import { TokenIcon } from '@components/app';
 import { useAppSelector, useAppTranslation } from '@hooks';
 import { Text, Icon, SearchList, LogoIcon, ZapIcon, SearchListItem, RedirectIcon, Link } from '@components/common';
 import { SecuredLine } from '@src/core/types';
-import { WalletSelectors } from '@src/core/store';
+import { WalletSelectors, OnchainMetaDataSelector } from '@src/core/store';
 import { getConfig } from '@src/config';
+import { formatAddress, getENS } from '@src/utils';
 const { NETWORK_SETTINGS } = getConfig();
 
 const LineTitle = styled(Text)`
@@ -20,6 +21,7 @@ const RedirectLink = styled(Link)`
 
 const LinkOut = styled(RedirectIcon)`
   fill: ${({ theme }) => theme.colors.primary};
+  height: 1.4rem;
 `;
 
 const CreditLineData = styled.div`
@@ -166,7 +168,7 @@ export const TxCreditLineInput: FC<TxCreditLineInputProps> = ({
 }) => {
   const { t } = useAppTranslation('common');
   const selectedNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
-  // tODO get borrower ENS
+  const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
 
   let listItems: SearchListItem[] = [];
   //let zappableItems: SearchListItem[] = [];
@@ -233,13 +235,14 @@ export const TxCreditLineInput: FC<TxCreditLineInputProps> = ({
           <CreditLineData>
             <RedirectLink to={`${blockExplorerUrl}/address/${selectedCredit.borrower}`}>
               <LineTitle ellipsis>
-                {t('components.transaction.add-credit-input.selected-borrower')}: {selectedCredit.borrower}
+                {t('components.transaction.add-credit-input.selected-borrower')}:
+                {' ' + formatAddress(getENS(selectedCredit.borrower, ensMap)!)}
               </LineTitle>
               <LinkOut />
             </RedirectLink>
             <RedirectLink to={`${blockExplorerUrl}/address/${selectedCredit.id}`}>
               <LineTitle ellipsis>
-                {t('components.transaction.add-credit-input.selected-line')}: {selectedCredit.id}
+                {t('components.transaction.add-credit-input.selected-line')}: {formatAddress(selectedCredit.id)}
               </LineTitle>
               <LinkOut />
             </RedirectLink>

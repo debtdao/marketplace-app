@@ -56,6 +56,7 @@
     "bnc-onboard": "1.38.2",
     "craco-alias": "3.0.1",
     "cross-env": "7.0.3",
+    "date-fns": "^2.29.3",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-prettier": "4.0.0",
     "eslint-plugin-react-hooks": "^4.6.0",

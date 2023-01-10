@@ -247,21 +247,36 @@ export const formatSecuredLineData = (
   const principal = BigNumber.from(0);
   const deposit = BigNumber.from(0);
 
+  console.log('Formatting secured line data - positions: ', positionFrags);
   const credit = positionFrags.reduce(
     (agg: any, c) => {
-      const price = tokenPrices[c.token?.id] || BigNumber.from(0);
+      console.log('Formatting secured line data - c: ', c);
+      const checkSumAddress = ethers.utils.getAddress(c.token?.id);
+
+      // const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
+      // const usdcPriceDecimals = ethers.utils.formatUnits(usdcPrice, 6);
+      const usdcPrice = BigNumber.from(0);
+      console.log('Formatting secured line data - tokenPrices: ', tokenPrices);
+      console.log('Formatting secured line data - price: ', usdcPrice); // USD so 10^6 decimals
+      console.log('Formatting secured line data - price (not big number): ', usdcPrice.toString());
+      // console.log('Formatting secured line data - price (formatted): ', usdcPriceDecimals);
+      console.log('Formatting secured line data - price math: ', usdcPrice.mul(unnullify(c.deposit, true)).toString());
+      console.log('Formatting secured line data - deposit: ', c.deposit);
+      console.log('Formatting secured line data - deposit unullify: ', unnullify(c.deposit, true));
       // const highestApy = BigNumber.from(c.dRate).gt(BigNumber.from(agg.highestApy[2]))
       //   ? [c.id, c.token?.id, c.dRate]
       //   : agg.highestApy;
       return {
         // lender: agg.lender.id,
-        principal: agg.principal.add(price.mul(unnullify(c.principal).toString())),
-        deposit: agg.deposit.add(price.mul(unnullify(c.deposit).toString())),
+        principal: agg.principal.add(usdcPrice.mul(unnullify(c.principal).toString())),
+        deposit: agg.deposit.add(usdcPrice.mul(unnullify(c.deposit).toString())),
         highestApy,
       };
     },
     { principal, deposit, highestApy }
   );
+  console.log('Formatting secured line data - aggregated deposit: ', credit.deposit.toString());
+  console.log('Formatting secured line data - aggregated principal: ', credit.principal.toString());
 
   // Sum value of deposits and create deposits map
   const [collateralValue, deposits]: [BigNumber, EscrowDepositMap] = collateralDeposits.reduce(

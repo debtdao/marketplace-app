@@ -25,6 +25,7 @@ import {
   OnchainMetaDataSelector,
   CollateralSelectors,
   NetworkSelectors,
+  TokensSelectors,
 } from '@src/core/store';
 import { getEnv } from '@config/env';
 
@@ -142,6 +143,7 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const etherscanUrl = getEtherscanUrlStub(network);
+  const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
 
   // if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
   if (!selectedSpigot) return <Container>{t('lineDetails:line.no-data')}</Container>;
@@ -211,21 +213,18 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
               sortable: true,
               className: 'col-type',
             },
-            // {
-            //   key: 'token',
-            //   header: t('lineDetails:metadata.escrow.assets-list.symbol'),
-            //   transform: ({ token: { symbol, icon, address } }) => (
-            //     //change to etherscan on launch
-            //     <a href={`https://goerli.etherscan.io/address/${address}`} target={'_blank'} rel={'noreferrer'}>
-            //       {icon && <TokenIcon icon={icon} symbol={symbol} />}
-            //       <Text>{symbol}</Text>
-            //       <RedirectLinkIcon />
-            //     </a>
-            //   ),
-            //   width: '15rem',
-            //   sortable: true,
-            //   className: 'col-symbol',
-            // },
+            {
+              key: 'token',
+              header: 'Contract Symbol', //t('lineDetails:metadata.escrow.assets-list.symbol'),
+              transform: ({ contract }) => (
+                <a href={etherscanUrl + `${contract}`} target={'_blank'} rel={'noreferrer'}>
+                  <Text>{tokensMap[formatAddress(contract)] ? tokensMap[formatAddress(contract)].symbol : 'N/A'}</Text>
+                </a>
+              ),
+              width: '15rem',
+              sortable: true,
+              className: 'col-symbol',
+            },
             {
               key: 'actions',
               transform: ({ contract }) => <ActionButtons actions={[claimRev(contract)]} />,

@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { device } from '@themes/default';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
-import { formatAddress, prettyNumbers, getENS, humanize } from '@src/utils';
+import { formatAddress, prettyNumbers, getENS, humanize, getEtherscanUrlStub } from '@src/utils';
 import {
   ARBITER_POSITION_ROLE,
   BORROWER_POSITION_ROLE,
@@ -24,6 +24,7 @@ import {
   CollateralActions,
   OnchainMetaDataSelector,
   CollateralSelectors,
+  NetworkSelectors,
 } from '@src/core/store';
 import { getEnv } from '@config/env';
 
@@ -139,6 +140,8 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const { NETWORK } = getEnv();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
+  const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
+  const etherscanUrl = getEtherscanUrlStub(network);
 
   // if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
   if (!selectedSpigot) return <Container>{t('lineDetails:line.no-data')}</Container>;
@@ -199,11 +202,12 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
               key: 'contract',
               header: 'Contract Address', //t('lineDetails:metadata.escrow.assets-list.contract'),
               transform: ({ contract }) => (
-                <>
+                <a href={etherscanUrl + `${contract}`} target={'_blank'} rel={'noreferrer'}>
                   <Text>{formatAddress(getENS(contract, ensMap)!)}</Text>
-                </>
+                  <RedirectLinkIcon />
+                </a>
               ),
-              width: '13rem',
+              width: '16rem',
               sortable: true,
               className: 'col-type',
             },

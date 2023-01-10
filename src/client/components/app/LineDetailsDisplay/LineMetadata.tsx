@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { device } from '@themes/default';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
-import { prettyNumbers } from '@src/utils';
+import { prettyNumbers, getEtherscanUrlStub } from '@src/utils';
 import {
   ARBITER_POSITION_ROLE,
   BORROWER_POSITION_ROLE,
@@ -20,7 +20,14 @@ import {
 } from '@src/core/types';
 import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
 import { Button, Text, RedirectIcon, Link } from '@components/common';
-import { LinesSelectors, ModalsActions, WalletSelectors, WalletActions, CollateralActions } from '@src/core/store';
+import {
+  LinesSelectors,
+  ModalsActions,
+  WalletSelectors,
+  WalletActions,
+  CollateralActions,
+  NetworkSelectors,
+} from '@src/core/store';
 import { humanize } from '@src/utils';
 import { getEnv } from '@config/env';
 
@@ -151,6 +158,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const dispatch = useAppDispatch();
   const { NETWORK } = getEnv();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
+  const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
 
   const { lineNetwork, principal, deposit, totalInterestPaid, revenue, deposits, spigots } = props;
   const totalRevenue = isEmpty(revenue)
@@ -268,6 +276,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
         return null;
     }
   };
+
   return (
     <>
       <ThreeColumnLayout>
@@ -319,8 +328,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
               key: 'token',
               header: t('lineDetails:metadata.escrow.assets-list.symbol'),
               transform: ({ token: { symbol, icon, address } }) => (
-                //change to etherscan on launch
-                <a href={`https://goerli.etherscan.io/address/${address}`} target={'_blank'} rel={'noreferrer'}>
+                //TODO: change to etherscan on launch
+                <a href={getEtherscanUrlStub(network) + `${address}`} target={'_blank'} rel={'noreferrer'}>
                   {icon && <TokenIcon icon={icon} symbol={symbol} />}
                   <Text>{symbol}</Text>
                   <RedirectLinkIcon />

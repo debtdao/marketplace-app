@@ -74,8 +74,9 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
   const selectedContractFunctions = useAppSelector(OnchainMetaDataSelector.selectFunctions);
   const [claimFuncType, setClaimFuncType] = useState({ id: '', label: '', value: '' });
   const [claimFunc, setClaimFunc] = useState<string>('');
-  const actualClaimFunc = selectedSpigot.spigots ? selectedSpigot.spigots[selectedRevenueContract].claimFunc : '';
-  console.log('Selected Line - actual claim func: ', actualClaimFunc);
+  // TODO: fix issue where closing the modal causes claimFunc to be undefined
+  // const actualClaimFunc = selectedSpigot.spigots ? selectedSpigot.spigots[selectedRevenueContract].claimFunc : '';
+
   const [funcInputs, setFuncInputs] = useState<ParamType[]>([]);
   const [userFuncInputs, setUserFuncInputs] = useState<{ [name: string]: any }>({});
 

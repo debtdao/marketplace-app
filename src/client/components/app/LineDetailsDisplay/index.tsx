@@ -89,6 +89,7 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
 
   if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
   const { principal, deposit, escrow, borrower, spigot, start, end } = selectedLine;
+  console.log('Deposit State 0: ', deposit);
 
   console.log('line detail index lineNetwork', props.lineNetwork);
   const StandardMetadata = (metadataProps: any) => <></>;

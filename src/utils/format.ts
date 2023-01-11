@@ -122,11 +122,25 @@ export const humanize = (
 ) => {
   if (!tokenDecimals && dataType === 'amount') return '0';
   const units = normalize(dataType, amount, tokenDecimals);
+  console.log('Humanize Amount Input: ', amount);
+  console.log('Humanize Amount: ', units);
+  console.log('Humanize Amount Format: ', format(dataType, units, formatDecimals));
   return format(dataType, units, formatDecimals);
 };
 
 export const prettyNumbers = (x: string) => {
   return numberWithCommas(parseInt(normalizeAmount(x, 18)).toFixed(2));
+};
+
+export const prettyNumbers2 = (x: string) => {
+  console.log('Pretty Numbers: Normalize Amount', normalizeAmount(x, 18));
+  console.log('Pretty Numbers: Format Normalize Amount', ethers.utils.formatUnits(normalizeAmount(x, 18), 24));
+  console.log(
+    'Pretty Numbers: Parse Normalize Amount',
+    parseFloat(ethers.utils.formatUnits(normalizeAmount(x, 18), 24)).toFixed(2)
+  );
+  console.log('Pretty Numbers: Add Commas', numberWithCommas(ethers.utils.formatUnits(normalizeAmount(x, 18), 24)));
+  return numberWithCommas(parseFloat(ethers.utils.formatUnits(normalizeAmount(x, 18), 24)).toFixed(2));
 };
 
 export const formatAddress = (address: string) => {

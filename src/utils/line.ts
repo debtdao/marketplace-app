@@ -47,7 +47,7 @@ import {
 
 import { humanize, normalizeAmount, normalize } from './format';
 
-const { parseUnits } = utils;
+const { parseUnits, formatUnits } = utils;
 
 /**
  * @function
@@ -253,23 +253,42 @@ export const formatSecuredLineData = (
       console.log('Formatting secured line data - c: ', c);
       const checkSumAddress = ethers.utils.getAddress(c.token?.id);
 
-      // const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
-      // const usdcPriceDecimals = ethers.utils.formatUnits(usdcPrice, 6);
-      const usdcPrice = BigNumber.from(0);
-      console.log('Formatting secured line data - tokenPrices: ', tokenPrices);
-      console.log('Formatting secured line data - price: ', usdcPrice); // USD so 10^6 decimals
+      const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
+      const usdcPriceDecimals = ethers.utils.formatUnits(usdcPrice, 6);
+      const tokenPriceDecimals = c.token.decimals;
+      // const usdcPrice = BigNumber.from(0);
+      // console.log('Formatting secured line data - tokenPrices: ', tokenPrices);
+      // console.log('Formatting secured line data - price: ', usdcPrice); // USD so 10^6 decimals
       console.log('Formatting secured line data - price (not big number): ', usdcPrice.toString());
       // console.log('Formatting secured line data - price (formatted): ', usdcPriceDecimals);
-      console.log('Formatting secured line data - price math: ', usdcPrice.mul(unnullify(c.deposit, true)).toString());
       console.log('Formatting secured line data - deposit: ', c.deposit);
-      console.log('Formatting secured line data - deposit unullify: ', unnullify(c.deposit, true));
+      console.log(
+        'Formatting secured line data - price math: ',
+        c.token.symbol,
+        checkSumAddress,
+        Number(ethers.utils.formatUnits(usdcPrice.mul(unnullify(c.deposit, true).toString()), 6)) /
+          10 ** tokenPriceDecimals
+        // .div(unnullify(10 ** 6, true))
+        // .toString()
+      );
+
+      console.log(
+        'Deposit State 1: ',
+        c.token.symbol,
+        checkSumAddress,
+        usdcPrice.mul(unnullify(c.deposit)).toString()
+        // .div(unnullify(10 ** 6, true))
+        // .toString()
+      );
+      // console.log('Formatting secured line data - deposit unullify: ', unnullify(c.deposit, true));
+      // console.log('Formatting secured line data - deposit unullify: ', unnullify(c.deposit, true));
       // const highestApy = BigNumber.from(c.dRate).gt(BigNumber.from(agg.highestApy[2]))
       //   ? [c.id, c.token?.id, c.dRate]
       //   : agg.highestApy;
       return {
         // lender: agg.lender.id,
         principal: agg.principal.add(usdcPrice.mul(unnullify(c.principal).toString())),
-        deposit: agg.deposit.add(usdcPrice.mul(unnullify(c.deposit).toString())),
+        deposit: agg.deposit.add(usdcPrice.mul(unnullify(c.deposit)).toString()),
         highestApy,
       };
     },
@@ -405,11 +424,13 @@ export const formatSecuredLineData = (
     };
   }, {});
 
+  console.log('Credit Parse Units Deposit: ', formatUnits(unnullify(credit.deposit), 6).toString());
+
   return {
     credit: {
       highestApy,
       principal: parseUnits(unnullify(credit.principal), 'ether').toString(),
-      deposit: parseUnits(unnullify(credit.deposit), 'ether').toString(),
+      deposit: formatUnits(unnullify(credit.deposit), 6).toString(),
       interest: '0', // TODO
       totalInterestRepaid: '0', // TODO
       positionIds: Object.keys(positions),

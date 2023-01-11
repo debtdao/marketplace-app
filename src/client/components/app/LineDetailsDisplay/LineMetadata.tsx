@@ -1,12 +1,12 @@
 import { isEmpty } from 'lodash';
-import { BigNumber } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import styled from 'styled-components';
 import { format } from 'date-fns';
 
 import { device } from '@themes/default';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
-import { prettyNumbers, getEtherscanUrlStub } from '@src/utils';
+import { prettyNumbers, getEtherscanUrlStub, unnullify, prettyNumbers2 } from '@src/utils';
 import {
   ARBITER_POSITION_ROLE,
   BORROWER_POSITION_ROLE,
@@ -141,6 +141,9 @@ interface MetricDisplay extends Metric {
 }
 
 const MetricDataDisplay = ({ title, data, displaySubmetrics = false, submetrics }: MetricDisplay) => {
+  // const formattedData = prettyNumbers(data);
+  // const formattedData = Number(ethers.utils.formatUnits(unnullify(data, true), 6)) / 10 ** 18;
+  console.log('Metrics Display data: ', data);
   return (
     <MetricContainer>
       <MetricName>{title}</MetricName>
@@ -272,7 +275,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const getCollateralTableActions = () => {
     switch (userPositionMetadata.role) {
       case BORROWER_POSITION_ROLE:
-        return <Button onClick={depositHandler}>{depositCollateralText} </Button>;
       case ARBITER_POSITION_ROLE:
       case LENDER_POSITION_ROLE: // for testing
         return (
@@ -292,11 +294,14 @@ export const LineMetadata = (props: LineMetadataProps) => {
 
   const startDateHumanized = format(new Date(startTime * 1000), 'MMMM dd, yyyy');
   const endDateHumanized = format(new Date(endTime * 1000), 'MMMM dd, yyyy');
+  console.log('Deposit State: ', deposit);
   return (
     <>
       <ThreeColumnLayout>
-        <MetricDataDisplay title={t('lineDetails:metadata.principal')} data={`$ ${prettyNumbers(principal)}`} />
-        <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${prettyNumbers(deposit)}`} />
+        <MetricDataDisplay title={t('lineDetails:metadata.principal')} data={`$ ${prettyNumbers2(principal)}`} />
+        {/* <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${humanize('amount', deposit, 42, 2)}`} /> */}
+        <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${humanize('amount', deposit, 18, 2)}`} />
+        {/* <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${prettyNumbers2(deposit)}`} /> */}
         <MetricDataDisplay
           title={t('lineDetails:metadata.totalInterestPaid')}
           data={`$ ${prettyNumbers(totalInterestPaid)}`}

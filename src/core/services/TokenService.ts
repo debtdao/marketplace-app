@@ -61,9 +61,6 @@ export class TokenServiceImpl implements TokenService {
       ...token,
       symbol: token.address === WETH ? 'WETH' : token.symbol,
     }));
-    console.log('Supported Tokens 1 - length: ', supportedTokens.length);
-    console.log('Supported Tokens 2 - length: ', fixedSupportedTokens.length);
-    // console.log('Supported Tokens: ', getUniqueAndCombine(fixedSupportedTokens, [], 'address'));
     return getUniqueAndCombine(fixedSupportedTokens, [], 'address');
   }
 

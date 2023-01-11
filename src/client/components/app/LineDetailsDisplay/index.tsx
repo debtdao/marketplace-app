@@ -115,7 +115,8 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
         totalInterestRepaid={totalInterestRepaid}
         startTime={start}
         endTime={end}
-        minCRatio={escrow?.minCRatio ?? '0'}
+        minCRatio={escrow?.minCRatio ?? 0}
+        cratio={escrow?.cratio ?? '0'}
         defaultSplit={defaultSplit}
         collateralValue={escrow?.collateralValue ?? '0'}
         revenueValue={spigot?.revenueValue ?? '0'}

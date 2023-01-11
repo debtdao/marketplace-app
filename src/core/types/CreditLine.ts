@@ -153,7 +153,7 @@ export interface Collateral {
 export interface BaseEscrow extends BaseCollateralModule {
   id: Address;
   cratio: string;
-  minCRatio: string;
+  minCRatio: number;
   collateralValue: string;
 }
 
@@ -178,7 +178,7 @@ export interface SpigotRevenueContractMap {
 export interface AggregatedEscrow extends BaseEscrow {
   id: Address;
   cratio: string;
-  minCRatio: string;
+  minCRatio: number;
   collateralValue: string;
   type: CollateralTypes;
   line: string;

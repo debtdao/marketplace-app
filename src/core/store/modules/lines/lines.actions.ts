@@ -112,7 +112,6 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
         .map((k) => categories[k])
         .map((params: GetLinesArgs) => creditLineService.getLines({ network, ...params }))
     );
-    console.log('Promises: ', promises);
 
     const { linesData, allBorrowers } = categoryKeys.reduce(
       ({ linesData, allBorrowers }: MarketPageData, category: string, i: number): MarketPageData => {
@@ -120,9 +119,7 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
         if (!promises[i]) {
           return { linesData, allBorrowers };
         } else {
-          console.log('Lines Data - Promises: ', promises[i]!);
           const categoryLines = formatGetLinesData(promises[i]!, tokenPrices);
-          console.log('Lines Data - categoryLines: ', categoryLines);
           return {
             linesData: { ...linesData, [category]: categoryLines },
             allBorrowers: [...allBorrowers, ...categoryLines.map((line) => line.borrower)],
@@ -131,7 +128,6 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
       },
       { linesData: {}, allBorrowers: [] }
     );
-    console.log('Lines Data action: ', linesData);
     allBorrowers.map((b) => dispatch(OnchainMetaDataActions.getENS(b)));
 
     return { linesData };

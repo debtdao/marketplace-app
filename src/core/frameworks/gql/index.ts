@@ -93,7 +93,6 @@ export const createQuery =
       client
         .query({ query, variables })
         .then((result: QueryResult) => {
-          console.log('gql result', result, query);
           const { data, error } = result;
           const requestedData = path ? at(data, [path])[0] : data;
           if (error) return reject(error);

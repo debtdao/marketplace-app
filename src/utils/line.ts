@@ -244,8 +244,6 @@ export const formatSecuredLineData = (
   const revenues: SpigotRevenueSummaryFragResponse[] = spigot?.summaries || [];
   const spigots: SpigotRevenueContractFragResponse[] = spigot.spigots || [];
 
-  console.log('Collateral Deposits: ', collateralDeposits);
-
   // position id, token address, APY
   const highestApy: [string, string, string] = ['', '', '0'];
   const principal = BigNumber.from(0);
@@ -253,20 +251,16 @@ export const formatSecuredLineData = (
   const totalInterestRepaid = BigNumber.from(0);
 
   // TODO: Convert all position values (principal, deposit, totalInterestRepaid) to 18 decimals before aggregating.
-  console.log('Formatting secured line data - positions: ', positionFrags);
-  const credit = positionFrags.reduce(
+  const credit: {
+    principal: BigNumber;
+    deposit: BigNumber;
+    highestApy: [string, string, string];
+    totalInterestRepaid: BigNumber;
+  } = positionFrags.reduce(
     (agg: any, c) => {
-      console.log('Formatting secured line data - c: ', c);
       const checkSumAddress = ethers.utils.getAddress(c.token?.id);
-      console.log('Formatting secured line data - token symbol', c.token.symbol);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
-      console.log('Formatting secured line data - usdcPrice: ', usdcPrice);
-      // const usdcPrice = BigNumber.from(0);
-      // const usdcPriceDecimals = ethers.utils.formatUnits(usdcPrice, 6);
-      // const tokenPriceDecimals = c.token.decimals;
-      // console.log('Formatting secured line data - math: ', usdcPrice.mul(unnullify(c.principal).toString()));
       return {
-        // lender: agg.lender.id,
         principal: agg.principal.add(usdcPrice.mul(unnullify(c.principal).toString())),
         deposit: agg.deposit.add(usdcPrice.mul(unnullify(c.deposit)).toString()),
         highestApy,
@@ -275,15 +269,12 @@ export const formatSecuredLineData = (
     },
     { principal, deposit, highestApy, totalInterestRepaid }
   );
-  console.log('Formatting secured line data - aggregated deposit: ', credit.deposit.toString());
-  console.log('Formatting secured line data - aggregated principal: ', credit.principal.toString());
 
   // Sum value of deposits and create deposits map
   const [collateralValue, deposits]: [BigNumber, EscrowDepositMap] = collateralDeposits.reduce(
     (agg, collateralDeposit) => {
       const checkSumAddress = ethers.utils.getAddress(collateralDeposit.token.id);
       const price = unnullify(tokenPrices[checkSumAddress], true);
-      console.log('Collateral Token and Price: ', collateralDeposit.token.id, price);
       return !collateralDeposit.enabled
         ? agg
         : [
@@ -300,8 +291,6 @@ export const formatSecuredLineData = (
     },
     [BigNumber.from(0), {}]
   );
-  console.log('Collateral Value: ', collateralValue.toString());
-  console.log('Collateral Deposits: ', collateralDeposits);
 
   // Create spigots map
   const spigotRevenueContracts: SpigotRevenueContractMap = spigots.reduce(
@@ -341,20 +330,15 @@ export const formatSecuredLineData = (
     type: COLLATERAL_TYPE_ASSET,
     line,
     collateralValue: formatUnits(unnullify(collateralValue), 6).toString(),
-    cratio: parseUnits(unnullify(credit.principal).toString(), 'ether').eq(0)
+    cratio: parseUnits(credit.principal.toString(), 'ether').eq(0)
       ? '0'
-      : collateralValue.div(unnullify(credit.principal).toString()).toString(),
-    // TODO: fill in with appropriate value, not copied directly from cratio
-    // minCRatio: parseUnits(unnullify(credit.principal).toString(), 'ether').eq(0)
-    //   ? '0'
-    //   : collateralValue.div(unnullify(credit.principal).toString()).toString(),
+      : String(Number(BigNumber.from(10000).mul(collateralValue).div(credit.principal).toString()) / 100),
     minCRatio: escrow.minCRatio,
     events: escrowCollateralEvents,
     deposits,
   };
 
   // aggregated revenue in USD by token across all spigots
-  console.log('Revenue Summary - revenues: ', revenues);
   const [revenueValue, revenueSummary]: [BigNumber, RevenueSummaryMap] = revenues.reduce<any>(
     (agg, { token, totalVolume, totalVolumeUsd, ...summary }) => {
       console.log('rev', agg, { ...summary, totalVolume, totalVolumeUsd });
@@ -380,29 +364,6 @@ export const formatSecuredLineData = (
     },
     [BigNumber.from(0), {} as RevenueSummaryMap]
   );
-  console.log('Revenue Value: ', revenueValue.toString());
-
-  // const [collateralValue, deposits]: [BigNumber, EscrowDepositMap] = collateralDeposits.reduce(
-  //   (agg, collateralDeposit) => {
-  //     const checkSumAddress = ethers.utils.getAddress(collateralDeposit.token.id);
-  //     const price = unnullify(tokenPrices[checkSumAddress], true);
-  //     console.log('Collateral Token and Price: ', collateralDeposit.token.id, price);
-  //     return !collateralDeposit.enabled
-  //       ? agg
-  //       : [
-  //           agg[0].add(unnullify(collateralDeposit.amount).toString()).mul(price),
-  //           {
-  //             ...agg[1],
-  //             [collateralDeposit.token.id]: {
-  //               ...collateralDeposit,
-  //               type: COLLATERAL_TYPE_ASSET,
-  //               token: _createTokenView(collateralDeposit.token, BigNumber.from(collateralDeposit.amount), price),
-  //             },
-  //           },
-  //         ];
-  //   },
-  //   [BigNumber.from(0), {}]
-  // );
 
   const spigotEvents = formatSpigotCollateralEvents(spigot.events);
   const collateralEvents = _.concat(spigotEvents, escrowCollateralEvents);
@@ -438,17 +399,6 @@ export const formatSecuredLineData = (
       },
     };
   }, {});
-
-  console.log('Credit Parse Units Deposit: ', formatUnits(unnullify(credit.deposit), 6).toString());
-  console.log(
-    'Formatting Secured line data - aggregated deposit 2: ',
-    parseUnits(unnullify(credit.deposit), 'ether').toString()
-  );
-
-  console.log('Principal - original units: ', credit.principal.toString());
-  console.log('Principal - parse units: ', parseUnits(unnullify(credit.principal), 'ether').toString());
-  console.log('Principal - format units: ', formatUnits(unnullify(credit.principal), 6).toString());
-  console.log('Interest Repaid - format units: ', formatUnits(unnullify(credit.totalInterestRepaid), 6).toString());
 
   return {
     credit: {
@@ -523,7 +473,8 @@ export const formatLineWithEvents = (
   const [revenueValue, revenueSummary]: [BigNumber, RevenueSummaryMap] = revenues.reduce<any>(
     (agg, { token, totalVolume, totalVolumeUsd, ...summary }) => {
       console.log('rev', agg, { ...summary, totalVolume, totalVolumeUsd });
-      const usdcPrice = BigNumber.from(1000000); // TODO: Multiply by actual price
+      const checkSumAddress = ethers.utils.getAddress(token.id);
+      const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
       return [
         agg[0].add(unnullify(totalVolume).toString()).mul(usdcPrice),
         {
@@ -573,6 +524,10 @@ export const formatLineWithEvents = (
     collateralValue: formatUnits(unnullify(collateralValue), 6).toString(),
     cratio: escrow!.cratio,
     minCRatio: escrow!.minCRatio,
+    // TODO: add this in later
+    // cratio: parseUnits(unnullify(credit.principal).toString(), 'ether').eq(0)
+    // ? '0'
+    // : collateralValue.div(unnullify(credit.principal).toString()).toString(),
     events: escrowCollateralEvents,
     deposits,
   };

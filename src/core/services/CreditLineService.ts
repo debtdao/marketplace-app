@@ -443,7 +443,6 @@ export class CreditLineServiceImpl implements CreditLineService {
     // todo get all token prices from yearn add update store with values
     const response = getLines(prop)
       .then((data) => {
-        console.log('Get Lines Raw: ', data);
         return data;
       })
       .catch((err) => {

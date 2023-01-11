@@ -151,7 +151,6 @@ export const Market = () => {
         <SpinnerLoading flex="1" width="100%" />
       ) : (
         Object.entries(lineCategoriesForDisplay!).map(([key, val]: [string, SecuredLine[]], i: number) => {
-          console.log('line card val: ', val);
           return (
             <StyledRecommendationsCard
               header={t(key)}

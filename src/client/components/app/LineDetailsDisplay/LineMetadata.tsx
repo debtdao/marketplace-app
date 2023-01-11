@@ -124,7 +124,8 @@ interface LineMetadataProps {
   startTime: number;
   endTime: number;
   revenue?: { [token: string]: RevenueSummary };
-  minCRatio: string;
+  minCRatio: number;
+  cratio: string;
   defaultSplit: string;
   collateralValue: string;
   revenueValue: string;
@@ -187,6 +188,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
     startTime,
     endTime,
     spigots,
+    cratio,
     minCRatio,
     defaultSplit,
     collateralValue,
@@ -354,7 +356,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
         />
         <MetricDataDisplay
           title={'Collateralization Ratio'} //{t('lineDetails:metadata.principal')}
-          data={minCRatio + '%'}
+          data={cratio + '%'}
         />
         {/* <MetricDataDisplay
           title={''} //{t('lineDetails:metadata.principal')}

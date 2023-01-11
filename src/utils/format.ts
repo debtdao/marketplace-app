@@ -122,9 +122,6 @@ export const humanize = (
 ) => {
   if (!tokenDecimals && dataType === 'amount') return '0';
   const units = normalize(dataType, amount, tokenDecimals);
-  console.log('Humanize Amount Input: ', amount);
-  console.log('Humanize Amount: ', units);
-  console.log('Humanize Amount Format: ', format(dataType, units, formatDecimals));
   return format(dataType, units, formatDecimals);
 };
 

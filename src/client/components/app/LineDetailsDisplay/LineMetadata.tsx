@@ -119,7 +119,7 @@ const AssetsListCard = styled(DetailCard)`
 interface LineMetadataProps {
   principal: string;
   deposit: string;
-  totalInterestPaid: string;
+  totalInterestRepaid: string;
   startTime: number;
   endTime: number;
   revenue?: { [token: string]: RevenueSummary };
@@ -172,7 +172,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
 
   console.log('Line Metadata props: ', props);
-  const { lineNetwork, principal, deposit, totalInterestPaid, revenue, deposits, startTime, endTime, spigots } = props;
+  const { lineNetwork, principal, deposit, totalInterestRepaid, revenue, deposits, startTime, endTime, spigots } =
+    props;
   const totalRevenue = isEmpty(revenue)
     ? ''
     : Object.values(revenue!)
@@ -295,17 +296,26 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const startDateHumanized = format(new Date(startTime * 1000), 'MMMM dd, yyyy');
   const endDateHumanized = format(new Date(endTime * 1000), 'MMMM dd, yyyy');
   console.log('Deposit State: ', deposit);
+  console.log('Interest State: ', totalInterestRepaid);
   return (
     <>
       <ThreeColumnLayout>
-        <MetricDataDisplay title={t('lineDetails:metadata.principal')} data={`$ ${prettyNumbers2(principal)}`} />
+        {/* <MetricDataDisplay title={t('lineDetails:metadata.principal')} data={`$ ${prettyNumbers2(principal)}`} /> */}
         {/* <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${humanize('amount', deposit, 42, 2)}`} /> */}
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.deposit')}
+          data={`$ ${humanize('amount', principal, 18, 2)}`}
+        />
         <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${humanize('amount', deposit, 18, 2)}`} />
-        {/* <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${prettyNumbers2(deposit)}`} /> */}
         <MetricDataDisplay
           title={t('lineDetails:metadata.totalInterestPaid')}
-          data={`$ ${prettyNumbers(totalInterestPaid)}`}
+          data={`$ ${humanize('amount', totalInterestRepaid, 18, 2)}`}
         />
+        {/* <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${prettyNumbers2(deposit)}`} /> */}
+        {/* <MetricDataDisplay
+          title={t('lineDetails:metadata.totalInterestPaid')}
+          data={`$ ${prettyNumbers(totalInterestPaid)}`}
+        /> */}
         <MetricDataDisplay title={t('lineDetails:metadata.start')} data={startDateHumanized} />
         <MetricDataDisplay title={t('lineDetails:metadata.end')} data={endDateHumanized} />
       </ThreeColumnLayout>

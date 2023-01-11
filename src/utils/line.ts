@@ -246,53 +246,30 @@ export const formatSecuredLineData = (
   const highestApy: [string, string, string] = ['', '', '0'];
   const principal = BigNumber.from(0);
   const deposit = BigNumber.from(0);
+  const totalInterestRepaid = BigNumber.from(0);
 
+  // TODO: Convert all position values (principal, deposit, totalInterestRepaid) to 18 decimals before aggregating.
   console.log('Formatting secured line data - positions: ', positionFrags);
   const credit = positionFrags.reduce(
     (agg: any, c) => {
       console.log('Formatting secured line data - c: ', c);
       const checkSumAddress = ethers.utils.getAddress(c.token?.id);
-
+      console.log('Formatting secured line data - token symbol', c.token.symbol);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
-      const usdcPriceDecimals = ethers.utils.formatUnits(usdcPrice, 6);
-      const tokenPriceDecimals = c.token.decimals;
+      console.log('Formatting secured line data - usdcPrice: ', usdcPrice);
       // const usdcPrice = BigNumber.from(0);
-      // console.log('Formatting secured line data - tokenPrices: ', tokenPrices);
-      // console.log('Formatting secured line data - price: ', usdcPrice); // USD so 10^6 decimals
-      console.log('Formatting secured line data - price (not big number): ', usdcPrice.toString());
-      // console.log('Formatting secured line data - price (formatted): ', usdcPriceDecimals);
-      console.log('Formatting secured line data - deposit: ', c.deposit);
-      console.log(
-        'Formatting secured line data - price math: ',
-        c.token.symbol,
-        checkSumAddress,
-        Number(ethers.utils.formatUnits(usdcPrice.mul(unnullify(c.deposit, true).toString()), 6)) /
-          10 ** tokenPriceDecimals
-        // .div(unnullify(10 ** 6, true))
-        // .toString()
-      );
-
-      console.log(
-        'Deposit State 1: ',
-        c.token.symbol,
-        checkSumAddress,
-        usdcPrice.mul(unnullify(c.deposit)).toString()
-        // .div(unnullify(10 ** 6, true))
-        // .toString()
-      );
-      // console.log('Formatting secured line data - deposit unullify: ', unnullify(c.deposit, true));
-      // console.log('Formatting secured line data - deposit unullify: ', unnullify(c.deposit, true));
-      // const highestApy = BigNumber.from(c.dRate).gt(BigNumber.from(agg.highestApy[2]))
-      //   ? [c.id, c.token?.id, c.dRate]
-      //   : agg.highestApy;
+      // const usdcPriceDecimals = ethers.utils.formatUnits(usdcPrice, 6);
+      // const tokenPriceDecimals = c.token.decimals;
+      console.log('Formatting secured line data - math: ', usdcPrice.mul(unnullify(c.principal).toString()));
       return {
         // lender: agg.lender.id,
         principal: agg.principal.add(usdcPrice.mul(unnullify(c.principal).toString())),
         deposit: agg.deposit.add(usdcPrice.mul(unnullify(c.deposit)).toString()),
         highestApy,
+        totalInterestRepaid: agg.totalInterestRepaid.add(usdcPrice.mul(unnullify(c.interestRepaid)).toString()),
       };
     },
-    { principal, deposit, highestApy }
+    { principal, deposit, highestApy, totalInterestRepaid }
   );
   console.log('Formatting secured line data - aggregated deposit: ', credit.deposit.toString());
   console.log('Formatting secured line data - aggregated principal: ', credit.principal.toString());
@@ -425,14 +402,23 @@ export const formatSecuredLineData = (
   }, {});
 
   console.log('Credit Parse Units Deposit: ', formatUnits(unnullify(credit.deposit), 6).toString());
+  console.log(
+    'Formatting Secured line data - aggregated deposit 2: ',
+    parseUnits(unnullify(credit.deposit), 'ether').toString()
+  );
+
+  console.log('Principal - original units: ', credit.principal.toString());
+  console.log('Principal - parse units: ', parseUnits(unnullify(credit.principal), 'ether').toString());
+  console.log('Principal - format units: ', formatUnits(unnullify(credit.principal), 6).toString());
+  console.log('Interest Repaid - format units: ', formatUnits(unnullify(credit.totalInterestRepaid), 6).toString());
 
   return {
     credit: {
       highestApy,
-      principal: parseUnits(unnullify(credit.principal), 'ether').toString(),
+      principal: formatUnits(unnullify(credit.principal), 6).toString(),
       deposit: formatUnits(unnullify(credit.deposit), 6).toString(),
       interest: '0', // TODO
-      totalInterestRepaid: '0', // TODO
+      totalInterestRepaid: formatUnits(unnullify(credit.totalInterestRepaid), 6).toString(),
       positionIds: Object.keys(positions),
       positions,
     },
@@ -586,6 +572,7 @@ export const formatLinePageData = (
     ...metadata
     // userLinesMetadataMap,
   } = lineData;
+  console.log('Raw Line Page Positions: ', positions);
   const {
     credit,
     collateralEvents,

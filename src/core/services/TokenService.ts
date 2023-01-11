@@ -61,12 +61,16 @@ export class TokenServiceImpl implements TokenService {
       ...token,
       symbol: token.address === WETH ? 'WETH' : token.symbol,
     }));
+    console.log('Supported Tokens 1 - length: ', supportedTokens.length);
+    console.log('Supported Tokens 2 - length: ', fixedSupportedTokens.length);
+    // console.log('Supported Tokens: ', getUniqueAndCombine(fixedSupportedTokens, [], 'address'));
     return getUniqueAndCombine(fixedSupportedTokens, [], 'address');
   }
 
   public async getSupportedOracleTokens(): Promise<SupportedOracleTokenResponse | undefined> {
     const response = getSupportedOracleTokens(undefined)
       .then((data) => {
+        console.log('Supported Tokens 3: ', data);
         return data;
       })
       .catch((err) => {

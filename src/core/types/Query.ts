@@ -145,6 +145,7 @@ export interface BaseLineFragResponse {
   borrower: {
     id: Address;
   };
+  defaultSplit: string;
 }
 
 export interface BasePositionFragResponse {

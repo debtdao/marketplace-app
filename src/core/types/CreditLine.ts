@@ -45,6 +45,7 @@ export interface LineOfCredit {
   deposit: string;
   interest: string;
   // lifetime stats
+  defaultSplit: string;
   totalInterestRepaid: string;
   // id, symbol, APY (4 decimals)
   highestApy: [string, string, string];
@@ -199,6 +200,7 @@ export interface RevenueSummaryMap {
 }
 export interface AggregatedSpigot extends BaseCollateralModule {
   id: Address;
+  revenueValue: string;
   // aggregated revenue in USD by token across all spigots
   revenueSummary: RevenueSummaryMap;
   events?: CollateralEvent[];

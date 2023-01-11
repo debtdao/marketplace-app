@@ -187,8 +187,10 @@ export function formatGetLinesData(
       escrowRes?.id ?? '',
       positions,
       events,
-      escrowRes?.deposits ?? [],
-      spigotRes?.revenues ?? [],
+      // escrowRes?.deposits ?? [],
+      // spigotRes?.revenues ?? [],
+      escrowRes,
+      spigotRes,
       tokenPrices
     );
     // const deposits = escrowRes?.deposits.map((d: any) => ({ ...d, token: d.token.id }));
@@ -242,6 +244,8 @@ export const formatSecuredLineData = (
   const revenues: SpigotRevenueSummaryFragResponse[] = spigot?.summaries || [];
   const spigots: SpigotRevenueContractFragResponse[] = spigot.spigots || [];
 
+  console.log('Collateral Deposits: ', collateralDeposits);
+
   // position id, token address, APY
   const highestApy: [string, string, string] = ['', '', '0'];
   const principal = BigNumber.from(0);
@@ -277,11 +281,13 @@ export const formatSecuredLineData = (
   // Sum value of deposits and create deposits map
   const [collateralValue, deposits]: [BigNumber, EscrowDepositMap] = collateralDeposits.reduce(
     (agg, collateralDeposit) => {
-      const price = unnullify(tokenPrices[collateralDeposit.token.id], true);
+      const checkSumAddress = ethers.utils.getAddress(collateralDeposit.token.id);
+      const price = unnullify(tokenPrices[checkSumAddress], true);
+      console.log('Collateral Token and Price: ', collateralDeposit.token.id, price);
       return !collateralDeposit.enabled
         ? agg
         : [
-            agg[0].add(parseUnits(unnullify(collateralDeposit.amount).toString(), 'ether').mul(price)),
+            agg[0].add(unnullify(collateralDeposit.amount).toString()).mul(price),
             {
               ...agg[1],
               [collateralDeposit.token.id]: {
@@ -294,6 +300,8 @@ export const formatSecuredLineData = (
     },
     [BigNumber.from(0), {}]
   );
+  console.log('Collateral Value: ', collateralValue.toString());
+  console.log('Collateral Deposits: ', collateralDeposits);
 
   // Create spigots map
   const spigotRevenueContracts: SpigotRevenueContractMap = spigots.reduce(
@@ -332,40 +340,69 @@ export const formatSecuredLineData = (
     id: escrowId,
     type: COLLATERAL_TYPE_ASSET,
     line,
-    collateralValue: collateralValue.toString(),
+    collateralValue: formatUnits(unnullify(collateralValue), 6).toString(),
     cratio: parseUnits(unnullify(credit.principal).toString(), 'ether').eq(0)
       ? '0'
       : collateralValue.div(unnullify(credit.principal).toString()).toString(),
     // TODO: fill in with appropriate value, not copied directly from cratio
-    minCRatio: parseUnits(unnullify(credit.principal).toString(), 'ether').eq(0)
-      ? '0'
-      : collateralValue.div(unnullify(credit.principal).toString()).toString(),
+    // minCRatio: parseUnits(unnullify(credit.principal).toString(), 'ether').eq(0)
+    //   ? '0'
+    //   : collateralValue.div(unnullify(credit.principal).toString()).toString(),
+    minCRatio: escrow.minCRatio,
     events: escrowCollateralEvents,
     deposits,
   };
 
   // aggregated revenue in USD by token across all spigots
   console.log('Revenue Summary - revenues: ', revenues);
-  const revenueSummary: RevenueSummaryMap = revenues.reduce<any>(
-    (summaries, { token, totalVolume, totalVolumeUsd, ...summary }) => {
-      console.log('rev', summaries, { ...summary, totalVolume, totalVolumeUsd });
-      return {
-        ...summaries,
-        [getAddress(token.id)]: {
-          ...summary,
-          type: COLLATERAL_TYPE_REVENUE,
-          token: _createTokenView(
-            token,
-            BigNumber.from(totalVolume),
-            BigNumber.from(totalVolumeUsd).div(BigNumber.from(totalVolume))
-          ), // use avg price at time of revenue
-          amount: totalVolume,
-          value: (totalVolumeUsd ?? '0').toString(),
+  const [revenueValue, revenueSummary]: [BigNumber, RevenueSummaryMap] = revenues.reduce<any>(
+    (agg, { token, totalVolume, totalVolumeUsd, ...summary }) => {
+      console.log('rev', agg, { ...summary, totalVolume, totalVolumeUsd });
+      const checkSumAddress = ethers.utils.getAddress(token.id);
+      const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
+      return [
+        agg[0].add(unnullify(totalVolume).toString()).mul(usdcPrice),
+        {
+          ...agg[1],
+          [getAddress(token.id)]: {
+            ...summary,
+            type: COLLATERAL_TYPE_REVENUE,
+            token: _createTokenView(
+              token,
+              BigNumber.from(totalVolume),
+              BigNumber.from(totalVolumeUsd).div(BigNumber.from(totalVolume))
+            ), // use avg price at time of revenue
+            amount: totalVolume,
+            value: (totalVolumeUsd ?? '0').toString(),
+          },
         },
-      };
+      ];
     },
-    {} as RevenueSummaryMap
+    [BigNumber.from(0), {} as RevenueSummaryMap]
   );
+  console.log('Revenue Value: ', revenueValue.toString());
+
+  // const [collateralValue, deposits]: [BigNumber, EscrowDepositMap] = collateralDeposits.reduce(
+  //   (agg, collateralDeposit) => {
+  //     const checkSumAddress = ethers.utils.getAddress(collateralDeposit.token.id);
+  //     const price = unnullify(tokenPrices[checkSumAddress], true);
+  //     console.log('Collateral Token and Price: ', collateralDeposit.token.id, price);
+  //     return !collateralDeposit.enabled
+  //       ? agg
+  //       : [
+  //           agg[0].add(unnullify(collateralDeposit.amount).toString()).mul(price),
+  //           {
+  //             ...agg[1],
+  //             [collateralDeposit.token.id]: {
+  //               ...collateralDeposit,
+  //               type: COLLATERAL_TYPE_ASSET,
+  //               token: _createTokenView(collateralDeposit.token, BigNumber.from(collateralDeposit.amount), price),
+  //             },
+  //           },
+  //         ];
+  //   },
+  //   [BigNumber.from(0), {}]
+  // );
 
   const spigotEvents = formatSpigotCollateralEvents(spigot.events);
   const collateralEvents = _.concat(spigotEvents, escrowCollateralEvents);
@@ -374,6 +411,7 @@ export const formatSecuredLineData = (
     id: spigotId,
     type: COLLATERAL_TYPE_REVENUE,
     line,
+    revenueValue: formatUnits(unnullify(revenueValue), 6).toString(),
     revenueSummary,
     events: spigotEvents,
     spigots: spigotRevenueContracts,
@@ -482,25 +520,29 @@ export const formatLineWithEvents = (
 
   // aggregated revenue in USD by token across all spigots
   const revenues: SpigotRevenueSummaryFragResponse[] = lineEvents.spigot.summaries || [];
-  const revenueSummary: RevenueSummaryMap = revenues.reduce<any>(
-    (summaries, { token, totalVolume, totalVolumeUsd, ...summary }) => {
-      console.log('rev', summaries, { ...summary, totalVolume, totalVolumeUsd });
-      return {
-        ...summaries,
-        [getAddress(token.id)]: {
-          ...summary,
-          type: COLLATERAL_TYPE_REVENUE,
-          token: _createTokenView(
-            token,
-            BigNumber.from(totalVolume),
-            BigNumber.from(totalVolumeUsd).div(BigNumber.from(totalVolume))
-          ), // use avg price at time of revenue
-          amount: totalVolume,
-          value: (totalVolumeUsd ?? '0').toString(),
+  const [revenueValue, revenueSummary]: [BigNumber, RevenueSummaryMap] = revenues.reduce<any>(
+    (agg, { token, totalVolume, totalVolumeUsd, ...summary }) => {
+      console.log('rev', agg, { ...summary, totalVolume, totalVolumeUsd });
+      const usdcPrice = BigNumber.from(1000000); // TODO: Multiply by actual price
+      return [
+        agg[0].add(unnullify(totalVolume).toString()).mul(usdcPrice),
+        {
+          ...agg[1],
+          [getAddress(token.id)]: {
+            ...summary,
+            type: COLLATERAL_TYPE_REVENUE,
+            token: _createTokenView(
+              token,
+              BigNumber.from(totalVolume),
+              BigNumber.from(totalVolumeUsd).div(BigNumber.from(totalVolume))
+            ), // use avg price at time of revenue
+            amount: totalVolume,
+            value: (totalVolumeUsd ?? '0').toString(),
+          },
         },
-      };
+      ];
     },
-    {} as RevenueSummaryMap
+    [BigNumber.from(0), {} as RevenueSummaryMap]
   );
 
   // Get escrow collateral events
@@ -528,7 +570,7 @@ export const formatLineWithEvents = (
     id: escrow!.id,
     type: COLLATERAL_TYPE_ASSET,
     line: escrow!.line,
-    collateralValue: collateralValue.toString(),
+    collateralValue: formatUnits(unnullify(collateralValue), 6).toString(),
     cratio: escrow!.cratio,
     minCRatio: escrow!.minCRatio,
     events: escrowCollateralEvents,
@@ -540,6 +582,7 @@ export const formatLineWithEvents = (
     id: spigot!.id,
     type: COLLATERAL_TYPE_REVENUE,
     line: spigot!.line,
+    revenueValue: formatUnits(revenueValue, 6).toString(),
     revenueSummary: revenueSummary,
     events: spigotEvents,
     spigots: spigotRevenueContracts,
@@ -569,7 +612,9 @@ export const formatLinePageData = (
     borrower,
     status,
     events,
+    defaultSplit,
     ...metadata
+
     // userLinesMetadataMap,
   } = lineData;
   console.log('Raw Line Page Positions: ', positions);
@@ -598,6 +643,7 @@ export const formatLinePageData = (
     collateralEvents,
     creditEvents,
     borrower: borrower.id,
+    defaultSplit,
     status: status.toLowerCase() as LineStatusTypes,
     // TODO add UsePositionMetada,
     spigotId: spigot?.id ?? '',

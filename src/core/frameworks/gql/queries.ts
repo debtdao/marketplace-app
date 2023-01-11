@@ -28,6 +28,7 @@ const BASE_LINE_FRAGMENT = gql`
     borrower {
       id
     }
+    defaultSplit
   }
 `;
 

@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { format, differenceInDays } from 'date-fns';
 
-import { prettyNumbers, formatAddress, unnullify } from '@utils';
+import { prettyNumbers, formatAddress, unnullify, humanize } from '@utils';
 import { Card, CardHeader, CardContent, Text, Icon, ChevronRightIcon } from '@components/common';
 import { TokenIcon } from '@components/app';
 import { useAppTranslation, useAppSelector } from '@hooks';
@@ -161,8 +161,7 @@ export const RecommendationsCard = ({ header, subHeader, items, ...props }: Reco
                 <Divider />
 
                 <Metric>
-                  ${prettyNumbers(unnullify('0'))} / $ {/*TODO: Need to add this functionality*/}
-                  {prettyNumbers(item.deposit)}
+                  ${humanize('amount', item.principal, 18, 2)} / ${humanize('amount', item.deposit, 18, 2)}
                 </Metric>
                 <MetricsTextContainer>
                   <MetricsText>
@@ -174,9 +173,8 @@ export const RecommendationsCard = ({ header, subHeader, items, ...props }: Reco
 
                 <ItemInfoLabel>{t('components.line-card.secured-by')}:</ItemInfoLabel>
                 <Metric>
-                  ${prettyNumbers(unnullify(item?.escrow?.collateralValue))} / ${' '}
-                  {/*TODO: Need to add this functionality*/}
-                  {prettyNumbers(unnullify('0'))}
+                  ${humanize('amount', item.escrow?.collateralValue, 18, 2)} / ${' '}
+                  {humanize('amount', item.spigot?.revenueValue, 18, 2)}
                 </Metric>
                 <MetricsTextContainer>
                   <MetricsText>

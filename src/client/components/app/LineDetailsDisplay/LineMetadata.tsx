@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
 import { prettyNumbers, getEtherscanUrlStub, unnullify, prettyNumbers2 } from '@src/utils';
 import {
+  AggregatedEscrow,
   ARBITER_POSITION_ROLE,
   BORROWER_POSITION_ROLE,
   Collateral,
@@ -123,6 +124,10 @@ interface LineMetadataProps {
   startTime: number;
   endTime: number;
   revenue?: { [token: string]: RevenueSummary };
+  minCRatio: string;
+  defaultSplit: string;
+  collateralValue: string;
+  revenueValue: string;
   deposits?: EscrowDepositMap;
   spigots?: SpigotRevenueContractMap;
   lineNetwork: Network;
@@ -172,45 +177,65 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
 
   console.log('Line Metadata props: ', props);
-  const { lineNetwork, principal, deposit, totalInterestRepaid, revenue, deposits, startTime, endTime, spigots } =
-    props;
-  const totalRevenue = isEmpty(revenue)
-    ? ''
-    : Object.values(revenue!)
-        // use historical price data for revenue
-        .reduce((sum, rev) => sum.add(BigNumber.from(rev.value)), BigNumber.from('0'))
-        // .div(BigNumber.from(1)) // scale to usd decimals
-        .toString();
+  const {
+    lineNetwork,
+    principal,
+    deposit,
+    totalInterestRepaid,
+    revenue,
+    deposits,
+    startTime,
+    endTime,
+    spigots,
+    minCRatio,
+    defaultSplit,
+    collateralValue,
+    revenueValue,
+  } = props;
 
-  const totalCollateral = isEmpty(deposits)
-    ? ''
-    : Object.values(deposits!)
-        .reduce<BigNumber>(
-          (sum: BigNumber, d) =>
-            // use current market value for tokens. if no price dont display.
-            !d || !d.token.priceUsdc ? sum : sum.add(BigNumber.from(Number(d!.token.priceUsdc) ?? '0').mul(d!.amount)),
-          BigNumber.from('0')
-        )
-        // .div(BigNumber.from(1)) // scale to usd decimals
-        .toString();
+  // const totalRevenue = isEmpty(revenue)
+  //   ? ''
+  //   : Object.values(revenue!)
+  //       // use historical price data for revenue
+  //       .reduce((sum, rev) => sum.add(BigNumber.from(rev.value)), BigNumber.from('0'))
+  //       // .div(BigNumber.from(1)) // scale to usd decimals
+  //       .toString();
+
+  // const totalCollateral = isEmpty(deposits)
+  //   ? ''
+  //   : Object.values(deposits!)
+  //       .reduce<BigNumber>(
+  //         (sum: BigNumber, d) =>
+  //           // use current market value for tokens. if no price dont display.
+  //           !d || !d.token.priceUsdc ? sum : sum.add(BigNumber.from(Number(d!.token.priceUsdc) ?? '0').mul(d!.amount)),
+  //         BigNumber.from('0')
+  //       )
+  //       // .div(BigNumber.from(1)) // scale to usd decimals
+  //       .toString();
 
   const renderEscrowMetadata = () => {
     if (!deposits) return null;
-    if (!totalCollateral)
+    if (!collateralValue)
       return (
         <MetricDataDisplay
           title={t('lineDetails:metadata.escrow.no-collateral')}
-          data={`$ ${prettyNumbers(totalCollateral)}`}
+          data={`$ ${prettyNumbers(collateralValue)}`}
         />
       );
     return (
-      <MetricDataDisplay title={t('lineDetails:metadata.escrow.total')} data={`$ ${prettyNumbers(totalCollateral)}`} />
+      <MetricDataDisplay
+        title={t('lineDetails:metadata.escrow.total')}
+        data={`$ ${humanize('amount', collateralValue, 18, 2)}`}
+      />
     );
   };
   const renderSpigotMetadata = () => {
     if (!revenue) return null;
     return (
-      <MetricDataDisplay title={t('lineDetails:metadata.revenue.total')} data={`$ ${prettyNumbers(totalRevenue)}`} />
+      <MetricDataDisplay
+        title={t('lineDetails:metadata.revenue.total')}
+        data={`$ ${humanize('amount', revenueValue, 18, 2)}`}
+      />
     );
   };
 
@@ -303,10 +328,13 @@ export const LineMetadata = (props: LineMetadataProps) => {
         {/* <MetricDataDisplay title={t('lineDetails:metadata.principal')} data={`$ ${prettyNumbers2(principal)}`} /> */}
         {/* <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${humanize('amount', deposit, 42, 2)}`} /> */}
         <MetricDataDisplay
-          title={t('lineDetails:metadata.deposit')}
+          title={t('lineDetails:metadata.principal')}
           data={`$ ${humanize('amount', principal, 18, 2)}`}
         />
-        <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${humanize('amount', deposit, 18, 2)}`} />
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.deposit')} // rename to Credit Limit
+          data={`$ ${humanize('amount', deposit, 18, 2)}`}
+        />
         <MetricDataDisplay
           title={t('lineDetails:metadata.totalInterestPaid')}
           data={`$ ${humanize('amount', totalInterestRepaid, 18, 2)}`}
@@ -315,6 +343,22 @@ export const LineMetadata = (props: LineMetadataProps) => {
         {/* <MetricDataDisplay
           title={t('lineDetails:metadata.totalInterestPaid')}
           data={`$ ${prettyNumbers(totalInterestPaid)}`}
+        /> */}
+        <MetricDataDisplay
+          title={'Revenue Split'} //{t('lineDetails:metadata.principal')}
+          data={defaultSplit + '%'}
+        />
+        <MetricDataDisplay
+          title={'Minimum Collateralization Ratio'} //{t('lineDetails:metadata.principal')}
+          data={minCRatio + '%'}
+        />
+        <MetricDataDisplay
+          title={'Collateralization Ratio'} //{t('lineDetails:metadata.principal')}
+          data={minCRatio + '%'}
+        />
+        {/* <MetricDataDisplay
+          title={''} //{t('lineDetails:metadata.principal')}
+          data={''}
         /> */}
         <MetricDataDisplay title={t('lineDetails:metadata.start')} data={startDateHumanized} />
         <MetricDataDisplay title={t('lineDetails:metadata.end')} data={endDateHumanized} />

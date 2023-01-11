@@ -88,8 +88,9 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   }, [selectedLine, ensMap]);
 
   if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
-  const { principal, deposit, totalInterestRepaid, escrow, borrower, spigot, start, end } = selectedLine;
-  console.log('Deposit State 0: ', deposit);
+  const { principal, deposit, totalInterestRepaid, escrow, borrower, spigot, start, end, defaultSplit } = selectedLine;
+  console.log('Escrow State 0: ', escrow);
+  console.log('Spigot State 0: ', spigot);
 
   console.log('line detail index lineNetwork', props.lineNetwork);
   const StandardMetadata = (metadataProps: any) => <></>;
@@ -114,6 +115,10 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
         totalInterestRepaid={totalInterestRepaid}
         startTime={start}
         endTime={end}
+        minCRatio={escrow?.minCRatio ?? '0'}
+        defaultSplit={defaultSplit}
+        collateralValue={escrow?.collateralValue ?? '0'}
+        revenueValue={spigot?.revenueValue ?? '0'}
         spigots={spigot?.spigots}
         lineNetwork={props.lineNetwork}
       />

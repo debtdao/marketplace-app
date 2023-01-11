@@ -260,6 +260,7 @@ export const formatSecuredLineData = (
     (agg: any, c) => {
       const checkSumAddress = ethers.utils.getAddress(c.token?.id);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
+      const tokenDecimals = c.token.decimals;
       return {
         principal: agg.principal.add(usdcPrice.mul(unnullify(c.principal).toString())),
         deposit: agg.deposit.add(usdcPrice.mul(unnullify(c.deposit)).toString()),
@@ -572,7 +573,6 @@ export const formatLinePageData = (
 
     // userLinesMetadataMap,
   } = lineData;
-  console.log('Raw Line Page Positions: ', positions);
   const {
     credit,
     collateralEvents,

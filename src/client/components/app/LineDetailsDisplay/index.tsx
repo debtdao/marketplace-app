@@ -72,7 +72,6 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const [borrowerID, setBorrowerId] = useState('');
-  console.log('Line Details Display: ', selectedLine);
   useEffect(() => {
     dispatch(OnchainMetaDataActions.getENS(selectedLine?.borrower!));
   }, [selectedLine]);
@@ -89,10 +88,6 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
 
   if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
   const { principal, deposit, totalInterestRepaid, escrow, borrower, spigot, start, end, defaultSplit } = selectedLine;
-  console.log('Escrow State 0: ', escrow);
-  console.log('Spigot State 0: ', spigot);
-
-  console.log('line detail index lineNetwork', props.lineNetwork);
   const StandardMetadata = (metadataProps: any) => <></>;
 
   // allow passing in core data first if we have it already and let Page data render once returned

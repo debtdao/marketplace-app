@@ -67,7 +67,6 @@ export class TokenServiceImpl implements TokenService {
   public async getSupportedOracleTokens(): Promise<SupportedOracleTokenResponse | undefined> {
     const response = getSupportedOracleTokens(undefined)
       .then((data) => {
-        console.log('Supported Tokens 3: ', data);
         return data;
       })
       .catch((err) => {

@@ -147,9 +147,6 @@ interface MetricDisplay extends Metric {
 }
 
 const MetricDataDisplay = ({ title, data, displaySubmetrics = false, submetrics }: MetricDisplay) => {
-  // const formattedData = prettyNumbers(data);
-  // const formattedData = Number(ethers.utils.formatUnits(unnullify(data, true), 6)) / 10 ** 18;
-  console.log('Metrics Display data: ', data);
   return (
     <MetricContainer>
       <MetricName>{title}</MetricName>
@@ -177,7 +174,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
 
-  console.log('Line Metadata props: ', props);
   const {
     lineNetwork,
     principal,
@@ -322,8 +318,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
 
   const startDateHumanized = format(new Date(startTime * 1000), 'MMMM dd, yyyy');
   const endDateHumanized = format(new Date(endTime * 1000), 'MMMM dd, yyyy');
-  console.log('Deposit State: ', deposit);
-  console.log('Interest State: ', totalInterestRepaid);
   return (
     <>
       <ThreeColumnLayout>

@@ -260,7 +260,7 @@ export const formatSecuredLineData = (
       // const usdcPrice = BigNumber.from(0);
       // const usdcPriceDecimals = ethers.utils.formatUnits(usdcPrice, 6);
       // const tokenPriceDecimals = c.token.decimals;
-      console.log('Formatting secured line data - math: ', usdcPrice.mul(unnullify(c.principal).toString()));
+      // console.log('Formatting secured line data - math: ', usdcPrice.mul(unnullify(c.principal).toString()));
       return {
         // lender: agg.lender.id,
         principal: agg.principal.add(usdcPrice.mul(unnullify(c.principal).toString())),

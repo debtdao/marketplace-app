@@ -100,7 +100,7 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
     const { creditLineService, onchainMetaDataService } = extra.services;
     const network = getNetwork(wallet.networkVersion);
     const tokenPrices = Object.entries(tokensMap).reduce(
-      (prices, [addy, { priceUsdc }]) => ({ ...prices, [addy]: priceUsdc }),
+      (prices, [addy, { priceUsdc }]) => ({ ...prices, [addy]: BigNumber.from(priceUsdc) }),
       {}
     );
 

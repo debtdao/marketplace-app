@@ -191,26 +191,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
     revenueValue,
   } = props;
 
-  // const totalRevenue = isEmpty(revenue)
-  //   ? ''
-  //   : Object.values(revenue!)
-  //       // use historical price data for revenue
-  //       .reduce((sum, rev) => sum.add(BigNumber.from(rev.value)), BigNumber.from('0'))
-  //       // .div(BigNumber.from(1)) // scale to usd decimals
-  //       .toString();
-
-  // const totalCollateral = isEmpty(deposits)
-  //   ? ''
-  //   : Object.values(deposits!)
-  //       .reduce<BigNumber>(
-  //         (sum: BigNumber, d) =>
-  //           // use current market value for tokens. if no price dont display.
-  //           !d || !d.token.priceUsdc ? sum : sum.add(BigNumber.from(Number(d!.token.priceUsdc) ?? '0').mul(d!.amount)),
-  //         BigNumber.from('0')
-  //       )
-  //       // .div(BigNumber.from(1)) // scale to usd decimals
-  //       .toString();
-
   const renderEscrowMetadata = () => {
     if (!deposits) return null;
     if (!collateralValue)
@@ -396,7 +376,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
             {
               key: 'value',
               header: t('lineDetails:metadata.escrow.assets-list.value'),
-              format: ({ value }) => humanize('usd', value, 2 /* 4 decimals but as percentage */, 0),
+              format: ({ value }) => `$ ${humanize('amount', value, 18, 2)}`,
               sortable: true,
               width: '20rem',
               className: 'col-value',

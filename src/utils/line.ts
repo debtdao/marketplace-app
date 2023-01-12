@@ -275,11 +275,12 @@ export const formatSecuredLineData = (
   const [collateralValue, deposits]: [BigNumber, EscrowDepositMap] = collateralDeposits.reduce(
     (agg, collateralDeposit) => {
       const checkSumAddress = ethers.utils.getAddress(collateralDeposit.token.id);
-      const usdcPrice = BigNumber.from(tokenPrices[checkSumAddress]) ?? BigNumber.from(0);
+      // const usdcPrice = BigNumber.from(tokenPrices[checkSumAddress]) ?? BigNumber.from(0);
+      const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
       return !collateralDeposit.enabled
         ? agg
         : [
-            agg[0].add(unnullify(collateralDeposit.amount).toString()).mul(usdcPrice),
+            agg[0].add(unnullify(collateralDeposit.amount, true).mul(usdcPrice)),
             {
               ...agg[1],
               [collateralDeposit.token.id]: {
@@ -437,17 +438,20 @@ export const formatLineWithEvents = (
   // Create deposit map for aggregated escrow object
   const [collateralValue, deposits]: [BigNumber, EscrowDepositMap] = lineEvents.escrow.deposits.reduce(
     (agg, collateralDeposit) => {
-      const price = unnullify(tokenPrices[collateralDeposit.token.id], true);
+      const checkSumAddress = ethers.utils.getAddress(collateralDeposit.token.id);
+      // const usdcPrice = BigNumber.from(tokenPrices[checkSumAddress]) ?? BigNumber.from(0);
+      const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
       return !collateralDeposit.enabled
         ? agg
         : [
-            agg[0].add(parseUnits(unnullify(collateralDeposit.amount).toString(), 'ether').mul(price)),
+            agg[0].add(unnullify(collateralDeposit.amount, true).mul(usdcPrice)),
             {
               ...agg[1],
               [collateralDeposit.token.id]: {
                 ...collateralDeposit,
                 type: COLLATERAL_TYPE_ASSET,
-                token: _createTokenView(collateralDeposit.token, BigNumber.from(collateralDeposit.amount), price),
+                token: _createTokenView(collateralDeposit.token, BigNumber.from(collateralDeposit.amount), usdcPrice),
+                value: formatUnits(unnullify(collateralDeposit.amount, true).mul(usdcPrice).toString(), 6).toString(),
               },
             },
           ];
@@ -526,10 +530,6 @@ export const formatLineWithEvents = (
     collateralValue: formatUnits(unnullify(collateralValue), 6).toString(),
     cratio: escrow!.cratio,
     minCRatio: escrow!.minCRatio,
-    // TODO: add this in later
-    // cratio: parseUnits(unnullify(credit.principal).toString(), 'ether').eq(0)
-    // ? '0'
-    // : collateralValue.div(unnullify(credit.principal).toString()).toString(),
     events: escrowCollateralEvents,
     deposits,
   };

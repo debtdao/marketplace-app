@@ -105,13 +105,13 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
     );
 
     // ensure consistent ordering of categories
-    console.log('Categories: ', categories);
     const categoryKeys = Object.keys(categories);
     const promises = await Promise.all(
       categoryKeys
         .map((k) => categories[k])
         .map((params: GetLinesArgs) => creditLineService.getLines({ network, ...params }))
     );
+    console.log('Promises: ', promises);
 
     const { linesData, allBorrowers } = categoryKeys.reduce(
       ({ linesData, allBorrowers }: MarketPageData, category: string, i: number): MarketPageData => {

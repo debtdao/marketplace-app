@@ -78,12 +78,7 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
 
   useEffect(() => {
     const ensName = getENS(selectedLine?.borrower!, ensMap);
-
-    if (!ensName) {
-      setBorrowerId(selectedLine?.borrower!);
-    } else {
-      setBorrowerId(ensName);
-    }
+    setBorrowerId(ensName!);
   }, [selectedLine, ensMap]);
 
   if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;

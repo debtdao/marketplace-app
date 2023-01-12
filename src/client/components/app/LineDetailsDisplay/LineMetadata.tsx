@@ -345,11 +345,11 @@ export const LineMetadata = (props: LineMetadataProps) => {
               key: 'token',
               header: t('lineDetails:metadata.escrow.assets-list.symbol'),
               transform: ({ token: { symbol, icon, address } }) => (
-                <a href={getEtherscanUrlStub(network) + `${address}`} target={'_blank'} rel={'noreferrer'}>
+                <Link to={getEtherscanUrlStub(network) + `${address}`}>
                   {icon && <TokenIcon icon={icon} symbol={symbol} />}
                   <Text>{symbol}</Text>
                   <RedirectLinkIcon />
-                </a>
+                </Link>
               ),
               width: '15rem',
               sortable: true,

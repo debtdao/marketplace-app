@@ -97,22 +97,7 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
           </BorrowerName>
         </RouterLink>
       </Header>
-      <LineMetadata
-        revenue={spigot?.revenueSummary}
-        deposits={escrow?.deposits}
-        deposit={deposit}
-        principal={principal}
-        totalInterestRepaid={totalInterestRepaid}
-        startTime={start}
-        endTime={end}
-        minCRatio={escrow?.minCRatio ?? 0}
-        cratio={escrow?.cratio ?? '0'}
-        defaultSplit={defaultSplit}
-        collateralValue={escrow?.collateralValue ?? '0'}
-        revenueValue={spigot?.revenueValue ?? '0'}
-        spigots={spigot?.spigots}
-        lineNetwork={props.lineNetwork}
-      />
+      <LineMetadata />
 
       {positions && <PositionsTable positions={_.values(positions)} />}
     </Container>

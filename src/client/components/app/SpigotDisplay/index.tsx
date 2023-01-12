@@ -104,7 +104,7 @@ export const SpigotDisplay = () => {
       <Header>
         <RouterLink to={`${explorerUrl}/address/${borrowerID}`} key={borrowerID} selected={false}>
           <BorrowerName>
-            {t('lineDetails:metadata.borrower')} {'  :  '} {borrowerID}
+            {t('spigot:metadata.borrower')} {'  :  '} {borrowerID}
             <Redirect />
           </BorrowerName>
         </RouterLink>

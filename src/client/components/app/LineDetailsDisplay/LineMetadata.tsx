@@ -321,8 +321,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
   return (
     <>
       <ThreeColumnLayout>
-        {/* <MetricDataDisplay title={t('lineDetails:metadata.principal')} data={`$ ${prettyNumbers2(principal)}`} /> */}
-        {/* <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${humanize('amount', deposit, 42, 2)}`} /> */}
         <MetricDataDisplay
           title={t('lineDetails:metadata.principal')}
           data={`$ ${humanize('amount', principal, 18, 2)}`}
@@ -332,44 +330,19 @@ export const LineMetadata = (props: LineMetadataProps) => {
           data={`$ ${humanize('amount', deposit, 18, 2)}`}
         />
         <MetricDataDisplay
-          title={t('lineDetails:metadata.totalInterestPaid')}
+          title={t('lineDetails:metadata.total-interest-paid')}
           data={`$ ${humanize('amount', totalInterestRepaid, 18, 2)}`}
         />
-        {/* <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${prettyNumbers2(deposit)}`} /> */}
-        {/* <MetricDataDisplay
-          title={t('lineDetails:metadata.totalInterestPaid')}
-          data={`$ ${prettyNumbers(totalInterestPaid)}`}
-        /> */}
-        <MetricDataDisplay
-          title={'Revenue Split'} //{t('lineDetails:metadata.principal')}
-          data={defaultSplit + '%'}
-        />
-        <MetricDataDisplay
-          title={'Minimum Collateralization Ratio'} //{t('lineDetails:metadata.principal')}
-          data={minCRatio + '%'}
-        />
-        <MetricDataDisplay
-          title={'Collateralization Ratio'} //{t('lineDetails:metadata.principal')}
-          data={cratio + '%'}
-        />
-        {/* <MetricDataDisplay
-          title={''} //{t('lineDetails:metadata.principal')}
-          data={''}
-        /> */}
+        <MetricDataDisplay title={t('lineDetails:metadata.revenue-split')} data={defaultSplit + '%'} />
+        <MetricDataDisplay title={t('lineDetails:metadata.min-cratio')} data={minCRatio + '%'} />
+        <MetricDataDisplay title={t('lineDetails:metadata.cratio')} data={cratio + '%'} />
         <MetricDataDisplay title={t('lineDetails:metadata.start')} data={startDateHumanized} />
         <MetricDataDisplay title={t('lineDetails:metadata.end')} data={endDateHumanized} />
       </ThreeColumnLayout>
       <SectionHeader>
         {t('lineDetails:metadata.secured-by')}
-        {/* <CollateralTypeName to={`/spigots/${lineNetwork}/${selectedLine?.spigotId}`}> */}
-        {/* <CollateralTypeName to={`/lines/${lineNetwork}/${selectedLine?.id}/spigots/${selectedLine?.spigotId}`}>
-          {' '}
-          {t(`lineDetails:metadata.revenue.title`)}{' '}
-        </CollateralTypeName> */}
         {t(`lineDetails:metadata.revenue.title`)} {' + '}
-        {/* uncomment when escrow page made:
-          <CollateralTypeName to={'/spigot/' + selectedLine?.escrowId}> */}{' '}
-        {t(`lineDetails:metadata.escrow.title`)} {/* </CollateralTypeName> */}
+        {t(`lineDetails:metadata.escrow.title`)}
       </SectionHeader>
 
       {!revenue && !deposits && <MetricName>{t('lineDetails:metadata.unsecured')}</MetricName>}
@@ -382,7 +355,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
       <ViewContainer>
         <SectionHeader>{t('lineDetails:metadata.escrow.assets-list.title')}</SectionHeader>
         <AssetsListCard
-          header={' '} //{t('lineDetails:metadata.escrow.assets-list.title')}
+          header={' '}
           data-testid="line-assets-list"
           metadata={[
             {

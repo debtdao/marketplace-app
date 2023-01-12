@@ -1,6 +1,7 @@
 {
   "claim-revenue": "Claim Revenue",
   "metadata": {
+    "borrower": "Borrower",
     "revenue": {
       "no-revenue": "",
       "per-month": "",

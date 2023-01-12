@@ -39,7 +39,7 @@ import { TxAddressInput } from './components/TxAddressInput';
 import { TxByteInput } from './components/TxByteInput';
 import { Header, TxFuncSelector } from './components/TxFuncSelector';
 import { TxNumberInput } from './components/TxNumberInput';
-import { GenerateClaimRevenueInputs } from './components/GenerateClaimRevenueInputs';
+import { GenerateClaimRevenueInputs } from './components/TxClaimRevenueInputs';
 
 const {
   CONTRACT_ADDRESSES: { ETH },
@@ -228,13 +228,11 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
 
   const generateInputFields = () => {
     if (funcInputs.length === 0) {
-      return <></>;
+      return null;
     }
-    const inputFieldsHTML = [];
-    for (let i = 0; i < funcInputs.length; i++) {
-      const input = funcInputs[i];
+    const inputFieldsHTML = funcInputs.map((input, i) => {
       if (input.type.includes('int')) {
-        inputFieldsHTML.push(
+        return (
           <TxNumberInput
             headerText={input.name}
             amount={userFuncInputs[input.name] ?? ''}
@@ -244,7 +242,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
         );
       }
       if (input.type === 'address') {
-        inputFieldsHTML.push(
+        return (
           <TxAddressInput
             headerText={input.name}
             address={userFuncInputs[input.name] ?? ''}
@@ -253,7 +251,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
         );
       }
       if (input.type === 'bytes') {
-        inputFieldsHTML.push(
+        return (
           <TxByteInput
             headerText={input.name}
             byteCode={userFuncInputs[input.name] ?? ''}
@@ -261,7 +259,8 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
           />
         );
       }
-    }
+      return null;
+    });
 
     const mergedInputFieldsHTML = (
       <React.Fragment>

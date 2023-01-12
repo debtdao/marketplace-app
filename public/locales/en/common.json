@@ -17,7 +17,7 @@
     "positions-card": {
       "line": "Line",
       "positions": "Positions",
-      "drate": "Draw Down Rate",
+      "drate": "Drawn Down Rate",
       "frate": "Facility Rate",
       "total-deposits": "Supplied",
       "token": "Token",

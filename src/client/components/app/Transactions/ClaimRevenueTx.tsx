@@ -220,8 +220,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
 
   const handleInputChange = (name: string, type: string, value: any) => {
     console.log('handle input change', name, value);
-    let newUserFuncInputs = { ...userFuncInputs };
-    newUserFuncInputs[name] = value;
+    const newUserFuncInputs = { ...userFuncInputs, [name]: value };
     setUserFuncInputs(newUserFuncInputs);
     console.log('handle input change: ', userFuncInputs);
   };

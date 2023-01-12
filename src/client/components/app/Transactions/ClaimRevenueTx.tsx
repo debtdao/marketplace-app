@@ -250,7 +250,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
           />
         );
       }
-      if (input.type === 'bytes') {
+      if (input.type === 'bytes' || input.type.includes('bytes')) {
         return (
           <TxByteInput
             headerText={input.name}

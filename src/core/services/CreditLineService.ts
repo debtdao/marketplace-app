@@ -41,6 +41,7 @@ import { getConfig } from '@config';
 import { SecuredLineABI } from '@services/contracts';
 import { getContract } from '@frameworks/ethers';
 import { getLineEvents, getLinePage, getLines, getUserPortfolio } from '@frameworks/gql';
+import { decodeErrorData } from '@src/utils/decodeError';
 
 const { GRAPH_API_URL } = getConfig();
 
@@ -198,6 +199,10 @@ export class CreditLineServiceImpl implements CreditLineService {
         await this.executeContractMethod(props.lineAddress, 'depositAndRepay', [props.amount], props.network)
       );
     } catch (e) {
+      console.log(e);
+      const txnData = JSON.parse(JSON.stringify(e)).transaction.data;
+      console.log('Just the error 1', txnData);
+      decodeErrorData(txnData);
       console.log(`An error occured while depositAndRepay credit, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
     }

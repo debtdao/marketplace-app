@@ -1,0 +1,65 @@
+[
+    {
+      "inputs": [],
+      "name": "BadToken",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "EthSentWithERC20",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "RefundEthFailed",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "SendingEthFailed",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "TransferFailed",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "RefundIssued",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "getBalance",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ]

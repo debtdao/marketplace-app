@@ -7,7 +7,7 @@
   "rules": {
     "prettier/prettier": "error",
     "no-console": "off",
-    "react-hooks/exhaustive-deps": "warn",
+    "react-hooks/exhaustive-deps": "off",
     "import/order": ["error", {
       "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
       "newlines-between": "always"

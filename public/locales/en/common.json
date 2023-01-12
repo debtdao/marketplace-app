@@ -198,6 +198,7 @@
       "deploy-line": {
         "header": "Deploy Credit Line",
         "select-borrower": "1. Insert a borrower for the line",
+        "borrower-address-text": "Borrower Address",
         "select-ttl": "2. Insert a deadline for the line",
         "time-to-live": "Time this line will remain active for (in days):",
         "cratio": "3. Select a Collateralization Ratio",
@@ -261,6 +262,7 @@
         "header":"Enable Spigot",
         "select-function": "Select Function",
         "revenue-contract": "1. Revenue Contract",
+        "revenue-token-to-claim": "2. Revenue Token to Claim",
         "function-revenue": "3. Select function to claim revenue",
         "function-transfer": "2. Select function to transfer ownership of revenue contract",
         "cta": "Enable Spigot",

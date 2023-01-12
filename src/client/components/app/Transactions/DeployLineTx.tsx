@@ -204,7 +204,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       <TxAddressInput
         key={'credit-input'}
         headerText={t('components.transaction.deploy-line.select-borrower')}
-        inputText={'Borrower Address'}
+        inputText={t('components.transaction.deploy-line.borrower-address-text')}
         onAddressChange={onBorrowerAddressChange}
         address={borrowerAddress}
         // creditOptions={sourceCreditOptions}
@@ -257,21 +257,6 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       ) : (
         <h6>You should not deploy a line without discussing terms.</h6>
       )}
-      {/* <SectionContent>
-        <>
-          Advanced Mode
-          <ToggleButton
-            selected={advancedMode}
-            setSelected={() => toggleSecuredMode()}
-            className=""
-            disabled={false}
-            color=""
-            onClick={() => {}}
-            ariaLabel=""
-          />
-        </>
-      </SectionContent> */}
-
       <TxActions>
         <TxActionButton
           key={''}

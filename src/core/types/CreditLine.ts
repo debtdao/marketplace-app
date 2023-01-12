@@ -141,14 +141,6 @@ export interface Collateral {
   amount: string;
   value: string;
 }
-// id: Address;
-// active: boolean;
-// contract: Address;
-// startTime: number;
-// ownerSplit: number;
-// escrowed: string;
-// totalVolumeUsd: string;
-// events?: SpigotEvents[];
 
 export interface BaseEscrow extends BaseCollateralModule {
   id: Address;
@@ -215,10 +207,6 @@ export interface MarketPageData {
   linesData: MarketLines;
   allBorrowers: string[];
 }
-
-// export interface LinePageSpigot extends AggregatedSpigot {
-//   spigots?: { [address: string]: SpigotRevenueContract };
-// }
 
 export type CollateralModule = AggregatedEscrow | AggregatedSpigot;
 export type CollateralMap = { [address: string]: CollateralModule };

@@ -81,8 +81,6 @@ export const Spigot = () => {
 
   const generalLoading = appStatus.loading;
   const { id, line, revenueSummary } = selectedSpigot;
-  // getSpigotPageStatus.loading ||
-  // tokensStatus.loading;
 
   // critical thing is to setup claimRevenue for push payments
   return (

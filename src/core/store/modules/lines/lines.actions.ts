@@ -111,7 +111,6 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
         .map((k) => categories[k])
         .map((params: GetLinesArgs) => creditLineService.getLines({ network, ...params }))
     );
-    console.log('Promises: ', promises);
 
     const { linesData, allBorrowers } = categoryKeys.reduce(
       ({ linesData, allBorrowers }: MarketPageData, category: string, i: number): MarketPageData => {
@@ -149,7 +148,6 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
       if (selectedLine.creditEvents.length === 0 && selectedLine.collateralEvents.length === 0) {
         const lineEvents = await creditLineService.getLineEvents({ network, id });
         console.log('selected line events: ', lineEvents, network, id);
-        // TODO: Add spigot.spigots into formatLineWithEvents function
         const selectedLineWithEvents = formatLineWithEvents(selectedLine, lineEvents, tokenPrices);
         console.log('selected line with events 1: ', selectedLineWithEvents);
         return { linePageData: selectedLineWithEvents };

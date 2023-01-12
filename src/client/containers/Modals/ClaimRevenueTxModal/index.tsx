@@ -6,8 +6,8 @@ import { ModalTx } from '@components/common';
 import { ClaimRevenueTx } from '@components/app';
 
 const StyledClaimRevenueTxModal = styled(ModalTx)``;
+
 export interface ClaimRevenueTxModalProps {
-  // revenueContractAddress?: string;
   onClose: () => void;
 }
 

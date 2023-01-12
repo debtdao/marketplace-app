@@ -85,14 +85,6 @@ const RedirectLinkIcon = styled(RedirectIcon)`
   padding-bottom: 0.2rem;
 `;
 
-// const CollateralContainer = styled.div`
-//   ${({ theme }) => `
-//     display: flex;
-//     padding-bottom: ${theme.spacing.xl};
-//     gap: ${theme.spacing.xl};
-//   `}
-// `;
-
 const AssetsListCard = styled(DetailCard)`
   max-width: ${({ theme }) => theme.globalMaxWidth};
   padding: ${({ theme }) => theme.card.padding};
@@ -244,7 +236,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
   };
 
   const allCollateral: Collateral[] = [...Object.values(deposits ?? {}), ...Object.values(revenue ?? {})];
-  // const allCollateral: Collateral[] = [...Object.values(deposits ?? {}), ...Object.values(spigots ?? {})];
 
   const getCollateralRowActionForRole = (role: string) => {
     switch (role) {
@@ -354,7 +345,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
               key: 'token',
               header: t('lineDetails:metadata.escrow.assets-list.symbol'),
               transform: ({ token: { symbol, icon, address } }) => (
-                //TODO: change to etherscan on launch
                 <a href={getEtherscanUrlStub(network) + `${address}`} target={'_blank'} rel={'noreferrer'}>
                   {icon && <TokenIcon icon={icon} symbol={symbol} />}
                   <Text>{symbol}</Text>

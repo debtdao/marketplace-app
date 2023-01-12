@@ -250,7 +250,6 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
   ];
   const txActions = userMetadata.role === BORROWER_POSITION_ROLE ? escrowCollateralSettings : [];
 
-  // TODO: populate selectedCollateralAsset based on row in table being clicked on
   console.log('selected collat', selectedCollateralAsset);
   if (!selectedCollateralAsset) return null;
   const tokenView = _.find(allCollateralOptions, (t) => t.address === selectedCollateralAsset.address);

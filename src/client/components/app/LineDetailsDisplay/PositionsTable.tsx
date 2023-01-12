@@ -137,8 +137,6 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
   };
 
   const withdrawHandler = (position?: string) => {
-    console.log('withdraw handler position: ', position);
-    console.log('withdraw handler selectedLine: ', selectedLine);
     if (!position) return;
     dispatch(LinesActions.setSelectedLinePosition({ position }));
     dispatch(ModalsActions.openModal({ modalName: 'withdraw' }));
@@ -223,7 +221,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
       <ViewContainer>
         <PositionsCard
-          header={''} //{t('components.positions-card.positions')}
+          header={''}
           data-testid="vaults-opportunities-list"
           metadata={[
             {
@@ -328,9 +326,9 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
             ),
             actions: <ActionButtons value={position.id} actions={getUserPositionActions(position)} />,
           }))}
-          // TODO: Add search bar back when there is a need for it.
           SearchBar={
             <>
+              {/* // TODO: Add search bar back when there is a need for it. */}
               {/* <Input
                 value={''}
                 onChange={(e) => console.log(e)}

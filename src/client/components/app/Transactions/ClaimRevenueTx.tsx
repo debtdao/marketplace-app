@@ -57,19 +57,9 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
   const { header, onClose } = props;
   const [targetTokenAmount, setTargetTokenAmount] = useState('10000000');
   const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
-  // const selectedRevenueContract = useAppSelector(CollateralSelectors.selectSelectedRevenueContractAddress);
-
-  // TODO: Comment out hard-coded DPI revenue contract address
   const { revenueContractAddress: selectedRevenueContract } = useAppSelector(ModalSelectors.selectActiveModalProps);
-  // DPI revenue contract
-  // const selectedRevenueContract = '0x1494ca1f11d487c2bbe4543e90080aeba4ba3c2b';
-
-  console.log('ClaimRevenueTx - selectedRevenueContract: ', selectedRevenueContract);
-  // const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
-  console.log('Selected Spigot: ', selectedSpigot);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const [claimData, setClaimData] = useState('');
-  //const [revContract, setRevContract] = useState(selectedRevenueContract ?? '');
   const contractABI = useAppSelector(OnchainMetaDataSelector.selectABI);
   const selectedContractFunctions = useAppSelector(OnchainMetaDataSelector.selectFunctions);
   const [claimFuncType, setClaimFuncType] = useState({ id: '', label: '', value: '' });
@@ -98,7 +88,6 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
 
   useEffect(() => {
     // @cleanup would be great to just do this inside the selectors so we dont have hooks everywhere for same thing
-    console.log('how many renders');
     console.log('use effct #1', selectedTokenAddress, selectedSellToken);
     if (!selectedSellToken) {
       dispatch(
@@ -112,37 +101,15 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
       console.log('set tkn addr', selectedSellToken);
       setSelectedTokenAddress(selectedSellToken.address);
     }
-    // }, [dispatch, selectedSellToken, selectedTokenAddress, sourceAssetOptions]);
   }, [selectedSellToken, selectedTokenAddress]);
 
   console.log('selected revenue contract: ', selectedRevenueContract);
-  // useEffect(() => {
-  //   console.log('am I here 1?');
-  //   if (isValidAddress(selectedRevenueContract)) {
-  //     console.log('am I here 2?');
-  //     dispatch(OnchainMetaDataActions.getABI(selectedRevenueContract));
-  //     // change state of something
-  //   }
-  // }, []);
-  // }, [selectedRevenueContract, didFetchAbi]);
-  // console.log('am I here selected revenue contract?');
-
-  //console.log('selected tokens #2', selectedSellToken, selectedSellTokenAddress);
 
   const onSelectedSellTokenChange = (tokenAddress: string) => {
     console.log('set token', tokenAddress);
     setTargetTokenAmount('');
     dispatch(TokensActions.setSelectedTokenAddress({ tokenAddress }));
   };
-
-  // const onRevContractChange = (address: string) => {
-  //   console.log('on rev cont chng', address);
-
-  //   setRevContract(address);
-  //   if (address?.length == 42 && getAddress(address)) {
-  //     dispatch(CollateralActions.setSelectedRevenueContract({ contractAddress: getAddress(address) }));
-  //   }
-  // };
 
   // Event Handlers
 
@@ -223,7 +190,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
 
   if (!selectedSellToken && !selectedTokenAddress) return null;
 
-  // TODO: Get rid of this dead function.
+  // TODO: Autopopulate claimFunc in modal so this function can be deprecated.
   const onClaimFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
     const funcInputs = generateClaimFuncInputs(newFunc.label, contractABI[selectedRevenueContract]!);
     console.log('Func Inputs: ', funcInputs);
@@ -325,7 +292,6 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
   // setClaimFuncType(selectedFunc);
 
   return (
-    // <div />
     <StyledTransaction onClose={onClose} header={header}>
       <TxAddressInput
         headerText={t('components.transaction.enable-spigot.revenue-contract')}
@@ -333,12 +299,13 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
         //onAddressChange={onRevContractChange}
       />
       <TxTokenInput
-        headerText={t('components.transaction.claim-revenue.rev-token-input-header')}
+        headerText={t('components.transaction.enable-spigot.revenue-token-to-claim')}
         selectedToken={selectedSellToken!}
         onSelectedTokenChange={onSelectedSellTokenChange}
         tokenOptions={sourceAssetOptions}
-        amount="0" // todo simulate how many tokens will be claimed and add value here
+        amount="0"
         readOnly={true}
+        hideAmount={true}
       />
 
       {isVerifiedContract ? (

@@ -82,9 +82,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
 
   // @cleanup CollateralSelectors.selectedCollateralAsset
   const selectedAssetAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress) || TOKEN_ADDRESSES.DAI;
-  console.log('Selected Collateral Address: ', selectedAssetAddress);
 
-  //const enabledCollateralAddressess = _.values(selectedLine?.escrow?.deposits)?.map((d) => d.token.address);
   // @cleanup TODO pull colalteralOptions from subgraph instread of default yearn tokens
   const collateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
   const selectedAsset =
@@ -100,25 +98,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
     }
   });
 
-  // useEffect(() => {
-  //   if (!selectedSellToken) {
-  //     dispatch(
-  //       TokensActions.setSelectedTokenAddress({
-  //         tokenAddress: sourceAssetOptions[0].address,
-  //       })
-  //     );
-  //   }
-  //   if (!selectedTokenAddress && selectedSellToken) {
-  //     setSelectedTokenAddress(selectedSellToken.address);
-  //   }
-
-  //   if (!selectedCredit || !selectedSellToken) {
-  //     return;
-  //   }
-  // }, [selectedSellToken, walletNetwork]);
-
   useEffect(() => {
-    console.log('add position tx useEffect token/creditLine', selectedAsset, selectedLine);
     if (collateralOptions.length > 0 && !selectedAsset) {
       dispatch(
         TokensActions.setSelectedTokenAddress({
@@ -145,7 +125,6 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
   const setSelectedAsset = (assetAddress: string) => {
     dispatch(CollateralActions.setSelectedCollateralAsset({ assetAddress }));
     setSelectedCollateralAssetAddress(assetAddress);
-    console.log('Selected Collateral Address 2: ', assetAddress);
   };
 
   if (collateralOptions.length === 0) {

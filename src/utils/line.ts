@@ -40,7 +40,6 @@ import {
   AggregatedSpigot,
   SpigotEventFragResponse,
   SpigotRevenueContractFragResponse,
-  // LinePageSpigot,
   SpigotRevenueContract,
   SpigotRevenueContractMap,
 } from '@types';
@@ -187,14 +186,10 @@ export function formatGetLinesData(
       escrowRes?.id ?? '',
       positions,
       events,
-      // escrowRes?.deposits ?? [],
-      // spigotRes?.revenues ?? [],
       escrowRes,
       spigotRes,
       tokenPrices
     );
-    // const deposits = escrowRes?.deposits.map((d: any) => ({ ...d, token: d.token.id }));
-    // formatAggData (positions, deposits, summaries);
 
     return {
       ...rest,
@@ -275,7 +270,6 @@ export const formatSecuredLineData = (
   const [collateralValue, deposits]: [BigNumber, EscrowDepositMap] = collateralDeposits.reduce(
     (agg, collateralDeposit) => {
       const checkSumAddress = ethers.utils.getAddress(collateralDeposit.token.id);
-      // const usdcPrice = BigNumber.from(tokenPrices[checkSumAddress]) ?? BigNumber.from(0);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
       return !collateralDeposit.enabled
         ? agg
@@ -439,7 +433,6 @@ export const formatLineWithEvents = (
   const [collateralValue, deposits]: [BigNumber, EscrowDepositMap] = lineEvents.escrow.deposits.reduce(
     (agg, collateralDeposit) => {
       const checkSumAddress = ethers.utils.getAddress(collateralDeposit.token.id);
-      // const usdcPrice = BigNumber.from(tokenPrices[checkSumAddress]) ?? BigNumber.from(0);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
       return !collateralDeposit.enabled
         ? agg
@@ -571,7 +564,6 @@ export const formatLinePageData = (
     events,
     defaultSplit,
     ...metadata
-
     // userLinesMetadataMap,
   } = lineData;
   const {

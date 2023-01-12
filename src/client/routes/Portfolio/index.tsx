@@ -126,8 +126,6 @@ export const Portfolio = () => {
     }
   }, [userPortfolio, selectedRole]);
 
-  console.log('portfolio page - selectedRole', selectedRole);
-  console.log('portfolio page - selectedline', lineAddress);
   return (
     <StyledViewContainer>
       <PortfolioHeader>

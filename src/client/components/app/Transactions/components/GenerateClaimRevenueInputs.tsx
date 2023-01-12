@@ -20,10 +20,6 @@ export const GenerateClaimRevenueInputs: FC<FunctionInputs> = ({ funcInputs }) =
     return 'placeholder';
   };
 
-  // handleChange(name) {
-  //   this.setState({name: target.value});
-  // }
-
   if (!funcInputs || funcInputs.length === 0) {
     return <></>;
   }
@@ -32,12 +28,6 @@ export const GenerateClaimRevenueInputs: FC<FunctionInputs> = ({ funcInputs }) =
   for (let i = 0; i < funcInputs.length; i++) {
     const input = funcInputs[i];
     if (input.type.includes('int')) {
-      // const inputName = input.name;
-      // const setInputName = 'set' + input.name;
-      // eval(inputName);
-      // eval(setInputName);
-      // const [] = useState<ParamType>({});
-      // const [[input.name], ['set' + input.name]] = useState(input.type);
       inputFieldsHTML.push(<TxNumberInput headerText={input.name} amount={''} onInputChange={claimRevenue} />);
     }
     if (input.type === 'address') {

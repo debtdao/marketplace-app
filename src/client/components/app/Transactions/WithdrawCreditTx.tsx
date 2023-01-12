@@ -43,8 +43,6 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
   const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
 
-  console.log('withdraw modal selectedCredit: ', selectedCredit);
-  console.log('withdraw modal selectedPosition: ', selectedPosition);
   //Calculate maximum withdraw amount, then humanize for readability
   const getMaxWithdraw = () => {
     if (!selectedPosition) {

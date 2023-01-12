@@ -48,12 +48,8 @@ export const LineDetail = () => {
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
   const tokensStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
-  // const selectedLineCreditEvents = useAppSelector(LinesSelectors.selectSelectedLineCreditEvents);
   const getLinePageStatus = useAppSelector(LinesSelectors.selectGetLinePageStatus);
-  // const linesPageData = useAppSelector(LinesSelectors.selectLinePageData);
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
-  //const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
-  //const walletName = useAppSelector(WalletSelectors.selectWallet);
   const currentNetworkSettings = NETWORK_SETTINGS[currentNetwork];
 
   useEffect(() => {
@@ -65,7 +61,7 @@ export const LineDetail = () => {
 
     dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineAddress }));
     dispatch(LinesActions.getLinePage({ id: lineAddress }));
-    // TODO: Why did Kiba put this here? It makes it so you cannot grab the selectedLine when you switch to a new page.
+    // TODO: Why is this here? It makes it so you cannot grab the selectedLine when you switch to a new page.
     // return () => {
     //   dispatch(LinesActions.clearSelectedLine());
     // };

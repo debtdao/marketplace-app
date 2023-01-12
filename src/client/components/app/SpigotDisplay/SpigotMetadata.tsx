@@ -16,7 +16,7 @@ import {
   TokenView,
 } from '@src/core/types';
 import { DetailCard, ActionButtons, TokenIcon, ViewContainer, Container } from '@components/app';
-import { Button, Text, RedirectIcon } from '@components/common';
+import { Button, Text, RedirectIcon, Link } from '@components/common';
 import {
   LinesSelectors,
   ModalsActions,
@@ -146,6 +146,7 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
   const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const etherscanUrl = getEtherscanUrlStub(network);
   const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
+  const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
 
   useEffect(() => {
     if (!selectedSpigot || !selectedSpigot.spigots) return;
@@ -156,7 +157,7 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
       const revenueContract = spigots[id].contract;
       dispatch(OnchainMetaDataActions.getABI(revenueContract));
     }
-  }, [selectedSpigot]);
+  }, [selectedSpigot, walletNetwork]);
 
   // if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
   if (!selectedSpigot) return <Container>{t('lineDetails:line.no-data')}</Container>;
@@ -217,10 +218,10 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
               key: 'contract',
               header: 'Contract Address', //t('lineDetails:metadata.escrow.assets-list.contract'),
               transform: ({ contract }) => (
-                <a href={etherscanUrl + `${contract}`} target={'_blank'} rel={'noreferrer'}>
+                <Link to={etherscanUrl + `${contract}`}>
                   <Text>{formatAddress(getENS(contract, ensMap)!)}</Text>
                   <RedirectLinkIcon />
-                </a>
+                </Link>
               ),
               width: '16rem',
               sortable: true,
@@ -230,9 +231,9 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
               key: 'token',
               header: 'Contract Symbol', //t('lineDetails:metadata.escrow.assets-list.symbol'),
               transform: ({ contract }) => (
-                <a href={etherscanUrl + `${contract}`} target={'_blank'} rel={'noreferrer'}>
+                <Link to={etherscanUrl + `${contract}`}>
                   <Text>{tokensMap[formatAddress(contract)] ? tokensMap[formatAddress(contract)].symbol : 'N/A'}</Text>
-                </a>
+                </Link>
               ),
               width: '15rem',
               sortable: true,

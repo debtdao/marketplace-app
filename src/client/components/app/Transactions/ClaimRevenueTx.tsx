@@ -92,7 +92,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
     if (!selectedSellToken) {
       dispatch(
         TokensActions.setSelectedTokenAddress({
-          tokenAddress: selectedTokenAddress ? selectedTokenAddress : sourceAssetOptions[0].address,
+          tokenAddress: selectedTokenAddress ? selectedTokenAddress : sourceAssetOptions[0]?.address,
         })
       );
     }
@@ -207,11 +207,11 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
     isValidAddress(selectedRevenueContract) &&
     contractABI &&
     selectedContractFunctions[selectedRevenueContract] !== undefined &&
-    Array.from(Object.values(selectedContractFunctions[selectedRevenueContract]))!.length !== 0;
+    Object.values(selectedContractFunctions[selectedRevenueContract])!.length !== 0;
 
   const funcOptions = !selectedContractFunctions[selectedRevenueContract]
     ? []
-    : Array.from(Object.values(selectedContractFunctions[selectedRevenueContract])).map((func, i) => ({
+    : Object.values(selectedContractFunctions[selectedRevenueContract]).map((func, i) => ({
         id: i.toString(),
         label: func,
         value: '',

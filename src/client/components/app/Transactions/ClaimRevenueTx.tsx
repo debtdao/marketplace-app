@@ -315,6 +315,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
             selectedType={claimFuncType}
             onSelectedTypeChange={onClaimFuncSelection}
           />
+          {generateInputFields()}
         </>
       ) : (
         // if no ABI, input bytecode manually
@@ -329,7 +330,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
           />
         </>
       )}
-      {generateInputFields()}
+      {/* {generateInputFields()} */}
       {/* <GenerateClaimRevenueInputs funcInputs={funcInputs} /> */}
       <TxActions>
         <TxActionButton

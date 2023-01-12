@@ -104,8 +104,12 @@ export const Layout: FC = ({ children }) => {
   const previousNetwork = usePrevious(currentNetwork);
   const userWalletAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
 
+  // TODO: update how we get page name for a path to be more dynamic
   // const path = useAppSelector(({ route }) => route.path);
-  const path = location.pathname.toLowerCase().split('/')[1] as Route;
+  const path = location.pathname.toLowerCase().includes('spigot')
+    ? ('spigot' as Route)
+    : (location.pathname.toLowerCase().split('/')[1] as Route);
+
   const isLedgerLive = partner.id === 'ledger';
   const isIframe = isInIframe();
   const hideControls = isIframe || isLedgerLive;

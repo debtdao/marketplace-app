@@ -57,6 +57,9 @@ export const Spigot = () => {
   const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
+  const { NETWORK_SETTINGS } = getConfig();
+  const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
+  const currentNetworkSettings = NETWORK_SETTINGS[currentNetwork];
 
   useEffect(() => {
     if (!spigotAddress || !isValidAddress(spigotAddress)) {
@@ -77,21 +80,28 @@ export const Spigot = () => {
     };
   }, [spigotAddress]);
 
-  if (!selectedSpigot) return null;
-
   const generalLoading = appStatus.loading;
-  const { id, line, revenueSummary } = selectedSpigot;
 
   // critical thing is to setup claimRevenue for push payments
   return (
     <SpigotView>
       <SpigotDisplay />
-      {line ? (
+      {lineAddress ? (
         <Button>
-          <Link to={`/lines/${network}/${line}`}>{t('Back to Line of Credit')}</Link>
+          <Link to={`/lines/${network}/${lineAddress}`}>{t('Back to Line of Credit')}</Link>
         </Button>
       ) : null}
       {generalLoading && <SpinnerLoading flex="1" width="100%" height="20%" />}
+      {!generalLoading && !selectedSpigot && (
+        <StyledSliderCard
+          header={t('spigot:no-spigot-supported-card.header', { network: currentNetworkSettings.name })}
+          Component={
+            <Text>
+              <p>{t('spigot:no-spigot-supported-card.content')}</p>
+            </Text>
+          }
+        />
+      )}
     </SpigotView>
   );
 };

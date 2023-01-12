@@ -109,22 +109,6 @@ const AssetsListCard = styled(DetailCard)`
     }
   }
 ` as typeof DetailCard;
-interface LineMetadataProps {
-  principal: string;
-  deposit: string;
-  totalInterestRepaid: string;
-  startTime: number;
-  endTime: number;
-  revenue?: { [token: string]: RevenueSummary };
-  minCRatio: number;
-  cratio: string;
-  defaultSplit: string;
-  collateralValue: string;
-  revenueValue: string;
-  deposits?: EscrowDepositMap;
-  spigots?: SpigotRevenueContractMap;
-  lineNetwork: Network;
-}
 
 interface Metric {
   title: string;
@@ -156,7 +140,7 @@ const MetricDataDisplay = ({ title, data, displaySubmetrics = false, submetrics 
   );
 };
 
-export const LineMetadata = (props: LineMetadataProps) => {
+export const LineMetadata = () => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
@@ -165,23 +149,21 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const { NETWORK } = getEnv();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
+  console.log('Selected Line', selectedLine);
 
   const {
-    lineNetwork,
+    start: startTime,
+    end: endTime,
     principal,
     deposit,
     totalInterestRepaid,
-    revenue,
-    deposits,
-    startTime,
-    endTime,
-    spigots,
-    cratio,
-    minCRatio,
+    escrow,
+    spigot,
     defaultSplit,
-    collateralValue,
-    revenueValue,
-  } = props;
+  } = selectedLine!;
+
+  const { deposits, minCRatio, cratio, collateralValue } = escrow!;
+  const { revenueValue, revenueSummary: revenue } = spigot!;
 
   const renderEscrowMetadata = () => {
     if (!deposits) return null;
@@ -275,7 +257,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
         return (
           <>
             <Button>
-              <Link to={`/lines/${lineNetwork}/${selectedLine?.id}/spigots/${selectedLine?.spigotId}`}>
+              <Link to={`/lines/${network}/${selectedLine?.id}/spigots/${selectedLine?.spigotId}`}>
                 {enableSpigotText}
               </Link>
             </Button>

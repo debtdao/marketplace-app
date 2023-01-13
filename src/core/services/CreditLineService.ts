@@ -195,6 +195,7 @@ export class CreditLineServiceImpl implements CreditLineService {
       //  throw new Error('Amount is greater than (principal + interest to be accrued). Enter lower amount.');
       //}
 
+      console.log('Deposit and Repay Params: ', props.lineAddress, props.amount, props.network);
       return <TransactionResponse>(
         await this.executeContractMethod(props.lineAddress, 'depositAndRepay', [props.amount], props.network)
       );
@@ -362,6 +363,10 @@ export class CreditLineServiceImpl implements CreditLineService {
       await tx.wait();
       return tx;
     } catch (e) {
+      console.log(e);
+      const txnData = JSON.parse(JSON.stringify(e)).transaction.data;
+      console.log('Just the error 1', txnData);
+      decodeErrorData(txnData);
       console.log(
         `An error occured while ${methodName} with params [${params}] on CreditLine [${props?.contractAddress}], error = ${e} `
       );

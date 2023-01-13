@@ -12,7 +12,7 @@ import {
   useAppSelector,
   useSelectedSellToken,
 } from '@hooks';
-import { ACTIVE_STATUS, AddCreditProps, BORROWER_POSITION_ROLE, PROPOSED_STATUS } from '@src/core/types';
+import { ACTIVE_STATUS, REPAID_STATUS, AddCreditProps, BORROWER_POSITION_ROLE, PROPOSED_STATUS } from '@src/core/types';
 import { getConstants } from '@src/config/constants';
 import {
   TokensActions,
@@ -319,7 +319,8 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
     );
   }
 
-  const isActive = selectedCredit.status === ACTIVE_STATUS;
+  // TODO: When should propspective lenders not be able to propose a position for a a Line of Credit?
+  const isActive = selectedCredit.status === ACTIVE_STATUS || selectedCredit.status === REPAID_STATUS;
   if (!isActive) {
     const toMarketplace = () => {
       onClose();

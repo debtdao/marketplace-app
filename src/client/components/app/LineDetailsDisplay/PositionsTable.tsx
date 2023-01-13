@@ -178,6 +178,8 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
     }
 
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
+      if (position.status === 'CLOSED') return [];
+
       if (position.status === 'PROPOSED') {
         const approveMutualConsent = {
           name: t('components.transaction.add-credit.accept-terms'),

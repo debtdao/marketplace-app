@@ -338,7 +338,6 @@ export const formatSecuredLineData = (
   // aggregated revenue in USD by token across all spigots
   const [revenueValue, revenueSummary]: [BigNumber, RevenueSummaryMap] = revenues.reduce<any>(
     (agg, { token, totalVolume, totalVolumeUsd, ...summary }) => {
-      console.log('rev', agg, { ...summary, totalVolume, totalVolumeUsd });
       const checkSumAddress = ethers.utils.getAddress(token.id);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
       return [

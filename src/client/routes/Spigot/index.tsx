@@ -64,7 +64,7 @@ export const Spigot = () => {
   useEffect(() => {
     if (!spigotAddress || !isValidAddress(spigotAddress)) {
       dispatch(AlertsActions.openAlert({ message: 'INVALID_ADDRESS', type: 'error' }));
-      history.push('/market');
+      history.push(`${currentNetwork}/market`);
       return;
     }
     dispatch(CollateralActions.setSelectedSpigot({ spigotAddress: spigotAddress }));
@@ -88,7 +88,7 @@ export const Spigot = () => {
       <SpigotDisplay />
       {lineAddress ? (
         <Button>
-          <Link to={`/lines/${network}/${lineAddress}`}>{t('Back to Line of Credit')}</Link>
+          <Link to={`/${network}/lines//${lineAddress}`}>{t('Back to Line of Credit')}</Link>
         </Button>
       ) : null}
       {generalLoading && <SpinnerLoading flex="1" width="100%" height="20%" />}

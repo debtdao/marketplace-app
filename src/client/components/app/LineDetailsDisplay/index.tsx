@@ -90,7 +90,7 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   return (
     <Container>
       <Header>
-        <RouterLink to={`/portfolio/${props.lineNetwork}/${borrower}`} key={borrower} selected={false}>
+        <RouterLink to={`/${props.lineNetwork}/portfolio/${borrower}`} key={borrower} selected={false}>
           <BorrowerName>
             {t('lineDetails:metadata.borrower')} {'  :  '} {borrowerID}
             <Redirect />

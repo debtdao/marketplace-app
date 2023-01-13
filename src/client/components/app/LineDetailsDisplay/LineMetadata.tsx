@@ -257,7 +257,7 @@ export const LineMetadata = () => {
         return (
           <>
             <Button>
-              <Link to={`/lines/${network}/${selectedLine?.id}/spigots/${selectedLine?.spigotId}`}>
+              <Link to={`/${network}/lines/${selectedLine?.id}/spigots/${selectedLine?.spigotId}`}>
                 {enableSpigotText}
               </Link>
             </Button>

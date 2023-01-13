@@ -55,7 +55,7 @@ export const LineDetail = () => {
   useEffect(() => {
     if (!lineAddress || !isValidAddress(lineAddress)) {
       dispatch(AlertsActions.openAlert({ message: 'INVALID_ADDRESS', type: 'error' }));
-      history.push('/market');
+      history.push(`${currentNetwork}/market`);
       return;
     }
 

@@ -301,7 +301,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
             drate: `${normalizeAmount(position.dRate, 2)} %`,
             frate: `${normalizeAmount(position.fRate, 2)} %`,
             line: (
-              <RouterLink to={`/lines/${currentNetwork}/${position.line}`} key={position.line} selected={false}>
+              <RouterLink to={`/${currentNetwork}/lines/${position.line}`} key={position.line} selected={false}>
                 {formatAddress(position.line)}
                 <RedirectLinkIcon />
               </RouterLink>
@@ -310,7 +310,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
             principal: humanize('amount', position.principal, position.token.decimals, 2),
             interest: humanize('amount', position.interestAccrued, position.token.decimals, 2),
             lender: (
-              <RouterLink to={`/portfolio/${currentNetwork}/${position.lender}`} key={position.id} selected={false}>
+              <RouterLink to={`/${currentNetwork}/portfolio/${position.lender}`} key={position.id} selected={false}>
                 {formatAddress(getENS(position.lender, ensMap)!)}
                 <RedirectLinkIcon />
               </RouterLink>

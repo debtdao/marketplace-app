@@ -49,7 +49,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
       setErrors([...errors, 'no selected position']);
       return '0';
     }
-    let maxWithdraw: string = `${Number(selectedPosition.deposit) - Number(selectedPosition.principal)}`;
+    let maxWithdraw: string = `${Number(selectedPosition.deposit) - Number(selectedPosition.principal) + Number(selectedPosition.interestRepaid)}`;
     maxWithdraw = normalize('amount', maxWithdraw, selectedPosition.token.decimals);
     return maxWithdraw;
   };

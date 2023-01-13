@@ -1,7 +1,37 @@
-import { LineStatusTypes, PositionStatusTypes } from '@types';
+import { PopulatedTransaction } from 'ethers';
 
-import { Address } from './Blockchain';
+import { LineStatusTypes, PositionStatusTypes, SpigotRevenueContract } from './CreditLine';
+import { Address, Network } from './Blockchain';
 
+// 0x API
+
+// https://docs.0x.org/0x-api-swap/api-references/get-swap-v1-quote
+export interface GetTradeQuoteProps {
+  sellToken: string; // token symbol or address
+  buyToken: string; // token symbol or address
+  sellAmount?: string; // in sellToken decimals
+  buyAmount?: string; // in buyToken decimals
+  network?: Network;
+
+  // optional protection fields
+  slippagePercentage?: string;
+  priceImpactProtectionPercentage?: string;
+  enableSlippageProtection?: boolean;
+}
+
+export interface ZeroExAPIValidationError {
+  reason: 'Validation Failed';
+  validationErrors: {
+    field: string; // field in order
+    code: number;
+    reason: string; // e.g. "INSUFFICIENT_ASSET_LIQUIDITY"
+    description: string; // e.g. "We cant trade this token pair at the requested amount due to a lack of liquidity"}
+  };
+}
+
+export interface ZeroExAPIQuoteResponse extends PopulatedTransaction, GetTradeQuoteProps {}
+
+// Subgraph
 export interface QueryCreator<ArgType, ResponseType> {
   (args: ArgType): QueryResponse<ResponseType>;
 }
@@ -115,6 +145,7 @@ export interface BaseLineFragResponse {
   borrower: {
     id: Address;
   };
+  defaultSplit: string;
 }
 
 export interface BasePositionFragResponse {
@@ -160,6 +191,19 @@ export interface SpigotRevenueSummaryFragResponse {
   timeOfFirstIncome: number;
   timeOfLastIncome: number;
 }
+
+export interface SpigotRevenueContractFragResponse {
+  id: Address;
+  active: boolean;
+  contract: Address;
+  claimFunc: string;
+  transferFunc: string;
+  startTime: number;
+  ownerSplit: number;
+  escrowed: string;
+  totalVolumeUsd: string;
+}
+
 export interface SpigotEventFragResponse {
   __typename: 'ClaimRevenueEvent';
   timestamp: number;
@@ -189,7 +233,6 @@ export interface BaseEscrowFragResponse {
   minCRatio: string;
   deposits: BaseEscrowDepositFragResponse[];
 }
-
 export interface GetLinesResponse {
   lines: BaseLineFragResponse & {
     positions: BasePositionFragResponse[];
@@ -218,6 +261,8 @@ export interface GetLineEventsResponse {
   };
   spigot: {
     events?: SpigotEventFragResponse[];
+    spigots: SpigotRevenueContractFragResponse[];
+    summaries: SpigotRevenueSummaryFragResponse[];
   };
 }
 
@@ -228,11 +273,7 @@ export interface GetLinePageResponse extends BaseLineFragResponse {
   spigot?: {
     id: Address;
     summaries: SpigotRevenueSummaryFragResponse[];
-    spigots: {
-      contract: Address;
-      active: boolean;
-      startTime: number;
-    };
+    spigots: SpigotRevenueContractFragResponse[];
     events?: SpigotEventFragResponse[];
   };
   escrow?: BaseEscrowFragResponse & {
@@ -262,11 +303,7 @@ export interface LineOfCreditsResponse extends BaseLineFragResponse {
   spigot?: {
     id: Address;
     summaries: SpigotRevenueSummaryFragResponse[];
-    spigots: {
-      contract: Address;
-      active: boolean;
-      startTime: number;
-    };
+    spigots: SpigotRevenueContractFragResponse[];
     events?: SpigotEventFragResponse[];
   };
 

@@ -152,44 +152,23 @@ export const TxDropdown: FC<TxDropdownProps> = ({
   ...props
 }) => {
   const { t } = useAppTranslation('common');
+  const [isOpen, setOpenedSearch] = useState(false);
 
-  let listItems: SearchListItem[] = [];
-  let selectedItem: SearchListItem = {
-    id: selectedType?.id || '',
-    label: selectedType?.label,
-    value: selectedType?.value,
-  };
-
-  if (typeOptions && typeOptions.length > 1) {
-    listItems = typeOptions
-      .filter((s) => !!s)
-      .map((item) => {
-        return {
-          id: item!.id,
-          label: item!.label,
-          value: item!.value,
-        };
-      });
-  }
+  if (!typeOptions) return null;
 
   const openSearchList = () => {
     setOpenedSearch(true);
   };
 
-  const [openedSearch, setOpenedSearch] = useState(false);
-  const searchListHeader = readOnly
-    ? t('components.transaction.deposit-and-repay.select-repay')
-    : t('components.transaction.deposit-and-repay.select-repay');
-
   return (
     <StyledTxCreditLineInput {...props}>
       <>{headerText && <Header>{headerText}</Header>}</>
-      {!readOnly && openedSearch && (
-        <CSSTransition in={openedSearch} appear={true} timeout={scaleTransitionTime} classNames="scale">
+      {!readOnly && isOpen && (
+        <CSSTransition in={isOpen} appear={true} timeout={scaleTransitionTime} classNames="scale">
           <StyledSearchList
-            list={listItems}
-            headerText={searchListHeader}
-            selected={selectedItem}
+            list={typeOptions}
+            headerText={t('components.transaction.repay.select-repay')}
+            selected={selectedType}
             setSelected={(item) => onSelectedTypeChange(item!)}
             onCloseList={() => setOpenedSearch(false)}
           />
@@ -199,15 +178,15 @@ export const TxDropdown: FC<TxDropdownProps> = ({
       {/* NOTE Using fragments here because: https://github.com/yearn/yearn-finance-v3/pull/565 */}
       <>
         <CreditLineInfo center={false} onClick={openSearchList}>
-          <CreditLineSelector onClick={listItems?.length > 1 ? openSearchList : undefined} center={false}>
+          <CreditLineSelector onClick={typeOptions?.length > 1 ? openSearchList : undefined} center={false}>
             <CreditLineIconContainer onClick={openSearchList}>
               <StyledIcon Component={WalletIcon} />
-              {listItems?.length > 1 && <CreditLineListIcon Component={ZapIcon} />}
+              {typeOptions?.length > 1 && <CreditLineListIcon Component={ZapIcon} />}
             </CreditLineIconContainer>
-            <CreditLineName>{selectedItem.value}</CreditLineName>
+            <CreditLineName>{selectedType.value}</CreditLineName>
           </CreditLineSelector>
           <CreditLineData>
-            <LineTitle ellipsis> Repay From: {selectedType.value} </LineTitle>
+            <LineTitle ellipsis>{selectedType.value}</LineTitle>
           </CreditLineData>
         </CreditLineInfo>
       </>

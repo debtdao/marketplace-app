@@ -41,7 +41,6 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
   const [transactionLoading, setLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>(['']);
   const [transactionApproved, setTransactionApproved] = useState(true);
-  const [targetAmount, setTargetAmount] = useState('1');
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
   const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
@@ -49,6 +48,20 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
   const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
   const initialToken: string = selectedSellTokenAddress || DAI;
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
+
+  // Calculate maximum repay amount, then humanize for readability
+  const getMaxRepay = () => {
+    if (!selectedPosition) {
+      setErrors([...errors, 'no selected position']);
+      return;
+    }
+    let maxRepay: string = `${Number(selectedPosition.principal) + Number(selectedPosition.interestAccrued)}`;
+    maxRepay = normalize('amount', `${maxRepay}`, selectedPosition.token.decimals);
+    return maxRepay;
+  };
+
+  // Set default repayment amounnt as the max repayment amount
+  const [targetAmount, setTargetAmount] = useState(getMaxRepay()!);
 
   const repaymentOptions = [
     { id: '1', label: 'Repay from:', value: 'Wallet' },
@@ -304,17 +317,6 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
     dispatch(TokensActions.setSelectedTokenAddress({ tokenAddress }));
   };
 
-  //Calculate maximum repay amount, then humanize for readability
-  const getMaxRepay = () => {
-    if (!selectedPosition) {
-      setErrors([...errors, 'no selected position']);
-      return;
-    }
-    let maxRepay: string = `${Number(selectedPosition.principal) + Number(selectedPosition.interestAccrued)}`;
-    maxRepay = normalize('amount', `${maxRepay}`, selectedPosition.token.decimals);
-    return maxRepay;
-  };
-
   const targetBalance = normalizeAmount(selectedSellToken.balance, selectedSellToken.decimals);
 
   const tokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(targetBalance, 4)} ${
@@ -380,9 +382,9 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
         amountValue={String(10000000 * Number(targetAmount))}
         maxAmount={getMaxRepay()}
         selectedToken={selectedSellToken}
-        onSelectedTokenChange={onSelectedSellTokenChange}
+        // onSelectedTokenChange={onSelectedSellTokenChange}
         // @cleanup TODO
-        tokenOptions={walletNetwork === 'goerli' ? testTokens : sourceAssetOptions}
+        // tokenOptions={walletNetwork === 'goerli' ? testTokens : sourceAssetOptions}
         // inputError={!!sourceStatus.error}
         readOnly={acceptingOffer}
         // displayGuidance={displaySourceGuidance}

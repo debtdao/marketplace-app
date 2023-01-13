@@ -2,11 +2,12 @@ import { FC, useState } from 'react';
 import styled from 'styled-components';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
-import { useAppTranslation } from '@hooks';
+import { useAppTranslation, useAppSelector } from '@hooks';
 import { Text, Icon, ZapIcon, LogoIcon } from '@components/common';
 import { PositionSearchList } from '@src/client/components/common/PositionSearchList';
+import { OnchainMetaDataSelector } from '@src/core/store';
 import { CreditPosition } from '@src/core/types';
-import { normalizeAmount } from '@src/utils';
+import { normalizeAmount, formatAddress, getENS } from '@src/utils';
 
 import { TokenIcon } from '../../TokenIcon';
 
@@ -23,7 +24,7 @@ const CreditLineData = styled.div`
   border-radius: ${({ theme }) => theme.globalRadius};
   background: ${({ theme }) => theme.colors.txModalColors.backgroundVariant};
   padding: ${({ theme }) => theme.layoutPadding};
-  font-size: 1.7rem;
+  font-size: 1.4rem;
   flex: 1;
 `;
 
@@ -155,6 +156,7 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
 }) => {
   const { t } = useAppTranslation('common');
   const [openedSearch, setOpenedSearch] = useState(false);
+  const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
 
   if (!positions || positions.length < 1) return null;
   const position = selectedPosition || positions[0];
@@ -207,10 +209,9 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
             <CreditLineName>{position.token.symbol}</CreditLineName>
           </CreditLineSelector>
           <CreditLineData>
-            <LineTitle ellipsis> Lender: {position?.lender} </LineTitle>
+            <LineTitle ellipsis> Lender: {formatAddress(getENS(position?.lender, ensMap)!)} </LineTitle>
             <LineTitle ellipsis>
-              {`${normalizeAmount(position?.deposit, 18)} ${position?.token.symbol}
-              @${position?.dRate}/${position?.fRate}%`}
+              Available: {`${normalizeAmount(position?.deposit, 18)} ${position?.token.symbol}`}
             </LineTitle>
           </CreditLineData>
         </CreditLineInfo>

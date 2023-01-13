@@ -27,7 +27,6 @@ export class TransactionServiceImpl implements TransactionService {
 
   public async execute(props: ExecuteTransactionProps): Promise<TransactionResponse> {
     const { network, methodName, abi, contractAddress, args, overrides } = props;
-    console.log('subgraph inside TXN service execute', network);
     let gasFees: GasFees = {};
     try {
       if (network === 'mainnet') {

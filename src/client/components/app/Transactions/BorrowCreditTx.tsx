@@ -41,8 +41,6 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
 
-  console.log('positions', positions);
-
   const _updatePosition = () =>
     onPositionChange({
       credit: selectedCredit?.id,

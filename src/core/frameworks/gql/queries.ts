@@ -28,6 +28,7 @@ const BASE_LINE_FRAGMENT = gql`
     borrower {
       id
     }
+    defaultSplit
   }
 `;
 
@@ -74,7 +75,11 @@ const BASE_SPIGOT_FRAGMENT = gql`
     id
     active
     contract
+    claimFunc
+    transferFunc
     startTime
+    ownerSplit
+    escrowed
     totalVolumeUsd
   }
 `;
@@ -232,6 +237,8 @@ export const GET_LINE_PAGE_QUERY = gql`
 export const GET_LINE_EVENTS_QUERY = gql`
   ${LINE_EVENT_FRAGMENT}
   ${TOKEN_FRAGMENT}
+  ${BASE_SPIGOT_FRAGMENT}
+  ${SPIGOT_SUMMARY_FRAGMENT}
   ${ESCROW_EVENT_FRAGMENT}
   ${SPIGOT_EVENT_FRAGMENT}
 
@@ -257,6 +264,12 @@ export const GET_LINE_EVENTS_QUERY = gql`
       spigot {
         events {
           ...SpigotEventFrag
+        }
+        spigots {
+          ...BaseSpigotFrag
+        }
+        summaries {
+          ...SpigotSummaryFrag
         }
       }
     }

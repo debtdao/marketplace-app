@@ -4,19 +4,27 @@ import { useState, useEffect } from 'react';
 
 import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
 import { RedirectIcon, Text, Link } from '@components/common';
-import { OnchainMetaDataActions, OnchainMetaDataSelector, LinesSelectors, NetworkSelectors } from '@store';
-import { Network } from '@src/core/types';
+import {
+  OnchainMetaDataActions,
+  OnchainMetaDataSelector,
+  LinesSelectors,
+  CollateralSelectors,
+  WalletSelectors,
+  CollateralActions,
+  ModalsActions,
+  LinesActions,
+} from '@store';
 import { getENS } from '@src/utils';
+import { useExplorerURL } from '@src/client/hooks/useExplorerURL';
 
-import { LineMetadata } from './LineMetadata';
-import { PositionsTable } from './PositionsTable';
+import { ActionButtons } from '../ActionButtons';
+import { BorrowerName } from '../LineDetailsDisplay';
 
-interface LineDetailsProps {
-  onAddCollateral?: Function;
-  lineNetwork: Network;
-}
+import { SpigotMetadata } from './SpigotMetadata';
 
-export const Container = styled.div`
+interface SpigotDisplayProps {}
+
+const Container = styled.div`
   margin: 0;
   padding: 1em;
   width: 100%;
@@ -61,45 +69,44 @@ const RouterLink = styled(Link)<{ selected: boolean }>`
   `}
 `;
 
-export const BorrowerName = styled(Text)`
+const SpigotAddy = styled(Text)`
   max-width: 100%;
 `;
 
-export const LineDetailsDisplay = (props: LineDetailsProps) => {
+export const SpigotDisplay = () => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
-  const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
+  const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
+  const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
+  const explorerUrl = useExplorerURL(walletNetwork);
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const [borrowerID, setBorrowerId] = useState('');
+  // const borrowerID = getENS(selectedLine?.borrower!, ensMap);
+
   useEffect(() => {
     dispatch(OnchainMetaDataActions.getENS(selectedLine?.borrower!));
-  }, [selectedLine]);
-
-  useEffect(() => {
     const ensName = getENS(selectedLine?.borrower!, ensMap);
     setBorrowerId(ensName!);
-  }, [selectedLine, ensMap]);
-
-  if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
-  const { principal, deposit, totalInterestRepaid, escrow, borrower, spigot, start, end, defaultSplit } = selectedLine;
-  const StandardMetadata = (metadataProps: any) => <></>;
+  }, [selectedLine]);
 
   // allow passing in core data first if we have it already and let Page data render once returned
   // if we have all data render full UI
+
+  if (!selectedSpigot) return null;
+
   return (
     <Container>
       <Header>
-        <RouterLink to={`/${props.lineNetwork}/portfolio/${borrower}`} key={borrower} selected={false}>
+        <RouterLink to={`${explorerUrl}/address/${borrowerID}`} key={borrowerID} selected={false}>
           <BorrowerName>
-            {t('lineDetails:metadata.borrower')} {'  :  '} {borrowerID}
+            {t('spigot:metadata.borrower')} {'  :  '} {borrowerID}
             <Redirect />
           </BorrowerName>
         </RouterLink>
       </Header>
-      <LineMetadata />
-
-      {positions && <PositionsTable positions={_.values(positions)} />}
+      <Header>Revenue Contracts</Header>
+      <SpigotMetadata />
     </Container>
   );
 };

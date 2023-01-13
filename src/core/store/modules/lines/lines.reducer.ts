@@ -180,14 +180,14 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 
       // loop over nested structure of new Lines and update state
       Object.entries(linesData).map(([category, ls]) =>
-        ls?.map((l) => {
-          lines[l.id] = l;
+        ls?.map((line) => {
+          lines[line.id] = line;
           // update positions for each line
-          const linePositionMap = _.zipObject(_.values(l.positionIds), _.values(l.positions));
+          const linePositionMap = _.zipObject(_.values(line.positionIds), _.values(line.positions));
           positions = { ...positions, ...linePositionMap };
-          state.statusMap.user.linesActionsStatusMap[l.id] = initialLineActionsStatusMap;
+          state.statusMap.user.linesActionsStatusMap[line.id] = initialLineActionsStatusMap;
           // save line id to category for reference
-          categories[category] = [...(categories[category] || []), l.id];
+          categories[category] = [...(categories[category] || []), line.id];
         })
       );
       state.linesMap = { ...state.linesMap, ...lines };

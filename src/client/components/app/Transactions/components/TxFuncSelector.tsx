@@ -37,7 +37,7 @@ const StyledSearchList = styled(SearchList)`
   transform-origin: bottom left;
 `;
 
-const Header = styled.div`
+export const Header = styled.div`
   font-size: 1.6rem;
   text-transform: capitalize;
   color: ${({ theme }) => theme.colors.txModalColors.text};
@@ -111,6 +111,7 @@ export const TxFuncSelector: FC<TxDropdownProps> = ({
     label: selectedType?.label,
     value: selectedType?.value,
   };
+  console.log('Func Selector: ', selectedItem);
 
   if (typeOptions && typeOptions.length > 1) {
     listItems = typeOptions
@@ -123,6 +124,7 @@ export const TxFuncSelector: FC<TxDropdownProps> = ({
         };
       });
   }
+  console.log('Func Selector - list items: ', typeOptions);
 
   const openSearchList = () => {
     setOpenedSearch(true);

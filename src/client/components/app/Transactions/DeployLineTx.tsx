@@ -56,7 +56,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
   const [timeToLive, setTimeToLive] = useState('0');
 
   // Deploy Line with config state
-  const [advancedMode, setAdvancedMode] = useState(false);
+  const [advancedMode, setAdvancedMode] = useState(true);
   const [cratio, setCratio] = useState('0');
   const [revenueSplit, setRevenueSplit] = useState('0');
 
@@ -123,7 +123,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
         })
       ).then((res) => {
         if (res.meta.requestStatus === 'rejected') {
-          setTransactionCompleted(2);
+          // setTransactionCompleted(2);
           setLoading(false);
         }
         if (res.meta.requestStatus === 'fulfilled') {
@@ -162,7 +162,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
         })
       ).then((res) => {
         if (res.meta.requestStatus === 'rejected') {
-          setTransactionCompleted(2);
+          // setTransactionCompleted(2);
           setLoading(false);
         }
         if (res.meta.requestStatus === 'fulfilled') {
@@ -204,8 +204,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       <TxAddressInput
         key={'credit-input'}
         headerText={t('components.transaction.deploy-line.select-borrower')}
-        // inputText={t('components.transaction.deploy-line.select-borrower')}
-        inputText={''}
+        inputText={t('components.transaction.deploy-line.borrower-address-text')}
         onAddressChange={onBorrowerAddressChange}
         address={borrowerAddress}
         // creditOptions={sourceCreditOptions}
@@ -234,6 +233,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
             headerText={t('components.transaction.deploy-line.cratio')}
             inputLabel={t('components.transaction.deploy-line.cratio-input')}
             width={'sm'}
+            placeholder={'30%'}
             amount={cratio}
             maxAmount={'max string'}
             onInputChange={onCratioChange}
@@ -245,6 +245,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
             headerText={t('components.transaction.deploy-line.revenue-split')}
             inputLabel={t('components.transaction.deploy-line.revenue-split-input')}
             width={'sm'}
+            placeholder={'90%'}
             amount={revenueSplit}
             maxAmount={'max string'}
             onInputChange={onRevenueSplitChange}
@@ -256,21 +257,6 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       ) : (
         <h6>You should not deploy a line without discussing terms.</h6>
       )}
-      <SectionContent>
-        <>
-          Advanced Mode
-          <ToggleButton
-            selected={advancedMode}
-            setSelected={() => toggleSecuredMode()}
-            className=""
-            disabled={false}
-            color=""
-            onClick={() => {}}
-            ariaLabel=""
-          />
-        </>
-      </SectionContent>
-
       <TxActions>
         <TxActionButton
           key={''}

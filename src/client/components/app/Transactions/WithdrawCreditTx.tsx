@@ -154,7 +154,10 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
     },
   ];
 
-  if (!selectedCredit) return null;
+  if (!selectedCredit) {
+    console.log('withdraw modal selected credit is undefined: ', selectedCredit);
+    return null;
+  }
 
   if (transactionCompleted === 1) {
     return (

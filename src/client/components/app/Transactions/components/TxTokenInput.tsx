@@ -198,8 +198,8 @@ export interface TxTokenInputProps {
   inputText?: string;
   inputError?: boolean;
   amount?: string;
-  onAmountChange?: (amount: string) => void;
   amountValue?: string;
+  onAmountChange?: (amount: string) => void;
   maxAmount?: string;
   maxLabel?: string;
   selectedToken: Token;
@@ -219,8 +219,8 @@ export const TxTokenInput: FC<TxTokenInputProps> = ({
   inputText,
   inputError,
   amount,
-  onAmountChange,
   amountValue,
+  onAmountChange,
   maxAmount,
   maxLabel = 'Max',
   selectedToken,
@@ -263,13 +263,6 @@ export const TxTokenInput: FC<TxTokenInputProps> = ({
   const searchListHeader = selectedToken.yield
     ? t('components.transaction.token-input.search-select-vault')
     : t('components.transaction.token-input.search-select-token');
-
-  // const getMainInputField = () => {
-  //   if(hideAmount) return null;
-  //   switch(style) {
-  //     case 'amount':
-  //       return
-  // }
 
   const tokenInfoIcon = style === 'oracle' ? ChailinkIcon : ZapIcon;
   return (

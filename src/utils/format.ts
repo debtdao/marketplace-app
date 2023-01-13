@@ -129,6 +129,17 @@ export const prettyNumbers = (x: string) => {
   return numberWithCommas(parseInt(normalizeAmount(x, 18)).toFixed(2));
 };
 
+export const prettyNumbers2 = (x: string) => {
+  console.log('Pretty Numbers: Normalize Amount', normalizeAmount(x, 18));
+  console.log('Pretty Numbers: Format Normalize Amount', ethers.utils.formatUnits(normalizeAmount(x, 18), 24));
+  console.log(
+    'Pretty Numbers: Parse Normalize Amount',
+    parseFloat(ethers.utils.formatUnits(normalizeAmount(x, 18), 24)).toFixed(2)
+  );
+  console.log('Pretty Numbers: Add Commas', numberWithCommas(ethers.utils.formatUnits(normalizeAmount(x, 18), 24)));
+  return numberWithCommas(parseFloat(ethers.utils.formatUnits(normalizeAmount(x, 18), 24)).toFixed(2));
+};
+
 export const formatAddress = (address: string) => {
   if (isValidAddress(address)) {
     const checkSumAddress = ethers.utils.getAddress(address);

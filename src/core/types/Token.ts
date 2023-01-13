@@ -1,5 +1,4 @@
-import { Address } from './Blockchain';
-
+import { Address, Network } from './Blockchain';
 export interface UserTokenData {
   address: string;
   balance: string;

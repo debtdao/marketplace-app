@@ -1,0 +1,18 @@
+{
+  "claim-revenue": "Claim Revenue",
+  "metadata": {
+    "borrower": "Borrower",
+    "revenue": {
+      "no-revenue": "",
+      "per-month": "",
+      "total": "",
+      "lifetime-revenue": "",
+      "30d-revenue": ""
+    },
+    "add-revenue-contract": "Add Revenue Contract"
+  },
+  "no-spigot-supported-card": {
+    "header": "No Spigot available at this address",
+    "content": ""
+  }
+}

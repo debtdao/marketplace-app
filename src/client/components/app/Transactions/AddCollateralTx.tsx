@@ -13,7 +13,7 @@ import {
   useSelectedSellToken,
 } from '@hooks';
 import { ACTIVE_STATUS, AddCollateralProps, ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE } from '@src/core/types';
-import { getConstants } from '@src/config/constants';
+import { getConstants, testTokens } from '@src/config/constants';
 import {
   TokensActions,
   WalletSelectors,
@@ -22,6 +22,8 @@ import {
   CollateralActions,
   LinesActions,
   selectDepositTokenOptionsByAsset,
+  ModalSelectors,
+  NetworkSelectors,
 } from '@store';
 import { Button } from '@components/common';
 
@@ -34,7 +36,6 @@ import { TxStatus } from './components/TxStatus';
 const { ZERO_ADDRESS } = getConstants();
 
 const StyledTransaction = styled(TxContainer)``;
-
 interface AddCollateralTxProps {
   header: string;
   onClose: () => void;
@@ -81,6 +82,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
 
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
+  const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
 
   //state for params
   const { header, onClose } = props;
@@ -91,9 +93,12 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedEscrow = useAppSelector(CollateralSelectors.selectSelectedEscrow);
   const allCollateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
-  const selectedCollateralAsset = useAppSelector(CollateralSelectors.selectSelectedCollateralAsset);
 
+  const { assetAddress: selectedCollateralAssetAddress } = useAppSelector(ModalSelectors.selectActiveModalProps);
   const collateralOptions = _.values(selectedEscrow?.deposits).map((d) => d.token);
+  const selectedCollateralAsset = selectedCollateralAssetAddress
+    ? selectedEscrow?.deposits![selectedCollateralAssetAddress].token
+    : undefined;
 
   useEffect(() => {
     if (!selectedEscrow && selectedLine?.escrowId) {
@@ -287,7 +292,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
       onClose();
       // send user to top of market page instead of bottom where they currently are
       window.scrollTo({ top: 0, left: 0 });
-      history.push('/market');
+      history.push(`${currentNetwork}/market`);
     };
 
     return (
@@ -306,10 +311,10 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
   }
 
   return (
-    <StyledTransaction onClose={onClose} header={header || t('components.transaction.title')}>
+    <StyledTransaction onClose={onClose} header={t('components.transaction.deposit-collateral.header')}>
       <TxTokenInput
         key={'token-input'}
-        headerText={t('components.transaction.add-credit.select-token')}
+        headerText={t('components.transaction.deposit-collateral.select-token')}
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
         amountValue={String(10000000 * Number(targetTokenAmount))}

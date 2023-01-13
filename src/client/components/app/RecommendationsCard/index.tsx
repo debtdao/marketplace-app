@@ -1,6 +1,7 @@
 import styled from 'styled-components';
+import { format, differenceInDays } from 'date-fns';
 
-import { prettyNumbers, formatAddress, unnullify } from '@utils';
+import { prettyNumbers, formatAddress, unnullify, humanize } from '@utils';
 import { Card, CardHeader, CardContent, Text, Icon, ChevronRightIcon } from '@components/common';
 import { TokenIcon } from '@components/app';
 import { useAppTranslation, useAppSelector } from '@hooks';
@@ -111,6 +112,7 @@ const Metric = styled.span`
 
 const MetricsText = styled.span`
   font-size: 1.6rem;
+  font-weight: normal;
 `;
 
 interface RecommendationsProps {
@@ -131,48 +133,60 @@ export const RecommendationsCard = ({ header, subHeader, items, ...props }: Reco
       <CardHeader header={header} subHeader={subHeader} />
 
       <StyledCardContent>
-        {items.map((item, i) => (
-          <ItemCard key={`${i}-${item.borrower}`} variant="primary" onClick={item.onAction ? item.onAction : undefined}>
-            {item.header && <ItemHeader>{item.header}</ItemHeader>}
+        {items.map((item, i) => {
+          const endDateHumanized = format(new Date(item.end * 1000), 'MMMM dd, yyyy');
+          return (
+            <ItemCard
+              key={`${i}-${item.borrower}`}
+              variant="primary"
+              onClick={item.onAction ? item.onAction : undefined}
+            >
+              {item.header && <ItemHeader>{item.header}</ItemHeader>}
 
-            <TopIcon>
-              <TokenIcon symbol={''} icon={item.icon} size="xxBig" />
-            </TopIcon>
+              <TopIcon>
+                <TokenIcon symbol={''} icon={item.icon} size="xxBig" />
+              </TopIcon>
 
-            <ItemInfo>
-              <ItemName>
-                {' '}
-                {t('components.line-card.borrower')}: {formatAddress(getENS(item.borrower, ensMap)!)}
-              </ItemName>
-              <Divider />
-              <Metric>
-                ${prettyNumbers(unnullify('0'))} / $ {/*TODO: Need to add this functionality*/}
-                {prettyNumbers(item.deposit)}
-              </Metric>
-              <MetricsTextContainer>
-                <MetricsText>
+              <ItemInfo>
+                <ItemName>
                   {' '}
-                  {t('components.line-card.total-debt')} / {t('components.line-card.total-credit')}{' '}
-                </MetricsText>
-              </MetricsTextContainer>
-              <Divider />
+                  {t('components.line-card.borrower')}: {formatAddress(getENS(item.borrower, ensMap)!)}
+                </ItemName>
+                <Divider />
 
-              <ItemInfoLabel>{t('components.line-card.secured-by')}:</ItemInfoLabel>
-              <Metric>
-                ${prettyNumbers(unnullify(item?.escrow?.collateralValue))} / ${' '}
-                {/*TODO: Need to add this functionality*/}
-                {prettyNumbers(unnullify('0'))}
-              </Metric>
-              <MetricsTextContainer>
-                <MetricsText>
-                  {' '}
-                  {t('components.line-card.collateral')} / {t('components.line-card.revenue')}{' '}
-                </MetricsText>
-              </MetricsTextContainer>
-            </ItemInfo>
-            {item.onAction && <TokenListIcon Component={ChevronRightIcon} />}
-          </ItemCard>
-        ))}
+                <Metric>
+                  ${humanize('amount', item.principal, 18, 2)} / ${humanize('amount', item.deposit, 18, 2)}
+                </Metric>
+                <MetricsTextContainer>
+                  <MetricsText>
+                    {' '}
+                    {t('components.line-card.total-debt')} / {t('components.line-card.total-credit')}{' '}
+                  </MetricsText>
+                </MetricsTextContainer>
+                <Divider />
+
+                <ItemInfoLabel>{t('components.line-card.secured-by')}:</ItemInfoLabel>
+                <Metric>
+                  ${humanize('amount', item.escrow?.collateralValue, 18, 2)} / ${' '}
+                  {humanize('amount', item.spigot?.revenueValue, 18, 2)}
+                </Metric>
+                <MetricsTextContainer>
+                  <MetricsText>
+                    {' '}
+                    {t('components.line-card.collateral')} / {t('components.line-card.revenue')}{' '}
+                  </MetricsText>
+                </MetricsTextContainer>
+                <Divider />
+
+                <ItemInfoLabel>
+                  {t('components.line-card.end')}: <MetricsText>{endDateHumanized}</MetricsText>
+                </ItemInfoLabel>
+                <Divider />
+              </ItemInfo>
+              {item.onAction && <TokenListIcon Component={ChevronRightIcon} />}
+            </ItemCard>
+          );
+        })}
       </StyledCardContent>
     </ContainerCard>
   );

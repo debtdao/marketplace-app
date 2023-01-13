@@ -1,32 +1,53 @@
 import { isEmpty } from 'lodash';
-import { BigNumber } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import styled from 'styled-components';
+import { format } from 'date-fns';
 
 import { device } from '@themes/default';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
-import { prettyNumbers } from '@src/utils';
+import { prettyNumbers, getEtherscanUrlStub, unnullify, prettyNumbers2 } from '@src/utils';
 import {
+  AggregatedEscrow,
   ARBITER_POSITION_ROLE,
   BORROWER_POSITION_ROLE,
   Collateral,
   EscrowDeposit,
   EscrowDepositMap,
   LENDER_POSITION_ROLE,
+  Network,
   RevenueSummary,
+  SpigotRevenueContractMap,
   TokenView,
 } from '@src/core/types';
 import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
-import { Button, Text, RedirectIcon } from '@components/common';
-import { LinesSelectors, ModalsActions, WalletSelectors, WalletActions, CollateralActions } from '@src/core/store';
+import { Button, Text, RedirectIcon, Link } from '@components/common';
+import {
+  LinesSelectors,
+  ModalsActions,
+  WalletSelectors,
+  WalletActions,
+  CollateralActions,
+  NetworkSelectors,
+} from '@src/core/store';
 import { humanize } from '@src/utils';
 import { getEnv } from '@config/env';
 
 const SectionHeader = styled.h3`
   ${({ theme }) => `
+    display: flex;
     font-size: ${theme.fonts.sizes.xl};
     font-weight: 600;
     margin: ${theme.spacing.xl} 0;
+    color: ${theme.colors.primary};
+  `}
+`;
+
+const CollateralTypeName = styled(Link)`
+  ${({ theme }) => `
+    font-size: ${theme.fonts.sizes.xl};
+    font-weight: 600;
+    margin: 0 ${theme.fonts.sizes.sm};
     color: ${theme.colors.primary};
   `}
 `;
@@ -89,16 +110,6 @@ const AssetsListCard = styled(DetailCard)`
   }
 ` as typeof DetailCard;
 
-interface LineMetadataProps {
-  principal: string;
-  deposit: string;
-  totalInterestPaid: string;
-  startTime: number;
-  endTime: number;
-  revenue?: { [token: string]: RevenueSummary };
-  deposits?: EscrowDepositMap;
-}
-
 interface Metric {
   title: string;
   data: string;
@@ -129,63 +140,53 @@ const MetricDataDisplay = ({ title, data, displaySubmetrics = false, submetrics 
   );
 };
 
-export const LineMetadata = (props: LineMetadataProps) => {
-  console.log('render line metadata', props);
+export const LineMetadata = () => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
+  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const dispatch = useAppDispatch();
   const { NETWORK } = getEnv();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
+  const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
+  console.log('Selected Line', selectedLine);
 
-  const { principal, deposit, totalInterestPaid, revenue, deposits } = props;
-  const modules = [revenue && 'revenue', deposits && 'escrow'].filter((x) => !!x);
-  const totalRevenue = isEmpty(revenue)
-    ? ''
-    : Object.values(revenue!)
-        // use historical price data for revenue
-        .reduce((sum, rev) => sum.add(BigNumber.from(rev.value)), BigNumber.from('0'))
-        // .div(BigNumber.from(1)) // scale to usd decimals
-        .toString();
+  const {
+    start: startTime,
+    end: endTime,
+    principal,
+    deposit,
+    totalInterestRepaid,
+    escrow,
+    spigot,
+    defaultSplit,
+  } = selectedLine!;
 
-  const totalCollateral = isEmpty(deposits)
-    ? ''
-    : Object.values(deposits!)
-        .reduce<BigNumber>(
-          (sum: BigNumber, d) =>
-            // use current market value for tokens. if no price dont display.
-            !d || !d.token.priceUsdc ? sum : sum.add(BigNumber.from(Number(d!.token.priceUsdc) ?? '0').mul(d!.amount)),
-          BigNumber.from('0')
-        )
-        // .div(BigNumber.from(1)) // scale to usd decimals
-        .toString();
+  const { deposits, minCRatio, cratio, collateralValue } = escrow!;
+  const { revenueValue, revenueSummary: revenue } = spigot!;
 
   const renderEscrowMetadata = () => {
     if (!deposits) return null;
-    if (!totalCollateral)
+    if (!collateralValue)
       return (
         <MetricDataDisplay
           title={t('lineDetails:metadata.escrow.no-collateral')}
-          data={`$ ${prettyNumbers(totalCollateral)}`}
-        />
-      );
-    return (
-      <MetricDataDisplay title={t('lineDetails:metadata.escrow.total')} data={`$ ${prettyNumbers(totalCollateral)}`} />
-    );
-  };
-  const renderSpigotMetadata = () => {
-    if (!revenue) return null;
-    if (!totalRevenue)
-      return (
-        <MetricDataDisplay
-          title={t('lineDetails:metadata.revenue.no-revenue')}
-          data={`$ ${prettyNumbers(totalRevenue)}`}
+          data={`$ ${prettyNumbers(collateralValue)}`}
         />
       );
     return (
       <MetricDataDisplay
-        title={t('lineDetails:metadata.revenue.per-month')}
-        data={`$ ${prettyNumbers(totalRevenue)}`}
+        title={t('lineDetails:metadata.escrow.total')}
+        data={`$ ${humanize('amount', collateralValue, 18, 2)}`}
+      />
+    );
+  };
+  const renderSpigotMetadata = () => {
+    if (!revenue) return null;
+    return (
+      <MetricDataDisplay
+        title={t('lineDetails:metadata.revenue.total')}
+        data={`$ ${humanize('amount', revenueValue, 18, 2)}`}
       />
     );
   };
@@ -195,7 +196,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
       connectWallet();
     } else {
       dispatch(CollateralActions.setSelectedCollateralAsset({ assetAddress: token.address }));
-      dispatch(ModalsActions.openModal({ modalName: 'addCollateral' }));
+      dispatch(ModalsActions.openModal({ modalName: 'addCollateral', modalProps: { assetAddress: token.address } }));
     }
   };
 
@@ -251,33 +252,51 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const getCollateralTableActions = () => {
     switch (userPositionMetadata.role) {
       case BORROWER_POSITION_ROLE:
-        return <Button onClick={depositHandler}>{depositCollateralText} </Button>;
       case ARBITER_POSITION_ROLE:
-      case LENDER_POSITION_ROLE: // for testing
         return (
           <>
             <Button onClick={addSpigotHandler}>{enableSpigotText}</Button>
             <Button onClick={enableAssetHandler}>{enableCollateralText}</Button>
           </>
         );
+      case LENDER_POSITION_ROLE: // for testing
+
       default:
         return null;
     }
   };
 
+  const startDateHumanized = format(new Date(startTime * 1000), 'MMMM dd, yyyy');
+  const endDateHumanized = format(new Date(endTime * 1000), 'MMMM dd, yyyy');
   return (
     <>
       <ThreeColumnLayout>
-        <MetricDataDisplay title={t('lineDetails:metadata.principal')} data={`$ ${prettyNumbers(principal)}`} />
-        <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${prettyNumbers(deposit)}`} />
         <MetricDataDisplay
-          title={t('lineDetails:metadata.totalInterestPaid')}
-          data={`$ ${prettyNumbers(totalInterestPaid)}`}
+          title={t('lineDetails:metadata.principal')}
+          data={`$ ${humanize('amount', principal, 18, 2)}`}
         />
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.deposit')} // rename to Credit Limit
+          data={`$ ${humanize('amount', deposit, 18, 2)}`}
+        />
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.total-interest-paid')}
+          data={`$ ${humanize('amount', totalInterestRepaid, 18, 2)}`}
+        />
+        <MetricDataDisplay title={t('lineDetails:metadata.revenue-split')} data={defaultSplit + '%'} />
+        <MetricDataDisplay title={t('lineDetails:metadata.min-cratio')} data={minCRatio + '%'} />
+        <MetricDataDisplay title={t('lineDetails:metadata.cratio')} data={cratio + '%'} />
+        <MetricDataDisplay title={t('lineDetails:metadata.start')} data={startDateHumanized} />
+        <MetricDataDisplay title={t('lineDetails:metadata.end')} data={endDateHumanized} />
       </ThreeColumnLayout>
       <SectionHeader>
         {t('lineDetails:metadata.secured-by')}
-        {modules.map((m) => t(`lineDetails:metadata.${m}.title`)).join(' + ')}
+        <CollateralTypeName to={`/${network}/lines/${selectedLine?.id}/spigots/${selectedLine?.spigotId}`}>
+          {' '}
+          {t(`lineDetails:metadata.revenue.title`)}{' '}
+        </CollateralTypeName>
+        {' + '}
+        {t(`lineDetails:metadata.escrow.title`)}
       </SectionHeader>
 
       {!revenue && !deposits && <MetricName>{t('lineDetails:metadata.unsecured')}</MetricName>}
@@ -288,8 +307,9 @@ export const LineMetadata = (props: LineMetadataProps) => {
       </ThreeColumnLayout>
 
       <ViewContainer>
+        <SectionHeader>{t('lineDetails:metadata.escrow.assets-list.title')}</SectionHeader>
         <AssetsListCard
-          header={t('lineDetails:metadata.escrow.assets-list.title')}
+          header={' '}
           data-testid="line-assets-list"
           metadata={[
             {
@@ -308,12 +328,11 @@ export const LineMetadata = (props: LineMetadataProps) => {
               key: 'token',
               header: t('lineDetails:metadata.escrow.assets-list.symbol'),
               transform: ({ token: { symbol, icon, address } }) => (
-                //change to etherscan on launch
-                <a href={`https://goerli.etherscan.io/address/${address}`} target={'_blank'} rel={'noreferrer'}>
+                <Link to={getEtherscanUrlStub(network) + `${address}`}>
                   {icon && <TokenIcon icon={icon} symbol={symbol} />}
                   <Text>{symbol}</Text>
                   <RedirectLinkIcon />
-                </a>
+                </Link>
               ),
               width: '15rem',
               sortable: true,
@@ -330,7 +349,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
             {
               key: 'value',
               header: t('lineDetails:metadata.escrow.assets-list.value'),
-              format: ({ value }) => humanize('usd', value, 2 /* 4 decimals but as percentage */, 0),
+              format: ({ value }) => `$ ${humanize('amount', value, 18, 2)}`,
               sortable: true,
               width: '20rem',
               className: 'col-value',

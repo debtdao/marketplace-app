@@ -163,20 +163,18 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     );
   }
 
-  console.log(
-    'enable spig modal contract ahs funcs?',
-    selectedContractFunctions[revenueContractAddy]?.length == 0,
-    selectedContractFunctions[revenueContractAddy] !== undefined &&
-      selectedContractFunctions[revenueContractAddy]!.length !== 0
-  );
   const isVerifiedContract =
     isValidAddress(revenueContractAddy) &&
     contractABI &&
     selectedContractFunctions[revenueContractAddy] !== undefined &&
-    selectedContractFunctions[revenueContractAddy]!.length !== 0;
+    Object.values(selectedContractFunctions[revenueContractAddy])!.length !== 0;
   const funcOptions = !selectedContractFunctions[revenueContractAddy]
     ? []
-    : selectedContractFunctions[revenueContractAddy].map((func, i) => ({ id: i.toString(), label: func, value: '' }));
+    : Object.values(selectedContractFunctions[revenueContractAddy]).map((func, i) => ({
+        id: i.toString(),
+        label: func,
+        value: '',
+      }));
 
   return (
     // <div />

@@ -17,13 +17,13 @@
     "positions-card": {
       "line": "Line",
       "positions": "Positions",
-      "drate": "dRate",
-      "frate": "fRate",
+      "drate": "Drawn Down Rate",
+      "frate": "Facility Rate",
       "total-deposits": "Supplied",
       "token": "Token",
       "status": "Status",
       "principal": "Borrowed",
-      "interest": "Interest",
+      "interest": "Interest Accrued",
       "lender": "Lender"
     },
     "list-card": {
@@ -58,8 +58,9 @@
       "total-debt": "Outstanding Debt",
       "total-credit": "Total Credit",
       "collateral": "Collateral",
-      "start": "Start Time",
-      "end": "End Time",
+      "start": "Deployment",
+      "end": "Deadline",
+      "time-to-live": "Days Remaining",
       "line": "Line Id",
       "revenue": "Spigoted Revenue"
     },
@@ -121,7 +122,6 @@
       "max": "MAX",
       "migrate": "Migrate",
       "reinvest": "Reinvest",
-      "repay": "Repay",
       "reward": "Reward",
       "sign": "Sign",
       "stake": "Stake",
@@ -186,6 +186,10 @@
           "enable-cta": "Enable token"
         }
       },
+      "deposit-collateral": {
+        "header": "Deposit Collateral",
+        "select-token": "The Token Used As Collateral"
+      },
       "arbiter-liquidate": {
         "header": "Liquidate Borrowers",
         "select-credit": "1. Select a borrower to liquidate",
@@ -194,12 +198,13 @@
       "deploy-line": {
         "header": "Deploy Credit Line",
         "select-borrower": "1. Insert a borrower for the line",
+        "borrower-address-text": "Borrower Address",
         "select-ttl": "2. Insert a deadline for the line",
         "time-to-live": "Time this line will remain active for (in days):",
         "cratio": "3. Select a Collateralization Ratio",
-        "cratio-input": "Your Cratio",
+        "cratio-input": "Collaterization Ratio",
         "revenue-split": "4. Select a Revenue Split",
-        "revenue-split-input": "Your revenue split"
+        "revenue-split-input": "Revenue Split"
       },
       "borrow-credit": {
         "header": "Borrow",
@@ -207,13 +212,46 @@
         "select-amount": "2. Amount to Borrow:",
         "your-rates": "3. Your Rates:"
       },
-      "deposit-and-repay": {
+      "repay": {
         "header": "Repay",
         "select-position": "1. Select Position to Repay:",
-        "repay-type": "2. Select Repay Type:",
         "select-amount": "3. You Owe:",
-        "your-rates": "4. Your Interest Rates:",
-        "select-repay": "Select Repayment Method"
+        "repay-type": "2. Select Source of Funds:",
+        "your-rates": "4. Your Current Rates:",
+        "select-repay-option": "Select Repayment Method",
+        "repaying-from": "Repaying from your",
+        "close": {
+          "title": "Close",
+          "desc": "permanently close line",
+          "cta": "Close"
+        },
+        "deposit-and-repay": {
+          "title": "Deposit & repay",
+          "desc": "from your wallet",
+          "cta": "Deposit & Repay"
+        },
+        "deposit-and-close": {
+          "title": "Repay & close",
+          "desc": "",
+          "cta": "Close"
+        },
+        "unused": {
+          "title": "From reserves",
+          "desc": "from excess revenue",
+          "cta": "Repay"
+        },
+        "claim-and-repay": {
+          "title": "From revenue",
+          "desc": "claim revenue from spigot and repay",
+          "cta": "Claim & Repay",
+          "claim-token": "Revenue token to claim",
+          "insufficient-liquidity": "Insufficient Liquidity for revenue token"
+        },
+        "claim-and-trade": {
+          "title": "To reserves",
+          "desc": "claim revenue from spigot and store in unused reserves",
+          "cta": "Claim & Trade"
+        }
       },
       "withdraw-credit": {
         "header": "Withdraw",
@@ -224,10 +262,20 @@
         "header":"Enable Spigot",
         "select-function": "Select Function",
         "revenue-contract": "1. Revenue Contract",
+        "revenue-token-to-claim": "2. Revenue Token to Claim",
         "function-revenue": "3. Select function to claim revenue",
         "function-transfer": "2. Select function to transfer ownership of revenue contract",
         "cta": "Enable Spigot",
         "enable-failed": "Enable Spigot Failed."
+      },
+      "claim-revenue": {
+        "header": "Claim Revenue via Spigot",
+        "rev-contract-input": "Contract to claim from",
+        "rev-token-input-header": "Revenue token to claim",
+        "rev-contract-inputs": "4. Fill Function Input Values",
+        "claim-data-header": "Transaction data to call on revenue contract",
+        "claim-data-input": "Hexcode (0xdebfda05....)",
+        "cta": "Claim"
       }
     }
   },
@@ -293,6 +341,7 @@
   "pages": {
     "market": "Debt DAO Credit Market",
     "lines": "Line Of Credit",
+    "spigot": "Spigot",
     "portfolio": "Credit Investment Portfolio",
     "disclaimer": "Disclaimer",
     "settings": "Settings",

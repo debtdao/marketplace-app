@@ -17,9 +17,8 @@ import { device } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer } from '@components/app';
 import { Input, SearchIcon, Button, RedirectIcon, Link } from '@components/common';
 import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, CreditPosition } from '@src/core/types';
-import { humanize, formatAddress, normalizeAmount } from '@src/utils';
+import { humanize, formatAddress, normalizeAmount, getENS } from '@src/utils';
 import { getEnv } from '@config/env';
-import { getENS } from '@src/utils';
 
 const PositionsCard = styled(DetailCard)`
   max-width: ${({ theme }) => theme.globalMaxWidth};
@@ -145,7 +144,6 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
 
   const borrowHandler = (position?: string) => {
     if (!position) return;
-    console.log('borrow', position);
     dispatch(LinesActions.setSelectedLinePosition({ position }));
     dispatch(ModalsActions.openModal({ modalName: 'borrow' }));
   };
@@ -162,8 +160,15 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
 
   //Returns a list of transactions to display on positions table
   const getUserPositionActions = (position: CreditPosition) => {
+    const repayAction = {
+      name: t('components.transaction.repay.header'),
+      handler: depositAndRepayHandler,
+      disabled: false,
+    };
+
     if (userRoleMetadata.role === ARBITER_POSITION_ROLE) {
       return [
+        repayAction,
         {
           name: t('components.transaction.liquidate'),
           handler: liquidateHandler,
@@ -181,14 +186,10 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
         };
         return [approveMutualConsent];
       }
+
       const borrowAction = {
         name: t('components.transaction.borrow'),
         handler: borrowHandler,
-        disabled: false,
-      };
-      const repayAction = {
-        name: t('components.transaction.deposit-and-repay.header'),
-        handler: depositAndRepayHandler,
         disabled: false,
       };
 
@@ -198,7 +199,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
 
     //If user is lender, and line has amount to withdraw, return withdraw action
     if (
-      getAddress(position.lender) == userWallet &&
+      getAddress(position.lender) === userWallet &&
       BigNumber.from(position.deposit).gt(BigNumber.from(position.principal))
     ) {
       return [
@@ -220,7 +221,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
       <ViewContainer>
         <PositionsCard
-          header={t('components.positions-card.positions')}
+          header={''}
           data-testid="vaults-opportunities-list"
           metadata={[
             {
@@ -235,7 +236,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
               hide: !displayLine,
               header: t('components.positions-card.line'),
               sortable: true,
-              width: '8rem',
+              width: '13rem',
               className: 'col-apy',
             },
             {
@@ -249,42 +250,42 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
               key: 'token',
               header: t('components.positions-card.token'),
               sortable: true,
-              width: '10rem',
+              width: '8rem',
               className: 'col-available',
             },
             {
               key: 'deposit',
               header: t('components.positions-card.total-deposits'),
               sortable: true,
-              width: '10rem',
+              width: '13rem',
               className: 'col-assets',
             },
             {
               key: 'principal',
               header: t('components.positions-card.principal'),
               sortable: true,
-              width: '10rem',
+              width: '13rem',
               className: 'col-assets',
             },
             {
               key: 'interest',
               header: t('components.positions-card.interest'),
               sortable: true,
-              width: '10rem',
+              width: '8rem',
               className: 'col-assets',
             },
             {
               key: 'drate',
               header: t('components.positions-card.drate'),
               sortable: true,
-              width: '7rem',
+              width: '10rem',
               className: 'col-assets',
             },
             {
               key: 'frate',
               header: t('components.positions-card.frate'),
               sortable: true,
-              width: '7rem',
+              width: '10rem',
               className: 'col-assets',
             },
             {
@@ -300,8 +301,8 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
             drate: `${normalizeAmount(position.dRate, 2)} %`,
             frate: `${normalizeAmount(position.fRate, 2)} %`,
             line: (
-              <RouterLink to={`/lines/${currentNetwork}/${position.line}`} key={position.line} selected={false}>
-                {position.line}
+              <RouterLink to={`/${currentNetwork}/lines/${position.line}`} key={position.line} selected={false}>
+                {formatAddress(position.line)}
                 <RedirectLinkIcon />
               </RouterLink>
             ),
@@ -309,7 +310,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
             principal: humanize('amount', position.principal, position.token.decimals, 2),
             interest: humanize('amount', position.interestAccrued, position.token.decimals, 2),
             lender: (
-              <RouterLink to={`/portfolio/${currentNetwork}/${position.lender}`} key={position.id} selected={false}>
+              <RouterLink to={`/${currentNetwork}/portfolio/${position.lender}`} key={position.id} selected={false}>
                 {formatAddress(getENS(position.lender, ensMap)!)}
                 <RedirectLinkIcon />
               </RouterLink>
@@ -327,12 +328,13 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
           }))}
           SearchBar={
             <>
-              <Input
+              {/* // TODO: Add search bar back when there is a need for it. */}
+              {/* <Input
                 value={''}
                 onChange={(e) => console.log(e)}
                 placeholder={t('components.search-input.search')}
                 Icon={SearchIcon}
-              />
+              /> */}
 
               {userRoleMetadata.role === LENDER_POSITION_ROLE && (
                 <Button onClick={depositHandler}>{ctaButtonText}</Button>

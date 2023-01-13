@@ -19,11 +19,12 @@ const StyledViewContainer = styled(ViewContainer)`
 
 const PortfolioHeader = styled.div`
   grid-column: 1 / 3;
+  grid-column-gap: ${({ theme }) => theme.spacing.xl};
   display: flex;
   justify-content: space-between;
 
   @media ${device.desktop} {
-    justify-content: space-around;
+    justify-content: flex-start;
   }
 `;
 
@@ -87,6 +88,7 @@ export const Portfolio = () => {
   const portfolioAddress = userAddress ? userAddress : userWallet;
   const allPositions = useAppSelector(LinesSelectors.selectPositionsMap);
   const [selectedRole, setRole] = useState<string>(BORROWER_POSITION_ROLE);
+  const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
 
   const availableRoles = [BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE];
 
@@ -118,12 +120,12 @@ export const Portfolio = () => {
           const position = lenderPositions[0];
           dispatch(LinesActions.clearSelectedLine());
           dispatch(LinesActions.setSelectedLinePosition({ position }));
+          dispatch(LinesActions.setSelectedLineAddress({ lineAddress: allPositions[position].line }));
         }
       }
     }
   }, [userPortfolio, selectedRole]);
 
-  console.log('portfolio page', selectedRole);
   return (
     <StyledViewContainer>
       <PortfolioHeader>

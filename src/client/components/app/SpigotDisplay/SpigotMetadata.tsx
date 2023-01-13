@@ -177,7 +177,16 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
     : `${t('components.connect-button.connect')}`;
 
   const getCollateralTableActions = () => {
-    return <Button onClick={addSpigotHandler}>{enableSpigotText}</Button>;
+    switch (userPositionMetadata.role) {
+      case BORROWER_POSITION_ROLE:
+      case ARBITER_POSITION_ROLE:
+        return (
+          <>
+            <Button onClick={addSpigotHandler}>{enableSpigotText}</Button>
+          </>
+        );
+      case LENDER_POSITION_ROLE:
+    }
   };
 
   const claimRev = (contract: string) => {

@@ -253,17 +253,14 @@ export const LineMetadata = () => {
     switch (userPositionMetadata.role) {
       case BORROWER_POSITION_ROLE:
       case ARBITER_POSITION_ROLE:
-      case LENDER_POSITION_ROLE: // for testing
         return (
           <>
-            <Button>
-              <Link to={`/${network}/lines/${selectedLine?.id}/spigots/${selectedLine?.spigotId}`}>
-                {enableSpigotText}
-              </Link>
-            </Button>
+            <Button onClick={addSpigotHandler}>{enableSpigotText}</Button>
             <Button onClick={enableAssetHandler}>{enableCollateralText}</Button>
           </>
         );
+      case LENDER_POSITION_ROLE: // for testing
+
       default:
         return null;
     }
@@ -294,7 +291,11 @@ export const LineMetadata = () => {
       </ThreeColumnLayout>
       <SectionHeader>
         {t('lineDetails:metadata.secured-by')}
-        {t(`lineDetails:metadata.revenue.title`)} {' + '}
+        <CollateralTypeName to={`/${network}/lines/${selectedLine?.id}/spigots/${selectedLine?.spigotId}`}>
+          {' '}
+          {t(`lineDetails:metadata.revenue.title`)}{' '}
+        </CollateralTypeName>
+        {' + '}
         {t(`lineDetails:metadata.escrow.title`)}
       </SectionHeader>
 

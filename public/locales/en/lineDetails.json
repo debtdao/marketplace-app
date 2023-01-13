@@ -33,7 +33,7 @@
       }
     },
     "collateral-table": {
-      "enable-spigot": "Attach Revenue Contract to Spigot",
+      "enable-spigot": "Add Spigot",
       "enable-asset": "Enable Collateral",
       "add-collateral": "Deposit",
       "no-table": "No Collateral added"

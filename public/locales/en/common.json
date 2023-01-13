@@ -17,7 +17,7 @@
     "positions-card": {
       "line": "Line",
       "positions": "Positions",
-      "drate": "Draw Down Rate",
+      "drate": "Drawn Down Rate",
       "frate": "Facility Rate",
       "total-deposits": "Supplied",
       "token": "Token",
@@ -341,7 +341,7 @@
   "pages": {
     "market": "Debt DAO Credit Market",
     "lines": "Line Of Credit",
-    "spigots": "Debt DAO Spigot",
+    "spigot": "Spigot",
     "portfolio": "Credit Investment Portfolio",
     "disclaimer": "Disclaimer",
     "settings": "Settings",

@@ -78,12 +78,7 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
 
   useEffect(() => {
     const ensName = getENS(selectedLine?.borrower!, ensMap);
-
-    if (!ensName) {
-      setBorrowerId(selectedLine?.borrower!);
-    } else {
-      setBorrowerId(ensName);
-    }
+    setBorrowerId(ensName!);
   }, [selectedLine, ensMap]);
 
   if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
@@ -95,29 +90,14 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   return (
     <Container>
       <Header>
-        <RouterLink to={`/portfolio/${props.lineNetwork}/${borrower}`} key={borrower} selected={false}>
+        <RouterLink to={`/${props.lineNetwork}/portfolio/${borrower}`} key={borrower} selected={false}>
           <BorrowerName>
             {t('lineDetails:metadata.borrower')} {'  :  '} {borrowerID}
             <Redirect />
           </BorrowerName>
         </RouterLink>
       </Header>
-      <LineMetadata
-        revenue={spigot?.revenueSummary}
-        deposits={escrow?.deposits}
-        deposit={deposit}
-        principal={principal}
-        totalInterestRepaid={totalInterestRepaid}
-        startTime={start}
-        endTime={end}
-        minCRatio={escrow?.minCRatio ?? 0}
-        cratio={escrow?.cratio ?? '0'}
-        defaultSplit={defaultSplit}
-        collateralValue={escrow?.collateralValue ?? '0'}
-        revenueValue={spigot?.revenueValue ?? '0'}
-        spigots={spigot?.spigots}
-        lineNetwork={props.lineNetwork}
-      />
+      <LineMetadata />
 
       {positions && <PositionsTable positions={_.values(positions)} />}
     </Container>

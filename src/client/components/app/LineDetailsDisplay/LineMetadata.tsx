@@ -109,22 +109,6 @@ const AssetsListCard = styled(DetailCard)`
     }
   }
 ` as typeof DetailCard;
-interface LineMetadataProps {
-  principal: string;
-  deposit: string;
-  totalInterestRepaid: string;
-  startTime: number;
-  endTime: number;
-  revenue?: { [token: string]: RevenueSummary };
-  minCRatio: number;
-  cratio: string;
-  defaultSplit: string;
-  collateralValue: string;
-  revenueValue: string;
-  deposits?: EscrowDepositMap;
-  spigots?: SpigotRevenueContractMap;
-  lineNetwork: Network;
-}
 
 interface Metric {
   title: string;
@@ -156,7 +140,7 @@ const MetricDataDisplay = ({ title, data, displaySubmetrics = false, submetrics 
   );
 };
 
-export const LineMetadata = (props: LineMetadataProps) => {
+export const LineMetadata = () => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
@@ -165,23 +149,21 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const { NETWORK } = getEnv();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
+  console.log('Selected Line', selectedLine);
 
   const {
-    lineNetwork,
+    start: startTime,
+    end: endTime,
     principal,
     deposit,
     totalInterestRepaid,
-    revenue,
-    deposits,
-    startTime,
-    endTime,
-    spigots,
-    cratio,
-    minCRatio,
+    escrow,
+    spigot,
     defaultSplit,
-    collateralValue,
-    revenueValue,
-  } = props;
+  } = selectedLine!;
+
+  const { deposits, minCRatio, cratio, collateralValue } = escrow!;
+  const { revenueValue, revenueSummary: revenue } = spigot!;
 
   const renderEscrowMetadata = () => {
     if (!deposits) return null;
@@ -271,17 +253,14 @@ export const LineMetadata = (props: LineMetadataProps) => {
     switch (userPositionMetadata.role) {
       case BORROWER_POSITION_ROLE:
       case ARBITER_POSITION_ROLE:
-      case LENDER_POSITION_ROLE: // for testing
         return (
           <>
-            <Button>
-              <Link to={`/lines/${lineNetwork}/${selectedLine?.id}/spigots/${selectedLine?.spigotId}`}>
-                {enableSpigotText}
-              </Link>
-            </Button>
+            <Button onClick={addSpigotHandler}>{enableSpigotText}</Button>
             <Button onClick={enableAssetHandler}>{enableCollateralText}</Button>
           </>
         );
+      case LENDER_POSITION_ROLE: // for testing
+
       default:
         return null;
     }
@@ -312,7 +291,11 @@ export const LineMetadata = (props: LineMetadataProps) => {
       </ThreeColumnLayout>
       <SectionHeader>
         {t('lineDetails:metadata.secured-by')}
-        {t(`lineDetails:metadata.revenue.title`)} {' + '}
+        <CollateralTypeName to={`/${network}/lines/${selectedLine?.id}/spigots/${selectedLine?.spigotId}`}>
+          {' '}
+          {t(`lineDetails:metadata.revenue.title`)}{' '}
+        </CollateralTypeName>
+        {' + '}
         {t(`lineDetails:metadata.escrow.title`)}
       </SectionHeader>
 
@@ -345,11 +328,11 @@ export const LineMetadata = (props: LineMetadataProps) => {
               key: 'token',
               header: t('lineDetails:metadata.escrow.assets-list.symbol'),
               transform: ({ token: { symbol, icon, address } }) => (
-                <a href={getEtherscanUrlStub(network) + `${address}`} target={'_blank'} rel={'noreferrer'}>
+                <Link to={getEtherscanUrlStub(network) + `${address}`}>
                   {icon && <TokenIcon icon={icon} symbol={symbol} />}
                   <Text>{symbol}</Text>
                   <RedirectLinkIcon />
-                </a>
+                </Link>
               ),
               width: '15rem',
               sortable: true,

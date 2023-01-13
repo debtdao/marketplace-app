@@ -10,5 +10,9 @@
       "30d-revenue": ""
     },
     "add-revenue-contract": "Add Revenue Contract"
+  },
+  "no-spigot-supported-card": {
+    "header": "No Spigot available at this address",
+    "content": ""
   }
 }

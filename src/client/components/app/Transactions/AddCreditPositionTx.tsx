@@ -14,7 +14,14 @@ import {
 } from '@hooks';
 import { ACTIVE_STATUS, AddCreditProps, BORROWER_POSITION_ROLE, PROPOSED_STATUS } from '@src/core/types';
 import { getConstants } from '@src/config/constants';
-import { TokensActions, TokensSelectors, WalletSelectors, LinesSelectors, LinesActions } from '@store';
+import {
+  TokensActions,
+  TokensSelectors,
+  WalletSelectors,
+  LinesSelectors,
+  LinesActions,
+  NetworkSelectors,
+} from '@store';
 import { Button } from '@components/common';
 
 import { TxContainer } from './components/TxContainer';
@@ -95,6 +102,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
   const [transactionType, setTransactionType] = useState('propose');
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
+  const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
 
   console.log('selectedPosition', selectedPosition, selectedCredit);
   useEffect(() => {
@@ -317,7 +325,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       onClose();
       // send user to top of market page instead of bottom where they currently are
       window.scrollTo({ top: 0, left: 0 });
-      history.push('/market');
+      history.push(`${currentNetwork}/market`);
     };
 
     return (

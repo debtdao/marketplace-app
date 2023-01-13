@@ -82,16 +82,12 @@ export const SpigotDisplay = () => {
   const explorerUrl = useExplorerURL(walletNetwork);
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const [borrowerID, setBorrowerId] = useState('');
+  // const borrowerID = getENS(selectedLine?.borrower!, ensMap);
 
   useEffect(() => {
-    // TODO: replace with a more efficient way to get the ENS name
     dispatch(OnchainMetaDataActions.getENS(selectedLine?.borrower!));
     const ensName = getENS(selectedLine?.borrower!, ensMap);
-    if (!ensName) {
-      setBorrowerId(selectedLine?.borrower!);
-    } else {
-      setBorrowerId(ensName);
-    }
+    setBorrowerId(ensName!);
   }, [selectedLine]);
 
   // allow passing in core data first if we have it already and let Page data render once returned

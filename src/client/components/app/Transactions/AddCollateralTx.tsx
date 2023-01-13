@@ -23,6 +23,7 @@ import {
   LinesActions,
   selectDepositTokenOptionsByAsset,
   ModalSelectors,
+  NetworkSelectors,
 } from '@store';
 import { Button } from '@components/common';
 
@@ -81,6 +82,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
 
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
+  const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
 
   //state for params
   const { header, onClose } = props;
@@ -290,7 +292,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
       onClose();
       // send user to top of market page instead of bottom where they currently are
       window.scrollTo({ top: 0, left: 0 });
-      history.push('/market');
+      history.push(`${currentNetwork}/market`);
     };
 
     return (

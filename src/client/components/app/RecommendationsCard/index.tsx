@@ -134,12 +134,7 @@ export const RecommendationsCard = ({ header, subHeader, items, ...props }: Reco
 
       <StyledCardContent>
         {items.map((item, i) => {
-          const startDate = new Date(item.start * 1000);
-          const endDate = new Date(item.end * 1000);
-          const startDateHumanized = format(startDate, 'MMMM dd, yyyy');
-          const endDateHumanized = format(endDate, 'MMMM dd, yyyy');
-          const daysDiff = differenceInDays(endDate, startDate);
-          const timeToLive = daysDiff === 1 ? `${daysDiff} day` : `${daysDiff} days`;
+          const endDateHumanized = format(new Date(item.end * 1000), 'MMMM dd, yyyy');
           return (
             <ItemCard
               key={`${i}-${item.borrower}`}

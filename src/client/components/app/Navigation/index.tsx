@@ -64,7 +64,7 @@ export const Navigation = ({ hideOptionalLinks }: NavigationProps) => {
 
   const displayLinks = navLinks.filter((link) => {
     if (link.text === 'navigation.portfolio') {
-      link.to = `/portfolio/${currentNetwork}/${userAddress}`;
+      link.to = `/${currentNetwork}/portfolio/${userAddress}`;
     }
     return !(link.optional && hideOptionalLinks);
   });

@@ -39,7 +39,7 @@ import { TxAddressInput } from './components/TxAddressInput';
 import { TxByteInput } from './components/TxByteInput';
 import { Header, TxFuncSelector } from './components/TxFuncSelector';
 import { TxNumberInput } from './components/TxNumberInput';
-import { GenerateClaimRevenueInputs } from './components/GenerateClaimRevenueInputs';
+import { GenerateClaimRevenueInputs } from './components/TxClaimRevenueInputs';
 
 const {
   CONTRACT_ADDRESSES: { ETH },
@@ -92,7 +92,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
     if (!selectedSellToken) {
       dispatch(
         TokensActions.setSelectedTokenAddress({
-          tokenAddress: selectedTokenAddress ? selectedTokenAddress : sourceAssetOptions[0].address,
+          tokenAddress: selectedTokenAddress ? selectedTokenAddress : sourceAssetOptions[0]?.address,
         })
       );
     }
@@ -207,11 +207,11 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
     isValidAddress(selectedRevenueContract) &&
     contractABI &&
     selectedContractFunctions[selectedRevenueContract] !== undefined &&
-    Array.from(Object.values(selectedContractFunctions[selectedRevenueContract]))!.length !== 0;
+    Object.values(selectedContractFunctions[selectedRevenueContract])!.length !== 0;
 
   const funcOptions = !selectedContractFunctions[selectedRevenueContract]
     ? []
-    : Array.from(Object.values(selectedContractFunctions[selectedRevenueContract])).map((func, i) => ({
+    : Object.values(selectedContractFunctions[selectedRevenueContract]).map((func, i) => ({
         id: i.toString(),
         label: func,
         value: '',
@@ -220,21 +220,18 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
 
   const handleInputChange = (name: string, type: string, value: any) => {
     console.log('handle input change', name, value);
-    let newUserFuncInputs = { ...userFuncInputs };
-    newUserFuncInputs[name] = value;
+    const newUserFuncInputs = { ...userFuncInputs, [name]: value };
     setUserFuncInputs(newUserFuncInputs);
     console.log('handle input change: ', userFuncInputs);
   };
 
   const generateInputFields = () => {
     if (funcInputs.length === 0) {
-      return <></>;
+      return null;
     }
-    const inputFieldsHTML = [];
-    for (let i = 0; i < funcInputs.length; i++) {
-      const input = funcInputs[i];
+    const inputFieldsHTML = funcInputs.map((input, i) => {
       if (input.type.includes('int')) {
-        inputFieldsHTML.push(
+        return (
           <TxNumberInput
             headerText={input.name}
             amount={userFuncInputs[input.name] ?? ''}
@@ -244,7 +241,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
         );
       }
       if (input.type === 'address') {
-        inputFieldsHTML.push(
+        return (
           <TxAddressInput
             headerText={input.name}
             address={userFuncInputs[input.name] ?? ''}
@@ -252,8 +249,8 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
           />
         );
       }
-      if (input.type === 'bytes') {
-        inputFieldsHTML.push(
+      if (input.type === 'bytes' || input.type.includes('bytes')) {
+        return (
           <TxByteInput
             headerText={input.name}
             byteCode={userFuncInputs[input.name] ?? ''}
@@ -261,7 +258,8 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
           />
         );
       }
-    }
+      return null;
+    });
 
     const mergedInputFieldsHTML = (
       <React.Fragment>
@@ -316,6 +314,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
             selectedType={claimFuncType}
             onSelectedTypeChange={onClaimFuncSelection}
           />
+          {generateInputFields()}
         </>
       ) : (
         // if no ABI, input bytecode manually
@@ -330,7 +329,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
           />
         </>
       )}
-      {generateInputFields()}
+      {/* {generateInputFields()} */}
       {/* <GenerateClaimRevenueInputs funcInputs={funcInputs} /> */}
       <TxActions>
         <TxActionButton

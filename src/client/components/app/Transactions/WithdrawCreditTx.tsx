@@ -49,11 +49,16 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
       setErrors([...errors, 'no selected position']);
       return '0';
     }
-    const maxWithdrawAmount: number = Number(selectedPosition.deposit) - Number(selectedPosition.principal) + Number(selectedPosition.interestRepaid);
+    const maxWithdrawAmount: number =
+      Number(selectedPosition.deposit) - Number(selectedPosition.principal) + Number(selectedPosition.interestRepaid);
 
     // 1 is the smallest possible unit for the token decimal
     const maxWithdrawAmountLessDust: number = maxWithdrawAmount >= 1 ? maxWithdrawAmount - 1 : 0;
-    const maxWithdrawLessDustNormalized = normalize('amount', String(maxWithdrawAmountLessDust), selectedPosition.token.decimals);
+    const maxWithdrawLessDustNormalized = normalize(
+      'amount',
+      String(maxWithdrawAmountLessDust),
+      selectedPosition.token.decimals
+    );
     return maxWithdrawLessDustNormalized;
   };
 

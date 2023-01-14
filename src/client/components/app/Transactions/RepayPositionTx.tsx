@@ -493,6 +493,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       return '0';
     }
     const maxRepay: string = `${Number(selectedPosition.principal) + Number(selectedPosition.interestAccrued)}`;
+
     return normalizeAmount(maxRepay, selectedPosition.token.decimals);
   };
 

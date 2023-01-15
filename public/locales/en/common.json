@@ -215,9 +215,9 @@
       "repay": {
         "header": "Repay",
         "select-position": "1. Select Position to Repay:",
-        "select-amount": "3. You Owe:",
-        "repay-type": "2. Select Source of Funds:",
-        "your-rates": "4. Your Current Rates:",
+        "your-rates": "2. Your Current Rates:",
+        "repay-type": "3. Select Source of Funds:",
+        "select-amount": "4. You Owe:",
         "select-repay-option": "Select Repayment Method",
         "repaying-from": "Repaying from your",
         "close": {

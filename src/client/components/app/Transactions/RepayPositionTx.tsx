@@ -88,6 +88,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     // selectedVaultOrLab: useAppSelector(VaultsSelectors.selectRecommendations)[0],
     allowTokenSelect: true,
   });
+  console.log('deposit and repay selected position: ', selectedPosition);
 
   // used for 0x testing
   const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
@@ -96,7 +97,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const [transactionLoading, setLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>(['']);
   const [transactionApproved, setTransactionApproved] = useState(true);
-  const [targetAmount, setTargetAmount] = useState('100000000000');
+  const [targetAmount, setTargetAmount] = useState('0');
 
   const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
   const [tokensToBuy, setTokensToBuy] = useState('');
@@ -191,12 +192,24 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       return;
     }
 
-    console.log('repayTX', selectedPosition.line);
+    console.log('deposit and repay repayTX', selectedPosition.line);
 
+    console.log('deposit and repay txn target amount: ', targetAmount);
+    console.log(
+      'deposit and repay txn target amount adj 1: ',
+      ethers.utils.parseUnits(targetAmount, selectedPosition.token.decimals)
+    );
+    console.log(
+      'deposit and repay txn target amount adj 2: ',
+      ethers.utils.parseUnits(targetAmount, selectedPosition.token.decimals).toString()
+    );
+    // TODO: Add unit test for submitting txns
     dispatch(
       LinesActions.depositAndRepay({
         lineAddress: selectedPosition.line,
-        amount: ethers.utils.parseEther(targetAmount),
+        // amount: ethers.utils.parseEther(targetAmount),
+        amount: ethers.utils.parseUnits(targetAmount, selectedPosition.token.decimals),
+        // amount: ethers.utils.formatUnits(targetAmount, selectedPosition.token.decimals),
         network: walletNetwork,
       })
     ).then((res) => {
@@ -573,7 +586,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
               headerText={t('components.transaction.repay.claim-and-repay.claim-token')}
               inputText={tokenHeaderText}
               amount={normalizeAmount(targetAmount, selectedPosition.token.decimals)}
-              onAmountChange={(amnt) => setTargetAmount(toWei(amnt, selectedPosition.token.decimals))}
+              // onAmountChange={(amnt) => setTargetAmount(toWei(amnt, selectedPosition.token.decimals))}
+              onAmountChange={(amnt) => setTargetAmount(amnt)}
               // token to claim from spigot
               selectedToken={selectedSellToken}
               // 0x testing data
@@ -615,7 +629,9 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             headerText={t('components.transaction.repay.select-amount')}
             inputText={tokenHeaderText}
             amount={normalizeAmount(amount, selectedPosition.token.decimals)}
-            onAmountChange={(amnt) => setTargetAmount(toWei(amnt, selectedPosition.token.decimals))}
+            // TODO: Note - RepayPositionTax is the only one that sets targetAmount in wei instead of string
+            // onAmountChange={(amnt) => setTargetAmount(toWei(amnt, selectedPosition.token.decimals))}
+            onAmountChange={(amnt) => setTargetAmount(amnt)}
             // @cleanup TODO
             maxAmount={getMaxRepay()}
             selectedToken={selectedSellToken}
@@ -629,7 +645,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   return (
     <StyledTransaction onClose={onClose} header={header || t('components.transaction.repay.header')}>
       <TxPositionInput
-        headerText={t('components.transaction.borrow-credit.select-line')}
+        headerText={t('components.transaction.repay.select-position')}
         inputText={t('components.transaction.borrow-credit.select-line')}
         onSelectedPositionChange={onSelectedPositionChange}
         selectedPosition={selectedPosition}

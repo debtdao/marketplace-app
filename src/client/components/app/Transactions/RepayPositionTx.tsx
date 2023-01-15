@@ -585,7 +585,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             <TxTokenInput
               headerText={t('components.transaction.repay.claim-and-repay.claim-token')}
               inputText={tokenHeaderText}
-              amount={normalizeAmount(targetAmount, selectedPosition.token.decimals)}
+              // amount={normalizeAmount(targetAmount, selectedPosition.token.decimals)}
+              amount={targetAmount}
               // onAmountChange={(amnt) => setTargetAmount(toWei(amnt, selectedPosition.token.decimals))}
               onAmountChange={(amnt) => setTargetAmount(amnt)}
               // token to claim from spigot
@@ -628,8 +629,10 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
           <TxTokenInput
             headerText={t('components.transaction.repay.select-amount')}
             inputText={tokenHeaderText}
-            amount={normalizeAmount(amount, selectedPosition.token.decimals)}
-            // TODO: Note - RepayPositionTax is the only one that sets targetAmount in wei instead of string
+            // TODO: Note - RepayPositionTxn is the only one that normalizes the amount field
+            // amount={normalizeAmount(amount, selectedPosition.token.decimals)}
+            amount={targetAmount}
+            // TODO: Note - RepayPositionTxn is the only one that sets targetAmount in wei instead of string
             // onAmountChange={(amnt) => setTargetAmount(toWei(amnt, selectedPosition.token.decimals))}
             onAmountChange={(amnt) => setTargetAmount(amnt)}
             // @cleanup TODO

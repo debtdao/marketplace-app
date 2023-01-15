@@ -232,7 +232,7 @@
         },
         "deposit-and-close": {
           "title": "Repay & close",
-          "desc": "",
+          "desc": "from your wallet",
           "cta": "Close"
         },
         "unused": {

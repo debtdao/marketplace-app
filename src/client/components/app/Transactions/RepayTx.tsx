@@ -364,7 +364,7 @@ export const DepositAndRepayTx: FC<DepositAndRepayProps> = (props) => {
       <TxDropdown
         key={'type-input'}
         headerText={t('components.transaction.deposit-and-repay.repay-type')}
-        inputText={t('components.transaction.deposit-and-repay.select-repay')}
+        inputText={t('components.transaction.deposit-and-repay.select-repay-option')}
         onSelectedTypeChange={onSelectedTypeChange}
         selectedType={repayType}
         typeOptions={repaymentOptions}

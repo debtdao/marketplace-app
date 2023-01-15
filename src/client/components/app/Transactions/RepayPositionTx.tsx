@@ -670,7 +670,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       />
       <TxDropdown
         headerText={t('components.transaction.repay.repay-type')}
-        inputText={t('components.transaction.repay.select-repay-option')}
+        inputText={t('components.transaction.repay.select-repay')}
         onSelectedTypeChange={onSelectedTypeChange}
         selectedType={repayType}
         typeOptions={allRepaymentOptions}

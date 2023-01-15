@@ -167,7 +167,7 @@ export const TxDropdown: FC<TxDropdownProps> = ({
         <CSSTransition in={isOpen} appear={true} timeout={scaleTransitionTime} classNames="scale">
           <StyledSearchList
             list={typeOptions}
-            headerText={t('components.transaction.repay.select-repay')}
+            headerText={t('components.transaction.repay.select-repay-option')}
             selected={selectedType}
             setSelected={(item) => onSelectedTypeChange(item!)}
             onCloseList={() => setOpenedSearch(false)}

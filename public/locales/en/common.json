@@ -190,6 +190,10 @@
         "header": "Deposit Collateral",
         "select-token": "The Token Used As Collateral"
       },
+
+      "release-collateral": {
+        "header": "Release Collateral"
+      },
       "arbiter-liquidate": {
         "header": "Liquidate Borrowers",
         "select-credit": "1. Select a borrower to liquidate",

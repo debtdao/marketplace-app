@@ -13,6 +13,7 @@ const { openModal, closeModal } = ModalsActions;
 
 const modalsReducer = createReducer(modalsInitialState, (builder) => {
   builder.addCase(openModal, (state, { payload: { modalName, modalProps } }) => {
+    console.log('MODAL REDUCER', modalName);
     state.activeModal = modalName;
     state.modalProps = modalProps || {};
 

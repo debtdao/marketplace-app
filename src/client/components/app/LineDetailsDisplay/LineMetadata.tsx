@@ -200,6 +200,17 @@ export const LineMetadata = () => {
     }
   };
 
+  const withdrawHandler = (token: TokenView) => {
+    if (!walletIsConnected) {
+      connectWallet();
+    } else {
+      dispatch(CollateralActions.setSelectedCollateralAsset({ assetAddress: token.address }));
+      dispatch(
+        ModalsActions.openModal({ modalName: 'releaseCollateral', modalProps: { assetAddress: token.address } })
+      );
+    }
+  };
+
   const addSpigotHandler = (token: TokenView) => {
     if (!walletIsConnected) {
       connectWallet();
@@ -250,8 +261,10 @@ export const LineMetadata = () => {
     : `${t('components.connect-button.connect')}`;
 
   const getCollateralTableActions = () => {
+    console.log('COLLATERAL TABLE', userPositionMetadata.role);
     switch (userPositionMetadata.role) {
       case BORROWER_POSITION_ROLE:
+      //  return; // comment this out to test buttons
       case ARBITER_POSITION_ROLE:
         return (
           <>
@@ -268,6 +281,37 @@ export const LineMetadata = () => {
 
   const startDateHumanized = format(new Date(startTime * 1000), 'MMMM dd, yyyy');
   const endDateHumanized = format(new Date(endTime * 1000), 'MMMM dd, yyyy');
+
+  // TODO: fix types on args
+  // TODO: What is the action button for revenue?
+  const renderButtons = (token: any, type: any) => {
+    console.log('TYPE BUTTONS', type);
+    if (type === 'revenue') {
+      return;
+    }
+    return (
+      <>
+        <ActionButtons
+          actions={[
+            {
+              name: t('components.transaction.withdraw'),
+              handler: () => withdrawHandler(token),
+              disabled: !walletIsConnected,
+            },
+          ]}
+        />
+        <ActionButtons
+          actions={[
+            {
+              name: t('components.transaction.deposit'),
+              handler: () => depositHandler(token),
+              disabled: !walletIsConnected,
+            },
+          ]}
+        />
+      </>
+    );
+  };
   return (
     <>
       <ThreeColumnLayout>
@@ -356,17 +400,7 @@ export const LineMetadata = () => {
             },
             {
               key: 'actions',
-              transform: ({ token }) => (
-                <ActionButtons
-                  actions={[
-                    {
-                      name: t('components.transaction.deposit'),
-                      handler: () => depositHandler(token),
-                      disabled: !walletIsConnected,
-                    },
-                  ]}
-                />
-              ),
+              transform: ({ token, type }) => renderButtons(token, type),
               align: 'flex-end',
               width: 'auto',
               grow: '1',

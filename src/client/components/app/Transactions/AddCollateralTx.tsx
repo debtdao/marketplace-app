@@ -12,7 +12,13 @@ import {
   useAppSelector,
   useSelectedSellToken,
 } from '@hooks';
-import { ACTIVE_STATUS, AddCollateralProps, ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE } from '@src/core/types';
+import {
+  ACTIVE_STATUS,
+  AddCollateralProps,
+  ARBITER_POSITION_ROLE,
+  BORROWER_POSITION_ROLE,
+  REPAID_STATUS,
+} from '@src/core/types';
 import { getConstants, testTokens } from '@src/config/constants';
 import {
   TokensActions,
@@ -286,7 +292,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
     );
   }
 
-  const isActive = selectedLine.status === ACTIVE_STATUS;
+  const isActive = selectedLine.status === ACTIVE_STATUS || selectedLine.status === REPAID_STATUS; // TODO = make resusable?
   if (!isActive) {
     const toMarketplace = () => {
       onClose();

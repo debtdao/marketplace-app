@@ -122,6 +122,7 @@
       "max": "MAX",
       "migrate": "Migrate",
       "reinvest": "Reinvest",
+      "release": "Release",
       "reward": "Reward",
       "sign": "Sign",
       "stake": "Stake",
@@ -192,7 +193,9 @@
       },
 
       "release-collateral": {
-        "header": "Release Collateral"
+        "header": "Release Collateral",
+        "select-token": "The Token Used As Collateral"
+        
       },
       "arbiter-liquidate": {
         "header": "Liquidate Borrowers",

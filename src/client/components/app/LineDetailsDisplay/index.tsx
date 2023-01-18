@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
 import { RedirectIcon, Text, Link } from '@components/common';
 import { OnchainMetaDataActions, OnchainMetaDataSelector, LinesSelectors, NetworkSelectors } from '@store';
-import { Network } from '@src/core/types';
+import { Collateral, Network } from '@src/core/types';
 import { getENS } from '@src/utils';
 
 import { LineMetadata } from './LineMetadata';
@@ -72,6 +72,7 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const [borrowerID, setBorrowerId] = useState('');
+
   useEffect(() => {
     dispatch(OnchainMetaDataActions.getENS(selectedLine?.borrower!));
   }, [selectedLine]);

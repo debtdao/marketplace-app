@@ -9,6 +9,7 @@ import {
   CollateralEvent,
   Address,
   ClaimRevenueProps,
+  ReleaseCollateraltProps,
 } from '@src/core/types';
 
 const setSelectedEscrow = createAction<{ escrowAddress?: string }>('collateral/setSelectedEscrow');
@@ -83,6 +84,33 @@ const addCollateral = createAsyncThunk<
   };
 });
 
+const releaseCollateral = createAsyncThunk<
+  { contract: string; token: string; success: boolean },
+  ReleaseCollateraltProps,
+  ThunkAPI
+>('collateral/releaseCollateral', async (props, { extra, getState, dispatch }) => {
+  const { wallet } = getState();
+  const { services } = extra;
+  const userAddress = wallet.selectedAddress;
+  if (!userAddress) throw new Error('WALLET NOT CONNECTED');
+
+  console.log('addCollateral action props', props);
+  // TODO chekc that they are arbiter on line that owns Escrowbeforethey send tx
+  const { collateralService } = services;
+  const tx = await collateralService.releaseCollateral(props);
+  console.log('addCollateral tx', tx);
+
+  if (!tx) {
+    throw new Error('failed to add collateral');
+  }
+
+  return {
+    ...props,
+    contract: props.escrowAddress,
+    success: !!tx,
+  };
+});
+
 const addSpigot = createAsyncThunk<{ contract: string; asset: string; success: boolean }, AddSpigotProps, ThunkAPI>(
   'collateral/addSpigot',
   async (props, { extra, getState, dispatch }) => {
@@ -142,6 +170,7 @@ export const CollateralActions = {
   setSelectedCollateralAsset,
   enableCollateral,
   addCollateral,
+  releaseCollateral,
   addSpigot,
   claimRevenue,
   saveModuleToMap,

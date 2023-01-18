@@ -13,23 +13,9 @@ export interface ReleaseCollateralTxModalProps {
 export const ReleaseCollateralTxModal: FC<ReleaseCollateralTxModalProps> = ({ onClose, ...props }) => {
   const { t } = useAppTranslation('common');
 
-  const onSelectedCreditLineChange = () => {
-    // new creditLine selected to invest in
-    // setSelected()
-  };
-
-  const onPositionChange = () => {
-    // update deposit params
-  };
-
   return (
     <StyledReleaseCollateralTxModal {...props}>
-      <ReleaseCollateralTx 
-        header={t('components.transaction.enable-spigot.header')} 
-        onClose={onClose} 
-        onSelectedCreditLineChange={onSelectedCreditLineChange}
-        onPositionChange={onPositionChange}
-      />
+      <ReleaseCollateralTx header={t('components.transaction.enable-spigot.header')} onClose={onClose} />
     </StyledReleaseCollateralTxModal>
   );
 };

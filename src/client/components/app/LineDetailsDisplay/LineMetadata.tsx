@@ -21,7 +21,7 @@ import {
   TokenView,
 } from '@src/core/types';
 import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
-import { Button, Text, RedirectIcon, Link } from '@components/common';
+import { Button, Text, RedirectIcon, Link, CardEmptyList } from '@components/common';
 import {
   LinesSelectors,
   ModalsActions,
@@ -264,7 +264,7 @@ export const LineMetadata = () => {
     console.log('COLLATERAL TABLE', userPositionMetadata.role);
     switch (userPositionMetadata.role) {
       case BORROWER_POSITION_ROLE:
-      //  return; // comment this out to test buttons
+        return; // comment this out to test buttons
       case ARBITER_POSITION_ROLE:
         return (
           <>
@@ -289,12 +289,13 @@ export const LineMetadata = () => {
     if (type === 'revenue') {
       return;
     }
+    // TODO: Needs padding
     return (
       <>
         <ActionButtons
           actions={[
             {
-              name: t('components.transaction.withdraw'),
+              name: t('components.transaction.release'),
               handler: () => withdrawHandler(token),
               disabled: !walletIsConnected,
             },
@@ -349,9 +350,8 @@ export const LineMetadata = () => {
         {renderSpigotMetadata()}
         {renderEscrowMetadata()}
       </ThreeColumnLayout>
-
+      <SectionHeader>{t('lineDetails:metadata.escrow.assets-list.title')}</SectionHeader>
       <ViewContainer>
-        <SectionHeader>{t('lineDetails:metadata.escrow.assets-list.title')}</SectionHeader>
         <AssetsListCard
           header={' '}
           data-testid="line-assets-list"

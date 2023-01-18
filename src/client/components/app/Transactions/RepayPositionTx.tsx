@@ -559,6 +559,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         );
 
         if (getAddress(buyToken) !== getAddress(sellToken) && !haveFetched0x) {
+          // if (!haveFetched0x) {
           setHaveFetched0x(true);
           const tradeTx = getTradeQuote({
             // set fake data for testing 0x
@@ -579,9 +580,18 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
           console.log('get 0x trade quote', tradeTx);
         }
+        // when buyToken and sellToken addresses are identical, don't use 0x
+        else {
+          console.log(targetAmount);
+          // not buying via 0x, but claiming so that position can be repaid
+          setTokensToBuy(targetAmount);
+          // fake 0x transaction data so revenue token can be claimed and used for repayment
+          setTradeData({} as ZeroExAPIQuoteResponse);
+        }
 
         return (
           <>
+            {/* TODO: Select from available revenue tokens */}
             <TxTokenInput
               headerText={t('components.transaction.repay.claim-and-repay.claim-token')}
               inputText={tokenHeaderText}
@@ -611,6 +621,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             ) : (
               <TradeError> {t('components.transaction.repay.claim-and-repay.insufficient-liquidity')} </TradeError>
             )}
+            {/* TODO: Add error message if trading into same token as revenue token */}
           </>
         );
 

@@ -242,11 +242,6 @@
           "desc": "from your wallet",
           "cta": "Close"
         },
-        "unused": {
-          "title": "From reserves",
-          "desc": "from excess revenue",
-          "cta": "Repay"
-        },
         "claim-and-repay": {
           "title": "From revenue",
           "desc": "claim revenue from spigot and repay",
@@ -258,6 +253,11 @@
           "title": "To reserves",
           "desc": "claim revenue from spigot and store in unused reserves",
           "cta": "Claim & Trade"
+        },
+        "use-and-repay": {
+          "title": "From reserves",
+          "desc": "from excess revenue",
+          "cta": "Use and Repay"
         }
       },
       "withdraw-credit": {

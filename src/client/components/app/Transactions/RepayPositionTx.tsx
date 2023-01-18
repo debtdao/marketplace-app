@@ -53,9 +53,9 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       value: t('components.transaction.repay.deposit-and-close.desc'),
     },
     {
-      id: 'unused',
-      label: t('components.transaction.repay.unused.title'),
-      value: t('components.transaction.repay.unused.desc'),
+      id: 'use-and-repay',
+      label: t('components.transaction.repay.use-and-repay.title'),
+      value: t('components.transaction.repay.use-and-repay.desc'),
     },
     {
       id: 'close',
@@ -428,10 +428,10 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             contrast: false,
           },
         ];
-      case 'unused':
+      case 'use-and-repay':
         return [
           {
-            label: t('components.transaction.use-and-repay.cta'),
+            label: t('components.transaction.repay.use-and-repay.cta'),
             onAction: useAndRepay,
             status: true,
             disabled: !transactionApproved,

@@ -555,7 +555,15 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
           'repay from rev - buy/sell tokens',
           getAddress(buyToken) !== getAddress(sellToken),
           getAddress(buyToken),
-          getAddress(sellToken)
+          getAddress(sellToken),
+          tokensToBuy,
+          targetAmount,
+          haveFetched0x
+        );
+
+        console.log(
+          'repay from rev - buy/sell tokens 2',
+          getAddress(buyToken) !== getAddress(sellToken) && !haveFetched0x
         );
 
         if (getAddress(buyToken) !== getAddress(sellToken) && !haveFetched0x) {
@@ -582,11 +590,11 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         }
         // when buyToken and sellToken addresses are identical, don't use 0x
         else {
-          console.log(targetAmount);
           // not buying via 0x, but claiming so that position can be repaid
-          setTokensToBuy(targetAmount);
+          // setHaveFetched0x(true);
+          // setTokensToBuy(targetAmount);
           // fake 0x transaction data so revenue token can be claimed and used for repayment
-          setTradeData({} as ZeroExAPIQuoteResponse);
+          // setTradeData({} as ZeroExAPIQuoteResponse);
         }
 
         return (
@@ -605,14 +613,15 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
               // selectedToken={tokensMap[ETH]}
               onSelectedTokenChange={onSelectedSellTokenChange}
               tokenOptions={sourceAssetOptions} // TODO get options from unusedToken data in subgraph
-              readOnly={true}
+              readOnly={false}
             />
-            {/* redner bought tokens based on trade data from 0x API response */}
+            {/* redner tokens to purchase based on trade data from 0x API response */}
             {!!tokensToBuy ? (
               <TxTokenInput
                 headerText={t('components.transaction.repay.claim-and-repay.credit-token')}
                 inputText={t('components.transaction.repay.claim-and-repay.buy-amount')}
-                amount={normalizeAmount(tokensToBuy, selectedPosition.token.decimals)}
+                // amount={normalizeAmount(tokensToBuy, selectedPosition.token.decimals)}
+                amount={tokensToBuy}
                 selectedToken={selectedPosition.token}
                 // 0x testing data
                 // selectedToken={tokensMap[DAI]}
@@ -621,7 +630,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             ) : (
               <TradeError> {t('components.transaction.repay.claim-and-repay.insufficient-liquidity')} </TradeError>
             )}
-            {/* TODO: Add error message if trading into same token as revenue token */}
           </>
         );
 

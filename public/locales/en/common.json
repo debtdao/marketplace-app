@@ -195,7 +195,7 @@
       "release-collateral": {
         "header": "Release Collateral",
         "select-token": "The Token Used As Collateral"
-        
+
       },
       "arbiter-liquidate": {
         "header": "Liquidate Borrowers",
@@ -247,6 +247,8 @@
           "desc": "claim revenue from spigot and repay",
           "cta": "Claim & Repay",
           "claim-token": "Revenue token to claim",
+          "credit-token": "Credit Token To Purchase",
+          "buy-amount": "Purchase Amount",
           "insufficient-liquidity": "Insufficient Liquidity for revenue token"
         },
         "claim-and-trade": {

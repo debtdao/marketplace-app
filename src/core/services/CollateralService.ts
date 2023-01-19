@@ -31,6 +31,7 @@ import {
   UseAndRepayProps,
   UpdateSpigotOwnerSplitProps,
   ClaimRevenueProps,
+  TradeableProps,
 } from '@types';
 import { getConfig } from '@config';
 import { getContract } from '@frameworks/ethers';
@@ -197,6 +198,16 @@ export class CollateralServiceImpl implements CollateralService {
       this.lineAbi,
       'updateOwnerSplit',
       [props.revenueContract],
+      props.network
+    );
+  }
+
+  public async tradeable(props: TradeableProps): Promise<TransactionResponse | PopulatedTransaction> {
+    return await this.executeContractMethod(
+      props.lineAddress,
+      this.lineAbi,
+      'tradeable',
+      [props.tokenAddress],
       props.network
     );
   }

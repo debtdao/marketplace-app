@@ -32,6 +32,7 @@ export const collateralInitialState: CollateralState = {
   selectedSpigot: undefined,
   selectedCollateralAsset: undefined,
   selectedRevenueContract: undefined,
+  reserves: {},
   collateralMap: {},
   eventsMap: {},
   user: {
@@ -50,6 +51,7 @@ const {
   addCollateral,
   enableCollateral,
   addSpigot,
+  tradeable,
 } = CollateralActions;
 
 const collateralReducer = createReducer(collateralInitialState, (builder) => {
@@ -136,6 +138,11 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
         if (line.spigot) map[line.spigotId!] = line.spigot;
       });
       state.collateralMap = { ...state.collateralMap, ...map };
+    })
+    /* -------------------------------- claimTradeableTokens ------------------------------- */
+    .addCase(tradeable.fulfilled, (state, { payload: { claimableTokens } }) => {
+      console.log('claimableTokens', claimableTokens);
+      // state.reserves
     });
 });
 

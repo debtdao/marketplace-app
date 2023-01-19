@@ -251,6 +251,9 @@
           "buy-amount": "Purchase Amount",
           "insufficient-liquidity": "Insufficient Liquidity for revenue token"
         },
+        "approve-funds-for-repayment": {
+          "cta": "Approve Funds For Repayment"
+        },
         "claim-and-trade": {
           "title": "To reserves",
           "desc": "claim revenue from spigot and store in unused reserves",

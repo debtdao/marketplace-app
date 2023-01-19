@@ -147,12 +147,14 @@ export const formatSpigotCollateralEvents = (events: SpigotEventFragResponse[] |
   const spigotEvents = events
     .filter((event: SpigotEventFragResponse) => event.__typename === 'ClaimRevenueEvent')
     .map((event: SpigotEventFragResponse) => {
-      const { revenueToken, escrowed: amount, timestamp, value } = event;
+      // const { revenueToken, escrowed: amount, timestamp, value } = event;
+      const { revenueToken, timestamp, value } = event;
       return {
         id: revenueToken.id as Address,
         type: 'revenue' as CollateralTypes,
         timestamp,
-        amount,
+        // amount,
+        amount: '0',
         value,
       };
     });

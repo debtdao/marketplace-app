@@ -373,6 +373,12 @@ export interface ClaimRevenueProps {
   dryRun?: boolean;
 }
 
+export interface TradeableProps {
+  tokenAddress: Address;
+  network: Network;
+  lineAddress: Address;
+}
+
 export interface LiquidateEscrowAssetProps {
   // userPositionMetadata: UserPositionMetadata;
   lineAddress: Address;
@@ -463,6 +469,7 @@ export interface CollateralService {
   isSpigotOwner(spigotAddress?: string, lineAddress?: string): Promise<boolean>;
   defaultSplit(lineAddress: string): Promise<BigNumber>;
   maxSplit(): BigNumber; // always 100
+  tradeable(props: TradeableProps): Promise<TransactionResponse | PopulatedTransaction>;
 }
 
 export interface OnchainMetaDataService {

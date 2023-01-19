@@ -219,7 +219,7 @@ export interface SpigotRevenueContract extends Collateral {
   transferFunc: string;
   startTime: number;
   ownerSplit: number;
-  escrowed: string;
+  //escrowed: string;
   totalVolumeUsd: string;
   events?: SpigotEvents[];
 }
@@ -289,7 +289,7 @@ type SpigotEvents = ClaimRevenueEvent;
 
 export interface ClaimRevenueEvent extends CollateralEvent {
   revenueToken: TokenView;
-  escrowed: string;
+  //escrowed: string;
   netIncome: string;
 }
 

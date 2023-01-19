@@ -10,7 +10,9 @@ import {
   Address,
   ClaimRevenueProps,
   ReleaseCollateraltProps,
+  TradeableProps,
 } from '@src/core/types';
+import { TxActionButton } from '@src/client/components/app';
 
 const setSelectedEscrow = createAction<{ escrowAddress?: string }>('collateral/setSelectedEscrow');
 const setSelectedSpigot = createAction<{ spigotAddress?: string }>('collateral/setSelectedSpigot');
@@ -163,6 +165,30 @@ const claimRevenue = createAsyncThunk<{ contract: string; success: boolean }, Cl
   }
 );
 
+const tradeable = createAsyncThunk<{ claimableTokens: string; success: boolean }, TradeableProps, ThunkAPI>(
+  'collateral/tradeable',
+  async (props, { extra, getState }) => {
+    const { lineAddress, network, tokenAddress } = props;
+    const { collateralService } = extra.services;
+
+    const tx = await collateralService.tradeable({
+      lineAddress,
+      network,
+      tokenAddress,
+    });
+    console.log('transaction: ', tx);
+
+    if (!tx) {
+      throw new Error('failed to view tradeable tokens');
+    }
+
+    return {
+      claimableTokens: tx?.value!.toString(),
+      success: !!tx?.value,
+    };
+  }
+);
+
 export const CollateralActions = {
   setSelectedEscrow,
   setSelectedSpigot,
@@ -173,6 +199,7 @@ export const CollateralActions = {
   releaseCollateral,
   addSpigot,
   claimRevenue,
+  tradeable,
   saveModuleToMap,
   saveEventsToMap,
 };

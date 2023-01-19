@@ -79,7 +79,7 @@ const BASE_SPIGOT_FRAGMENT = gql`
     transferFunc
     startTime
     ownerSplit
-    escrowed
+    #escrowed
     totalVolumeUsd
   }
 `;
@@ -110,7 +110,7 @@ const SPIGOT_EVENT_FRAGMENT = gql`
       revenueToken {
         ...TokenFrag
       }
-      escrowed
+      #escrowed
       netIncome
       value
     }

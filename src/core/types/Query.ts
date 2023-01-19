@@ -200,7 +200,7 @@ export interface SpigotRevenueContractFragResponse {
   transferFunc: string;
   startTime: number;
   ownerSplit: number;
-  escrowed: string;
+  //escrowed: string;
   totalVolumeUsd: string;
 }
 
@@ -208,7 +208,7 @@ export interface SpigotEventFragResponse {
   __typename: 'ClaimRevenueEvent';
   timestamp: number;
   revenueToken: TokenFragRepsonse;
-  escrowed: string;
+  //escrowed: string;
   netIncome: string;
   value: string;
 }

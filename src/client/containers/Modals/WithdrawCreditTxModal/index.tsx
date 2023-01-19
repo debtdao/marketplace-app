@@ -22,6 +22,7 @@ export const WithdrawCreditTxModal: FC<WithdrawTxModalProps> = ({ onClose, ...pr
     // update deposit params
   };
   console.log('withdraw modal props: ', props);
+  console.log('withdraw modal props: ', props);
   return (
     <StyledWithdrawTxModal {...props}>
       <WithdrawCreditTx

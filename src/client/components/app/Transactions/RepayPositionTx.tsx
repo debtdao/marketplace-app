@@ -100,9 +100,10 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const [targetAmount, setTargetAmount] = useState('0');
 
   const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
-  const [tokensToBuy, setTokensToBuy] = useState('');
+  const [tokensToBuy, setTokensToBuy] = useState('0');
   const [tradeData, setTradeData] = useState<ZeroExAPIQuoteResponse>();
   const [haveFetched0x, setHaveFetched0x] = useState<boolean>(false);
+  const [successfulQuote, setSuccessfulQuote] = useState<boolean>(false);
 
   useEffect(() => {
     if (!selectedSellToken && !_.isEmpty(sourceAssetOptions)) {
@@ -568,7 +569,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
         if (getAddress(buyToken) !== getAddress(sellToken) && !haveFetched0x) {
           // if (!haveFetched0x) {
-          setHaveFetched0x(true);
           const tradeTx = getTradeQuote({
             // set fake data for testing 0x
             // buyToken: DAI,
@@ -581,20 +581,23 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
           }).then((result) => {
             console.log('repay modal: trade quote res', result, result?.buyAmount);
             if (result) {
+              setHaveFetched0x(true);
               setTokensToBuy(result.buyAmount!);
               setTradeData(result);
+            } else {
+              setSuccessfulQuote(false);
             }
           });
 
           console.log('get 0x trade quote', tradeTx);
         }
         // when buyToken and sellToken addresses are identical, don't use 0x
-        else {
+        else if (!haveFetched0x) {
           // not buying via 0x, but claiming so that position can be repaid
-          // setHaveFetched0x(true);
-          // setTokensToBuy(targetAmount);
+          setHaveFetched0x(true);
+          setTokensToBuy(targetAmount);
           // fake 0x transaction data so revenue token can be claimed and used for repayment
-          // setTradeData({} as ZeroExAPIQuoteResponse);
+          setTradeData({} as ZeroExAPIQuoteResponse);
         }
 
         return (
@@ -615,20 +618,21 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
               tokenOptions={sourceAssetOptions} // TODO get options from unusedToken data in subgraph
               readOnly={false}
             />
-            {/* redner tokens to purchase based on trade data from 0x API response */}
-            {!!tokensToBuy ? (
-              <TxTokenInput
-                headerText={t('components.transaction.repay.claim-and-repay.credit-token')}
-                inputText={t('components.transaction.repay.claim-and-repay.buy-amount')}
-                // amount={normalizeAmount(tokensToBuy, selectedPosition.token.decimals)}
-                amount={tokensToBuy}
-                selectedToken={selectedPosition.token}
-                // 0x testing data
-                // selectedToken={tokensMap[DAI]}
-                readOnly={true}
-              />
-            ) : (
+            {/* rendner tokens to purchase based on trade data from 0x API response */}
+            <TxTokenInput
+              headerText={t('components.transaction.repay.claim-and-repay.credit-token')}
+              inputText={t('components.transaction.repay.claim-and-repay.buy-amount')}
+              // amount={normalizeAmount(tokensToBuy, selectedPosition.token.decimals)}
+              amount={tokensToBuy}
+              selectedToken={selectedPosition.token}
+              // 0x testing data
+              // selectedToken={tokensMap[DAI]}
+              readOnly={true}
+            />
+            {!successfulQuote ? (
               <TradeError> {t('components.transaction.repay.claim-and-repay.insufficient-liquidity')} </TradeError>
+            ) : (
+              <></>
             )}
           </>
         );

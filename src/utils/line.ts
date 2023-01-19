@@ -236,6 +236,7 @@ export const formatSecuredLineData = (
   spigot: AggregatedSpigot;
   escrow: AggregatedEscrow;
 } => {
+  console.log('do I get here 17');
   // derivative or aggregated data we need to compute and store while mapping position data
   const collateralDeposits: BaseEscrowDepositFragResponse[] = escrow?.deposits || [];
   const revenues: SpigotRevenueSummaryFragResponse[] = spigot?.summaries || [];
@@ -554,6 +555,7 @@ export const formatLinePageData = (
   lineData: GetLinePageResponse | undefined,
   tokenPrices: { [token: string]: BigNumber }
 ): SecuredLineWithEvents | undefined => {
+  console.log('do I get here 16', lineData);
   if (!lineData) return undefined;
   // add token Prices as arg
   const {

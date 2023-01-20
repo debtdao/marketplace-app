@@ -69,47 +69,44 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
 
   const [funcInputs, setFuncInputs] = useState<ParamType[]>([]);
   const [userFuncInputs, setUserFuncInputs] = useState<{ [name: string]: any }>({});
+  // const [didFetchAbi, setDidFetchABI] = useState<boolean>(false);
 
-  console.log('User Func Inputs: ', userFuncInputs);
+  // TODO: remove all references to selectedSellToken and selectedTokenAddress
+  // const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
+  // const initialToken: string = selectedSellTokenAddress || ETH;
+  // const { selectedSellToken, sourceAssetOptions } = useSelectedSellToken({
+  //   selectedSellTokenAddress: initialToken,
+  //   allowTokenSelect: true,
+  // });
 
-  const [didFetchAbi, setDidFetchABI] = useState<boolean>(false);
-
-  const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
-  const initialToken: string = selectedSellTokenAddress || ETH;
-  const { selectedSellToken, sourceAssetOptions } = useSelectedSellToken({
-    selectedSellTokenAddress: initialToken,
-    allowTokenSelect: true,
-  });
-
-  console.log('selected tokens #1', selectedSellToken, selectedSellTokenAddress);
+  // console.log('selected tokens #1', selectedSellToken, selectedSellTokenAddress);
   const [transactionLoading, setLoading] = useState(false);
-  const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
+  // const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
+  const [revenueTokenToClaim, setRevenueTokenToClaim] = useState('');
   const [transactionCompleted, setTransactionCompleted] = useState(0);
 
-  useEffect(() => {
-    // @cleanup would be great to just do this inside the selectors so we dont have hooks everywhere for same thing
-    console.log('use effct #1', selectedTokenAddress, selectedSellToken);
-    if (!selectedSellToken) {
-      dispatch(
-        TokensActions.setSelectedTokenAddress({
-          tokenAddress: selectedTokenAddress ? selectedTokenAddress : sourceAssetOptions[0]?.address,
-        })
-      );
-    }
-    console.log('use effct #2', selectedTokenAddress, selectedSellToken);
-    if (!selectedTokenAddress && selectedSellToken) {
-      console.log('set tkn addr', selectedSellToken);
-      setSelectedTokenAddress(selectedSellToken.address);
-    }
-  }, [selectedSellToken, selectedTokenAddress]);
+  // useEffect(() => {
+  //   // @cleanup would be great to just do this inside the selectors so we dont have hooks everywhere for same thing
+  //   console.log('use effct #1', selectedTokenAddress, selectedSellToken);
+  //   if (!selectedSellToken) {
+  //     dispatch(
+  //       TokensActions.setSelectedTokenAddress({
+  //         tokenAddress: selectedTokenAddress ? selectedTokenAddress : sourceAssetOptions[0]?.address,
+  //       })
+  //     );
+  //   }
+  //   console.log('use effct #2', selectedTokenAddress, selectedSellToken);
+  //   if (!selectedTokenAddress && selectedSellToken) {
+  //     console.log('set tkn addr', selectedSellToken);
+  //     setSelectedTokenAddress(selectedSellToken.address);
+  //   }
+  // }, [selectedSellToken, selectedTokenAddress]);
 
-  console.log('selected revenue contract: ', selectedRevenueContract);
-
-  const onSelectedSellTokenChange = (tokenAddress: string) => {
-    console.log('set token', tokenAddress);
-    setTargetTokenAmount('');
-    dispatch(TokensActions.setSelectedTokenAddress({ tokenAddress }));
-  };
+  // const onSelectedSellTokenChange = (tokenAddress: string) => {
+  //   console.log('set token', tokenAddress);
+  //   setTargetTokenAmount('');
+  //   dispatch(TokensActions.setSelectedTokenAddress({ tokenAddress }));
+  // };
 
   // Event Handlers
 
@@ -134,15 +131,21 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
       return;
     }
 
-    if (!selectedSellTokenAddress) {
+    // if (!selectedSellTokenAddress) {
+    //   console.log('claim rev modal: claimRevenue() - no rev token selected');
+    //   return;
+    // }
+
+    if (!revenueTokenToClaim) {
       console.log('claim rev modal: claimRevenue() - no rev token selected');
       return;
     }
+
     console.log(
       'Claim Rev Data',
       selectedSpigot.id,
       selectedRevenueContract,
-      selectedSellTokenAddress,
+      // selectedSellTokenAddress,
       claimFunc,
       walletNetwork
     );
@@ -151,7 +154,8 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
       CollateralActions.claimRevenue({
         spigotAddress: selectedSpigot.id,
         revenueContract: selectedRevenueContract,
-        token: selectedSellTokenAddress,
+        // token: selectedSellTokenAddress,
+        token: revenueTokenToClaim,
         claimData: claimFunc, // default to null claimdata
         network: walletNetwork,
       })
@@ -188,12 +192,12 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
     );
   }
 
-  if (!selectedSellToken && !selectedTokenAddress) return null;
+  // if (!selectedSellToken && !selectedTokenAddress) return null;
 
   // TODO: Autopopulate claimFunc in modal so this function can be deprecated.
   const onClaimFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
     const funcInputs = generateClaimFuncInputs(newFunc.label, contractABI[selectedRevenueContract]!);
-    console.log('Func Inputs: ', funcInputs);
+    // console.log('Func Inputs: ', funcInputs);
     setFuncInputs(funcInputs);
     const hashedSigFunc = generateSig(newFunc.label, contractABI[selectedRevenueContract]!);
     setClaimFunc(hashedSigFunc);
@@ -216,13 +220,10 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
         label: func,
         value: '',
       }));
-  console.log('Func Options: ', funcOptions);
 
   const handleInputChange = (name: string, type: string, value: any) => {
-    console.log('handle input change', name, value);
     const newUserFuncInputs = { ...userFuncInputs, [name]: value };
     setUserFuncInputs(newUserFuncInputs);
-    console.log('handle input change: ', userFuncInputs);
   };
 
   const generateInputFields = () => {
@@ -293,10 +294,21 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
     <StyledTransaction onClose={onClose} header={header}>
       <TxAddressInput
         headerText={t('components.transaction.enable-spigot.revenue-contract')}
+        inputText={t('components.transaction.claim-revenue.rev-contract-input-text')}
         address={selectedRevenueContract}
         //onAddressChange={onRevContractChange}
       />
-      <TxTokenInput
+
+      {/* NOTE: user must manually input the revenue token they wish to claim because there is no assumption that the revenue contract will have an oracle and be included in the Debt DAO subgraph */}
+      <TxAddressInput
+        headerText={t('components.transaction.enable-spigot.revenue-token-to-claim')}
+        inputText={t('components.transaction.claim-revenue.rev-token-input-text')}
+        address={revenueTokenToClaim}
+        onAddressChange={setRevenueTokenToClaim}
+      />
+
+      {/* TODO: remove this way of selecting the revenue token to claim */}
+      {/* <TxTokenInput
         headerText={t('components.transaction.enable-spigot.revenue-token-to-claim')}
         selectedToken={selectedSellToken!}
         onSelectedTokenChange={onSelectedSellTokenChange}
@@ -304,7 +316,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
         amount="0"
         readOnly={true}
         hideAmount={true}
-      />
+      /> */}
 
       {isVerifiedContract ? (
         <>

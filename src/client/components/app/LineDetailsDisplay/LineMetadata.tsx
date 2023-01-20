@@ -282,6 +282,10 @@ export const LineMetadata = () => {
 
   const startDateHumanized = format(new Date(startTime * 1000), 'MMMM dd, yyyy');
   const endDateHumanized = format(new Date(endTime * 1000), 'MMMM dd, yyyy');
+  // const revenueSplitFormatted = defaultSplit + '% (Borrower) / ' + (100 - Number(defaultSplit)) + '% (Lender)';
+  const revenueSplitFormatted: Metric[] = [];
+  revenueSplitFormatted.push({ title: 'Borrower', data: defaultSplit + '%' });
+  revenueSplitFormatted.push({ title: 'Lender', data: 100 - Number(defaultSplit) + '%' });
 
   // TODO: fix types on args
   // TODO: What is the action button for revenue?
@@ -329,7 +333,12 @@ export const LineMetadata = () => {
           title={t('lineDetails:metadata.total-interest-paid')}
           data={`$ ${humanize('amount', totalInterestRepaid, 18, 2)}`}
         />
-        <MetricDataDisplay title={t('lineDetails:metadata.revenue-split')} data={defaultSplit + '%'} />
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.revenue-split')}
+          data={''}
+          displaySubmetrics={true}
+          submetrics={revenueSplitFormatted}
+        />
         <MetricDataDisplay title={t('lineDetails:metadata.min-cratio')} data={minCRatio + '%'} />
         <MetricDataDisplay title={t('lineDetails:metadata.cratio')} data={cratio + '%'} />
         <MetricDataDisplay

@@ -10,6 +10,7 @@ import {
   SecuredLine,
   CollateralEvent,
   BaseEscrowDepositFragResponse,
+  ReservesMap,
 } from '@types';
 import { formatCollateralEvents, formatSpigotCollateralEvents } from '@src/utils';
 
@@ -32,7 +33,7 @@ export const collateralInitialState: CollateralState = {
   selectedSpigot: undefined,
   selectedCollateralAsset: undefined,
   selectedRevenueContract: undefined,
-  reserves: {},
+  reservesMap: {},
   collateralMap: {},
   eventsMap: {},
   user: {
@@ -140,9 +141,8 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
       state.collateralMap = { ...state.collateralMap, ...map };
     })
     /* -------------------------------- claimTradeableTokens ------------------------------- */
-    .addCase(tradeable.fulfilled, (state, { payload: { claimableTokens } }) => {
-      console.log('claimableTokens', claimableTokens);
-      // state.reserves
+    .addCase(tradeable.fulfilled, (state, { payload: { tokenAddressMap, lineAddress } }) => {
+      state.reservesMap[lineAddress] = tokenAddressMap;
     });
 });
 

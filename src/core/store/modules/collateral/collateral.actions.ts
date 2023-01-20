@@ -165,29 +165,34 @@ const claimRevenue = createAsyncThunk<{ contract: string; success: boolean }, Cl
   }
 );
 
-const tradeable = createAsyncThunk<{ claimableTokens: string; success: boolean }, TradeableProps, ThunkAPI>(
-  'collateral/tradeable',
-  async (props, { extra, getState }) => {
-    const { lineAddress, network, tokenAddress } = props;
-    const { collateralService } = extra.services;
+const tradeable = createAsyncThunk<
+  { tokenAddressMap: { [tokenAddress: string]: string }; lineAddress: string; success: boolean },
+  TradeableProps,
+  ThunkAPI
+>('collateral/tradeable', async (props, { extra, getState }) => {
+  const { lineAddress, network, tokenAddress } = props;
+  const { collateralService } = extra.services;
+  const tokenAddressMap: { [tokenAddress: string]: string } = {};
 
-    const tx = await collateralService.tradeable({
-      lineAddress,
-      network,
-      tokenAddress,
-    });
-    console.log('transaction: ', tx);
+  const tx = await collateralService.tradeable({
+    lineAddress,
+    network,
+    tokenAddress,
+  });
+  console.log('transaction: ', tx);
 
-    if (!tx) {
-      throw new Error('failed to view tradeable tokens');
-    }
-
-    return {
-      claimableTokens: tx?.value!.toString(),
-      success: !!tx?.value,
-    };
+  if (!tx) {
+    throw new Error('failed to view tradeable tokens');
   }
-);
+
+  tokenAddressMap[tokenAddress] = tx?.value!.toString();
+
+  return {
+    tokenAddressMap,
+    lineAddress: lineAddress,
+    success: !!tx?.value,
+  };
+});
 
 export const CollateralActions = {
   setSelectedEscrow,

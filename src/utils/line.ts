@@ -585,7 +585,7 @@ export const formatLinePageData = (
     spigot,
     tokenPrices
   );
-
+  console.log('do I get here 16', lineData);
   const pageData: SecuredLineWithEvents = {
     // metadata
     ...metadata,

@@ -142,7 +142,7 @@ export interface CollateralState {
     escrowAllowances: { [line: string]: { [token: string]: string } };
   };
   statusMap: CollateralActionsStatusMap;
-  reserves: { [reserveAddress: string]: { [tokenAddress: string]: string } }; // spigotedLine | escrow -> token -> liquidatable}
+  reservesMap: { [reserveAddress: string]: { [tokenAddress: string]: string } }; // spigotedLine | escrow -> token -> liquidatable}
 }
 
 interface TokenCollateralMap {

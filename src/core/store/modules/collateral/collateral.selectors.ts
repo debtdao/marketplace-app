@@ -12,6 +12,7 @@ import {} from './collateral.reducer';
 const selectStatusMap = (state: RootState) => state.collateral.statusMap;
 const selectCollateralMap = (state: RootState) => state.collateral.collateralMap;
 const selectCollateralEventsMap = (state: RootState) => state.collateral.eventsMap;
+const selectReservesMap = (state: RootState) => state.collateral.reservesMap;
 const selectSelectedEscrowAddress = (state: RootState) => state.collateral.selectedEscrow;
 const selectSelectedSpigotAddress = (state: RootState) => state.collateral.selectedSpigot;
 const selectSpigotForSelectedLine = (state: RootState) =>
@@ -45,4 +46,5 @@ export const CollateralSelectors = {
   selectSelectedCollateralAsset,
   selectSelectedRevenueContractAddress,
   selectCollateralEventsMap,
+  selectReservesMap,
 };

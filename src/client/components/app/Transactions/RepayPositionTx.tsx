@@ -14,6 +14,7 @@ import {
   LinesActions,
   WalletSelectors,
   CollateralActions,
+  CollateralSelectors,
 } from '@store';
 import { getConstants, testTokens } from '@src/config/constants';
 import { CreditPosition, TokenView, ZeroExAPIQuoteResponse } from '@src/core/types';
@@ -84,6 +85,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
   const [repayType, setRepayType] = useState(allRepaymentOptions[0]);
   const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
+  const reservesMap = useAppSelector(CollateralSelectors.selectReservesMap);
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
@@ -643,10 +645,11 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
           //   tokenAddress: buyToken,
           // });
           // setTargetAmount();
+          console.log('addresses: ', selectedPosition.line, buyToken);
           dispatch(
             CollateralActions.tradeable({
-              lineAddress: selectedPosition.line,
-              tokenAddress: buyToken,
+              lineAddress: getAddress(selectedPosition.line),
+              tokenAddress: getAddress(buyToken),
               network: walletNetwork!,
             })
           );

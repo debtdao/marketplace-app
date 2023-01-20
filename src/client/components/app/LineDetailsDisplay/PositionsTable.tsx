@@ -223,7 +223,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
       <ViewContainer>
         <PositionsCard
-          header={''}
+          header={' '}
           data-testid="vaults-opportunities-list"
           metadata={[
             {

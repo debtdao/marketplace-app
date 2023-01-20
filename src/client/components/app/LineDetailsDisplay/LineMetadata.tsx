@@ -262,10 +262,9 @@ export const LineMetadata = () => {
     : `${t('components.connect-button.connect')}`;
 
   const getCollateralTableActions = () => {
-    console.log('COLLATERAL TABLE', userPositionMetadata.role);
     switch (userPositionMetadata.role) {
       case BORROWER_POSITION_ROLE:
-        return; // comment this out to test buttons
+        return <></>;
       case ARBITER_POSITION_ROLE:
         return (
           <>
@@ -274,9 +273,10 @@ export const LineMetadata = () => {
           </>
         );
       case LENDER_POSITION_ROLE: // for testing
+        return <></>;
 
       default:
-        return null;
+        return <></>;
     }
   };
 

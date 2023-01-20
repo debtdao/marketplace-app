@@ -284,8 +284,8 @@ export const LineMetadata = () => {
   const endDateHumanized = format(new Date(endTime * 1000), 'MMMM dd, yyyy');
   // const revenueSplitFormatted = defaultSplit + '% (Borrower) / ' + (100 - Number(defaultSplit)) + '% (Lender)';
   const revenueSplitFormatted: Metric[] = [];
-  revenueSplitFormatted.push({ title: 'Borrower', data: defaultSplit + '%' });
-  revenueSplitFormatted.push({ title: 'Lender', data: 100 - Number(defaultSplit) + '%' });
+  revenueSplitFormatted.push({ title: 'Borrower', data: 100 - Number(defaultSplit) + '%' });
+  revenueSplitFormatted.push({ title: 'Lender', data: defaultSplit + '%' });
 
   // TODO: fix types on args
   // TODO: What is the action button for revenue?

@@ -314,6 +314,14 @@ export class CollateralServiceImpl implements CollateralService {
     return await this._getLineContract(lineAddress).tradeable(tokenAddress);
   }
 
+  public async getOwnerTokens(spigotAddress: string, tokenAddress: string): Promise<BigNumber> {
+    return await this._getSpigotContract(spigotAddress).getOwnerTokens(tokenAddress);
+  }
+
+  public async getOperatorTokens(spigotAddress: string, tokenAddress: string): Promise<BigNumber> {
+    return await this._getSpigotContract(spigotAddress).getOperatorTokens(tokenAddress);
+  }
+
   // todo pass in user position metadata state where used instead
 
   // public async isBorrower(lineAddress: string): Promise<boolean> {

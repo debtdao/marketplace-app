@@ -296,7 +296,7 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
     );
   }
 
-  const isActive = selectedLine.status === ACTIVE_STATUS || selectedLine.status === REPAID_STATUS;
+  const isActive = selectedLine.status === ACTIVE_STATUS;
   if (!isActive) {
     console.log(isActive);
     console.log(selectedLine.status);

@@ -292,7 +292,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
     );
   }
 
-  const isActive = selectedLine.status === ACTIVE_STATUS || selectedLine.status === REPAID_STATUS; // TODO = make resusable?
+  const isActive = selectedLine.status === ACTIVE_STATUS; // TODO = make resusable?
   if (!isActive) {
     const toMarketplace = () => {
       onClose();

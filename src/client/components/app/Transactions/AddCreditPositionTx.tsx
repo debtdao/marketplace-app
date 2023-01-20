@@ -320,7 +320,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   }
 
   // TODO: When should propspective lenders not be able to propose a position for a a Line of Credit?
-  const isActive = selectedCredit.status === ACTIVE_STATUS || selectedCredit.status === REPAID_STATUS;
+  const isActive = selectedCredit.status === ACTIVE_STATUS;
   if (!isActive) {
     const toMarketplace = () => {
       onClose();

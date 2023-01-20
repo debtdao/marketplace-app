@@ -377,6 +377,7 @@ export interface TradeableProps {
   tokenAddress: Address;
   network: Network;
   lineAddress: Address;
+  spigotAddress: Address;
 }
 
 export interface LiquidateEscrowAssetProps {
@@ -470,6 +471,8 @@ export interface CollateralService {
   defaultSplit(lineAddress: string): Promise<BigNumber>;
   maxSplit(): BigNumber; // always 100
   getTradeableTokens(lineAddress: string, tokenAddress: string): Promise<BigNumber>;
+  getOwnerTokens(spigotAddress: string, tokenAddress: string): Promise<BigNumber>;
+  getOperatorTokens(spigotAddress: string, tokenAddress: string): Promise<BigNumber>;
 }
 
 export interface OnchainMetaDataService {

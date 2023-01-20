@@ -22,6 +22,7 @@ import { TxStatus } from './components/TxStatus';
 import { TxAddressInput } from './components/TxAddressInput';
 import { TxByteInput } from './components/TxByteInput';
 import { TxFuncSelector } from './components/TxFuncSelector';
+import { TxNumberInput } from './components/TxNumberInput';
 
 const StyledTransaction = styled(TxContainer)`
   min-height: 60vh;
@@ -58,6 +59,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const [didFetchAbi, setDidFetchABI] = useState<boolean>(false);
   const [claimFuncType, setClaimFuncType] = useState({ id: '', label: '', value: '' });
   const [transferFuncType, setTransferFuncType] = useState({ id: '', label: '', value: '' });
+  const [revenueSplit, setRevenueSplit] = useState(selectedLine?.defaultSplit ?? '0');
 
   useEffect(() => {
     // if escrow not set yet then correct state
@@ -94,6 +96,10 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     }
   };
 
+  const onRevenueSplitChange = (amount: string) => {
+    setRevenueSplit(amount);
+  };
+
   const enableSpigot = () => {
     setLoading(true);
 
@@ -119,7 +125,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       revenueContract: revenueContractAddy,
       setting: {
         // TODO: QUERY OWNERSPLIT ON SPIGOTENTITY
-        ownerSplit: toWei('100', 0),
+        ownerSplit: toWei(revenueSplit, 0),
         claimFunction: claimFunc,
         transferOwnerFunction: transferFunc,
       },
@@ -221,7 +227,18 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
           />
         </>
       )}
-
+      <TxNumberInput
+        headerText={t('components.transaction.deploy-line.revenue-split')}
+        inputLabel={t('components.transaction.deploy-line.revenue-split-input')}
+        width={'sm'}
+        placeholder={selectedLine.defaultSplit}
+        amount={revenueSplit}
+        maxAmount={'max string'}
+        onInputChange={onRevenueSplitChange}
+        readOnly={false}
+        hideAmount={false}
+        inputError={false}
+      />
       <TxActions>
         <TxActionButton
           key={t('components.transaction.enable-spigot.cta') as string}

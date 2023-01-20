@@ -166,27 +166,46 @@ const claimRevenue = createAsyncThunk<{ contract: string; success: boolean }, Cl
 );
 
 const tradeable = createAsyncThunk<
-  { tokenAddressMap: { [tokenAddress: string]: string }; lineAddress: string; success: boolean },
+  {
+    tokenAddressMap: { [tokenAddress: string]: { unusedTokens: string; ownerTokens: string; operatorTokens: string } };
+    lineAddress: string;
+    success: boolean;
+  },
   TradeableProps,
   ThunkAPI
 >('collateral/tradeable', async (props, { extra, getState }) => {
-  const { lineAddress, network, tokenAddress } = props;
+  const { lineAddress, network, tokenAddress, spigotAddress } = props;
   const { collateralService } = extra.services;
-  const tokenAddressMap: { [tokenAddress: string]: string } = {};
+  const tokenAddressMap: {
+    [tokenAddress: string]: {
+      unusedTokens: string;
+      ownerTokens: string;
+      operatorTokens: string;
+    };
+  } = {};
 
-  const tx = await collateralService.getTradeableTokens(lineAddress, tokenAddress);
-  console.log('tradeable transaction: ', tx.toString());
+  const tradeableTxn = await collateralService.getTradeableTokens(lineAddress, tokenAddress);
+  const ownerTokenTxn = await collateralService.getOwnerTokens(spigotAddress, tokenAddress);
+  const operatorTokenTxn = await collateralService.getOperatorTokens(spigotAddress, tokenAddress);
 
-  if (!tx) {
+  console.log('tradeable transaction 1: ', tradeableTxn.toString());
+  console.log('tradeable transaction 2: ', ownerTokenTxn.toString());
+  console.log('tradeable transaction 3: ', operatorTokenTxn.toString());
+
+  if (!tradeableTxn || !ownerTokenTxn || !operatorTokenTxn) {
     throw new Error('failed to view tradeable tokens');
   }
 
-  tokenAddressMap[tokenAddress] = tx.toString();
+  tokenAddressMap[tokenAddress] = {
+    unusedTokens: tradeableTxn.sub(ownerTokenTxn).toString(),
+    ownerTokens: ownerTokenTxn.toString(),
+    operatorTokens: operatorTokenTxn.toString(),
+  };
 
   return {
     tokenAddressMap,
     lineAddress: lineAddress,
-    success: !!tx,
+    success: !!tradeableTxn && !!ownerTokenTxn && !!operatorTokenTxn,
   };
 });
 

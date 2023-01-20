@@ -85,6 +85,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
   const [repayType, setRepayType] = useState(allRepaymentOptions[0]);
   const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
+  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
+  // const selectedSpigot = useAppSelector(CollateralSelectors.selectSpigotForSelectedLine);
   const reservesMap = useAppSelector(CollateralSelectors.selectReservesMap);
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
@@ -377,30 +379,31 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
   const useAndRepay = () => {
     setLoading(true);
-    // TODO set error in state to display no line selected
-    if (!selectedPosition?.line || !targetAmount || !selectedSellTokenAddress || !walletNetwork) {
+    // // TODO set error in state to display no line selected
+    if (!selectedPosition?.line || !targetAmount || !walletNetwork) {
       setLoading(false);
       return;
     }
 
-    // this throwsa "conditional hook called" even tho its an action + not being called anywher except callback
-    // dispatch(
-    //   LinesActions.useAndRepay({
-    //     lineAddress: selectedPosition.line,
-    //     amount: BigNumber.from(targetAmount),
-    //     network: walletNetwork,
-    //   })
-    // ).then((res) => {
-    //   if (res.meta.requestStatus === 'rejected') {
-    //     setTransactionCompleted(2);
-    //     setLoading(false);
-    //   }
-    //   if (res.meta.requestStatus === 'fulfilled') {
-    //     setTransactionCompleted(1);
-    //     window.location.reload();
-    //     setLoading(false);
-    //   }
-    // });
+    // TODO: determine why this throws "conditional hook called" even tho its an action + not being called anywher except callback. Disabled the rule-of-hooks for now for this specific line.
+    dispatch(
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      LinesActions.useAndRepay({
+        lineAddress: selectedPosition.line,
+        amount: BigNumber.from(targetAmount),
+        network: walletNetwork,
+      })
+    ).then((res) => {
+      if (res.meta.requestStatus === 'rejected') {
+        setTransactionCompleted(2);
+        setLoading(false);
+      }
+      if (res.meta.requestStatus === 'fulfilled') {
+        setTransactionCompleted(1);
+        window.location.reload();
+        setLoading(false);
+      }
+    });
   };
 
   const closePosition = () => {
@@ -549,6 +552,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     return normalizeAmount(maxRepay, selectedPosition.token.decimals);
   };
 
+  console.log('selected sell token: ', selectedSellToken);
   const targetBalance = normalizeAmount(selectedSellToken.balance, selectedSellToken.decimals);
 
   const tokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(targetBalance, 4)} ${
@@ -649,6 +653,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
           dispatch(
             CollateralActions.tradeable({
               lineAddress: getAddress(selectedPosition.line),
+              spigotAddress: getAddress(selectedLine!.spigotId),
+              // spigotAddress: getAddress(selectedSpigot),
               tokenAddress: getAddress(buyToken),
               network: walletNetwork!,
             })
@@ -662,6 +668,21 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             sellToken: buyToken,
           } as ZeroExAPIQuoteResponse);
         }
+
+        // TODO: Generate the header text
+        // Generate header text for claiming revenue tokens
+        // console.log('reserves map: ', reservesMap);
+        // const claimTargetBalance = normalizeAmount(
+        //   reservesMap[selectedPosition.line]
+        //     ? reservesMap[selectedPosition.line][selectedSellToken.address].ownerTokens
+        //     : '0',
+        //   selectedSellToken.decimals
+        // );
+
+        // const claimTokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(
+        //   claimTargetBalance,
+        //   4
+        // )} ${selectedSellToken.symbol}`;
 
         return (
           <>

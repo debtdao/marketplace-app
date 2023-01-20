@@ -310,17 +310,6 @@ export class CollateralServiceImpl implements CollateralService {
     return (await this._getLineContract(lineAddress)).defaultRevenueSplit();
   }
 
-  // TODO: remove this comment for the original tradeable function
-  public async tradeable(props: TradeableProps): Promise<TransactionResponse | PopulatedTransaction> {
-    return await this.executeContractMethod(
-      props.lineAddress,
-      this.lineAbi,
-      'tradeable',
-      [props.tokenAddress],
-      props.network
-    );
-  }
-
   public async getTradeableTokens(lineAddress: string, tokenAddress: string): Promise<BigNumber> {
     return await this._getLineContract(lineAddress).tradeable(tokenAddress);
   }

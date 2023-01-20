@@ -174,28 +174,12 @@ const tradeable = createAsyncThunk<
   const { collateralService } = extra.services;
   const tokenAddressMap: { [tokenAddress: string]: string } = {};
 
-  // TODO: remove original tradeable call using tx
-  // const tx = await collateralService.tradeable({
-  //   lineAddress,
-  //   network,
-  //   tokenAddress,
-  // });
-  // console.log('transaction: ', tx);
-
   const tx = await collateralService.getTradeableTokens(lineAddress, tokenAddress);
   console.log('tradeable transaction: ', tx.toString());
 
   if (!tx) {
     throw new Error('failed to view tradeable tokens');
   }
-
-  // tokenAddressMap[tokenAddress] = tx?.value!.toString();
-
-  // return {
-  //   tokenAddressMap,
-  //   lineAddress: lineAddress,
-  //   success: !!tx?.value,
-  // };
 
   tokenAddressMap[tokenAddress] = tx.toString();
 

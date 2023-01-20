@@ -469,7 +469,6 @@ export interface CollateralService {
   isSpigotOwner(spigotAddress?: string, lineAddress?: string): Promise<boolean>;
   defaultSplit(lineAddress: string): Promise<BigNumber>;
   maxSplit(): BigNumber; // always 100
-  // tradeable(props: TradeableProps): Promise<TransactionResponse | PopulatedTransaction>;
   getTradeableTokens(lineAddress: string, tokenAddress: string): Promise<BigNumber>;
 }
 

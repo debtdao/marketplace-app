@@ -182,9 +182,7 @@ export const TxRateInput: FC<TxRateInputProps> = ({
                 </InterestRateInputContainer>
               </RatesContainer>
               <RatesContainer>
-                <AmountTitle ellipsis>
-                  {'Drawn Down Rate' || t('components.transaction.deposit.rates-title')}
-                </AmountTitle>
+                <AmountTitle ellipsis>{'Drawn Rate' || t('components.transaction.deposit.rates-title')}</AmountTitle>
                 <InterestRateInputContainer>
                   <StyledAmountInput
                     //format from bps to % to display and back to bps to set value

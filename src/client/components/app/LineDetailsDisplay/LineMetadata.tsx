@@ -154,6 +154,7 @@ export const LineMetadata = () => {
   const {
     start: startTime,
     end: endTime,
+    status,
     principal,
     deposit,
     totalInterestRepaid,
@@ -331,6 +332,10 @@ export const LineMetadata = () => {
         <MetricDataDisplay title={t('lineDetails:metadata.revenue-split')} data={defaultSplit + '%'} />
         <MetricDataDisplay title={t('lineDetails:metadata.min-cratio')} data={minCRatio + '%'} />
         <MetricDataDisplay title={t('lineDetails:metadata.cratio')} data={cratio + '%'} />
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.status')}
+          data={status[0].toUpperCase() + status.substring(1)}
+        />
         <MetricDataDisplay title={t('lineDetails:metadata.start')} data={startDateHumanized} />
         <MetricDataDisplay title={t('lineDetails:metadata.end')} data={endDateHumanized} />
       </ThreeColumnLayout>

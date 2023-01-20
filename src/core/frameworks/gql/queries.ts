@@ -109,8 +109,7 @@ const SPIGOT_EVENT_FRAGMENT = gql`
       revenueToken {
         ...TokenFrag
       }
-      escrowed
-      netIncome
+      amount
       value
     }
   }

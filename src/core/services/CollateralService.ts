@@ -202,15 +202,15 @@ export class CollateralServiceImpl implements CollateralService {
     );
   }
 
-  public async tradeable(props: TradeableProps): Promise<TransactionResponse | PopulatedTransaction> {
-    return await this.executeContractMethod(
-      props.lineAddress,
-      this.lineAbi,
-      'tradeable',
-      [props.tokenAddress],
-      props.network
-    );
-  }
+  // public async tradeable(props: TradeableProps): Promise<TransactionResponse | PopulatedTransaction> {
+  //   return await this.executeContractMethod(
+  //     props.lineAddress,
+  //     this.lineAbi,
+  //     'tradeable',
+  //     [props.tokenAddress],
+  //     props.network
+  //   );
+  // }
 
   public async claimRevenue(props: ClaimRevenueProps): Promise<TransactionResponse | PopulatedTransaction> {
     // TODO get current status and split from subgraph and simulate calling updateSplit if it will change anything *return false)
@@ -285,6 +285,8 @@ export class CollateralServiceImpl implements CollateralService {
     );
   }
 
+  /* ============================= Helpers =============================*/
+
   private async getSignerAddress(): Promise<Address> {
     return await this.web3Provider.getSigner().getAddress();
   }
@@ -306,6 +308,21 @@ export class CollateralServiceImpl implements CollateralService {
 
   public async defaultSplit(lineAddress: string): Promise<BigNumber> {
     return (await this._getLineContract(lineAddress)).defaultRevenueSplit();
+  }
+
+  // TODO: remove this comment for the original tradeable function
+  public async tradeable(props: TradeableProps): Promise<TransactionResponse | PopulatedTransaction> {
+    return await this.executeContractMethod(
+      props.lineAddress,
+      this.lineAbi,
+      'tradeable',
+      [props.tokenAddress],
+      props.network
+    );
+  }
+
+  public async getTradeableTokens(lineAddress: string, tokenAddress: string): Promise<BigNumber> {
+    return await this._getLineContract(lineAddress).tradeable(tokenAddress);
   }
 
   // todo pass in user position metadata state where used instead
@@ -357,3 +374,24 @@ export class CollateralServiceImpl implements CollateralService {
     }
   }
 }
+
+// TODO: Remove this commented code from the original tradeable function call.
+// import { Contract } from '@ethersproject/contracts';
+
+// import { getConfig } from '@config';
+
+// const { MAINNET_PROVIDER_HTTPS, ARBITRUM_PROVIDER_HTTPS, GOERLI_PROVIDER_HTTPS } = getConfig();
+// const { NETWORK, CHAIN_IDS, CHAIN_NAMES } = getConfig();
+
+// export const getTradeableTokens = (
+//   lineAddress: string,
+//   abi: any,
+//   provider: any,
+//   tokenAddress: string,
+//   network: string
+// ): string => {
+//   const contract = new Contract(lineAddress, abi, provider);
+//   const result = contract.functions.tradeable().call();
+//   console.log('Tradeable Call: ', result);
+//   return '';
+// };

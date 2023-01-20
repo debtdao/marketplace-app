@@ -207,8 +207,7 @@ export interface SpigotEventFragResponse {
   __typename: 'ClaimRevenueEvent';
   timestamp: number;
   revenueToken: TokenFragRepsonse;
-  escrowed: string;
-  netIncome: string;
+  amount: string;
   value: string;
 }
 

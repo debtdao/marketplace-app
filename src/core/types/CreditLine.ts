@@ -290,8 +290,8 @@ type SpigotEvents = ClaimRevenueEvent;
 
 export interface ClaimRevenueEvent extends CollateralEvent {
   revenueToken: TokenView;
-  escrowed: string;
-  netIncome: string;
+  amount: string;
+  value: string;
 }
 
 // Redux State

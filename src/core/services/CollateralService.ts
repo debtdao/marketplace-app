@@ -26,7 +26,6 @@ import {
   ReleaseSpigotProps,
   AddSpigotProps,
   ACTIVE_STATUS,
-  REPAID_STATUS,
   LIQUIDATABLE_STATUS,
   UseAndRepayProps,
   UpdateSpigotOwnerSplitProps,

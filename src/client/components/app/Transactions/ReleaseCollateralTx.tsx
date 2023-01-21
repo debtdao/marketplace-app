@@ -12,13 +12,7 @@ import {
   useAppSelector,
   useSelectedSellToken,
 } from '@hooks';
-import {
-  ACTIVE_STATUS,
-  ARBITER_POSITION_ROLE,
-  BORROWER_POSITION_ROLE,
-  ReleaseCollateraltProps,
-  REPAID_STATUS,
-} from '@src/core/types';
+import { ACTIVE_STATUS, ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, ReleaseCollateraltProps } from '@src/core/types';
 import { getConstants, testTokens } from '@src/config/constants';
 import {
   TokensActions,

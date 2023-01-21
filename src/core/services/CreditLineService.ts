@@ -257,9 +257,8 @@ export class CreditLineServiceImpl implements CreditLineService {
       throw new Error('Claim and repay is not possible because not borrowing');
     }
 
-    // TODO change check to arbiter
-    if (!(await this.isSignerBorrowerOrLender(props.lineAddress, await this.getFirstID(props.lineAddress)))) {
-      throw new Error('Claim and repay is not possible because signer is not borrower or lender');
+    if ((await this.getSignerAddress()) !== (await this.arbiter(props.lineAddress))) {
+      throw new Error('Claim and trade is blocked if not from arbiter address');
     }
 
     console.log('sending claim and repay tx');

@@ -140,7 +140,7 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
       });
       state.collateralMap = { ...state.collateralMap, ...map };
     })
-    /* -------------------------------- claimTradeableTokens ------------------------------- */
+    /* -------------------------------- reserves ------------------------------- */
     .addCase(tradeable.fulfilled, (state, { payload: { tokenAddressMap, lineAddress } }) => {
       state.reservesMap[lineAddress] = tokenAddressMap;
     });

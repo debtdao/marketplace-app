@@ -31,6 +31,7 @@ import {
   UpdateSpigotOwnerSplitProps,
   ClaimRevenueProps,
   TradeableProps,
+  ClaimOperatorTokenProps,
 } from '@types';
 import { getConfig } from '@config';
 import { getContract } from '@frameworks/ethers';
@@ -258,6 +259,28 @@ export class CollateralServiceImpl implements CollateralService {
           this.lineAbi,
           'liquidate',
           [data.amount, data.targetToken],
+          props.network,
+          false
+        )
+      );
+    } catch (e) {
+      console.log(`An error occured while borrowing credit, error = [${JSON.stringify(e)}]`);
+      return Promise.reject(e);
+    }
+  }
+  // TODO: Is this the right place for this?
+  // TODO: Does this need any permissions?
+
+  public async claimOperatorTokens(
+    props: ClaimOperatorTokenProps
+  ): Promise<TransactionResponse | PopulatedTransaction> {
+    try {
+      return <TransactionResponse>(
+        await this.executeContractMethod(
+          props.spigotAddress,
+          this.spigotAbi,
+          'claimOperatorTokens',
+          [props.amount],
           props.network,
           false
         )

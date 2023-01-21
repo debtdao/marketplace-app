@@ -295,8 +295,8 @@ export const LineMetadata = () => {
       return;
     }
     // TODO: Needs padding
-    return (
-      <>
+    if (userPositionMetadata.role === BORROWER_POSITION_ROLE) {
+      return (
         <ActionButtons
           actions={[
             {
@@ -306,16 +306,18 @@ export const LineMetadata = () => {
             },
           ]}
         />
-        <ActionButtons
-          actions={[
-            {
-              name: t('components.transaction.deposit'),
-              handler: () => depositHandler(token),
-              disabled: !walletIsConnected,
-            },
-          ]}
-        />
-      </>
+      );
+    }
+    return (
+      <ActionButtons
+        actions={[
+          {
+            name: t('components.transaction.deposit'),
+            handler: () => depositHandler(token),
+            disabled: !walletIsConnected,
+          },
+        ]}
+      />
     );
   };
   return (

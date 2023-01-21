@@ -36,7 +36,7 @@ import { WalletSelectors } from './wallet/wallet.selectors';
 // Tokens State
 import tokensReducer, { tokensInitialState } from './tokens/tokens.reducer';
 import { TokensActions } from './tokens/tokens.actions';
-import { TokensSelectors } from './tokens/tokens.selectors';
+import { TokensSelectors, createToken } from './tokens/tokens.selectors';
 // Labs State
 // import labsReducer, { labsInitialState } from './labs/labs.reducer';
 // import { LabsActions } from './labs/labs.actions';
@@ -124,6 +124,9 @@ export {
   CollateralSelectors,
   OnchainMetaDataSelector,
 };
+
+// Functions
+export { createToken };
 
 // initialState
 export {

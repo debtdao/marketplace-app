@@ -389,7 +389,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
       LinesActions.useAndRepay({
         lineAddress: selectedPosition.line,
-        amount: BigNumber.from(targetAmount),
+        amount: ethers.utils.parseUnits(targetAmount, selectedPosition.token.decimals),
         network: walletNetwork,
       })
     ).then((res) => {
@@ -708,6 +708,24 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
       case 'deposit-and-close':
       case 'close':
+      case 'use-and-repay':
+        return (
+          <TxTokenInput
+            headerText={t('components.transaction.repay.select-amount')}
+            inputText={tokenHeaderText}
+            // TODO: Note - RepayPositionTxn is the only one that normalizes the amount field
+            // amount={normalizeAmount(amount, selectedPosition.token.decimals)}
+            amount={targetAmount}
+            // TODO: Note - RepayPositionTxn is the only one that sets targetAmount in wei instead of string
+            // onAmountChange={(amnt) => setTargetAmount(toWei(amnt, selectedPosition.token.decimals))}
+            onAmountChange={(amnt) => setTargetAmount(amnt)}
+            // @cleanup TODO
+            maxAmount={getMaxRepay()}
+            selectedToken={selectedSellToken}
+            onSelectedTokenChange={onSelectedSellTokenChange}
+            readOnly={false}
+          />
+        );
       case 'deposit-and-repay':
       default:
         const isClosing = repayType.id !== 'deposit-and-repay';

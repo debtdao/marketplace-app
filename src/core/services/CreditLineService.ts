@@ -272,7 +272,7 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   public async useAndRepay(props: UseAndRepayProps): Promise<TransactionResponse | PopulatedTransaction> {
     // TODO check unused is <= amount
-    // TODO
+    // TODO Only borrower or lender
     return await this.executeContractMethod(props.lineAddress, 'useAndRepay', [props.amount], props.network);
   }
 

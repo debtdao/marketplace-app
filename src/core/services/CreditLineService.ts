@@ -316,6 +316,8 @@ export class CreditLineServiceImpl implements CreditLineService {
     }
   }
 
+  // TODO: Add revokeConsent
+
   public async borrow(props: BorrowCreditProps): Promise<TransactionResponse | PopulatedTransaction> {
     try {
       const line = props.line;

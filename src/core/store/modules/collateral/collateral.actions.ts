@@ -1,4 +1,5 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
+import { getAddress } from 'ethers/lib/utils';
 
 import { ThunkAPI } from '@frameworks/redux';
 import {
@@ -211,7 +212,7 @@ const tradeable = createAsyncThunk<
 
   return {
     tokenAddressMap,
-    tokenAddress,
+    tokenAddress: getAddress(tokenAddress),
     lineAddress: lineAddress,
     success: !!tradeableTxn && !!ownerTokenTxn && !!operatorTokenTxn,
   };

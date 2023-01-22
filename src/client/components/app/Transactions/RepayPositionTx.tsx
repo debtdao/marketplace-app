@@ -640,6 +640,13 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
               setTokensToBuy(result.buyAmount!);
               setTradeData(result);
             }
+            // TODO: Mock 0x trade when buyTokena and sellToken are not the same
+            // console.log('Set Trade Data');
+            // setTradeData({
+            //   data: '0x' as BytesLike,
+            //   buyToken: buyToken,
+            //   sellToken: sellToken,
+            // } as ZeroExAPIQuoteResponse);
           });
 
           console.log('get 0x trade quote', tradeTx);
@@ -648,15 +655,15 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         else if (!haveFetched0x) {
           // not buying via 0x, but claiming so that position can be repaid
 
-          dispatch(
-            CollateralActions.tradeable({
-              lineAddress: getAddress(selectedPosition.line),
-              spigotAddress: getAddress(selectedLine!.spigotId),
-              // spigotAddress: getAddress(selectedSpigot),
-              tokenAddress: getAddress(buyToken),
-              network: walletNetwork!,
-            })
-          );
+          // dispatch(
+          //   CollateralActions.tradeable({
+          //     lineAddress: getAddress(selectedPosition.line),
+          //     spigotAddress: getAddress(selectedLine!.spigotId),
+          //     // spigotAddress: getAddress(selectedSpigot),
+          //     tokenAddress: getAddress(buyToken),
+          //     network: walletNetwork!,
+          //   })
+          // );
           setHaveFetched0x(true);
           setTokensToBuy(targetAmount);
           // fake 0x transaction data so revenue token can be claimed and used for repayment
@@ -694,8 +701,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             return createToken({ tokenData, userTokenData, allowancesMap });
           }
         });
-        console.log('claimableTokens - addresses: ', claimableTokenAddresses);
-        console.log('claimableTokens - options: ', claimableTokenOptions);
+        // console.log('claimableTokens - addresses: ', claimableTokenAddresses);
+        // console.log('claimableTokens - options: ', claimableTokenOptions);
 
         return (
           <>
@@ -722,11 +729,12 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
                   headerText={t('components.transaction.repay.claim-and-repay.credit-token')}
                   inputText={t('components.transaction.repay.claim-and-repay.buy-amount')}
                   // amount={normalizeAmount(tokensToBuy, selectedPosition.token.decimals)}
-                  amount={tokensToBuy}
+                  // amount={tokensToBuy} // TODO: uncomment this after testing 0x trade data.
+                  amount={targetAmount} // TODO: delete this after confirming 0x trade data is working.
                   selectedToken={selectedPosition.token}
                   // 0x testing data
                   // selectedToken={tokensMap[DAI]}
-                  readOnly={true}
+                  readOnly={false} // TODO: set back to true after testing 0x trade data
                 />
                 <TradeError> {t('components.transaction.repay.claim-and-repay.insufficient-liquidity')} </TradeError>
               </>

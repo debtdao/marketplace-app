@@ -146,7 +146,7 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
       state.reservesMap = {
         ...state.reservesMap,
         [lineAddress]: { ...(state.reservesMap[lineAddress] || {}), ...map },
-      };;
+      };
     });
 });
 

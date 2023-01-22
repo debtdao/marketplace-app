@@ -210,7 +210,9 @@ export interface MarketPageData {
 
 export type CollateralModule = AggregatedEscrow | AggregatedSpigot;
 export type CollateralMap = { [address: string]: CollateralModule };
-export type ReservesMap = { [address: string]: { [address: string]: string } };
+export type ReservesMap = {
+  [address: string]: { [address: string]: { operatorTokens: string; ownerTokens: string; unusedTokens: string } };
+};
 
 export interface SpigotRevenueContract extends Collateral {
   id: Address;

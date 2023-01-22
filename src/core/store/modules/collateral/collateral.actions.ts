@@ -180,7 +180,8 @@ const claimOperatorTokens = createAsyncThunk<{ claimed: string | undefined }, Cl
 
 const tradeable = createAsyncThunk<
   {
-    tokenAddressMap: { [tokenAddress: string]: { unusedTokens: string; ownerTokens: string; operatorTokens: string } };
+    tokenAddressMap: { unusedTokens: string; ownerTokens: string; operatorTokens: string };
+    tokenAddress: string;
     lineAddress: string;
     success: boolean;
   },
@@ -189,13 +190,6 @@ const tradeable = createAsyncThunk<
 >('collateral/tradeable', async (props, { extra, getState }) => {
   const { lineAddress, network, tokenAddress, spigotAddress } = props;
   const { collateralService } = extra.services;
-  const tokenAddressMap: {
-    [tokenAddress: string]: {
-      unusedTokens: string;
-      ownerTokens: string;
-      operatorTokens: string;
-    };
-  } = {};
 
   const tradeableTxn = await collateralService.getTradeableTokens(lineAddress, tokenAddress);
   const ownerTokenTxn = await collateralService.getOwnerTokens(spigotAddress, tokenAddress);
@@ -209,7 +203,7 @@ const tradeable = createAsyncThunk<
     throw new Error('failed to view tradeable tokens');
   }
 
-  tokenAddressMap[tokenAddress] = {
+  const tokenAddressMap = {
     unusedTokens: tradeableTxn.sub(ownerTokenTxn).toString(),
     ownerTokens: ownerTokenTxn.toString(),
     operatorTokens: operatorTokenTxn.toString(),
@@ -217,6 +211,7 @@ const tradeable = createAsyncThunk<
 
   return {
     tokenAddressMap,
+    tokenAddress,
     lineAddress: lineAddress,
     success: !!tradeableTxn && !!ownerTokenTxn && !!operatorTokenTxn,
   };

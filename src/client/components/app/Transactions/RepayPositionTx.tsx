@@ -18,7 +18,7 @@ import {
   CollateralSelectors,
 } from '@store';
 import { getConstants, testTokens } from '@src/config/constants';
-import { Balance, CreditPosition, TokenView, ZeroExAPIQuoteResponse } from '@src/core/types';
+import { Balance, CreditPosition, RevenueSummary, TokenView, ZeroExAPIQuoteResponse } from '@src/core/types';
 
 import { TxContainer } from './components/TxContainer';
 import { TxTokenInput } from './components/TxTokenInput';
@@ -136,6 +136,32 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
     // dispatch(TokensActions.getTokensDynamicData({ addresses: [initialToken] }));
   }, [selectedSellToken]);
+
+  useEffect(() => {
+    // populate collateral reservesmap in redux state
+    console.log('revenue token: ', 'am I here?', !reservesMap);
+    if (Object.keys(reservesMap).length === 0) {
+      // dispatch(CollateralActions.getReservesMap());
+      // get all collateral tokens of type revenue
+      const lineRevenueSummary = selectedLine!.spigot!.revenueSummary;
+      const revenueCollateralTokens: RevenueSummary[] = Object.values(lineRevenueSummary).filter(
+        (token) => token.type === 'revenue'
+      );
+
+      // populate reserves map with each revenue collateral token
+      for (const token of revenueCollateralTokens as RevenueSummary[]) {
+        console.log('revenue token: ', token);
+        dispatch(
+          CollateralActions.tradeable({
+            lineAddress: getAddress(selectedPosition!.line),
+            spigotAddress: getAddress(selectedLine!.spigotId),
+            tokenAddress: getAddress(token.token.address),
+            network: walletNetwork!,
+          })
+        );
+      }
+    }
+  }, []);
 
   // Event Handlers
 
@@ -668,6 +694,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             return createToken({ tokenData, userTokenData, allowancesMap });
           }
         });
+        console.log('claimableTokens - addresses: ', claimableTokenAddresses);
+        console.log('claimableTokens - options: ', claimableTokenOptions);
 
         return (
           <>

@@ -512,7 +512,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             label: t('components.transaction.repay.close.cta'),
             onAction: closePosition,
             status: true,
-            disabled: !transactionApproved,
+            disabled: transactionApproved,
             contrast: false,
           },
         ];
@@ -529,7 +529,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             label: t('components.transaction.repay.close.cta'),
             onAction: depositAndClose,
             status: true,
-            disabled: !transactionApproved,
+            disabled: transactionApproved,
             contrast: false,
           },
         ];

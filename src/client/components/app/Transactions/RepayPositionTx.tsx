@@ -121,7 +121,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const [errors, setErrors] = useState<string[]>(['']);
   const [transactionApproved, setTransactionApproved] = useState(true);
   const [targetAmount, setTargetAmount] = useState('0');
-
+  // const [creditTokenTargetBalance, setCreditTokenTargetBalance] = useState('0');
   const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
   const [tokensToBuy, setTokensToBuy] = useState('0');
   const [tradeData, setTradeData] = useState<ZeroExAPIQuoteResponse>();
@@ -647,19 +647,19 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     selectedPosition.token.symbol
   }`;
 
-  // // generate token header text for use-and-repay
-  // const creditTokenTargetBalance = normalizeAmount(
-  //   reservesMap[getAddress(selectedPosition.line)][getAddress(selectedPosition.token.address)]
-  //     ? reservesMap[getAddress(selectedPosition.line)][getAddress(selectedPosition.token.address)].unusedTokens
-  //     : '0',
-  //   selectedSellToken.decimals
-  // );
-  // console.log('Credit Token Target Balance: ', creditTokenTargetBalance);
+  // generate token header text for use-and-repay
+  const creditTokenTargetBalance = normalizeAmount(
+    reservesMap && reservesMap[getAddress(selectedPosition.line)]
+      ? reservesMap[getAddress(selectedPosition.line)][getAddress(selectedPosition.token.address)].unusedTokens
+      : '0',
+    selectedPosition.token.decimals
+  );
+  console.log('Credit Token Target Balance: ', creditTokenTargetBalance);
 
-  // const creditTokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(
-  //   creditTokenTargetBalance,
-  //   4
-  // )} ${selectedSellToken.symbol}`;
+  const creditTokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(
+    creditTokenTargetBalance,
+    4
+  )} ${selectedPosition.token.symbol}`;
 
   if (transactionCompleted === 1) {
     return (
@@ -828,7 +828,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         return (
           <TxTokenInput
             headerText={t('components.transaction.repay.select-amount')}
-            inputText={tokenHeaderText} // TODO: replace with creditTokenHeaderText
+            inputText={creditTokenHeaderText} // TODO: replace with creditTokenHeaderText
             // TODO: Note - RepayPositionTxn is the only one that normalizes the amount field
             // amount={normalizeAmount(amount, selectedPosition.token.decimals)}
             amount={targetAmount}

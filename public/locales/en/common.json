@@ -243,8 +243,8 @@
           "cta": "Close"
         },
         "claim-and-repay": {
-          "title": "From revenue",
-          "desc": "claim revenue from spigot and repay",
+          "title": "Repay with revenue",
+          "desc": "claim revenue and repay",
           "cta": "Claim & Repay",
           "claim-token": "Revenue token to claim",
           "credit-token": "Credit Token To Purchase",
@@ -255,12 +255,12 @@
           "cta": "Approve Funds For Repayment"
         },
         "claim-and-trade": {
-          "title": "To reserves",
-          "desc": "claim revenue from spigot and store in unused reserves",
-          "cta": "Claim & Trade"
+          "title": "Fund reserves",
+          "desc": "approve revenue for repayment",
+          "cta": "Trade & Approve For Repayment"
         },
         "use-and-repay": {
-          "title": "From reserves",
+          "title": "Repay with reserves",
           "desc": "from excess revenue",
           "cta": "Use and Repay"
         }

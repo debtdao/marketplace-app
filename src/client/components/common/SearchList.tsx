@@ -102,11 +102,20 @@ export interface SearchListProps {
   // TODO Check how to remove the any[] and not throw error on searchInput
   list: any[] | SearchListItem[];
   selected: SearchListItem;
+  displayValue?: boolean;
   setSelected: (selected: SearchListItem) => void;
   onCloseList?: () => void;
 }
 
-export const SearchList: FC<SearchListProps> = ({ headerText, list, selected, setSelected, onCloseList, ...props }) => {
+export const SearchList: FC<SearchListProps> = ({
+  headerText,
+  list,
+  selected,
+  setSelected,
+  onCloseList,
+  displayValue = true,
+  ...props
+}) => {
   const [filteredItems, setFilteredItems] = useState(list);
 
   useEffect(() => {
@@ -141,7 +150,7 @@ export const SearchList: FC<SearchListProps> = ({ headerText, list, selected, se
               <ListItem key={item.id} onClick={() => selectItem(item)} selected={item.id === selected.id}>
                 <TokenIcon icon={item.icon} symbol={item.label} size="big" />
                 <ItemLabel>{item.label}</ItemLabel>
-                {item.value}
+                {displayValue ? item.value : null}
               </ListItem>
             )
         )}

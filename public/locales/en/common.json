@@ -228,8 +228,8 @@
         "select-repay-option": "Select Repayment Method",
         "repaying-from": "Repaying from your",
         "close": {
-          "title": "Close",
-          "desc": "permanently close line",
+          "title": "Close Line",
+          "desc": "from your wallet",
           "cta": "Close"
         },
         "deposit-and-repay": {

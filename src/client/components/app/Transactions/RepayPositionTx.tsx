@@ -44,6 +44,15 @@ interface RepayPositionProps {
   onPositionChange: (data: { credit?: string; token: string | undefined; amount?: string }) => void;
 }
 
+// TODO: Add this back into approveDepositAndRepay or remote entirely.
+// interface GetActionsType {
+//   label: string;
+//   onAction: void | (() => void) | ((type: string) => void);
+//   status: boolean;
+//   disabled: boolean;
+//   contrast: boolean;
+// }
+
 const {
   CONTRACT_ADDRESSES: { DAI, ETH },
 } = getConstants();
@@ -117,8 +126,9 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const [tokensToBuy, setTokensToBuy] = useState('0');
   const [tradeData, setTradeData] = useState<ZeroExAPIQuoteResponse>();
   const [haveFetched0x, setHaveFetched0x] = useState<boolean>(false);
-  const [zeroExWarning, setZeroExWarning] = useState<boolean>(false);
+  // const [zeroExWarning, setZeroExWarning] = useState<boolean>(false);
   const [isTrade, setIsTrade] = useState<boolean>(false);
+  const maxInt = '115792089237316195423570985008687907853269984665640564039457584007913129639935';
 
   useEffect(() => {
     if (!selectedSellToken && !_.isEmpty(sourceAssetOptions)) {
@@ -185,6 +195,31 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       lineAddress: selectedPosition.line,
       tokenAddress: selectedPosition.token.address,
       amount: toWei(targetAmount, selectedPosition.token.decimals),
+      network: walletNetwork!,
+    };
+    dispatch(LinesActions.approveDeposit(approvalOBj)).then((res) => {
+      if (res.meta.requestStatus === 'rejected') {
+        setTransactionApproved(transactionApproved);
+        setLoading(false);
+      }
+      if (res.meta.requestStatus === 'fulfilled') {
+        setTransactionApproved(!transactionApproved);
+        setLoading(false);
+      }
+    });
+  };
+
+  // TODO: replace to only approve necessary amount
+  const approveFundsForClosing = (type: string = '') => {
+    setLoading(true);
+    if (!selectedPosition?.line || !selectedPosition) {
+      setLoading(false);
+      return;
+    }
+    let approvalOBj = {
+      lineAddress: selectedPosition.line,
+      tokenAddress: selectedPosition.token.address,
+      amount: maxInt, // TODO: replace to only approve necessary amount
       network: walletNetwork!,
     };
     dispatch(LinesActions.approveDeposit(approvalOBj)).then((res) => {
@@ -467,6 +502,13 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       case 'close':
         return [
           {
+            label: t('components.transaction.approve'),
+            onAction: approveFundsForClosing,
+            status: true,
+            disabled: !transactionApproved,
+            contrast: false,
+          },
+          {
             label: t('components.transaction.repay.close.cta'),
             onAction: closePosition,
             status: true,
@@ -476,6 +518,13 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         ];
       case 'deposit-and-close':
         return [
+          {
+            label: t('components.transaction.approve'),
+            onAction: approveFundsForClosing,
+            status: true,
+            disabled: !transactionApproved,
+            contrast: false,
+          },
           {
             label: t('components.transaction.repay.close.cta'),
             onAction: depositAndClose,
@@ -574,11 +623,14 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     if (!selectedPosition) {
       return '0';
     }
+
+    // TODO: replace interestAccrued with view function from contract. subgraph is always stale.
     const maxRepay: string = `${Number(selectedPosition.principal) + Number(selectedPosition.interestAccrued)}`;
 
     return normalizeAmount(maxRepay, selectedPosition.token.decimals);
   };
 
+  // TODO: replace with view function from contract. subgraph is always stale.
   const getInterestAccrued = (): string => {
     if (!selectedPosition) {
       return '0';
@@ -595,19 +647,19 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     selectedPosition.token.symbol
   }`;
 
-  // generate token header text for use-and-repay
-  const creditTokenTargetBalance = normalizeAmount(
-    reservesMap[getAddress(selectedPosition.line)][getAddress(selectedPosition.token.address)]
-      ? reservesMap[getAddress(selectedPosition.line)][getAddress(selectedPosition.token.address)].unusedTokens
-      : '0',
-    selectedSellToken.decimals
-  );
-  console.log('Credit Token Target Balance: ', creditTokenTargetBalance);
+  // // generate token header text for use-and-repay
+  // const creditTokenTargetBalance = normalizeAmount(
+  //   reservesMap[getAddress(selectedPosition.line)][getAddress(selectedPosition.token.address)]
+  //     ? reservesMap[getAddress(selectedPosition.line)][getAddress(selectedPosition.token.address)].unusedTokens
+  //     : '0',
+  //   selectedSellToken.decimals
+  // );
+  // console.log('Credit Token Target Balance: ', creditTokenTargetBalance);
 
-  const creditTokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(
-    creditTokenTargetBalance,
-    4
-  )} ${selectedSellToken.symbol}`;
+  // const creditTokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(
+  //   creditTokenTargetBalance,
+  //   4
+  // )} ${selectedSellToken.symbol}`;
 
   if (transactionCompleted === 1) {
     return (
@@ -770,12 +822,13 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             selectedToken={selectedPosition.token}
             readOnly={true}
           />
+          // {selectedPosition.}
         );
       case 'use-and-repay':
         return (
           <TxTokenInput
             headerText={t('components.transaction.repay.select-amount')}
-            inputText={creditTokenHeaderText} // TODO: replace with creditTokenHeaderText
+            inputText={tokenHeaderText} // TODO: replace with creditTokenHeaderText
             // TODO: Note - RepayPositionTxn is the only one that normalizes the amount field
             // amount={normalizeAmount(amount, selectedPosition.token.decimals)}
             amount={targetAmount}

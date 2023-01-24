@@ -127,6 +127,7 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
       },
       { linesData: {}, allBorrowers: [] }
     );
+    console.log('Lines Data: ', linesData);
     allBorrowers.map((b) => dispatch(OnchainMetaDataActions.getENS(b)));
 
     return { linesData };

@@ -678,6 +678,8 @@ const withdrawLine = createAsyncThunk<
   }
 );
 
+// TODO: add revokeConsent
+
 const getDepositAllowance = createAsyncThunk<
   TokenAllowance,
   {

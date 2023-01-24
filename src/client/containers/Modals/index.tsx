@@ -16,6 +16,7 @@ import { BorrowTxModal } from './BorrowTxModal';
 import { DeployLineTxModal } from './DeployLineTxModal';
 import { RepayPositionTxModal } from './RepayPositionTxModal';
 import { WithdrawCreditTxModal } from './WithdrawCreditTxModal';
+import { RevokeConsentTxModal } from './RevokeConsentTxModal';
 import { AddCollateralTxModal } from './AddCollateralTxModal';
 import { EnableSpigotTxModal } from './EnableSpigotTxModal';
 import { ClaimRevenueTxModal } from './ClaimRevenueTxModal';
@@ -173,6 +174,12 @@ export const Modals = () => {
       {activeModal === 'withdraw' && (
         <CSSTransition key={'withdraw'} timeout={modalTimeout} classNames="slideBottom">
           <WithdrawCreditTxModal onClose={closeModal} />
+        </CSSTransition>
+      )}
+
+      {activeModal === 'revokeConsent' && (
+        <CSSTransition key={'revokeConsent'} timeout={modalTimeout} classNames="slideBottom">
+          <RevokeConsentTxModal onClose={closeModal} />
         </CSSTransition>
       )}
 

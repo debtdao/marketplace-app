@@ -14,4 +14,5 @@ export * from './RepayPositionTx';
 export * from './MigrateTx';
 export * from './TestTx';
 export * from './WithdrawCreditTx';
+export * from './RevokeConsentTx';
 export * from './ReleaseCollateralTx';

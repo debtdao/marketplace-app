@@ -180,6 +180,7 @@ export interface CreditLineService {
   addCredit: (props: AddCreditProps) => Promise<TransactionResponse | PopulatedTransaction>;
   borrow: (props: BorrowCreditProps) => Promise<TransactionResponse | PopulatedTransaction>;
   withdraw: (props: WithdrawLineProps) => Promise<TransactionResponse | PopulatedTransaction>;
+  // revokeConsent: (props: RevokeConsentProps) => Promise<TransactionResponse | PopulatedTransaction>;
   // setRates: (props: SetRatesProps) => Promise<TransactionResponse | PopulatedTransaction>;
   // increaseCredit: (props: IncreaseCreditProps) => Promise<TransactionResponse | PopulatedTransaction>;
 
@@ -240,6 +241,15 @@ export interface WithdrawLineProps {
   network: Network;
   amount: BigNumber;
 }
+
+// export interface RevokeConsentProps {
+//   // dryRun?: boolean;
+//   // lineAddress: string;
+//   id: string;
+//   // network: Network;
+//   amount: BigNumber;
+// }
+
 export interface SetRatesProps {
   dryRun?: boolean;
   lineAddress: string;

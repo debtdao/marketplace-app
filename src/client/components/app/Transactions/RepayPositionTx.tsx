@@ -617,12 +617,12 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
   // generate token header text for use-and-repay
   const creditTokenTargetBalance = normalizeAmount(
-    reservesMap && reservesMap[getAddress(selectedPosition.line)]
+    reservesMap[getAddress(selectedPosition.line)] &&
+      reservesMap[getAddress(selectedPosition.line)][getAddress(selectedPosition.token.address)]
       ? reservesMap[getAddress(selectedPosition.line)][getAddress(selectedPosition.token.address)].unusedTokens
       : '0',
     selectedPosition.token.decimals
   );
-  console.log('Credit Token Target Balance: ', creditTokenTargetBalance);
 
   const creditTokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(
     creditTokenTargetBalance,

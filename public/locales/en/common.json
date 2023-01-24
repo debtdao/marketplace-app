@@ -271,6 +271,10 @@
         "select-line": "1. Selected line to withdraw",
         "select-amount": "2. Select amount to withdraw"
       },
+      "revoke-consent": {
+        "header": "Revoke Consent",
+        "cta": "Revoke Consent"
+      },
       "enable-spigot": {
         "header":"Enable Spigot",
         "select-function": "Select Function",

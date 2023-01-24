@@ -173,6 +173,7 @@ export function formatGetLinesData(
   return response.map((data: any) => {
     const {
       borrower: { id: borrower },
+      arbiter: { id: arbiter },
       positions,
       events = [],
       escrow: escrowRes,
@@ -196,6 +197,7 @@ export function formatGetLinesData(
       ...credit,
       status: status.toLowerCase() as LineStatusTypes,
       borrower,
+      arbiter,
       spigotId: spigotRes?.id,
       escrowId: escrowRes?.id,
       spigot: {
@@ -559,6 +561,7 @@ export const formatLinePageData = (
     escrow,
     positions,
     borrower,
+    arbiter,
     status,
     events,
     defaultSplit,
@@ -589,6 +592,7 @@ export const formatLinePageData = (
     collateralEvents,
     creditEvents,
     borrower: borrower.id,
+    arbiter: arbiter.id,
     defaultSplit,
     status: status.toLowerCase() as LineStatusTypes,
     // TODO add UsePositionMetada,

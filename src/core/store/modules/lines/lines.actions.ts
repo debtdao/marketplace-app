@@ -127,6 +127,7 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
       },
       { linesData: {}, allBorrowers: [] }
     );
+    console.log('Lines Data: ', linesData);
     allBorrowers.map((b) => dispatch(OnchainMetaDataActions.getENS(b)));
 
     return { linesData };
@@ -677,6 +678,8 @@ const withdrawLine = createAsyncThunk<
     // serializeError: parseError,
   }
 );
+
+// TODO: add revokeConsent
 
 const getDepositAllowance = createAsyncThunk<
   TokenAllowance,

@@ -97,7 +97,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const [repayType, setRepayType] = useState(allRepaymentOptions[0]);
   const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
-  // const selectedSpigot = useAppSelector(CollateralSelectors.selectSpigotForSelectedLine);
   const reservesMap = useAppSelector(CollateralSelectors.selectReservesMap);
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
@@ -111,7 +110,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     // selectedVaultOrLab: useAppSelector(VaultsSelectors.selectRecommendations)[0],
     allowTokenSelect: true,
   });
-  console.log('deposit and repay selected position: ', selectedPosition);
 
   // used for 0x testing
   const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
@@ -121,13 +119,13 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const [errors, setErrors] = useState<string[]>(['']);
   const [transactionApproved, setTransactionApproved] = useState(true);
   const [targetAmount, setTargetAmount] = useState('0');
-  // const [creditTokenTargetBalance, setCreditTokenTargetBalance] = useState('0');
   const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
   const [tokensToBuy, setTokensToBuy] = useState('0');
   const [tradeData, setTradeData] = useState<ZeroExAPIQuoteResponse>();
   const [haveFetched0x, setHaveFetched0x] = useState<boolean>(false);
   // const [zeroExWarning, setZeroExWarning] = useState<boolean>(false);
   const [isTrade, setIsTrade] = useState<boolean>(false);
+  // TODO: replace usage in useFundsForClosing with appropriate value
   const maxInt = '115792089237316195423570985008687907853269984665640564039457584007913129639935';
 
   useEffect(() => {
@@ -141,19 +139,11 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     if (!selectedTokenAddress && selectedSellToken) {
       setSelectedTokenAddress(selectedSellToken.address);
     }
-
-    // if (!selectedPosition || !selectedSellToken) {
-    //   return;
-    // }
-
-    // dispatch(TokensActions.getTokensDynamicData({ addresses: [initialToken] }));
   }, [selectedSellToken]);
 
   useEffect(() => {
     // populate collateral reservesmap in redux state
-    console.log('revenue token: ', 'am I here?', !reservesMap);
     if (Object.keys(reservesMap).length === 0) {
-      // dispatch(CollateralActions.getReservesMap());
       // get all collateral tokens of type revenue
       const lineRevenueSummary = selectedLine!.spigot!.revenueSummary;
       const revenueCollateralTokens: RevenueSummary[] = Object.values(lineRevenueSummary).filter(
@@ -209,7 +199,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     });
   };
 
-  // TODO: replace to only approve necessary amount
+  // TODO: fix usage of maxInt to only approve necessary amount
   const approveFundsForClosing = (type: string = '') => {
     setLoading(true);
     if (!selectedPosition?.line || !selectedPosition) {
@@ -269,24 +259,11 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       return;
     }
 
-    console.log('deposit and repay repayTX', selectedPosition.line);
-
-    console.log('deposit and repay txn target amount: ', targetAmount);
-    console.log(
-      'deposit and repay txn target amount adj 1: ',
-      ethers.utils.parseUnits(targetAmount, selectedPosition.token.decimals)
-    );
-    console.log(
-      'deposit and repay txn target amount adj 2: ',
-      ethers.utils.parseUnits(targetAmount, selectedPosition.token.decimals).toString()
-    );
     // TODO: Add unit test for submitting txns
     dispatch(
       LinesActions.depositAndRepay({
         lineAddress: selectedPosition.line,
-        // amount: ethers.utils.parseEther(targetAmount),
         amount: ethers.utils.parseUnits(targetAmount, selectedPosition.token.decimals),
-        // amount: ethers.utils.formatUnits(targetAmount, selectedPosition.token.decimals),
         network: walletNetwork,
       })
     ).then((res) => {
@@ -386,14 +363,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   };
 
   const claimAndTrade = () => {
-    console.log(
-      'claim and trade params: ',
-      tradeData!.data,
-      selectedPosition,
-      targetAmount,
-      selectedSellTokenAddress,
-      walletNetwork
-    );
     setLoading(true);
     // TODO set error in state to display no line selected
     if (
@@ -441,7 +410,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
   const useAndRepay = () => {
     setLoading(true);
-    // // TODO set error in state to display no line selected
+    // TODO set error in state to display no line selected
     if (!selectedPosition?.line || !targetAmount || !walletNetwork) {
       setLoading(false);
       return;
@@ -636,7 +605,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       return '0';
     }
     const interestAccrued: string = `${Number(selectedPosition.interestAccrued)}`;
-    console.log('Interest Accrued', interestAccrued);
     return normalizeAmount(interestAccrued, selectedPosition.token.decimals);
   };
 
@@ -692,14 +660,10 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     switch (repayType.id) {
       case 'claim-and-repay':
       case 'claim-and-trade':
-        // TODO set targetAmount to unused + getOwnerTokens
-
         const buyToken = getAddress(selectedPosition.token.address);
         const sellToken = getAddress(selectedSellToken.address);
-        const isTrade = buyToken !== sellToken;
 
         if (buyToken !== sellToken && !haveFetched0x) {
-          // if (!haveFetched0x) {
           const tradeTx = getTradeQuote({
             // set fake data for testing 0x
             // buyToken: DAI,
@@ -768,17 +732,14 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             return createToken({ tokenData, userTokenData, allowancesMap });
           }
         });
-        // console.log('claimableTokens - addresses: ', claimableTokenAddresses);
-        // console.log('claimableTokens - options: ', claimableTokenOptions);
 
         return (
           <>
             <TxTokenInput
               headerText={t('components.transaction.repay.claim-and-repay.claim-token')}
               inputText={claimTokenHeaderText}
-              // amount={normalizeAmount(targetAmount, selectedPosition.token.decimals)}
+              // TODO: create unit test for this
               amount={sellToken === buyToken ? claimTargetBalance : targetAmount}
-              // onAmountChange={(amnt) => setTargetAmount(toWei(amnt, selectedPosition.token.decimals))}
               onAmountChange={(amnt) => setTargetAmount(amnt)}
               // token to claim from spigot
               selectedToken={selectedSellToken}
@@ -794,13 +755,13 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
                 <TxTokenInput
                   headerText={t('components.transaction.repay.claim-and-repay.credit-token')}
                   inputText={t('components.transaction.repay.claim-and-repay.buy-amount')}
-                  // amount={normalizeAmount(tokensToBuy, selectedPosition.token.decimals)}
+                  // TODO: create unit test for this
                   amount={tokensToBuy} // TODO: uncomment this after testing 0x trade data.
                   // amount={targetAmount} // TODO: delete this after confirming 0x trade data is working.
                   selectedToken={selectedPosition.token}
                   // 0x testing data
                   // selectedToken={tokensMap[DAI]}
-                  readOnly={true} // TODO: set back to true after testing 0x trade data
+                  readOnly={true}
                 />
                 {/* TODO: Determine how to display an insufficient liquidity message when testing on Ethereum mainnet. */}
                 {/* {zeroExWarning ? (
@@ -811,7 +772,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
           </>
         );
 
-      // case 'deposit-and-close':
       case 'close':
         return (
           <TxTokenInput
@@ -822,7 +782,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             selectedToken={selectedPosition.token}
             readOnly={true}
           />
-          // {selectedPosition.}
         );
       case 'use-and-repay':
         return (
@@ -845,22 +804,12 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       case 'deposit-and-repay':
       default:
         const isClosing = repayType.id !== 'deposit-and-repay';
-        const amount = isClosing
-          ? bn(selectedPosition.principal)!.add(bn(selectedPosition.interestAccrued)!)!.toString()
-          : targetAmount;
-
-        console.log('repay from wallet inputs. isClosing, amount', isClosing, amount);
-
-        console.log('selected position', selectedPosition);
         return (
           <TxTokenInput
             headerText={t('components.transaction.repay.select-amount')}
             inputText={tokenHeaderText}
-            // TODO: Note - RepayPositionTxn is the only one that normalizes the amount field
-            // amount={normalizeAmount(amount, selectedPosition.token.decimals)}
+            // TODO: add unit test for this
             amount={targetAmount}
-            // TODO: Note - RepayPositionTxn is the only one that sets targetAmount in wei instead of string
-            // onAmountChange={(amnt) => setTargetAmount(toWei(amnt, selectedPosition.token.decimals))}
             onAmountChange={(amnt) => setTargetAmount(amnt)}
             // @cleanup TODO
             maxAmount={getMaxRepay()}

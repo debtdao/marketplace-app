@@ -124,7 +124,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       spigotAddress: selectedSpigot.id,
       revenueContract: revenueContractAddy,
       setting: {
-        // TODO: QUERY OWNERSPLIT ON SPIGOTENTITY
+        // TODO: create unit test for usage of toWei
         ownerSplit: toWei(revenueSplit, 0),
         claimFunction: claimFunc,
         transferOwnerFunction: transferFunc,

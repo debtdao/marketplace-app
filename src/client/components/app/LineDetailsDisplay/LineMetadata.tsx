@@ -244,7 +244,6 @@ export const LineMetadata = () => {
   const formattedCollateralData = allCollateral.map((c) => ({
     ...c,
     key: c.type + c.token.toString(),
-    // header: c.type + c.token.toString(),
     align: 'flex-start',
     actions: getCollateralRowActionForRole(userPositionMetadata.role),
   }));
@@ -282,7 +281,6 @@ export const LineMetadata = () => {
 
   const startDateHumanized = format(new Date(startTime * 1000), 'MMMM dd, yyyy');
   const endDateHumanized = format(new Date(endTime * 1000), 'MMMM dd, yyyy');
-  // const revenueSplitFormatted = defaultSplit + '% (Borrower) / ' + (100 - Number(defaultSplit)) + '% (Lender)';
   const revenueSplitFormatted: Metric[] = [];
   revenueSplitFormatted.push({ title: 'Borrower', data: 100 - Number(defaultSplit) + '%' });
   revenueSplitFormatted.push({ title: 'Lender', data: defaultSplit + '%' });
@@ -327,10 +325,7 @@ export const LineMetadata = () => {
           title={t('lineDetails:metadata.principal')}
           data={`$ ${humanize('amount', principal, 18, 2)}`}
         />
-        <MetricDataDisplay
-          title={t('lineDetails:metadata.deposit')} // rename to Credit Limit
-          data={`$ ${humanize('amount', deposit, 18, 2)}`}
-        />
+        <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${humanize('amount', deposit, 18, 2)}`} />
         <MetricDataDisplay
           title={t('lineDetails:metadata.total-interest-paid')}
           data={`$ ${humanize('amount', totalInterestRepaid, 18, 2)}`}

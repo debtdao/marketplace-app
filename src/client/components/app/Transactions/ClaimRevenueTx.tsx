@@ -69,44 +69,10 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
 
   const [funcInputs, setFuncInputs] = useState<ParamType[]>([]);
   const [userFuncInputs, setUserFuncInputs] = useState<{ [name: string]: any }>({});
-  // const [didFetchAbi, setDidFetchABI] = useState<boolean>(false);
 
-  // TODO: remove all references to selectedSellToken and selectedTokenAddress
-  // const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
-  // const initialToken: string = selectedSellTokenAddress || ETH;
-  // const { selectedSellToken, sourceAssetOptions } = useSelectedSellToken({
-  //   selectedSellTokenAddress: initialToken,
-  //   allowTokenSelect: true,
-  // });
-
-  // console.log('selected tokens #1', selectedSellToken, selectedSellTokenAddress);
   const [transactionLoading, setLoading] = useState(false);
-  // const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
   const [revenueTokenToClaim, setRevenueTokenToClaim] = useState('');
   const [transactionCompleted, setTransactionCompleted] = useState(0);
-
-  // useEffect(() => {
-  //   // @cleanup would be great to just do this inside the selectors so we dont have hooks everywhere for same thing
-  //   console.log('use effct #1', selectedTokenAddress, selectedSellToken);
-  //   if (!selectedSellToken) {
-  //     dispatch(
-  //       TokensActions.setSelectedTokenAddress({
-  //         tokenAddress: selectedTokenAddress ? selectedTokenAddress : sourceAssetOptions[0]?.address,
-  //       })
-  //     );
-  //   }
-  //   console.log('use effct #2', selectedTokenAddress, selectedSellToken);
-  //   if (!selectedTokenAddress && selectedSellToken) {
-  //     console.log('set tkn addr', selectedSellToken);
-  //     setSelectedTokenAddress(selectedSellToken.address);
-  //   }
-  // }, [selectedSellToken, selectedTokenAddress]);
-
-  // const onSelectedSellTokenChange = (tokenAddress: string) => {
-  //   console.log('set token', tokenAddress);
-  //   setTargetTokenAmount('');
-  //   dispatch(TokensActions.setSelectedTokenAddress({ tokenAddress }));
-  // };
 
   // Event Handlers
 
@@ -131,30 +97,17 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
       return;
     }
 
-    // if (!selectedSellTokenAddress) {
-    //   console.log('claim rev modal: claimRevenue() - no rev token selected');
-    //   return;
-    // }
-
     if (!revenueTokenToClaim) {
       console.log('claim rev modal: claimRevenue() - no rev token selected');
       return;
     }
 
-    console.log(
-      'Claim Rev Data',
-      selectedSpigot.id,
-      selectedRevenueContract,
-      // selectedSellTokenAddress,
-      claimFunc,
-      walletNetwork
-    );
+    console.log('Claim Rev Data', selectedSpigot.id, selectedRevenueContract, claimFunc, walletNetwork);
 
     dispatch(
       CollateralActions.claimRevenue({
         spigotAddress: selectedSpigot.id,
         revenueContract: selectedRevenueContract,
-        // token: selectedSellTokenAddress,
         token: revenueTokenToClaim,
         claimData: claimFunc, // default to null claimdata
         network: walletNetwork,
@@ -192,12 +145,9 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
     );
   }
 
-  // if (!selectedSellToken && !selectedTokenAddress) return null;
-
   // TODO: Autopopulate claimFunc in modal so this function can be deprecated.
   const onClaimFuncSelection = (newFunc: { id: string; label: string; value: string }) => {
     const funcInputs = generateClaimFuncInputs(newFunc.label, contractABI[selectedRevenueContract]!);
-    // console.log('Func Inputs: ', funcInputs);
     setFuncInputs(funcInputs);
     const hashedSigFunc = generateSig(newFunc.label, contractABI[selectedRevenueContract]!);
     setClaimFunc(hashedSigFunc);

@@ -196,10 +196,6 @@ const tradeable = createAsyncThunk<
   const ownerTokenTxn = await collateralService.getOwnerTokens(spigotAddress, tokenAddress);
   const operatorTokenTxn = await collateralService.getOperatorTokens(spigotAddress, tokenAddress);
 
-  console.log('tradeable transaction 1: ', tradeableTxn.toString());
-  console.log('tradeable transaction 2: ', ownerTokenTxn.toString());
-  console.log('tradeable transaction 3: ', operatorTokenTxn.toString());
-
   if (!tradeableTxn || !ownerTokenTxn || !operatorTokenTxn) {
     throw new Error('failed to view tradeable tokens');
   }

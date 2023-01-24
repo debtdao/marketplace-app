@@ -142,10 +142,8 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
     const selectedLine = LinesSelectors.selectSelectedLinePage(state);
     const tokenPrices = TokensSelectors.selectTokenPrices(state);
     const network = getNetwork(state.wallet.networkVersion);
-    console.log('do I get here? 11');
     // query and add credit and collateral events to pre-existing line data
     if (selectedLine) {
-      console.log('do I get here? 12');
       if (selectedLine.creditEvents.length === 0 && selectedLine.collateralEvents.length === 0) {
         const lineEvents = await creditLineService.getLineEvents({ network, id });
         console.log('selected line events: ', lineEvents, network, id);
@@ -155,7 +153,6 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
       }
       return { linePageData: selectedLine };
     } else {
-      console.log('do I get here? 13');
       try {
         const linePageData = formatLinePageData(await creditLineService.getLinePage({ network, id }), tokenPrices);
         console.log('selected line with events 2: ', linePageData);

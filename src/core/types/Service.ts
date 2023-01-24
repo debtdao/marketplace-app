@@ -413,9 +413,9 @@ export interface SweepSpigotProps {
   dryRun?: boolean;
 }
 
-export interface ClaimOperatorTokenProps {
+export interface ClaimOperatorTokensProps {
   spigotAddress: Address;
-  amount: BigNumber;
+  token: Address;
   network: Network;
   dryRun?: boolean;
 }
@@ -463,7 +463,7 @@ export interface CollateralService {
   claimRevenue(props: ClaimRevenueProps): Promise<TransactionResponse | PopulatedTransaction>;
   updateOwnerSplit(props: UpdateSpigotOwnerSplitProps): Promise<TransactionResponse | PopulatedTransaction>;
   addSpigot(props: AddSpigotProps): Promise<TransactionResponse | PopulatedTransaction>;
-  claimOperatorTokens(props: ClaimOperatorTokenProps): Promise<TransactionResponse | PopulatedTransaction>;
+  claimOperatorTokens(props: ClaimOperatorTokensProps): Promise<TransactionResponse | PopulatedTransaction>;
 
   // liquidate collateral
   // Escrow assets

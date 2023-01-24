@@ -31,7 +31,7 @@ import {
   UpdateSpigotOwnerSplitProps,
   ClaimRevenueProps,
   TradeableProps,
-  ClaimOperatorTokenProps,
+  ClaimOperatorTokensProps,
 } from '@types';
 import { getConfig } from '@config';
 import { getContract } from '@frameworks/ethers';
@@ -262,7 +262,7 @@ export class CollateralServiceImpl implements CollateralService {
   // TODO: Does this need any permissions?
 
   public async claimOperatorTokens(
-    props: ClaimOperatorTokenProps
+    props: ClaimOperatorTokensProps
   ): Promise<TransactionResponse | PopulatedTransaction> {
     try {
       return <TransactionResponse>(
@@ -270,7 +270,7 @@ export class CollateralServiceImpl implements CollateralService {
           props.spigotAddress,
           this.spigotAbi,
           'claimOperatorTokens',
-          [props.amount],
+          [props.token],
           props.network,
           false
         )

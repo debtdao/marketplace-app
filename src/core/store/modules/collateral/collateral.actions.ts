@@ -12,7 +12,7 @@ import {
   ClaimRevenueProps,
   ReleaseCollateraltProps,
   TradeableProps,
-  ClaimOperatorTokenProps,
+  ClaimOperatorTokensProps,
 } from '@src/core/types';
 import { TxActionButton } from '@src/client/components/app';
 
@@ -167,7 +167,7 @@ const claimRevenue = createAsyncThunk<{ contract: string; success: boolean }, Cl
   }
 );
 
-const claimOperatorTokens = createAsyncThunk<{ claimed: string | undefined }, ClaimOperatorTokenProps, ThunkAPI>(
+const claimOperatorTokens = createAsyncThunk<{ claimed: string | undefined }, ClaimOperatorTokensProps, ThunkAPI>(
   'collateral/claimOperatorTokens',
   async (props, { extra }) => {
     const { collateralService } = extra.services;

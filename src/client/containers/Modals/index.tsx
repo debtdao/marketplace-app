@@ -20,6 +20,7 @@ import { AddCollateralTxModal } from './AddCollateralTxModal';
 import { EnableSpigotTxModal } from './EnableSpigotTxModal';
 import { ClaimRevenueTxModal } from './ClaimRevenueTxModal';
 import { ReleaseCollateralTxModal } from './ReleaseCollateralTxModal';
+import { ClaimOperatorTokensTxModal } from './ClaimOperatorTokensTxModal';
 
 const modalTimeout = 300;
 
@@ -179,6 +180,12 @@ export const Modals = () => {
       {activeModal === 'addCollateral' && (
         <CSSTransition key={'addCollateral'} timeout={modalTimeout} classNames="slideBottom">
           <AddCollateralTxModal onClose={closeModal} />
+        </CSSTransition>
+      )}
+
+      {activeModal == 'claimOperatorTokens' && (
+        <CSSTransition key={'claimOperatorTokens'} timeout={modalTimeout} classNames="slideBottom">
+          <ClaimOperatorTokensTxModal onClose={closeModal} />
         </CSSTransition>
       )}
 

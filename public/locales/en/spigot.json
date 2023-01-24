@@ -9,6 +9,7 @@
       "lifetime-revenue": "",
       "30d-revenue": ""
     },
+    "claim-operator-tokens":"Claim Operator Tokens",
     "add-revenue-contract": "Add Revenue Contract"
   },
   "no-spigot-supported-card": {

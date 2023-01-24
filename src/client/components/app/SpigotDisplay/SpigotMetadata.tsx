@@ -172,13 +172,26 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
     }
   };
 
+  const claimOperatorTokensHandler = () => {
+    if (!walletIsConnected) {
+      connectWallet();
+    } else {
+      dispatch(ModalsActions.openModal({ modalName: 'claimOperatorTokens' }));
+    }
+  };
+
   const enableSpigotText = walletIsConnected
     ? `${t('spigot:metadata.add-revenue-contract')}`
+    : `${t('components.connect-button.connect')}`;
+
+  const ClaimOperatorTokensText = walletIsConnected
+    ? `${t('spigot:metadata.claim-operator-tokens')}`
     : `${t('components.connect-button.connect')}`;
 
   const getCollateralTableActions = () => {
     switch (userPositionMetadata.role) {
       case BORROWER_POSITION_ROLE:
+        return <Button onClick={claimOperatorTokensHandler}>{ClaimOperatorTokensText}</Button>; // TODO: What role does this go under? Do we need an Operator Role?
       case ARBITER_POSITION_ROLE:
         return (
           <>
@@ -186,6 +199,12 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
           </>
         );
       case LENDER_POSITION_ROLE:
+      default:
+        return (
+          <>
+            <Button onClick={claimOperatorTokensHandler}>{ClaimOperatorTokensText}</Button>
+          </>
+        );
     }
   };
 

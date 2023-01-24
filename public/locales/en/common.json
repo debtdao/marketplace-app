@@ -95,6 +95,7 @@
       "borrow": "Borrow",
       "deposit-and-repay-header": "Deposit and Repay",
       "claim-and-repay-header": "Claim and Repay",
+      "claim-operator-revenue":"Claim Revenue",
       "deposit-and-close-header": "Deposit and Close",
       "withdraw": "Withdraw",
       "borrow-limit": {
@@ -289,7 +290,10 @@
         "rev-contract-inputs": "4. Fill Function Input Values",
         "claim-data-header": "Transaction data to call on revenue contract",
         "claim-data-input": "Hexcode (0xdebfda05....)",
-        "cta": "Claim"
+        "cta": "Claim",
+        "claim-operator-tokens":{
+          "cta":"Claim Operator Tokens"
+        }
       }
     }
   },

@@ -11,6 +11,7 @@ export type ModalName =
   | 'borrow'
   | 'depositAndRepay'
   | 'claimRevenue'
+  | 'claimOperatorTokens'
   | 'releaseCollateral'
   // yearn modals
   | 'test'

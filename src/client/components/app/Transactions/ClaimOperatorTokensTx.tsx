@@ -182,7 +182,7 @@ export const ClaimOperatorTokensTx: FC<ClaimOperatorTokensTxProps> = (props) => 
     const sellToken = getAddress(selectedSellToken.address);
 
     const claimTargetBalance = normalizeAmount(
-      reservesMap[getAddress(selectedLine.id)]
+      reservesMap[getAddress(selectedLine.id)] && reservesMap[getAddress(selectedLine.id)][selectedSellToken.address]
         ? reservesMap[getAddress(selectedLine.id)][selectedSellToken.address].operatorTokens
         : '0',
       selectedSellToken.decimals
@@ -214,7 +214,7 @@ export const ClaimOperatorTokensTx: FC<ClaimOperatorTokensTxProps> = (props) => 
         <TxTokenInput
           headerText={t('components.transaction.repay.claim-and-repay.claim-token')}
           inputText={claimTokenHeaderText}
-          amount={targetAmount}
+          amount={claimTargetBalance}
           onAmountChange={(amnt) => setTargetAmount(amnt)}
           selectedToken={selectedSellToken}
           onSelectedTokenChange={onSelectedSellTokenChange}

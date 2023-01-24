@@ -234,7 +234,6 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
     align: 'flex-start',
     actions: 'claim-revenue',
   }));
-  console.log('formatted spigots: ', formattedSpigots);
   return (
     <>
       <ViewContainer>
@@ -264,6 +263,19 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
                 </Link>
               ),
               width: '15rem',
+              sortable: true,
+              className: 'col-symbol',
+            },
+            {
+              key: 'ownerSplit',
+              header: 'Revenue Split', //t('lineDetails:metadata.escrow.assets-list.symbol'),
+              transform: ({ ownerSplit }) => {
+                const borrowerSplit = 100 - Number(ownerSplit) + '%';
+                const lenderSplit = ownerSplit + '%';
+                const ownerSplitFormatted = `Borrower: ${borrowerSplit}  |  Lender: ${lenderSplit}`;
+                return <Text>{ownerSplitFormatted}</Text>;
+              },
+              width: '25rem',
               sortable: true,
               className: 'col-symbol',
             },

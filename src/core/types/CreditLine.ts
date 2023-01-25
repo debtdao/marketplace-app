@@ -110,7 +110,6 @@ export interface CreditPosition {
   interestAccrued: string;
   interestRepaid: string;
   totalInterestRepaid: string;
-  // borrower: Address;
   dRate: string;
   fRate: string;
   proposal: Proposal[];

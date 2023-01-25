@@ -183,7 +183,7 @@ export interface BasePositionFragResponse {
   dRate: string;
   fRate: string;
   token: TokenFragRepsonse;
-  proposal: ProposalFragResponse;
+  proposal: ProposalFragResponse[];
 }
 
 export interface LineEventFragResponse {

@@ -17,7 +17,13 @@ import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { device } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer } from '@components/app';
 import { Input, SearchIcon, Button, RedirectIcon, Link } from '@components/common';
-import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, CreditPosition } from '@src/core/types';
+import {
+  ARBITER_POSITION_ROLE,
+  BORROWER_POSITION_ROLE,
+  LENDER_POSITION_ROLE,
+  CreditPosition,
+  Proposal,
+} from '@src/core/types';
 import { humanize, formatAddress, normalizeAmount, getENS } from '@src/utils';
 import { getEnv } from '@config/env';
 
@@ -165,7 +171,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
     ? `${t('lineDetails:positions-table.new-position')}`
     : `${t('components.connect-button.connect')}`;
 
-  //Returns a list of transactions to display on positions table
+  // Returns a list of transactions to display on positions table
   const getUserPositionActions = (position: CreditPosition) => {
     const repayAction = {
       name: t('components.transaction.repay.header'),
@@ -206,7 +212,6 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
       else return [borrowAction, repayAction];
     }
 
-    // TODO: change from position.lender to position.maker
     // If user is lender and position status is PROPOSED, return revoke consent action
     if (getAddress(position.lender) === userWallet && position.status === 'PROPOSED') {
       return [
@@ -231,6 +236,32 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
     }
 
     // not party to line. no actions;
+    return [];
+  };
+
+  // Returns a list of transactions to display on positions table for proposals
+  const getUserProposalActions = (proposal: Proposal) => {
+    console.log('Proposal: ', proposal);
+    if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
+      const approveMutualConsent = {
+        name: t('components.transaction.add-credit.accept-terms'),
+        handler: depositHandler,
+        disabled: false,
+      };
+      return [approveMutualConsent];
+    }
+    // TODO: change from position.lender to position.maker
+    // If user is lender and position status is PROPOSED, return revoke consent action
+    if (getAddress(proposal.maker) === userWallet) {
+      return [
+        {
+          name: t('components.transaction.revoke-consent.cta'),
+          handler: revokeConsentHandler,
+          disabled: false,
+        },
+      ];
+    }
+
     return [];
   };
 
@@ -303,15 +334,15 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
                   {position.token.symbol}
                 </RouterLink>
               ),
-              actions: <ActionButtons value={position.id} actions={getUserPositionActions(position)} />,
+              actions: <ActionButtons value={position.id} actions={getUserProposalActions(proposal)} />,
             }))
           : [];
       // TODO: remove this if keep original way to display proposals
-      // const positionsAndProposalsToDisplay =
-      // position.status === 'PROPOSED' ? [...proposalsToDisplay] : [positionToDisplay];
+      const positionsAndProposalsToDisplay =
+        position.status === 'PROPOSED' ? [...proposalsToDisplay] : [positionToDisplay];
 
       // TODO: add this if keep original way to display proposals
-      const positionsAndProposalsToDisplay = [positionToDisplay, ...proposalsToDisplay];
+      // const positionsAndProposalsToDisplay = [positionToDisplay, ...proposalsToDisplay];
 
       return positionsAndProposalsToDisplay;
     })

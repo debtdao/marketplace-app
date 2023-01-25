@@ -276,8 +276,17 @@
         "select-amount": "2. Select amount to withdraw"
       },
       "revoke-consent": {
-        "header": "Revoke Consent",
-        "cta": "Revoke Consent"
+        "header": "Cancel Proposed Deal",
+        "cta": "Cancel Proposal",
+        "select-credit": "1. Borrower:",
+        "select-token": "2. Token:",
+        "select-lender": "3. Lender:",
+        "select-rates": "4. Interest Rates:",
+        "rates": {
+          "facility-rate": "Facility Rate",
+          "drawn-rate": "Drawn Rate"
+        },
+        "lender-address": "Ethereum Address"
       },
       "enable-spigot": {
         "header":"Enable Spigot",

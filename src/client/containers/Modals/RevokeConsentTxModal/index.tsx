@@ -25,12 +25,12 @@ export const RevokeConsentTxModal: FC<WithdrawTxModalProps> = ({ onClose, ...pro
   return (
     <StyledRevokeConsentTxModal {...props}>
       {/* TODO: add when implementing RevokeConsent */}
-      {/* <RevokeConsentTx
-        header={t('components.transaction.withdraw')}
+      <RevokeConsentTx
+        header={t('components.transaction.revoke-consent.header')}
         onSelectedCreditLineChange={onSelectedCreditLineChange}
         onPositionChange={onPositionChange}
         onClose={onClose}
-      /> */}
+      />
     </StyledRevokeConsentTxModal>
   );
 };

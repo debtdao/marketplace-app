@@ -205,6 +205,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
       else return [borrowAction, repayAction];
     }
 
+    // TODO: change from position.lender to position.maker
     // If user is lender and position status is PROPOSED, return revoke consent action
     if (getAddress(position.lender) === userWallet && position.status === 'PROPOSED') {
       return [

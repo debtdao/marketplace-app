@@ -13,6 +13,9 @@ import { TxActionButton } from './components/TxActions';
 import { TxActions } from './components/TxActions';
 import { TxStatus } from './components/TxStatus';
 import { TxTTLInput } from './components/TxTTLInput';
+import { TxAddressInput } from './components/TxAddressInput';
+import { TxTokenInput } from './components/TxTokenInput';
+import { TxRateInput } from './components/TxRateInput';
 
 const StyledTransaction = styled(TxContainer)``;
 
@@ -148,6 +151,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
     });
   };
 
+  // TODO: onAction should be revokeConsent
   const txActions = [
     {
       label: t('components.transaction.revoke-consent.cta'),
@@ -191,28 +195,40 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
     <StyledTransaction onClose={onClose} header={header || t('components.transaction.revoke-consent.header')}>
       <TxCreditLineInput
         key={'credit-input'}
-        headerText={t('components.transaction.withdraw-credit.select-line')}
-        inputText={t('components.transaction.withdraw-credit.select-line')}
+        headerText={t('components.transaction.revoke-consent.select-credit')}
         onSelectedCreditLineChange={onSelectedCreditLineChange}
         selectedCredit={selectedCredit}
-        // creditOptions={sourceCreditOptions}
-        // inputError={!!sourceStatus.error}
-        readOnly={false}
-        // displayGuidance={displaySourceGuidance}
+        readOnly={true}
       />
-      <StyledAmountInput
-        headerText={t('components.transaction.withdraw-credit.select-amount')}
-        inputText={t('')}
-        inputError={false}
-        amount={targetAmount}
-        onAmountChange={onAmountChange}
-        maxAmount={getMaxWithdraw()}
-        maxLabel={'Max'}
-        readOnly={false}
-        hideAmount={false}
-        loading={false}
-        loadingText={''}
+      <TxTokenInput
+        key={'token-input'}
+        headerText={t('components.transaction.revoke-consent.select-token')}
+        // inputText={tokenHeaderText}
+        amount={normalize('amount', selectedPosition!.deposit, selectedPosition!.token.decimals)}
+        // onAmountChange={onAmountChange}
+        // amountValue={toWei(targetTokenAmount, positionToken.decimals)}
+        amountValue={selectedPosition!.deposit}
+        // maxAmount={acceptingOffer ? targetTokenAmount : targetBalance}
+        selectedToken={selectedPosition!.token}
+        readOnly={true}
       />
+      <TxAddressInput
+        key={'lender-input'}
+        headerText={t('components.transaction.revoke-consent.select-lender')}
+        inputText={t('components.transaction.revoke-consent.lender-address')}
+        address={selectedPosition!.lender}
+        readOnly={true}
+      />
+
+      <TxRateInput
+        key={'frate'}
+        headerText={t('components.transaction.revoke-consent.select-rates')}
+        frate={selectedPosition!.fRate}
+        drate={selectedPosition!.dRate}
+        amount={selectedPosition!.fRate}
+        readOnly={true}
+      />
+
       <TxActions>
         {txActions.map(({ label, onAction, disabled, contrast }) => (
           <TxActionButton

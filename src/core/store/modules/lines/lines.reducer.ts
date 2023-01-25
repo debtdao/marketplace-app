@@ -41,6 +41,7 @@ export const initialUserMetadataStatusMap: UserLineMetadataStatusMap = {
 export const linesInitialState: CreditLineState = {
   selectedLineAddress: undefined,
   selectedPosition: undefined,
+  selectedProposal: undefined,
   linesMap: {},
   positionsMap: {},
   eventsMap: {},
@@ -80,6 +81,7 @@ const {
   // initiateSaveLines,
   setSelectedLineAddress,
   setSelectedLinePosition,
+  setSelectedLinePositionProposal,
   setPosition,
   getUserLinePositions,
   getUserPortfolio,
@@ -103,6 +105,11 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(setSelectedLinePosition, (state, { payload: { position } }) => {
       console.log('set position', position, state.positionsMap[position ?? ''], state.positionsMap);
       state.selectedPosition = position;
+    })
+
+    .addCase(setSelectedLinePositionProposal, (state, { payload: { position, proposal } }) => {
+      console.log('set proposal', proposal, state.positionsMap[position ?? ''], state.positionsMap);
+      state.selectedProposal = proposal;
     })
 
     .addCase(setPosition, (state, { payload: { id, position } }) => {

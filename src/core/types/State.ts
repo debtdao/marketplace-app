@@ -105,6 +105,7 @@ export interface IdToCreditPositionMap {
 export interface CreditLineState {
   selectedLineAddress: string | undefined;
   selectedPosition: string | undefined;
+  selectedProposal: string | undefined;
   linesMap: { [lineAddress: string]: SecuredLine };
   positionsMap: { [id: string]: CreditPosition };
   eventsMap: { [line: string]: CreditEvent[] };

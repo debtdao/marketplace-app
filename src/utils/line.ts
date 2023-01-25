@@ -43,7 +43,8 @@ import {
   SpigotRevenueContract,
   SpigotRevenueContractMap,
   ProposalFragResponse,
-  Proposal,
+  CreditProposal,
+  ProposalMap,
 } from '@types';
 
 import { humanize, normalizeAmount, normalize } from './format';
@@ -380,19 +381,35 @@ export const formatSecuredLineData = (
     spigots: spigotRevenueContracts,
   };
 
+  // Create positionMap
   const positions = positionFrags.reduce((obj: any, c: BasePositionFragResponse): PositionMap => {
     const { dRate, fRate, id, lender, line: lineObj, token, proposal: proposals, ...financials } = c;
     const lenderAddress = lender.id;
 
-    const proposal = proposals.map((p: ProposalFragResponse): Proposal => {
-      const { maker, taker, ...rest } = p;
+    // const proposal = proposals.map((p: ProposalFragResponse): CreditProposal => {
+    //   const { maker, taker, ...rest } = p;
+
+    //   return {
+    //     maker: maker.id,
+    //     taker: taker ? taker.id : taker,
+    //     ...rest,
+    //   };
+    // });
+
+    // Create proposalMap
+    const proposalsMap = proposals.reduce((propAgg: any, p: ProposalFragResponse): ProposalMap => {
+      const { id: proposalId, maker, taker, ...rest } = p;
 
       return {
-        maker: maker.id,
-        taker: taker ? taker.id : taker,
-        ...rest,
+        ...propAgg,
+        [proposalId]: {
+          id: proposalId,
+          maker: maker.id,
+          taker: taker ? taker.id : taker,
+          ...rest,
+        },
       };
-    });
+    }, {});
 
     const currentUsdPrice = tokenPrices[c.token?.id];
     return {
@@ -401,7 +418,7 @@ export const formatSecuredLineData = (
         id,
         lender: lenderAddress,
         line,
-        proposal,
+        proposalsMap,
         ...financials,
         dRate,
         fRate,

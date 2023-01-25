@@ -18,7 +18,8 @@ import {
   LineEvents,
   AggregatedEscrow,
   AggregatedSpigot,
-  CollateralEvent, // prev. GeneralVaultView, Super indepth data, SecuredLineWithEvents is most similar atm
+  CollateralEvent,
+  CreditProposal, // prev. GeneralVaultView, Super indepth data, SecuredLineWithEvents is most similar atm
 } from '@types';
 import { toBN, unnullify } from '@utils';
 import { getConstants } from '@src/config/constants';
@@ -43,6 +44,7 @@ const selectUserTokensMap = (state: RootState) => state.tokens.user.userTokensMa
 const selectTokensMap = (state: RootState) => state.tokens.tokensMap;
 const selectSelectedLineAddress = (state: RootState) => state.lines.selectedLineAddress;
 const selectSelectedPositionId = (state: RootState) => state.lines.selectedPosition;
+const selectSelectedProposalId = (state: RootState) => state.lines.selectedProposal;
 
 const selectCollateralMap = (state: RootState) => state.collateral.collateralMap;
 const selectCollateralEventsMap = (state: RootState) => state.collateral.eventsMap;
@@ -78,6 +80,14 @@ const selectSelectedPosition = createSelector(
     return positions[id];
   }
 );
+
+const selectSelectedProposal = createSelector(
+  [selectPositionsMap, selectSelectedPositionId, selectSelectedProposalId],
+  (positions, positionId = '', proposalId = ''): CreditProposal | undefined => {
+    return positions[positionId].proposalsMap[proposalId];
+  }
+);
+
 const selectPositionsForSelectedLine = createSelector(
   [selectPositionsMap, selectSelectedLineAddress],
   (positionsMap, line): PositionMap => {
@@ -329,8 +339,10 @@ export const LinesSelectors = {
   selectSelectedLine,
   selectSelectedLinePage,
   selectSelectedPositionId,
+  selectSelectedProposalId,
   selectSelectedLineActionsStatusMap,
   selectSelectedPosition,
+  selectSelectedProposal,
   // selectDepositedLines,
   selectSummaryData,
   //selectRecommendations,

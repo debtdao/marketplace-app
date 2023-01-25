@@ -76,6 +76,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
+  const selectedProposal = useAppSelector(LinesSelectors.selectSelectedProposal);
   const walletAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
   const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
@@ -106,17 +107,28 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
 
   console.log('selectedPosition', selectedPosition, selectedCredit);
   useEffect(() => {
-    if (selectedPosition?.status === PROPOSED_STATUS) {
-      //  selectedPosition.token.decimals instead of 0 as deci
-      const deposit = normalizeAmount(selectedPosition.deposit, selectedPosition.token.decimals);
-      console.log('position deposit user input vs norm val', selectedPosition.deposit, deposit);
+    if (selectedPosition?.status === PROPOSED_STATUS && selectedProposal) {
+      console.log('Selected Proposal: ', selectedProposal);
+      // //  selectedPosition.token.decimals instead of 0 as deci
+      // const deposit = normalizeAmount(selectedPosition.deposit, selectedPosition.token.decimals);
+      // console.log('position deposit user input vs norm val', selectedPosition.deposit, deposit);
 
-      if (!targetTokenAmount) setTargetTokenAmount(deposit);
-      if (!selectedSellTokenAddress) setSelectedTokenAddress(selectedPosition.token.address);
-      if (!drate) setDrate(normalizeAmount(selectedPosition.dRate, 0));
-      if (!frate) setFrate(normalizeAmount(selectedPosition.fRate, 0));
-      setLenderAddress(selectedPosition.lender);
-      setTargetTokenAmount(deposit);
+      // // set these values based on selectedProposal
+      // if (!targetTokenAmount) setTargetTokenAmount(deposit);
+      // if (!selectedSellTokenAddress) setSelectedTokenAddress(selectedPosition.token.address);
+      // if (!drate) setDrate(normalizeAmount(selectedPosition.dRate, 0));
+      // if (!frate) setFrate(normalizeAmount(selectedPosition.fRate, 0));
+      // setLenderAddress(selectedPosition.lender);
+      // setTargetTokenAmount(deposit);
+      // setTransactionType('accept');
+
+      // set values based on selectedProposal
+      const [dRate, fRate, deposit, tokenAddress, lenderAddress] = [...selectedProposal.args];
+      setTargetTokenAmount(normalizeAmount(deposit, selectedPosition.token.decimals));
+      setSelectedTokenAddress(tokenAddress);
+      setDrate(normalizeAmount(dRate, 0));
+      setFrate(normalizeAmount(fRate, 0));
+      setLenderAddress(lenderAddress);
       setTransactionType('accept');
     }
   }, [selectedPosition]);

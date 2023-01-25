@@ -55,6 +55,9 @@ import { LinesSelectors } from './lines.selectors';
 
 const setSelectedLineAddress = createAction<{ lineAddress?: string }>('lines/setSelectedLineAddress');
 const setSelectedLinePosition = createAction<{ position?: string }>('lines/setSelectedLinePosition');
+const setSelectedLinePositionProposal = createAction<{ position?: string; proposal?: string }>(
+  'lines/setSelectedLinePositionProposal'
+);
 const setPosition = createAction<{ id: string; position: CreditPosition }>('lines/setPosition');
 
 /* -------------------------------------------------------------------------- */
@@ -843,6 +846,7 @@ const getWithdrawAllowance = createAsyncThunk<
 export const LinesActions = {
   setSelectedLineAddress,
   setSelectedLinePosition,
+  setSelectedLinePositionProposal,
   setPosition,
   clearLinesData,
   clearUserData,

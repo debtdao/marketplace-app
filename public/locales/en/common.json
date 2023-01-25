@@ -165,6 +165,10 @@
         "select-token": "2. The token being lent",
         "select-lender": "3. Lender:",
         "select-rates": "4. Set Interest Rates",
+        "rates": {
+          "facility-rate":"Facility  Rate",
+          "drawn-rate":"Drawn Rate"
+        },
         "lender-address": "Ethereum Address",
         "back-to-market": "Head back to the Market",
         "accept-terms": "Accept",

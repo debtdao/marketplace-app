@@ -177,7 +177,7 @@ const claimOperatorTokens = createAsyncThunk<{ claimed: string | undefined }, Cl
     };
   }
 );
-// TODO: Does there need to be a reducer for this?
+// TODO: Do Optimistic State update for all Line Actions
 
 const tradeable = createAsyncThunk<
   {

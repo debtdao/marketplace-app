@@ -5,6 +5,7 @@
   },
   "metadata": {
     "borrower": "Borrower",
+    "lender": "Lender",
     "principal": "Total Outstanding Debt",
     "deposit": "Credit Limit",
     "total-interest-paid": "Lifetime Interest Paid",

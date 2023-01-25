@@ -4,7 +4,16 @@ import { BigNumber, BytesLike, ethers } from 'ethers';
 import { FC, useState, useEffect } from 'react';
 import { getAddress } from '@ethersproject/address';
 
-import { formatAmount, normalizeAmount, toWei, depositAndRepayUpdate, normalize, bn, getTradeQuote } from '@utils';
+import {
+  formatAmount,
+  normalizeAmount,
+  toWei,
+  depositAndRepayUpdate,
+  normalize,
+  bn,
+  getTradeQuote,
+  isGoerli,
+} from '@utils';
 import { useAppTranslation, useAppDispatch, useAppSelector, useSelectedSellToken } from '@hooks';
 import {
   TokensActions,
@@ -55,6 +64,7 @@ interface RepayPositionProps {
 
 const {
   CONTRACT_ADDRESSES: { DAI, ETH },
+  MAX_UINT256,
 } = getConstants();
 
 export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
@@ -126,7 +136,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   // const [zeroExWarning, setZeroExWarning] = useState<boolean>(false);
   const [isTrade, setIsTrade] = useState<boolean>(false);
   // TODO: replace usage in useFundsForClosing with appropriate value
-  const maxInt = '115792089237316195423570985008687907853269984665640564039457584007913129639935';
 
   useEffect(() => {
     if (!selectedSellToken && !_.isEmpty(sourceAssetOptions)) {
@@ -209,7 +218,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     let approvalOBj = {
       lineAddress: selectedPosition.line,
       tokenAddress: selectedPosition.token.address,
-      amount: maxInt, // TODO: replace to only approve necessary amount
+      amount: MAX_UINT256, // TODO: replace to only approve necessary amount
       network: walletNetwork!,
     };
     dispatch(LinesActions.approveDeposit(approvalOBj)).then((res) => {
@@ -523,9 +532,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
           },
         ];
       case 'claim-and-trade':
-        switch (isTrade) {
-          case true:
-            return [
+        return isTrade
+          ? [
               {
                 label: t('components.transaction.repay.claim-and-trade.cta'),
                 onAction: claimAndTrade,
@@ -533,9 +541,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
                 disabled: !transactionApproved,
                 contrast: false,
               },
-            ];
-          default:
-            return [
+            ]
+          : [
               {
                 label: t('components.transaction.repay.approve-funds-for-repayment.cta'),
                 onAction: claimAndTrade,
@@ -544,7 +551,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
                 contrast: false,
               },
             ];
-        }
       case 'deposit-and-repay':
       default:
         return [
@@ -616,9 +622,12 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   }`;
 
   // generate token header text for use-and-repay
-  const creditTokenTargetBalance = normalizeAmount(
+  const creditTokenExistsInReserves =
     reservesMap[getAddress(selectedPosition.line)] &&
-      reservesMap[getAddress(selectedPosition.line)][getAddress(selectedPosition.token.address)]
+    reservesMap[getAddress(selectedPosition.line)][getAddress(selectedPosition.token.address)];
+
+  const creditTokenTargetBalance = normalizeAmount(
+    creditTokenExistsInReserves
       ? reservesMap[getAddress(selectedPosition.line)][getAddress(selectedPosition.token.address)].unusedTokens
       : '0',
     selectedPosition.token.decimals
@@ -662,8 +671,9 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       case 'claim-and-trade':
         const buyToken = getAddress(selectedPosition.token.address);
         const sellToken = getAddress(selectedSellToken.address);
+        const isZeroExTrade = sellToken !== buyToken;
 
-        if (buyToken !== sellToken && !haveFetched0x) {
+        if (isZeroExTrade && !haveFetched0x) {
           const tradeTx = getTradeQuote({
             // set fake data for testing 0x
             // buyToken: DAI,
@@ -681,6 +691,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
               setTokensToBuy(result.buyAmount!);
               setTradeData(result);
             }
+            //TODO: Make  util function that creates 0x trade data, an another func that construct. Use 0x.ts
+
             // TODO: Set fake trade data to mock 0x trade when buyToken and sellToken are not the same
             // console.log('Set Trade Data');
             // setTradeData({
@@ -723,7 +735,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
         // TODO: test claimableTokenOptions on Ethereum mainnet
         const claimableTokenOptions: TokenView[] = claimableTokenAddresses.map((address) => {
-          if (walletNetwork === 'goerli') {
+          const isThisGoerli = isGoerli(walletNetwork);
+          if (isThisGoerli) {
             return testTokens.find((token) => token.address === address)!;
           } else {
             const tokenData = tokensMap[address];
@@ -739,7 +752,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
               headerText={t('components.transaction.repay.claim-and-repay.claim-token')}
               inputText={claimTokenHeaderText}
               // TODO: create unit test for this
-              amount={sellToken === buyToken ? claimTargetBalance : targetAmount}
+              amount={!isZeroExTrade ? claimTargetBalance : targetAmount}
               onAmountChange={(amnt) => setTargetAmount(amnt)}
               // token to claim from spigot
               selectedToken={selectedSellToken}
@@ -747,7 +760,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
               // selectedToken={tokensMap[ETH]}
               onSelectedTokenChange={onSelectedSellTokenChange}
               tokenOptions={claimableTokenOptions}
-              readOnly={sellToken === buyToken ? true : false}
+              readOnly={!isZeroExTrade ? true : false}
             />
             {/* rendner tokens to purchase based on trade data from 0x API response */}
             {sellToken !== buyToken ? (
@@ -777,7 +790,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
           <TxTokenInput
             headerText={t('components.transaction.repay.select-amount')}
             inputText={tokenHeaderText}
-            amount={getInterestAccrued()}
+            amount={getInterestAccrued()} // TODO: replace getInterestAccrued to pull from contract instead of subgraph
             onAmountChange={(amnt) => setTargetAmount(amnt)}
             selectedToken={selectedPosition.token}
             readOnly={true}

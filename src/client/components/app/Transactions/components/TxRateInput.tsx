@@ -166,7 +166,9 @@ export const TxRateInput: FC<TxRateInputProps> = ({
           <PositionData>
             <AmountInputContainer>
               <RatesContainer>
-                <AmountTitle ellipsis>{'Facility Rate' || t('components.transaction.deposit.rates-title')}</AmountTitle>
+                <AmountTitle ellipsis>
+                  {'Facility Rate' || t('components.transaction.add-credit.rates.facility-rate')}
+                </AmountTitle>
                 <InterestRateInputContainer>
                   <StyledAmountInput
                     //format from bps to % to display and back to bps to set value
@@ -182,7 +184,9 @@ export const TxRateInput: FC<TxRateInputProps> = ({
                 </InterestRateInputContainer>
               </RatesContainer>
               <RatesContainer>
-                <AmountTitle ellipsis>{'Drawn Rate' || t('components.transaction.deposit.rates-title')}</AmountTitle>
+                <AmountTitle ellipsis>
+                  {'Drawn Rate' || t('components.transaction.add-credit.rates.drawn-rate')}
+                </AmountTitle>
                 <InterestRateInputContainer>
                   <StyledAmountInput
                     //format from bps to % to display and back to bps to set value

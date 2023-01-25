@@ -161,42 +161,7 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
     );
   }
 
-  // Event Handlers
-  const approveCollateralToken = () => {
-    setLoading(true);
-    console.log('add collateral', selectedEscrow, selectedCollateralAsset, targetTokenAmount);
-    if (!selectedEscrow || !selectedCollateralAsset) {
-      setLoading(false);
-      return;
-    }
-    const amount = BigNumber.from(targetTokenAmount)
-      .mul(BigNumber.from(10).pow(selectedCollateralAsset.decimals))
-      .toString();
-    console.log(
-      'appr collateral',
-      targetTokenAmount,
-      toUnit(targetTokenAmount, Number(selectedCollateralAsset.decimals)),
-      amount
-    );
-    const approveTx = {
-      tokenAddress: selectedCollateralAsset?.address,
-      amount,
-      lineAddress: selectedEscrow.id, // @cleanup and refactor into TokenService
-      network: walletNetwork,
-    };
-    console.log('approval obj', approveTx);
-
-    dispatch(LinesActions.approveDeposit(approveTx)).then((res) => {
-      if (res.meta.requestStatus === 'rejected') {
-        setTransactionApproved(transactionApproved);
-        setLoading(false);
-      }
-      if (res.meta.requestStatus === 'fulfilled') {
-        setTransactionApproved(!transactionApproved);
-        setLoading(false);
-      }
-    });
-  };
+  // Event Handler
 
   const onTransactionCompletedDismissed = () => {
     if (onClose) {
@@ -245,13 +210,6 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
   };
 
   const escrowCollateralSettings = [
-    {
-      label: t('components.transaction.approve'),
-      onAction: approveCollateralToken,
-      status: true,
-      disabled: !transactionApproved,
-      contrast: false,
-    },
     {
       label: t('components.transaction.release'),
       onAction: releaseCollateral,

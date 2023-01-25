@@ -282,8 +282,11 @@ export const LineMetadata = () => {
   const startDateHumanized = format(new Date(startTime * 1000), 'MMMM dd, yyyy');
   const endDateHumanized = format(new Date(endTime * 1000), 'MMMM dd, yyyy');
   const revenueSplitFormatted: Metric[] = [];
-  revenueSplitFormatted.push({ title: 'Borrower', data: 100 - Number(defaultSplit) + '%' });
-  revenueSplitFormatted.push({ title: 'Lender', data: defaultSplit + '%' });
+  revenueSplitFormatted.push({
+    title: `${t('lineDetails:metadata.borrower')}`,
+    data: 100 - Number(defaultSplit) + '%',
+  });
+  revenueSplitFormatted.push({ title: `${t('lineDetails:metadata.lender')}`, data: defaultSplit + '%' });
 
   // TODO: fix types on args
   // TODO: What is the action button for revenue?

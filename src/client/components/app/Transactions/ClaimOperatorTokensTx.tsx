@@ -4,7 +4,7 @@ import { BigNumber, BytesLike, ethers } from 'ethers';
 import { FC, useState, useEffect } from 'react';
 import { getAddress } from '@ethersproject/address';
 
-import { formatAmount, normalizeAmount, toWei, depositAndRepayUpdate, normalize, bn, getTradeQuote } from '@utils';
+import { formatAmount, normalizeAmount, toWei, depositAndRepayUpdate, normalize, bn, getTradeQuote, isGoerli } from '@utils';
 import { useAppTranslation, useAppDispatch, useAppSelector, useSelectedSellToken } from '@hooks';
 import {
   TokensActions,
@@ -199,7 +199,8 @@ export const ClaimOperatorTokensTx: FC<ClaimOperatorTokensTxProps> = (props) => 
 
     // TODO: test claimableTokenOptions on Ethereum mainnet
     const claimableTokenOptions: TokenView[] = claimableTokenAddresses.map((address) => {
-      if (walletNetwork === 'goerli') {
+      const isThisGoerli = isGoerli(walletNetwork);
+      if (isThisGoerli) {
         return testTokens.find((token) => token.address === address)!;
       } else {
         const tokenData = tokensMap[address];

@@ -49,26 +49,17 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
       setErrors([...errors, 'no selected position']);
       return '0';
     }
-    // const maxWithdrawAmount: number =
-    //   Number(selectedPosition.deposit) - Number(selectedPosition.principal) + Number(selectedPosition.interestRepaid);
-
-    // // 1 is the smallest possible unit for the token decimal
-    // const maxWithdrawAmountLessDust: number = maxWithdrawAmount >= 1 ? maxWithdrawAmount - 1 : 0;
-    // const maxWithdrawLessDustNormalized = normalize(
-    //   'amount',
-    //   String(maxWithdrawAmountLessDust),
-    //   selectedPosition.token.decimals
-    // );
-
     const deposit: BigNumber = BigNumber.from(selectedPosition.deposit);
     const principal: BigNumber = BigNumber.from(selectedPosition.principal);
     const interestRepaid: BigNumber = BigNumber.from(selectedPosition.interestRepaid);
     const maxWithdrawAmount = deposit.sub(principal).add(interestRepaid);
     const maxWithdrawAmountLessDust = maxWithdrawAmount.gte(1) ? maxWithdrawAmount.sub(1) : BigNumber.from(0);
-    console.log('Max Withdraw Amount Less Dust: ', maxWithdrawAmountLessDust);
-    // const maxWithdrawLessDustNormalized = normalize('amount', maxWithdrawAmountLessDust.toString(), selectedPosition.token.decimals);
-
-    return maxWithdrawAmountLessDust.toString();
+    const maxWithdrawLessDustNormalized = normalize(
+      'amount',
+      maxWithdrawAmountLessDust.toString(),
+      selectedPosition.token.decimals
+    );
+    return maxWithdrawLessDustNormalized;
   };
 
   //Used to determine if amount user wants to withdraw is valid

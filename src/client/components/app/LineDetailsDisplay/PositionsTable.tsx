@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { useEffect, useState } from 'react';
 import { BigNumber, ethers } from 'ethers';
 import { getAddress, parseUnits } from 'ethers/lib/utils';
+import _ from 'lodash';
 
 import {
   ModalsActions,
@@ -233,6 +234,80 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
     return [];
   };
 
+  const formattedPositions = _.flatten(
+    positions?.map((position) => {
+      const positionToDisplay = {
+        // this needs to be humanized to correct amount depending on the token.
+        deposit: humanize('amount', position.deposit, position.token.decimals, 2),
+        drate: `${normalizeAmount(position.dRate, 2)} %`,
+        frate: `${normalizeAmount(position.fRate, 2)} %`,
+        line: (
+          <RouterLink to={`/${currentNetwork}/lines/${position.line}`} key={position.line} selected={false}>
+            {formatAddress(position.line)}
+            <RedirectLinkIcon />
+          </RouterLink>
+        ),
+        status: position.status,
+        principal: humanize('amount', position.principal, position.token.decimals, 2),
+        interest: humanize('amount', position.interestAccrued, position.token.decimals, 2),
+        lender: (
+          <RouterLink to={`/${currentNetwork}/portfolio/${position.lender}`} key={position.id} selected={false}>
+            {formatAddress(getENS(position.lender, ensMap)!)}
+            <RedirectLinkIcon />
+          </RouterLink>
+        ),
+        token: (
+          <RouterLink
+            key={position.token.address}
+            to={`https://etherscan.io/address/${position.token.address}`}
+            selected={false}
+          >
+            {position.token.symbol}
+          </RouterLink>
+        ),
+        actions: <ActionButtons value={position.id} actions={getUserPositionActions(position)} />,
+      };
+      //  const proposals = position.status === 'PROPOSED' ? position.proposals : [];
+      const proposalsToDisplay =
+        position.status === 'PROPOSED'
+          ? position.proposal.map((proposal) => ({
+              deposit: humanize('amount', proposal.args[2], position.token.decimals, 2),
+              drate: `${normalizeAmount(proposal.args[0], 2)} %`,
+              frate: `${normalizeAmount(proposal.args[1], 2)} %`,
+              line: (
+                <RouterLink to={`/${currentNetwork}/lines/${position.line}`} key={position.line} selected={false}>
+                  {formatAddress(position.line)}
+                  <RedirectLinkIcon />
+                </RouterLink>
+              ),
+              status: '',
+              principal: humanize('amount', '0', position.token.decimals, 2),
+              interest: humanize('amount', '0', position.token.decimals, 2),
+              lender: (
+                <RouterLink to={`/${currentNetwork}/portfolio/${proposal.args[4]}`} key={position.id} selected={false}>
+                  {formatAddress(getENS(proposal.args[4], ensMap)!)}
+                  <RedirectLinkIcon />
+                </RouterLink>
+              ),
+              token: (
+                <RouterLink
+                  key={proposal.args[3]}
+                  to={`https://etherscan.io/address/${proposal.args[3]}`}
+                  selected={false}
+                >
+                  {position.token.symbol}
+                </RouterLink>
+              ),
+              actions: <ActionButtons value={position.id} actions={getUserPositionActions(position)} />,
+            }))
+          : [];
+      const positionsAndProposalsToDisplay = [positionToDisplay, ...proposalsToDisplay];
+      console.log('xxx - positions and proposals: ', positionsAndProposalsToDisplay);
+      return positionsAndProposalsToDisplay;
+    })
+  );
+  console.log('xxx - formatted positions: ', formattedPositions);
+
   console.log('positions table display line', displayLine, !displayLine);
   return (
     <>
@@ -313,37 +388,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
               grow: '1',
             },
           ]}
-          data={positions?.map((position) => ({
-            // this needs to be humanized to correct amount depending on the token.
-            deposit: humanize('amount', position.deposit, position.token.decimals, 2),
-            drate: `${normalizeAmount(position.dRate, 2)} %`,
-            frate: `${normalizeAmount(position.fRate, 2)} %`,
-            line: (
-              <RouterLink to={`/${currentNetwork}/lines/${position.line}`} key={position.line} selected={false}>
-                {formatAddress(position.line)}
-                <RedirectLinkIcon />
-              </RouterLink>
-            ),
-            status: position.status,
-            principal: humanize('amount', position.principal, position.token.decimals, 2),
-            interest: humanize('amount', position.interestAccrued, position.token.decimals, 2),
-            lender: (
-              <RouterLink to={`/${currentNetwork}/portfolio/${position.lender}`} key={position.id} selected={false}>
-                {formatAddress(getENS(position.lender, ensMap)!)}
-                <RedirectLinkIcon />
-              </RouterLink>
-            ),
-            token: (
-              <RouterLink
-                key={position.token.address}
-                to={`https://etherscan.io/address/${position.token.address}`}
-                selected={false}
-              >
-                {position.token.symbol}
-              </RouterLink>
-            ),
-            actions: <ActionButtons value={position.id} actions={getUserPositionActions(position)} />,
-          }))}
+          data={formattedPositions}
           SearchBar={
             <>
               {/* // TODO: Add search bar back when there is a need for it. */}

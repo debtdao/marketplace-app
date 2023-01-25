@@ -86,6 +86,19 @@ export interface LineEvents {
 
 export interface SecuredLineWithEvents extends SecuredLine, LineEvents {}
 
+export interface Proposal {
+  id: string;
+  proposedAt: number;
+  revokedAt: number;
+  acceptedAt: number;
+  endedAt: number;
+  maker: string;
+  taker: string;
+  mutualConsentFunc: string;
+  msgData: string;
+  args: string[];
+}
+
 export interface CreditPosition {
   id: string;
   line: string;
@@ -100,6 +113,7 @@ export interface CreditPosition {
   // borrower: Address;
   dRate: string;
   fRate: string;
+  proposal: Proposal[];
 }
 
 // bare minimum to display about a user on a position

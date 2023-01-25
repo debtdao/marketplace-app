@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 
 import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
 import { LinesSelectors, LinesActions, WalletSelectors } from '@store';
-import { withdrawUpdate, normalize, toWei } from '@src/utils';
+import { withdrawUpdate, normalize, toWei, formatAmount, normalizeAmount } from '@src/utils';
 
 import { TxContainer } from './components/TxContainer';
 import { TxCreditLineInput } from './components/TxCreditLineInput';
@@ -191,6 +191,9 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
     );
   }
 
+  const targetBalance = normalizeAmount(selectedPosition!.token.balance, selectedPosition!.token.decimals);
+  const tokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(targetBalance, 4)}`;
+
   return (
     <StyledTransaction onClose={onClose} header={header || t('components.transaction.revoke-consent.header')}>
       <TxCreditLineInput
@@ -203,7 +206,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
       <TxTokenInput
         key={'token-input'}
         headerText={t('components.transaction.revoke-consent.select-token')}
-        // inputText={tokenHeaderText}
+        inputText={tokenHeaderText}
         amount={normalize('amount', selectedPosition!.deposit, selectedPosition!.token.decimals)}
         // onAmountChange={onAmountChange}
         // amountValue={toWei(targetTokenAmount, positionToken.decimals)}

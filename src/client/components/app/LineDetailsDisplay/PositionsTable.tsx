@@ -265,7 +265,12 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
             {position.token.symbol}
           </RouterLink>
         ),
-        actions: <ActionButtons value={position.id} actions={getUserPositionActions(position)} />,
+        actions: (
+          <ActionButtons
+            value={position.id}
+            actions={position.status !== 'PROPOSED' ? getUserPositionActions(position) : []}
+          />
+        ),
       };
       //  const proposals = position.status === 'PROPOSED' ? position.proposals : [];
       const proposalsToDisplay =

@@ -285,7 +285,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
                   <RedirectLinkIcon />
                 </RouterLink>
               ),
-              status: '',
+              status: position.status, // TODO: remove this if keep original way to display proposals
               principal: humanize('amount', '0', position.token.decimals, 2),
               interest: humanize('amount', '0', position.token.decimals, 2),
               lender: (
@@ -306,12 +306,16 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
               actions: <ActionButtons value={position.id} actions={getUserPositionActions(position)} />,
             }))
           : [];
+      // TODO: remove this if keep original way to display proposals
+      // const positionsAndProposalsToDisplay =
+      // position.status === 'PROPOSED' ? [...proposalsToDisplay] : [positionToDisplay];
+
+      // TODO: add this if keep original way to display proposals
       const positionsAndProposalsToDisplay = [positionToDisplay, ...proposalsToDisplay];
-      console.log('xxx - positions and proposals: ', positionsAndProposalsToDisplay);
+
       return positionsAndProposalsToDisplay;
     })
   );
-  console.log('xxx - formatted positions: ', formattedPositions);
 
   console.log('positions table display line', displayLine, !displayLine);
   return (

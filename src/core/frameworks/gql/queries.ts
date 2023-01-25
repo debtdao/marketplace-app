@@ -34,8 +34,29 @@ const BASE_LINE_FRAGMENT = gql`
   }
 `;
 
+const BASE_PROPOSAL_FRAGMENT = gql`
+  ${TOKEN_FRAGMENT}
+  fragment BaseProposalFrag on Proposal {
+    id
+    proposedAt
+    revokedAt
+    acceptedAt
+    endedAt
+    maker {
+      id
+    }
+    taker {
+      id
+    }
+    mutualConsentFunc
+    msgData
+    args
+  }
+`;
+
 const BASE_POSITION_FRAGMENT = gql`
   ${TOKEN_FRAGMENT}
+  ${BASE_PROPOSAL_FRAGMENT}
   fragment BasePositionFrag on Position {
     id
     status
@@ -50,6 +71,9 @@ const BASE_POSITION_FRAGMENT = gql`
     fRate
     token {
       ...TokenFrag
+    }
+    proposal {
+      ...BaseProposalFrag
     }
   }
 `;

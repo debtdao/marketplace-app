@@ -135,6 +135,7 @@ export interface TokenFragRepsonse {
   symbol: string;
   decimals: number;
 }
+
 export interface BaseLineFragResponse {
   id: Address;
   end: number;
@@ -149,7 +150,22 @@ export interface BaseLineFragResponse {
   };
   defaultSplit: string;
 }
-
+export interface ProposalFragResponse {
+  id: Address;
+  proposedAt: number;
+  revokedAt: number;
+  acceptedAt: number;
+  endedAt: number;
+  maker: {
+    id: string;
+  };
+  taker: {
+    id: string;
+  };
+  mutualConsentFunc: string;
+  msgData: string;
+  args: string[];
+}
 export interface BasePositionFragResponse {
   id: Address;
   status: PositionStatusTypes;
@@ -166,8 +182,8 @@ export interface BasePositionFragResponse {
   totalInterestRepaid: string;
   dRate: string;
   fRate: string;
-  // arbiter: string;
   token: TokenFragRepsonse;
+  proposal: ProposalFragResponse;
 }
 
 export interface LineEventFragResponse {

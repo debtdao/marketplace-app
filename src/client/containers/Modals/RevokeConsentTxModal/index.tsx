@@ -1,16 +1,17 @@
+// TODO: clean-up this code in Revoke Consent PR.
 import { FC } from 'react';
 import styled from 'styled-components';
 
 import { useAppTranslation } from '@hooks';
 import { ModalTx } from '@components/common';
-import { WithdrawCreditTx } from '@components/app';
+import { RevokeConsentTx } from '@components/app';
 
-const StyledWithdrawTxModal = styled(ModalTx)``;
+const StyledRevokeConsentTxModal = styled(ModalTx)``;
 export interface WithdrawTxModalProps {
   onClose: () => void;
 }
 
-export const WithdrawCreditTxModal: FC<WithdrawTxModalProps> = ({ onClose, ...props }) => {
+export const RevokeConsentTxModal: FC<WithdrawTxModalProps> = ({ onClose, ...props }) => {
   const { t } = useAppTranslation('common');
 
   const onSelectedCreditLineChange = () => {
@@ -22,13 +23,14 @@ export const WithdrawCreditTxModal: FC<WithdrawTxModalProps> = ({ onClose, ...pr
     // update deposit params
   };
   return (
-    <StyledWithdrawTxModal {...props}>
-      <WithdrawCreditTx
+    <StyledRevokeConsentTxModal {...props}>
+      {/* TODO: add when implementing RevokeConsent */}
+      {/* <RevokeConsentTx
         header={t('components.transaction.withdraw')}
         onSelectedCreditLineChange={onSelectedCreditLineChange}
         onPositionChange={onPositionChange}
         onClose={onClose}
-      />
-    </StyledWithdrawTxModal>
+      /> */}
+    </StyledRevokeConsentTxModal>
   );
 };

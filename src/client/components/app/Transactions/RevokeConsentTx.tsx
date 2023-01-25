@@ -1,13 +1,9 @@
+// TODO: This file is a work in progress. It currently just mimicks the WithdrawCreditTx.tsx file.
 import { FC, useState } from 'react';
 import styled from 'styled-components';
-import { BigNumber, ethers } from 'ethers';
+import { ethers } from 'ethers';
 
-import {
-  useAppTranslation,
-  useAppDispatch,
-  // used to dummy token for dev
-  useAppSelector,
-} from '@hooks';
+import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
 import { LinesSelectors, LinesActions, WalletSelectors } from '@store';
 import { withdrawUpdate, normalize, toWei } from '@src/utils';
 
@@ -22,14 +18,14 @@ const StyledTransaction = styled(TxContainer)``;
 
 const StyledAmountInput = styled(TxTTLInput)``;
 
-interface BorrowCreditProps {
+interface RevokeConsentProps {
   header: string;
   onClose: () => void;
   onSelectedCreditLineChange: Function;
   onPositionChange: (data: { credit?: string; amount?: string }) => void;
 }
 
-export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
+export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
   const { header, onClose, onPositionChange } = props;
@@ -49,14 +45,14 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
       setErrors([...errors, 'no selected position']);
       return '0';
     }
-    const deposit: BigNumber = BigNumber.from(selectedPosition.deposit);
-    const principal: BigNumber = BigNumber.from(selectedPosition.principal);
-    const interestRepaid: BigNumber = BigNumber.from(selectedPosition.interestRepaid);
-    const maxWithdrawAmount = deposit.sub(principal).add(interestRepaid);
-    const maxWithdrawAmountLessDust = maxWithdrawAmount.gte(1) ? maxWithdrawAmount.sub(1) : BigNumber.from(0);
+    const maxWithdrawAmount: number =
+      Number(selectedPosition.deposit) - Number(selectedPosition.principal) + Number(selectedPosition.interestRepaid);
+
+    // 1 is the smallest possible unit for the token decimal
+    const maxWithdrawAmountLessDust: number = maxWithdrawAmount >= 1 ? maxWithdrawAmount - 1 : 0;
     const maxWithdrawLessDustNormalized = normalize(
       'amount',
-      maxWithdrawAmountLessDust.toString(),
+      String(maxWithdrawAmountLessDust),
       selectedPosition.token.decimals
     );
     return maxWithdrawLessDustNormalized;
@@ -154,7 +150,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
 
   const txActions = [
     {
-      label: t('components.transaction.withdraw'),
+      label: t('components.transaction.revoke-consent.cta'),
       onAction: withdrawCredit,
       status: true,
       disabled: isWithdrawable(),
@@ -192,7 +188,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
   }
 
   return (
-    <StyledTransaction onClose={onClose} header={header || t('components.transaction.withdraw-credit.header')}>
+    <StyledTransaction onClose={onClose} header={header || t('components.transaction.revoke-consent.header')}>
       <TxCreditLineInput
         key={'credit-input'}
         headerText={t('components.transaction.withdraw-credit.select-line')}

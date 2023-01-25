@@ -21,7 +21,7 @@ import {
   TokenView,
 } from '@src/core/types';
 import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
-import { Button, Text, RedirectIcon, Link } from '@components/common';
+import { Button, Text, RedirectIcon, Link, CardEmptyList } from '@components/common';
 import {
   LinesSelectors,
   ModalsActions,
@@ -154,6 +154,7 @@ export const LineMetadata = () => {
   const {
     start: startTime,
     end: endTime,
+    status,
     principal,
     deposit,
     totalInterestRepaid,
@@ -200,6 +201,17 @@ export const LineMetadata = () => {
     }
   };
 
+  const withdrawHandler = (token: TokenView) => {
+    if (!walletIsConnected) {
+      connectWallet();
+    } else {
+      dispatch(CollateralActions.setSelectedCollateralAsset({ assetAddress: token.address }));
+      dispatch(
+        ModalsActions.openModal({ modalName: 'releaseCollateral', modalProps: { assetAddress: token.address } })
+      );
+    }
+  };
+
   const addSpigotHandler = (token: TokenView) => {
     if (!walletIsConnected) {
       connectWallet();
@@ -232,7 +244,6 @@ export const LineMetadata = () => {
   const formattedCollateralData = allCollateral.map((c) => ({
     ...c,
     key: c.type + c.token.toString(),
-    // header: c.type + c.token.toString(),
     align: 'flex-start',
     actions: getCollateralRowActionForRole(userPositionMetadata.role),
   }));
@@ -252,6 +263,7 @@ export const LineMetadata = () => {
   const getCollateralTableActions = () => {
     switch (userPositionMetadata.role) {
       case BORROWER_POSITION_ROLE:
+        return <></>;
       case ARBITER_POSITION_ROLE:
         return (
           <>
@@ -260,14 +272,55 @@ export const LineMetadata = () => {
           </>
         );
       case LENDER_POSITION_ROLE: // for testing
+        return <></>;
 
       default:
-        return null;
+        return <></>;
     }
   };
 
   const startDateHumanized = format(new Date(startTime * 1000), 'MMMM dd, yyyy');
   const endDateHumanized = format(new Date(endTime * 1000), 'MMMM dd, yyyy');
+  const revenueSplitFormatted: Metric[] = [];
+  revenueSplitFormatted.push({
+    title: `${t('lineDetails:metadata.borrower')}`,
+    data: 100 - Number(defaultSplit) + '%',
+  });
+  revenueSplitFormatted.push({ title: `${t('lineDetails:metadata.lender')}`, data: defaultSplit + '%' });
+
+  // TODO: fix types on args
+  // TODO: What is the action button for revenue?
+  const renderButtons = (token: any, type: any) => {
+    console.log('TYPE BUTTONS', type);
+    if (type === 'revenue') {
+      return;
+    }
+    // TODO: Needs padding
+    if (userPositionMetadata.role === BORROWER_POSITION_ROLE) {
+      return (
+        <ActionButtons
+          actions={[
+            {
+              name: t('components.transaction.release'),
+              handler: () => withdrawHandler(token),
+              disabled: !walletIsConnected,
+            },
+          ]}
+        />
+      );
+    }
+    return (
+      <ActionButtons
+        actions={[
+          {
+            name: t('components.transaction.deposit'),
+            handler: () => depositHandler(token),
+            disabled: !walletIsConnected,
+          },
+        ]}
+      />
+    );
+  };
   return (
     <>
       <ThreeColumnLayout>
@@ -275,17 +328,23 @@ export const LineMetadata = () => {
           title={t('lineDetails:metadata.principal')}
           data={`$ ${humanize('amount', principal, 18, 2)}`}
         />
-        <MetricDataDisplay
-          title={t('lineDetails:metadata.deposit')} // rename to Credit Limit
-          data={`$ ${humanize('amount', deposit, 18, 2)}`}
-        />
+        <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${humanize('amount', deposit, 18, 2)}`} />
         <MetricDataDisplay
           title={t('lineDetails:metadata.total-interest-paid')}
           data={`$ ${humanize('amount', totalInterestRepaid, 18, 2)}`}
         />
-        <MetricDataDisplay title={t('lineDetails:metadata.revenue-split')} data={defaultSplit + '%'} />
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.revenue-split')}
+          data={''}
+          displaySubmetrics={true}
+          submetrics={revenueSplitFormatted}
+        />
         <MetricDataDisplay title={t('lineDetails:metadata.min-cratio')} data={minCRatio + '%'} />
         <MetricDataDisplay title={t('lineDetails:metadata.cratio')} data={cratio + '%'} />
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.status')}
+          data={status[0].toUpperCase() + status.substring(1)}
+        />
         <MetricDataDisplay title={t('lineDetails:metadata.start')} data={startDateHumanized} />
         <MetricDataDisplay title={t('lineDetails:metadata.end')} data={endDateHumanized} />
       </ThreeColumnLayout>
@@ -305,9 +364,8 @@ export const LineMetadata = () => {
         {renderSpigotMetadata()}
         {renderEscrowMetadata()}
       </ThreeColumnLayout>
-
+      <SectionHeader>{t('lineDetails:metadata.escrow.assets-list.title')}</SectionHeader>
       <ViewContainer>
-        <SectionHeader>{t('lineDetails:metadata.escrow.assets-list.title')}</SectionHeader>
         <AssetsListCard
           header={' '}
           data-testid="line-assets-list"
@@ -356,17 +414,7 @@ export const LineMetadata = () => {
             },
             {
               key: 'actions',
-              transform: ({ token }) => (
-                <ActionButtons
-                  actions={[
-                    {
-                      name: t('components.transaction.deposit'),
-                      handler: () => depositHandler(token),
-                      disabled: !walletIsConnected,
-                    },
-                  ]}
-                />
-              ),
+              transform: ({ token, type }) => renderButtons(token, type),
               align: 'flex-end',
               width: 'auto',
               grow: '1',

@@ -210,6 +210,10 @@ export interface MarketPageData {
 
 export type CollateralModule = AggregatedEscrow | AggregatedSpigot;
 export type CollateralMap = { [address: string]: CollateralModule };
+export type ReservesMap = {
+  [address: string]: { [address: string]: { operatorTokens: string; ownerTokens: string; unusedTokens: string } };
+};
+
 export interface SpigotRevenueContract extends Collateral {
   id: Address;
   type: CollateralTypeRevenue;
@@ -219,7 +223,6 @@ export interface SpigotRevenueContract extends Collateral {
   transferFunc: string;
   startTime: number;
   ownerSplit: number;
-  escrowed: string;
   totalVolumeUsd: string;
   events?: SpigotEvents[];
 }
@@ -289,8 +292,8 @@ type SpigotEvents = ClaimRevenueEvent;
 
 export interface ClaimRevenueEvent extends CollateralEvent {
   revenueToken: TokenView;
-  escrowed: string;
-  netIncome: string;
+  amount: string;
+  value: string;
 }
 
 // Redux State

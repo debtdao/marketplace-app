@@ -16,9 +16,12 @@ import { BorrowTxModal } from './BorrowTxModal';
 import { DeployLineTxModal } from './DeployLineTxModal';
 import { RepayPositionTxModal } from './RepayPositionTxModal';
 import { WithdrawCreditTxModal } from './WithdrawCreditTxModal';
+import { RevokeConsentTxModal } from './RevokeConsentTxModal';
 import { AddCollateralTxModal } from './AddCollateralTxModal';
 import { EnableSpigotTxModal } from './EnableSpigotTxModal';
 import { ClaimRevenueTxModal } from './ClaimRevenueTxModal';
+import { ReleaseCollateralTxModal } from './ReleaseCollateralTxModal';
+import { ClaimOperatorTokensTxModal } from './ClaimOperatorTokensTxModal';
 
 const modalTimeout = 300;
 
@@ -175,9 +178,27 @@ export const Modals = () => {
         </CSSTransition>
       )}
 
+      {activeModal === 'revokeConsent' && (
+        <CSSTransition key={'revokeConsent'} timeout={modalTimeout} classNames="slideBottom">
+          <RevokeConsentTxModal onClose={closeModal} />
+        </CSSTransition>
+      )}
+
       {activeModal === 'addCollateral' && (
         <CSSTransition key={'addCollateral'} timeout={modalTimeout} classNames="slideBottom">
           <AddCollateralTxModal onClose={closeModal} />
+        </CSSTransition>
+      )}
+
+      {activeModal == 'claimOperatorTokens' && (
+        <CSSTransition key={'claimOperatorTokens'} timeout={modalTimeout} classNames="slideBottom">
+          <ClaimOperatorTokensTxModal onClose={closeModal} />
+        </CSSTransition>
+      )}
+
+      {activeModal === 'releaseCollateral' && (
+        <CSSTransition key={'releaseCollateral'} timeout={modalTimeout} classNames="slideBottom">
+          <ReleaseCollateralTxModal onClose={closeModal} />
         </CSSTransition>
       )}
 

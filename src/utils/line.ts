@@ -147,7 +147,7 @@ export const formatSpigotCollateralEvents = (events: SpigotEventFragResponse[] |
   const spigotEvents = events
     .filter((event: SpigotEventFragResponse) => event.__typename === 'ClaimRevenueEvent')
     .map((event: SpigotEventFragResponse) => {
-      const { revenueToken, escrowed: amount, timestamp, value } = event;
+      const { revenueToken, amount, timestamp, value } = event;
       return {
         id: revenueToken.id as Address,
         type: 'revenue' as CollateralTypes,
@@ -173,6 +173,7 @@ export function formatGetLinesData(
   return response.map((data: any) => {
     const {
       borrower: { id: borrower },
+      arbiter: { id: arbiter },
       positions,
       events = [],
       escrow: escrowRes,
@@ -196,6 +197,7 @@ export function formatGetLinesData(
       ...credit,
       status: status.toLowerCase() as LineStatusTypes,
       borrower,
+      arbiter,
       spigotId: spigotRes?.id,
       escrowId: escrowRes?.id,
       spigot: {
@@ -338,7 +340,6 @@ export const formatSecuredLineData = (
   // aggregated revenue in USD by token across all spigots
   const [revenueValue, revenueSummary]: [BigNumber, RevenueSummaryMap] = revenues.reduce<any>(
     (agg, { token, totalVolume, totalVolumeUsd, ...summary }) => {
-      console.log('rev', agg, { ...summary, totalVolume, totalVolumeUsd });
       const checkSumAddress = ethers.utils.getAddress(token.id);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
       return [
@@ -560,6 +561,7 @@ export const formatLinePageData = (
     escrow,
     positions,
     borrower,
+    arbiter,
     status,
     events,
     defaultSplit,
@@ -582,7 +584,6 @@ export const formatLinePageData = (
     spigot,
     tokenPrices
   );
-
   const pageData: SecuredLineWithEvents = {
     // metadata
     ...metadata,
@@ -591,6 +592,7 @@ export const formatLinePageData = (
     collateralEvents,
     creditEvents,
     borrower: borrower.id,
+    arbiter: arbiter.id,
     defaultSplit,
     status: status.toLowerCase() as LineStatusTypes,
     // TODO add UsePositionMetada,

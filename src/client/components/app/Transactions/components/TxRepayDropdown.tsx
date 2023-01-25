@@ -13,7 +13,7 @@ const LineTitle = styled(Text)`
 const CreditLineData = styled.div`
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-wrap: normal;
   border-radius: ${({ theme }) => theme.globalRadius};
   background: ${({ theme }) => theme.colors.txModalColors.backgroundVariant};
   padding: ${({ theme }) => theme.layoutPadding};
@@ -55,7 +55,7 @@ const CreditLineSelector = styled.div<{ onClick?: () => void; center?: boolean }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: ${({ center }) => (center ? '100%' : '8.4rem')};
+  width: ${({ center }) => (center ? '100%' : '13rem')}; // 8.4rem
   height: ${({ center }) => (center ? '12.6rem' : undefined)};
   border-radius: ${({ theme }) => theme.globalRadius};
   background: ${({ theme }) => theme.colors.txModalColors.backgroundVariant};
@@ -124,7 +124,7 @@ const StyledTxCreditLineInput = styled(TransitionGroup)`
   }
 `;
 
-export interface TxDropdownProps {
+export interface TxRepayDropdownProps {
   headerText?: string;
   inputText?: string;
   inputError?: boolean;
@@ -137,7 +137,7 @@ export interface TxDropdownProps {
   displayGuidance?: boolean;
 }
 
-export const TxDropdown: FC<TxDropdownProps> = ({
+export const TxRepayDropdown: FC<TxRepayDropdownProps> = ({
   headerText,
   inputText,
   inputError,
@@ -169,6 +169,7 @@ export const TxDropdown: FC<TxDropdownProps> = ({
             list={typeOptions}
             headerText={t('components.transaction.repay.select-repay-option')}
             selected={selectedType}
+            displayValue={false}
             setSelected={(item) => onSelectedTypeChange(item!)}
             onCloseList={() => setOpenedSearch(false)}
           />
@@ -183,7 +184,7 @@ export const TxDropdown: FC<TxDropdownProps> = ({
               <StyledIcon Component={WalletIcon} />
               {typeOptions?.length > 1 && <CreditLineListIcon Component={ZapIcon} />}
             </CreditLineIconContainer>
-            <CreditLineName>{selectedType.value}</CreditLineName>
+            <CreditLineName>{selectedType.label}</CreditLineName>
           </CreditLineSelector>
           <CreditLineData>
             <LineTitle ellipsis>{selectedType.value}</LineTitle>

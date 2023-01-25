@@ -26,11 +26,12 @@ import {
   ReleaseSpigotProps,
   AddSpigotProps,
   ACTIVE_STATUS,
-  REPAID_STATUS,
   LIQUIDATABLE_STATUS,
   UseAndRepayProps,
   UpdateSpigotOwnerSplitProps,
   ClaimRevenueProps,
+  TradeableProps,
+  ClaimOperatorTokensProps,
 } from '@types';
 import { getConfig } from '@config';
 import { getContract } from '@frameworks/ethers';
@@ -257,6 +258,28 @@ export class CollateralServiceImpl implements CollateralService {
       return Promise.reject(e);
     }
   }
+  // TODO: Is this the right place for this?
+  // TODO: Does this need any permissions?
+
+  public async claimOperatorTokens(
+    props: ClaimOperatorTokensProps
+  ): Promise<TransactionResponse | PopulatedTransaction> {
+    try {
+      return <TransactionResponse>(
+        await this.executeContractMethod(
+          props.spigotAddress,
+          this.spigotAbi,
+          'claimOperatorTokens',
+          [props.token],
+          props.network,
+          false
+        )
+      );
+    } catch (e) {
+      console.log(`An error occured while borrowing credit, error = [${JSON.stringify(e)}]`);
+      return Promise.reject(e);
+    }
+  }
 
   public async sweep(props: SweepSpigotProps): Promise<TransactionResponse | PopulatedTransaction> {
     // const role = props.userPositionMetadata.role;
@@ -273,6 +296,8 @@ export class CollateralServiceImpl implements CollateralService {
       props.dryRun
     );
   }
+
+  /* ============================= Helpers =============================*/
 
   private async getSignerAddress(): Promise<Address> {
     return await this.web3Provider.getSigner().getAddress();
@@ -295,6 +320,18 @@ export class CollateralServiceImpl implements CollateralService {
 
   public async defaultSplit(lineAddress: string): Promise<BigNumber> {
     return (await this._getLineContract(lineAddress)).defaultRevenueSplit();
+  }
+
+  public async getTradeableTokens(lineAddress: string, tokenAddress: string): Promise<BigNumber> {
+    return await this._getLineContract(lineAddress).tradeable(tokenAddress);
+  }
+
+  public async getOwnerTokens(spigotAddress: string, tokenAddress: string): Promise<BigNumber> {
+    return await this._getSpigotContract(spigotAddress).getOwnerTokens(tokenAddress);
+  }
+
+  public async getOperatorTokens(spigotAddress: string, tokenAddress: string): Promise<BigNumber> {
+    return await this._getSpigotContract(spigotAddress).getOperatorTokens(tokenAddress);
   }
 
   // todo pass in user position metadata state where used instead

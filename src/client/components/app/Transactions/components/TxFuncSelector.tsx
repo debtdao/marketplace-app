@@ -111,7 +111,6 @@ export const TxFuncSelector: FC<TxDropdownProps> = ({
     label: selectedType?.label,
     value: selectedType?.value,
   };
-  console.log('Func Selector: ', selectedItem);
 
   if (typeOptions && typeOptions.length > 1) {
     listItems = typeOptions
@@ -124,7 +123,6 @@ export const TxFuncSelector: FC<TxDropdownProps> = ({
         };
       });
   }
-  console.log('Func Selector - list items: ', typeOptions);
 
   const openSearchList = () => {
     setOpenedSearch(true);

@@ -79,6 +79,18 @@
         "internalType": "uint256",
         "name": "ownerSplit",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes4",
+        "name": "claimFnSig",
+        "type": "bytes4"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes4",
+        "name": "trsfrFnSig",
+        "type": "bytes4"
       }
     ],
     "name": "AddSpigot",

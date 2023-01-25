@@ -142,6 +142,12 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
     dispatch(ModalsActions.openModal({ modalName: 'withdraw' }));
   };
 
+  const revokeConsentHandler = (position?: string) => {
+    if (!position) return;
+    dispatch(LinesActions.setSelectedLinePosition({ position }));
+    dispatch(ModalsActions.openModal({ modalName: 'revokeConsent' }));
+  };
+
   const borrowHandler = (position?: string) => {
     if (!position) return;
     dispatch(LinesActions.setSelectedLinePosition({ position }));
@@ -178,6 +184,8 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
     }
 
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
+      if (position.status === 'CLOSED') return [];
+
       if (position.status === 'PROPOSED') {
         const approveMutualConsent = {
           name: t('components.transaction.add-credit.accept-terms'),
@@ -197,8 +205,17 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
       else return [borrowAction, repayAction];
     }
 
-    //If user is lender, and line has amount to withdraw, return withdraw action
-    if (
+    // If user is lender and position status is PROPOSED, return revoke consent action
+    if (getAddress(position.lender) === userWallet && position.status === 'PROPOSED') {
+      return [
+        {
+          name: t('components.transaction.revoke-consent.cta'),
+          handler: revokeConsentHandler,
+          disabled: false,
+        },
+      ];
+      // If user is lender, and line has amount to withdraw, return withdraw action
+    } else if (
       getAddress(position.lender) === userWallet &&
       BigNumber.from(position.deposit).gt(BigNumber.from(position.principal))
     ) {
@@ -221,7 +238,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
       <ViewContainer>
         <PositionsCard
-          header={''}
+          header={' '}
           data-testid="vaults-opportunities-list"
           metadata={[
             {

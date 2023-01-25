@@ -150,7 +150,7 @@ export const testTokens: TokenView[] = [
     // yield: '0',
   },
   {
-    address: '0x589a0b00a0dd78fc2c94b8eac676dec4c3dcd562',
+    address: '0x589a0b00a0dD78Fc2C94b8eac676dec4C3Dcd562',
     allowancesMap: {},
     balance: '0',
     balanceUsdc: '0',

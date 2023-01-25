@@ -22,7 +22,9 @@ const BASE_LINE_FRAGMENT = gql`
     type
     start
     status
-    arbiter
+    arbiter {
+      id
+    }
     oracle
     dex
     borrower {
@@ -79,7 +81,6 @@ const BASE_SPIGOT_FRAGMENT = gql`
     transferFunc
     startTime
     ownerSplit
-    escrowed
     totalVolumeUsd
   }
 `;
@@ -110,8 +111,7 @@ const SPIGOT_EVENT_FRAGMENT = gql`
       revenueToken {
         ...TokenFrag
       }
-      escrowed
-      netIncome
+      amount
       value
     }
   }
@@ -284,7 +284,12 @@ export const GET_LINES_QUERY = gql`
   ${TOKEN_FRAGMENT}
 
   query getLines($first: Int, $orderBy: String, $orderDirection: String, $blacklist: [ID]) {
-    lineOfCredits(first: $first, orderBy: $orderBy, orderDirection: $orderDirection, where: { id_not_in: $blacklist }) {
+    lineOfCredits(
+      first: $first
+      orderBy: $orderBy
+      orderDirection: $orderDirection
+      where: { id_not_in: $blacklist, status: "ACTIVE" }
+    ) {
       ...BaseLineFrag
 
       positions {

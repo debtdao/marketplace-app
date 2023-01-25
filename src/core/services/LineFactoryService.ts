@@ -3,6 +3,7 @@ import { BigNumber, ContractFunction, PopulatedTransaction, ethers } from 'ether
 import { TransactionService, Web3Provider, Config, ExecuteTransactionProps, Address, Network } from '@types';
 import { getConfig } from '@config';
 import { getLineFactoryforNetwork } from '@src/utils';
+import { decodeErrorData } from '@src/utils/decodeError';
 
 import { TransactionResponse } from '../types';
 
@@ -165,6 +166,11 @@ export class LineFactoryServiceImpl {
       await tx.wait();
       return tx;
     } catch (e) {
+      const txnData = JSON.parse(JSON.stringify(e)).transaction.data;
+      // const humanErrorMsg = ethers.utils.formatBytes32String(txnData);
+      console.log('Just the error 1', txnData);
+      decodeErrorData(txnData);
+      //console.log('Just the error 2', humanErrorMsg);
       console.log(
         `An error occured while ${methodName} with params [${params}] on FactoryLine [${props?.contractAddress}], error = [${e}]`
       );

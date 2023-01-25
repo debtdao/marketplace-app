@@ -5,6 +5,7 @@
   },
   "metadata": {
     "borrower": "Borrower",
+    "lender": "Lender",
     "principal": "Total Outstanding Debt",
     "deposit": "Credit Limit",
     "total-interest-paid": "Lifetime Interest Paid",
@@ -13,6 +14,7 @@
     "cratio":"Collateralization Ratio",
     "secured-by": "Secured By ",
     "unsecured": "This is an unsecured line of credit. You MUST trust the borrower.",
+    "status": "Status",
     "start": "Deployment",
     "end": "Deadline",
     "revenue": {

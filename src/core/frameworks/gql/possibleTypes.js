@@ -11,7 +11,7 @@ export const possibleTypes = {
     'AddCollateralEvent',
     'RemoveCollateralEvent',
   ],
-  LineEvent: ['UpdateStatusEvent', 'ProposeTermsEvent'],
+  LineEvent: ['UpdateStatusEvent', 'SetRatesEvent'],
   LineEventWithValue: [
     'AddCreditEvent',
     'IncreaseCreditEvent',
@@ -24,8 +24,9 @@ export const possibleTypes = {
     'RepayPrincipalEvent',
     'LiquidateEvent',
     'DefaultEvent',
-    'SetRatesEvent',
+    'ReservesChangedEvent',
   ],
+  ProposalEvents: ['ProposeTermsEvent', 'RevokeConsentEvent'],
   SpigotControllerEvent: [
     'UpdateOwnerEvent',
     'UpdateOperatorEvent',

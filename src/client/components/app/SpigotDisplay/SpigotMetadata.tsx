@@ -172,13 +172,26 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
     }
   };
 
+  const claimOperatorTokensHandler = () => {
+    if (!walletIsConnected) {
+      connectWallet();
+    } else {
+      dispatch(ModalsActions.openModal({ modalName: 'claimOperatorTokens' }));
+    }
+  };
+
   const enableSpigotText = walletIsConnected
     ? `${t('spigot:metadata.add-revenue-contract')}`
+    : `${t('components.connect-button.connect')}`;
+
+  const ClaimOperatorTokensText = walletIsConnected
+    ? `${t('spigot:metadata.claim-operator-tokens')}`
     : `${t('components.connect-button.connect')}`;
 
   const getCollateralTableActions = () => {
     switch (userPositionMetadata.role) {
       case BORROWER_POSITION_ROLE:
+        return <Button onClick={claimOperatorTokensHandler}>{ClaimOperatorTokensText}</Button>; // TODO: What role does this go under? Do we need an Operator Role?
       case ARBITER_POSITION_ROLE:
         return (
           <>
@@ -186,6 +199,12 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
           </>
         );
       case LENDER_POSITION_ROLE:
+      default:
+        return (
+          <>
+            <Button onClick={claimOperatorTokensHandler}>{ClaimOperatorTokensText}</Button>
+          </>
+        );
     }
   };
 
@@ -215,7 +234,6 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
     align: 'flex-start',
     actions: 'claim-revenue',
   }));
-  console.log('formatted spigots: ', formattedSpigots);
   return (
     <>
       <ViewContainer>
@@ -245,6 +263,19 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
                 </Link>
               ),
               width: '15rem',
+              sortable: true,
+              className: 'col-symbol',
+            },
+            {
+              key: 'ownerSplit',
+              header: 'Revenue Split', //t('lineDetails:metadata.escrow.assets-list.symbol'),
+              transform: ({ ownerSplit }) => {
+                const borrowerSplit = 100 - Number(ownerSplit) + '%';
+                const lenderSplit = ownerSplit + '%';
+                const ownerSplitFormatted = `Borrower: ${borrowerSplit}  |  Lender: ${lenderSplit}`;
+                return <Text>{ownerSplitFormatted}</Text>;
+              },
+              width: '25rem',
               sortable: true,
               className: 'col-symbol',
             },

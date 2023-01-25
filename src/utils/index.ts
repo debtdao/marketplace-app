@@ -15,3 +15,4 @@ export * from './etherscanAPI';
 export * from './hashSig';
 export * from './getENS';
 export * from './lineFactoryforNetwork';
+export * from './isGoerli';

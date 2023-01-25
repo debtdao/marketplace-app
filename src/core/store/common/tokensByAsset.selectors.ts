@@ -4,12 +4,14 @@ import { memoize, sortBy, unionBy } from 'lodash';
 import { getConfig } from '@config';
 import { TokenView } from '@types';
 import { testTokens } from '@src/config/constants';
+import { isGoerli } from '@src/utils';
 
 import { VaultsSelectors } from '../modules/vaults/vaults.selectors';
 import { AppSelectors } from '../modules/app/app.selectors';
 import { WalletSelectors } from '../modules/wallet/wallet.selectors';
 import { TokensSelectors, createToken } from '../modules/tokens/tokens.selectors';
 import { NetworkSelectors } from '../modules/network/network.selectors';
+
 const { NETWORK, TOKEN_ADDRESSES, ETHEREUM_ADDRESS } = getConfig();
 // import { Token } from 'graphql';
 
@@ -41,24 +43,8 @@ export const selectDepositTokenOptionsByAsset = createSelector(
   ) =>
     memoize((assetAddress?: string): TokenView[] => {
       const { userTokensMap, userTokensAllowancesMap } = tokensUser;
-      if (currentNetwork === 'goerli') {
-        // TODO: fill in token values appropriately with values from subgraph
-        // const tokens: TokenView[] = supportedTokens.map((address: string) => {
-        //   return {
-        //     address: address,
-        //     ...supportedTokensMap[address],
-        //     icon: '',
-        //     balance: '0',
-        //     balanceUsdc: '0',
-        //     priceUsdc: '0',
-        //     categories: [],
-        //     description: '',
-        //     website: '',
-        //     allowanceMap: {},
-        //   };
-        // });
-        // const allTestTokens = testTokens.concat(tokens);
-        // return allTestTokens;
+      const isThisGoerli = isGoerli(currentNetwork);
+      if (isThisGoerli) {
         return testTokens;
       } else {
         const mainTokens = Object.values(TOKEN_ADDRESSES)

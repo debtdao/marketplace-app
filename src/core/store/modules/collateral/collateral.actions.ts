@@ -1,4 +1,5 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
+import { getAddress } from 'ethers/lib/utils';
 
 import { ThunkAPI } from '@frameworks/redux';
 import {
@@ -9,7 +10,11 @@ import {
   CollateralEvent,
   Address,
   ClaimRevenueProps,
+  ReleaseCollateraltProps,
+  TradeableProps,
+  ClaimOperatorTokensProps,
 } from '@src/core/types';
+import { TxActionButton } from '@src/client/components/app';
 
 const setSelectedEscrow = createAction<{ escrowAddress?: string }>('collateral/setSelectedEscrow');
 const setSelectedSpigot = createAction<{ spigotAddress?: string }>('collateral/setSelectedSpigot');
@@ -83,6 +88,33 @@ const addCollateral = createAsyncThunk<
   };
 });
 
+const releaseCollateral = createAsyncThunk<
+  { contract: string; token: string; success: boolean },
+  ReleaseCollateraltProps,
+  ThunkAPI
+>('collateral/releaseCollateral', async (props, { extra, getState, dispatch }) => {
+  const { wallet } = getState();
+  const { services } = extra;
+  const userAddress = wallet.selectedAddress;
+  if (!userAddress) throw new Error('WALLET NOT CONNECTED');
+
+  console.log('addCollateral action props', props);
+  // TODO chekc that they are arbiter on line that owns Escrowbeforethey send tx
+  const { collateralService } = services;
+  const tx = await collateralService.releaseCollateral(props);
+  console.log('addCollateral tx', tx);
+
+  if (!tx) {
+    throw new Error('failed to add collateral');
+  }
+
+  return {
+    ...props,
+    contract: props.escrowAddress,
+    success: !!tx,
+  };
+});
+
 const addSpigot = createAsyncThunk<{ contract: string; asset: string; success: boolean }, AddSpigotProps, ThunkAPI>(
   'collateral/addSpigot',
   async (props, { extra, getState, dispatch }) => {
@@ -135,6 +167,53 @@ const claimRevenue = createAsyncThunk<{ contract: string; success: boolean }, Cl
   }
 );
 
+const claimOperatorTokens = createAsyncThunk<{ claimed: string | undefined }, ClaimOperatorTokensProps, ThunkAPI>(
+  'collateral/claimOperatorTokens',
+  async (props, { extra }) => {
+    const { collateralService } = extra.services;
+    const tx = await collateralService.claimOperatorTokens(props);
+    return {
+      claimed: tx.value?.toString(),
+    };
+  }
+);
+// TODO: Do Optimistic State update for all Line Actions
+
+const tradeable = createAsyncThunk<
+  {
+    tokenAddressMap: { unusedTokens: string; ownerTokens: string; operatorTokens: string };
+    tokenAddress: string;
+    lineAddress: string;
+    success: boolean;
+  },
+  TradeableProps,
+  ThunkAPI
+>('collateral/tradeable', async (props, { extra, getState }) => {
+  const { lineAddress, network, tokenAddress, spigotAddress } = props;
+  const { collateralService } = extra.services;
+
+  const tradeableTxn = await collateralService.getTradeableTokens(lineAddress, tokenAddress);
+  const ownerTokenTxn = await collateralService.getOwnerTokens(spigotAddress, tokenAddress);
+  const operatorTokenTxn = await collateralService.getOperatorTokens(spigotAddress, tokenAddress);
+
+  if (!tradeableTxn || !ownerTokenTxn || !operatorTokenTxn) {
+    throw new Error('failed to view tradeable tokens');
+  }
+
+  const tokenAddressMap = {
+    unusedTokens: tradeableTxn.sub(ownerTokenTxn).toString(),
+    ownerTokens: ownerTokenTxn.toString(),
+    operatorTokens: operatorTokenTxn.toString(),
+  };
+
+  return {
+    tokenAddressMap,
+    tokenAddress: getAddress(tokenAddress),
+    lineAddress: lineAddress,
+    success: !!tradeableTxn && !!ownerTokenTxn && !!operatorTokenTxn,
+  };
+});
+
 export const CollateralActions = {
   setSelectedEscrow,
   setSelectedSpigot,
@@ -142,8 +221,11 @@ export const CollateralActions = {
   setSelectedCollateralAsset,
   enableCollateral,
   addCollateral,
+  releaseCollateral,
   addSpigot,
   claimRevenue,
+  tradeable,
   saveModuleToMap,
   saveEventsToMap,
+  claimOperatorTokens,
 };

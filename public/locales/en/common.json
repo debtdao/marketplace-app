@@ -17,7 +17,7 @@
     "positions-card": {
       "line": "Line",
       "positions": "Positions",
-      "drate": "Drawn Down Rate",
+      "drate": "Drawn Rate",
       "frate": "Facility Rate",
       "total-deposits": "Supplied",
       "token": "Token",
@@ -95,6 +95,7 @@
       "borrow": "Borrow",
       "deposit-and-repay-header": "Deposit and Repay",
       "claim-and-repay-header": "Claim and Repay",
+      "claim-operator-revenue":"Claim Revenue",
       "deposit-and-close-header": "Deposit and Close",
       "withdraw": "Withdraw",
       "borrow-limit": {
@@ -122,6 +123,7 @@
       "max": "MAX",
       "migrate": "Migrate",
       "reinvest": "Reinvest",
+      "release": "Release",
       "reward": "Reward",
       "sign": "Sign",
       "stake": "Stake",
@@ -163,6 +165,10 @@
         "select-token": "2. The token being lent",
         "select-lender": "3. Lender:",
         "select-rates": "4. Set Interest Rates",
+        "rates": {
+          "facility-rate":"Facility  Rate",
+          "drawn-rate":"Drawn Rate"
+        },
         "lender-address": "Ethereum Address",
         "back-to-market": "Head back to the Market",
         "accept-terms": "Accept",
@@ -190,6 +196,12 @@
         "header": "Deposit Collateral",
         "select-token": "The Token Used As Collateral"
       },
+
+      "release-collateral": {
+        "header": "Release Collateral",
+        "select-token": "The Token Used As Collateral"
+
+      },
       "arbiter-liquidate": {
         "header": "Liquidate Borrowers",
         "select-credit": "1. Select a borrower to liquidate",
@@ -215,14 +227,14 @@
       "repay": {
         "header": "Repay",
         "select-position": "1. Select Position to Repay:",
-        "select-amount": "3. You Owe:",
-        "repay-type": "2. Select Source of Funds:",
-        "your-rates": "4. Your Current Rates:",
+        "your-rates": "2. Your Current Rates:",
+        "repay-type": "3. Select Source of Funds:",
+        "select-amount": "4. You Owe:",
         "select-repay-option": "Select Repayment Method",
         "repaying-from": "Repaying from your",
         "close": {
-          "title": "Close",
-          "desc": "permanently close line",
+          "title": "Close Line",
+          "desc": "from your wallet",
           "cta": "Close"
         },
         "deposit-and-repay": {
@@ -232,31 +244,40 @@
         },
         "deposit-and-close": {
           "title": "Repay & close",
-          "desc": "",
+          "desc": "from your wallet",
           "cta": "Close"
         },
-        "unused": {
-          "title": "From reserves",
-          "desc": "from excess revenue",
-          "cta": "Repay"
-        },
         "claim-and-repay": {
-          "title": "From revenue",
-          "desc": "claim revenue from spigot and repay",
+          "title": "Repay with revenue",
+          "desc": "claim revenue and repay",
           "cta": "Claim & Repay",
           "claim-token": "Revenue token to claim",
+          "credit-token": "Credit Token To Purchase",
+          "buy-amount": "Purchase Amount",
           "insufficient-liquidity": "Insufficient Liquidity for revenue token"
         },
+        "approve-funds-for-repayment": {
+          "cta": "Approve Funds For Repayment"
+        },
         "claim-and-trade": {
-          "title": "To reserves",
-          "desc": "claim revenue from spigot and store in unused reserves",
-          "cta": "Claim & Trade"
+          "title": "Fund reserves",
+          "desc": "approve revenue for repayment",
+          "cta": "Trade & Approve For Repayment"
+        },
+        "use-and-repay": {
+          "title": "Repay with reserves",
+          "desc": "from excess revenue",
+          "cta": "Use and Repay"
         }
       },
       "withdraw-credit": {
         "header": "Withdraw",
         "select-line": "1. Selected line to withdraw",
         "select-amount": "2. Select amount to withdraw"
+      },
+      "revoke-consent": {
+        "header": "Revoke Consent",
+        "cta": "Revoke Consent"
       },
       "enable-spigot": {
         "header":"Enable Spigot",
@@ -271,11 +292,16 @@
       "claim-revenue": {
         "header": "Claim Revenue via Spigot",
         "rev-contract-input": "Contract to claim from",
+        "rev-contract-input-text": "Revenue Contract Address",
         "rev-token-input-header": "Revenue token to claim",
+        "rev-token-input-text": "Token Address",
         "rev-contract-inputs": "4. Fill Function Input Values",
         "claim-data-header": "Transaction data to call on revenue contract",
         "claim-data-input": "Hexcode (0xdebfda05....)",
-        "cta": "Claim"
+        "cta": "Claim",
+        "claim-operator-tokens":{
+          "cta":"Claim Operator Tokens"
+        }
       }
     }
   },

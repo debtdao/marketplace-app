@@ -21,6 +21,7 @@ import {
   AddCreditProps,
   CloseProps,
   WithdrawLineProps,
+  // TODO: RevokeConsentProps,
   SetRatesProps,
   IncreaseCreditProps,
   DepositAndRepayProps,
@@ -41,6 +42,7 @@ import { getConfig } from '@config';
 import { SecuredLineABI } from '@services/contracts';
 import { getContract } from '@frameworks/ethers';
 import { getLineEvents, getLinePage, getLines, getUserPortfolio } from '@frameworks/gql';
+import { decodeErrorData } from '@src/utils/decodeError';
 
 const { GRAPH_API_URL } = getConfig();
 
@@ -103,6 +105,23 @@ export class CreditLineServiceImpl implements CreditLineService {
       return Promise.reject(e);
     }
   }
+
+  // TODO: Add revokeConsent method
+  // public async revokeConsent(props: RevokeConsentProps): Promise<TransactionResponse | PopulatedTransaction> {
+  //   try {
+  //     if (!(await this.isLender(props.lineAddress, props.id))) {
+  //       throw new Error('Cannot revoke consent. Signer is not lender');
+  //     }
+  //     // TODO: throw error if STATUS !== PROPOSED
+
+  //     return <TransactionResponse>(
+  //       await this.executeContractMethod(props.lineAddress, 'revokeConsent', [props.id, props.amount], props.network)
+  //     );
+  //   } catch (e) {
+  //     console.log(`An error occured while withdrawing credit, error = [${JSON.stringify(e)}]`);
+  //     return Promise.reject(e);
+  //   }
+  // }
 
   public async setRates(props: SetRatesProps): Promise<string> {
     try {
@@ -194,10 +213,15 @@ export class CreditLineServiceImpl implements CreditLineService {
       //  throw new Error('Amount is greater than (principal + interest to be accrued). Enter lower amount.');
       //}
 
+      console.log('Deposit and Repay Params: ', props.lineAddress, props.amount, props.network);
       return <TransactionResponse>(
         await this.executeContractMethod(props.lineAddress, 'depositAndRepay', [props.amount], props.network)
       );
     } catch (e) {
+      console.log(e);
+      const txnData = JSON.parse(JSON.stringify(e)).transaction.data;
+      console.log('Just the error 1', txnData);
+      decodeErrorData(txnData);
       console.log(`An error occured while depositAndRepay credit, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
     }
@@ -251,9 +275,8 @@ export class CreditLineServiceImpl implements CreditLineService {
       throw new Error('Claim and repay is not possible because not borrowing');
     }
 
-    // TODO change check to arbiter
-    if (!(await this.isSignerBorrowerOrLender(props.lineAddress, await this.getFirstID(props.lineAddress)))) {
-      throw new Error('Claim and repay is not possible because signer is not borrower or lender');
+    if ((await this.getSignerAddress()) !== (await this.arbiter(props.lineAddress))) {
+      throw new Error('Claim and trade is blocked if not from arbiter address');
     }
 
     console.log('sending claim and repay tx');
@@ -267,7 +290,7 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   public async useAndRepay(props: UseAndRepayProps): Promise<TransactionResponse | PopulatedTransaction> {
     // TODO check unused is <= amount
-    // TODO
+    // TODO Only borrower or lender
     return await this.executeContractMethod(props.lineAddress, 'useAndRepay', [props.amount], props.network);
   }
 
@@ -357,6 +380,10 @@ export class CreditLineServiceImpl implements CreditLineService {
       await tx.wait();
       return tx;
     } catch (e) {
+      // console.log(e);
+      // const txnData = JSON.parse(JSON.stringify(e)).transaction.data;
+      // console.log('Just the error 1', txnData);
+      // decodeErrorData(txnData);
       console.log(
         `An error occured while ${methodName} with params [${params}] on CreditLine [${props?.contractAddress}], error = ${e} `
       );

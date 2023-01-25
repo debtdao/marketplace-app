@@ -1,6 +1,5 @@
 export const getPageName = (path: string) => {
   const lPath = path.toLowerCase().split('/');
-  console.log('LPath: ', lPath);
   if (lPath.includes('spigots')) {
     return 'spigot';
   }

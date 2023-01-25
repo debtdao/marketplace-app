@@ -180,6 +180,7 @@ export interface CreditLineService {
   addCredit: (props: AddCreditProps) => Promise<TransactionResponse | PopulatedTransaction>;
   borrow: (props: BorrowCreditProps) => Promise<TransactionResponse | PopulatedTransaction>;
   withdraw: (props: WithdrawLineProps) => Promise<TransactionResponse | PopulatedTransaction>;
+  // TODO: revokeConsent: (props: RevokeConsentProps) => Promise<TransactionResponse | PopulatedTransaction>;
   // setRates: (props: SetRatesProps) => Promise<TransactionResponse | PopulatedTransaction>;
   // increaseCredit: (props: IncreaseCreditProps) => Promise<TransactionResponse | PopulatedTransaction>;
 
@@ -240,6 +241,16 @@ export interface WithdrawLineProps {
   network: Network;
   amount: BigNumber;
 }
+
+// TODO: add back when implementing RevokeConsent.
+// export interface RevokeConsentProps {
+//   // dryRun?: boolean;
+//   // lineAddress: string;
+//   id: string;
+//   // network: Network;
+//   amount: BigNumber;
+// }
+
 export interface SetRatesProps {
   dryRun?: boolean;
   lineAddress: string;
@@ -373,6 +384,13 @@ export interface ClaimRevenueProps {
   dryRun?: boolean;
 }
 
+export interface TradeableProps {
+  tokenAddress: Address;
+  network: Network;
+  lineAddress: Address;
+  spigotAddress: Address;
+}
+
 export interface LiquidateEscrowAssetProps {
   // userPositionMetadata: UserPositionMetadata;
   lineAddress: Address;
@@ -402,6 +420,13 @@ export interface SweepSpigotProps {
   status: string;
   borrower: Address;
   arbiter: Address;
+  network: Network;
+  dryRun?: boolean;
+}
+
+export interface ClaimOperatorTokensProps {
+  spigotAddress: Address;
+  token: Address;
   network: Network;
   dryRun?: boolean;
 }
@@ -449,6 +474,7 @@ export interface CollateralService {
   claimRevenue(props: ClaimRevenueProps): Promise<TransactionResponse | PopulatedTransaction>;
   updateOwnerSplit(props: UpdateSpigotOwnerSplitProps): Promise<TransactionResponse | PopulatedTransaction>;
   addSpigot(props: AddSpigotProps): Promise<TransactionResponse | PopulatedTransaction>;
+  claimOperatorTokens(props: ClaimOperatorTokensProps): Promise<TransactionResponse | PopulatedTransaction>;
 
   // liquidate collateral
   // Escrow assets
@@ -463,6 +489,9 @@ export interface CollateralService {
   isSpigotOwner(spigotAddress?: string, lineAddress?: string): Promise<boolean>;
   defaultSplit(lineAddress: string): Promise<BigNumber>;
   maxSplit(): BigNumber; // always 100
+  getTradeableTokens(lineAddress: string, tokenAddress: string): Promise<BigNumber>;
+  getOwnerTokens(spigotAddress: string, tokenAddress: string): Promise<BigNumber>;
+  getOperatorTokens(spigotAddress: string, tokenAddress: string): Promise<BigNumber>;
 }
 
 export interface OnchainMetaDataService {

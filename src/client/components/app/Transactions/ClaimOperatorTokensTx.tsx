@@ -4,7 +4,16 @@ import { BigNumber, BytesLike, ethers } from 'ethers';
 import { FC, useState, useEffect } from 'react';
 import { getAddress } from '@ethersproject/address';
 
-import { formatAmount, normalizeAmount, toWei, depositAndRepayUpdate, normalize, bn, getTradeQuote, isGoerli } from '@utils';
+import {
+  formatAmount,
+  normalizeAmount,
+  toWei,
+  depositAndRepayUpdate,
+  normalize,
+  bn,
+  getTradeQuote,
+  isGoerli,
+} from '@utils';
 import { useAppTranslation, useAppDispatch, useAppSelector, useSelectedSellToken } from '@hooks';
 import {
   TokensActions,

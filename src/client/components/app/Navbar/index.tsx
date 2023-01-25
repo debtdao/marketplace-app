@@ -9,6 +9,7 @@ import { Network } from '@types';
 import { device } from '@themes/default';
 import { getConfig } from '@config';
 import { getConstants } from '@src/config/constants';
+import { isGoerli } from '@src/utils';
 
 const StyledOptionList = styled(OptionList)`
   width: 15rem;

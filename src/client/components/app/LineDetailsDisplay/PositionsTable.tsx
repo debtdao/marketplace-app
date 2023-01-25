@@ -23,6 +23,8 @@ import {
   LENDER_POSITION_ROLE,
   CreditPosition,
   CreditProposal,
+  PROPOSED_STATUS,
+  CLOSED_STATUS,
 } from '@src/core/types';
 import { humanize, formatAddress, normalizeAmount, getENS } from '@src/utils';
 import { getEnv } from '@config/env';
@@ -195,9 +197,9 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
     }
 
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
-      if (position.status === 'CLOSED') return [];
+      if (position.status === CLOSED_STATUS) return [];
 
-      if (position.status === 'PROPOSED') {
+      if (position.status === PROPOSED_STATUS) {
         const approveMutualConsent = {
           name: t('components.transaction.add-credit.accept-terms'),
           handler: depositHandler,
@@ -217,7 +219,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
     }
 
     // If user is lender and position status is PROPOSED, return revoke consent action
-    if (getAddress(position.lender) === userWallet && position.status === 'PROPOSED') {
+    if (getAddress(position.lender) === userWallet && position.status === PROPOSED_STATUS) {
       return [
         {
           name: t('components.transaction.revoke-consent.cta'),
@@ -303,13 +305,13 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
         actions: (
           <ActionButtons
             value1={position.id}
-            actions={position.status !== 'PROPOSED' ? getUserPositionActions(position) : []}
+            actions={position.status !== PROPOSED_STATUS ? getUserPositionActions(position) : []}
           />
         ),
       };
-      const proposals = position.status === 'PROPOSED' ? position.proposalsMap : {};
+      const proposals = position.status === PROPOSED_STATUS ? position.proposalsMap : {};
       const proposalsToDisplay =
-        position.status === 'PROPOSED'
+        position.status === PROPOSED_STATUS
           ? Object.values(position.proposalsMap).map((proposal) => {
               console.log('Proposal: ', proposal);
               return {
@@ -352,7 +354,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
           : [];
       // TODO: remove this if keep original way to display proposals
       const positionsAndProposalsToDisplay =
-        position.status === 'PROPOSED' ? [...proposalsToDisplay] : [positionToDisplay];
+        position.status === PROPOSED_STATUS ? [...proposalsToDisplay] : [positionToDisplay];
 
       // TODO: add this if keep original way to display proposals
       // const positionsAndProposalsToDisplay = [positionToDisplay, ...proposalsToDisplay];

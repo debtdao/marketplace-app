@@ -1,11 +1,12 @@
 // TODO: This file is a work in progress. It currently just mimicks the WithdrawCreditTx.tsx file.
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
 
 import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
 import { LinesSelectors, LinesActions, WalletSelectors } from '@store';
 import { withdrawUpdate, normalize, toWei, formatAmount, normalizeAmount } from '@src/utils';
+import { ACTIVE_STATUS, AddCreditProps, BORROWER_POSITION_ROLE, PROPOSED_STATUS } from '@src/core/types';
 
 import { TxContainer } from './components/TxContainer';
 import { TxCreditLineInput } from './components/TxCreditLineInput';
@@ -38,9 +39,39 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
   const [errors, setErrors] = useState<string[]>(['']);
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
+  const selectedProposal = useAppSelector(LinesSelectors.selectSelectedProposal);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
+  // const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
+  const walletAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
   const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
+
+  //state for params
+  // const { header, onClose } = props;
+  // const [transactionCompleted, setTransactionCompleted] = useState(0);
+  // const [transactionApproved, setTransactionApproved] = useState(true);
+  // const [transactionLoading, setLoading] = useState(false);
+  const [targetTokenAmount, setTargetTokenAmount] = useState('0');
+  const [drate, setDrate] = useState('');
+  const [frate, setFrate] = useState('');
+  const [lenderAddress, setLenderAddress] = useState(walletAddress ? walletAddress : '');
+  const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
+  const [transactionType, setTransactionType] = useState('propose');
+
+  useEffect(() => {
+    if (selectedPosition?.status === PROPOSED_STATUS && selectedProposal) {
+      console.log('Selected Proposal: ', selectedProposal);
+
+      // set values based on selectedProposal
+      const [dRate, fRate, deposit, tokenAddress, lenderAddress] = [...selectedProposal.args];
+      setTargetTokenAmount(normalizeAmount(deposit, selectedPosition.token.decimals));
+      setSelectedTokenAddress(tokenAddress);
+      setDrate(normalizeAmount(dRate, 0));
+      setFrate(normalizeAmount(fRate, 0));
+      setLenderAddress(lenderAddress);
+      setTransactionType('accept');
+    }
+  }, [selectedPosition]);
 
   //Calculate maximum withdraw amount, then humanize for readability
   const getMaxWithdraw = () => {
@@ -97,7 +128,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
     }
   };
 
-  const withdrawCredit = () => {
+  const revokeConsent = () => {
     setLoading(true);
     if (!selectedCredit?.id) {
       setErrors([...errors, 'no selected credit ID']);
@@ -155,7 +186,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
   const txActions = [
     {
       label: t('components.transaction.revoke-consent.cta'),
-      onAction: withdrawCredit,
+      onAction: revokeConsent,
       status: true,
       disabled: isWithdrawable(),
       contrast: false,
@@ -207,11 +238,8 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
         key={'token-input'}
         headerText={t('components.transaction.revoke-consent.select-token')}
         inputText={tokenHeaderText}
-        amount={normalize('amount', selectedPosition!.deposit, selectedPosition!.token.decimals)}
-        // onAmountChange={onAmountChange}
-        // amountValue={toWei(targetTokenAmount, positionToken.decimals)}
+        amount={targetTokenAmount}
         amountValue={selectedPosition!.deposit}
-        // maxAmount={acceptingOffer ? targetTokenAmount : targetBalance}
         selectedToken={selectedPosition!.token}
         readOnly={true}
       />
@@ -226,8 +254,8 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
       <TxRateInput
         key={'frate'}
         headerText={t('components.transaction.revoke-consent.select-rates')}
-        frate={selectedPosition!.fRate}
-        drate={selectedPosition!.dRate}
+        frate={frate}
+        drate={drate}
         amount={selectedPosition!.fRate}
         readOnly={true}
       />

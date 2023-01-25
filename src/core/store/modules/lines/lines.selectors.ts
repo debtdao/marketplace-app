@@ -84,7 +84,7 @@ const selectSelectedPosition = createSelector(
 const selectSelectedProposal = createSelector(
   [selectPositionsMap, selectSelectedPositionId, selectSelectedProposalId],
   (positions, positionId = '', proposalId = ''): CreditProposal | undefined => {
-    return positions[positionId].proposalsMap[proposalId];
+    return positions[positionId] ? positions[positionId].proposalsMap[proposalId] : undefined;
   }
 );
 

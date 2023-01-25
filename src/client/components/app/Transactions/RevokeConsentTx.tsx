@@ -1,3 +1,4 @@
+// TODO: This file is a work in progress. It currently just mimicks the WithdrawCreditTx.tsx file.
 import { FC, useState } from 'react';
 import styled from 'styled-components';
 import { ethers } from 'ethers';

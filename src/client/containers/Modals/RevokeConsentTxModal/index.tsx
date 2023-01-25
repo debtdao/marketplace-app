@@ -1,3 +1,4 @@
+// TODO: clean-up this code in Revoke Consent PR.
 import { FC } from 'react';
 import styled from 'styled-components';
 

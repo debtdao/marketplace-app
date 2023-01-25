@@ -21,7 +21,7 @@ import {
   AddCreditProps,
   CloseProps,
   WithdrawLineProps,
-  // RevokeConsentProps,
+  // TODO: RevokeConsentProps,
   SetRatesProps,
   IncreaseCreditProps,
   DepositAndRepayProps,
@@ -106,6 +106,7 @@ export class CreditLineServiceImpl implements CreditLineService {
     }
   }
 
+  // TODO: Add revokeConsent method
   // public async revokeConsent(props: RevokeConsentProps): Promise<TransactionResponse | PopulatedTransaction> {
   //   try {
   //     if (!(await this.isLender(props.lineAddress, props.id))) {
@@ -332,8 +333,6 @@ export class CreditLineServiceImpl implements CreditLineService {
       return Promise.reject(e);
     }
   }
-
-  // TODO: Add revokeConsent
 
   public async borrow(props: BorrowCreditProps): Promise<TransactionResponse | PopulatedTransaction> {
     try {

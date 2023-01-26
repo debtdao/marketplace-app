@@ -184,7 +184,6 @@ export function formatGetLinesData(
       status,
       ...rest
     } = data;
-    console.log('Lines Data - positions 1: ', positions);
     const { credit, spigot, escrow } = formatSecuredLineData(
       rest.id,
       spigotRes?.id ?? '',
@@ -195,7 +194,6 @@ export function formatGetLinesData(
       spigotRes,
       tokenPrices
     );
-    console.log('Lines Data - positions 2: ', credit.positions);
 
     return {
       ...rest,
@@ -385,16 +383,6 @@ export const formatSecuredLineData = (
   const positions = positionFrags.reduce((obj: any, c: BasePositionFragResponse): PositionMap => {
     const { dRate, fRate, id, lender, line: lineObj, token, proposal: proposals, ...financials } = c;
     const lenderAddress = lender.id;
-
-    // const proposal = proposals.map((p: ProposalFragResponse): CreditProposal => {
-    //   const { maker, taker, ...rest } = p;
-
-    //   return {
-    //     maker: maker.id,
-    //     taker: taker ? taker.id : taker,
-    //     ...rest,
-    //   };
-    // });
 
     // Create proposalMap
     const proposalsMap = proposals.reduce((propAgg: any, p: ProposalFragResponse): ProposalMap => {

@@ -14,6 +14,7 @@ import {
   LinesByRole,
   PositionMap,
   CreditEvent,
+  CreditProposal,
 } from '@types';
 import { getNetworkId } from '@src/utils';
 
@@ -83,6 +84,7 @@ const {
   setSelectedLinePosition,
   setSelectedLinePositionProposal,
   setPosition,
+  setProposal,
   getUserLinePositions,
   getUserPortfolio,
   clearLinesData,
@@ -108,12 +110,18 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
 
     .addCase(setSelectedLinePositionProposal, (state, { payload: { position, proposal } }) => {
-      console.log('set proposal', proposal, state.positionsMap[position ?? ''], state.positionsMap);
       state.selectedProposal = proposal;
     })
 
     .addCase(setPosition, (state, { payload: { id, position } }) => {
       state.positionsMap[id] = position;
+    })
+
+    .addCase(setProposal, (state, { payload: { lineAddress, positionId, proposalId } }) => {
+      const { revokedAt: oldRevokedAt, ...rest } = state.positionsMap[positionId]?.proposalsMap[proposalId];
+      const revokedAt = 1234; // TODO: replace with actual time the proposal was revoked
+      const updatedProposal = { revokedAt, ...rest };
+      state.positionsMap[positionId].proposalsMap[proposalId] = updatedProposal;
     })
     /* -------------------------------------------------------------------------- */
     /*                                 Clear State                                */

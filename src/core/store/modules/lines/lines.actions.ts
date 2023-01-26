@@ -60,6 +60,9 @@ const setSelectedLinePositionProposal = createAction<{ position?: string; propos
 );
 const setPosition = createAction<{ id: string; position: CreditPosition }>('lines/setPosition');
 
+// TODO: update this to fetch the updated proposal from the subgraph to set revokedAt
+const setProposal = createAction<{ lineAddress: string; positionId: string; proposalId: string }>('lines/setProposal');
+
 /* -------------------------------------------------------------------------- */
 /*                                 Clear State                                */
 /* -------------------------------------------------------------------------- */
@@ -879,6 +882,7 @@ export const LinesActions = {
   setSelectedLinePosition,
   setSelectedLinePositionProposal,
   setPosition,
+  setProposal,
   clearLinesData,
   clearUserData,
   clearSelectedLine,

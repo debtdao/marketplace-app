@@ -107,7 +107,6 @@ export class CreditLineServiceImpl implements CreditLineService {
   }
 
   public async revokeConsent(props: RevokeConsentProps): Promise<TransactionResponse | PopulatedTransaction> {
-    console.log('Revoke Consent Parameters', props);
     try {
       // TODO: Add a check to see if the signer is the maker of the proposal.
       // if (!(await this.isLender(props.lineAddress, props.id))) {
@@ -436,13 +435,6 @@ export class CreditLineServiceImpl implements CreditLineService {
   }
 
   public async isLender(contractAddress: string, id: BytesLike): Promise<boolean> {
-    console.log(
-      'is lender',
-      await this.getSignerAddress(),
-      contractAddress,
-      id,
-      await this.getLenderByCreditID(contractAddress, id)
-    );
     return (await this.getSignerAddress()) === (await this.getLenderByCreditID(contractAddress, id));
   }
 

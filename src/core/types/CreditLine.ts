@@ -114,7 +114,6 @@ export interface CreditPosition {
   totalInterestRepaid: string;
   dRate: string;
   fRate: string;
-  // proposal: Proposal[];
   proposalsMap: ProposalMap;
 }
 

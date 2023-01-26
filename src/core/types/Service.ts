@@ -244,10 +244,8 @@ export interface WithdrawLineProps {
 
 // TODO: add back when implementing RevokeConsent.
 export interface RevokeConsentProps {
-  // dryRun?: boolean;
   lineAddress: string;
   id: string;
-  // id: string;
   network: Network;
   msgData: string;
 }

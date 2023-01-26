@@ -113,7 +113,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
         dispatch(
           LinesActions.setPosition({
             id: selectedPosition.id,
-            position: selectedPosition,
+            position: selectedPosition, // TODO: this looks incorrect. set to updatedPosition?
           })
         );
         setTransactionCompleted(1);

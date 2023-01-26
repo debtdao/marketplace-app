@@ -18,8 +18,8 @@ import {
   LineEvents,
   AggregatedEscrow,
   AggregatedSpigot,
-  CollateralEvent,
-  CreditProposal, // prev. GeneralVaultView, Super indepth data, SecuredLineWithEvents is most similar atm
+  CollateralEvent, // prev. GeneralVaultView, Super indepth data, SecuredLineWithEvents is most similar atm
+  CreditProposal,
 } from '@types';
 import { toBN, unnullify } from '@utils';
 import { getConstants } from '@src/config/constants';

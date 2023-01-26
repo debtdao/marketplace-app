@@ -112,14 +112,14 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
       }
       if (res.meta.requestStatus === 'fulfilled') {
         setTransactionCompleted(1);
-        // TODO: update the proposal when the transaction is completed
-        // const updatedPosition = withdrawUpdate(selectedPosition, targetAmount);
-        // dispatch(
-        //   LinesActions.setPosition({
-        //     id: selectedPosition.id,
-        //     position: selectedPosition,
-        //   })
-        // );
+        dispatch(
+          LinesActions.setProposal({
+            lineAddress: selectedCredit.id,
+            positionId: selectedPosition.id,
+            proposalId: selectedProposal!.id,
+            // network: walletNetwork,
+          })
+        );
         setLoading(false);
       }
     });

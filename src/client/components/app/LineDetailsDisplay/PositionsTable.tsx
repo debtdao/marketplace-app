@@ -130,7 +130,6 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
   // Action Handlers for positions table
 
   const depositHandler = (position?: string, proposal?: string) => {
-    console.log('Deposit Handler: ', position, proposal);
     if (!userWallet) {
       connectWallet();
     } else {
@@ -272,10 +271,10 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
     return [];
   };
 
-  const formattedPositions = _.flatten(
+  const formattedPositionsAndProposals = _.flatten(
     positions?.map((position) => {
+      // get position (not in PROPOSED_STATUS)
       const positionToDisplay = {
-        // this needs to be humanized to correct amount depending on the token.
         deposit: humanize('amount', position.deposit, position.token.decimals, 2),
         drate: `${normalizeAmount(position.dRate, 2)} %`,
         frate: `${normalizeAmount(position.fRate, 2)} %`,
@@ -310,13 +309,12 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
           />
         ),
       };
-      const proposals = position.status === PROPOSED_STATUS ? position.proposalsMap : {};
+      // generate list of proposals from each position in PROPOSED_STATUS
       const proposalsToDisplay =
         position.status === PROPOSED_STATUS
           ? Object.values(position.proposalsMap)
               .filter((proposal) => proposal.revokedAt === null)
               .map((proposal) => {
-                console.log('Proposal: ', proposal);
                 return {
                   deposit: humanize('amount', proposal.args[2], position.token.decimals, 2),
                   drate: `${normalizeAmount(proposal.args[0], 2)} %`,
@@ -327,7 +325,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
                       <RedirectLinkIcon />
                     </RouterLink>
                   ),
-                  status: position.status, // TODO: remove this if keep original way to display proposals
+                  status: position.status,
                   principal: humanize('amount', '0', position.token.decimals, 2),
                   interest: humanize('amount', '0', position.token.decimals, 2),
                   lender: (
@@ -359,19 +357,14 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
                 };
               })
           : [];
-      // TODO: remove this if keep original way to display proposals
+
       const positionsAndProposalsToDisplay =
         position.status === PROPOSED_STATUS ? [...proposalsToDisplay] : [positionToDisplay];
 
-      // TODO: add this if keep original way to display proposals
-      // const positionsAndProposalsToDisplay = [positionToDisplay, ...proposalsToDisplay];
-
       return positionsAndProposalsToDisplay;
-      // return positionToDisplay;
     })
   );
 
-  console.log('positions table display line', displayLine, !displayLine);
   return (
     <>
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
@@ -451,7 +444,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
               grow: '1',
             },
           ]}
-          data={formattedPositions}
+          data={formattedPositionsAndProposals}
           SearchBar={
             <>
               {/* // TODO: Add search bar back when there is a need for it. */}

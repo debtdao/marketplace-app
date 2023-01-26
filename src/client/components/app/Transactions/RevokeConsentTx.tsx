@@ -239,7 +239,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
         headerText={t('components.transaction.revoke-consent.select-token')}
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
-        amountValue={selectedPosition!.deposit}
+        amountValue={toWei(targetTokenAmount, selectedPosition!.token.decimals)}
         selectedToken={selectedPosition!.token}
         readOnly={true}
       />
@@ -261,7 +261,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
       />
 
       <TxActions>
-        {txActions.map(({ label, onAction, disabled, contrast }) => (
+        {txActions.map(({ label, onAction, status, disabled, contrast }) => (
           <TxActionButton
             key={label}
             data-testid={`modal-action-${label.toLowerCase()}`}

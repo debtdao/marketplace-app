@@ -106,17 +106,19 @@ export class CreditLineServiceImpl implements CreditLineService {
     }
   }
 
-  // TODO: Add revokeConsent method
   public async revokeConsent(props: RevokeConsentProps): Promise<TransactionResponse | PopulatedTransaction> {
     console.log('Revoke Consent Parameters', props);
     try {
-      if (!(await this.isLender(props.lineAddress, props.id))) {
-        throw new Error('Cannot revoke consent. Signer is not lender');
-      }
-      // TODO: throw error if STATUS !== PROPOSED
-      return <TransactionResponse>(
-        await this.executeContractMethod(props.lineAddress, 'revokeConsent', [props.msgData], props.network)
-      );
+      // TODO: Add a check to see if the signer is the maker of the proposal.
+      // if (!(await this.isLender(props.lineAddress, props.id))) {
+      //   throw new Error('Cannot revoke consent. Signer is not lender');
+      // }
+      return (await this.executeContractMethod(
+        props.lineAddress,
+        'revokeConsent',
+        [props.msgData],
+        props.network
+      )) as TransactionResponse;
     } catch (e) {
       console.log(`An error occured while revoking consent, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
@@ -434,6 +436,13 @@ export class CreditLineServiceImpl implements CreditLineService {
   }
 
   public async isLender(contractAddress: string, id: BytesLike): Promise<boolean> {
+    console.log(
+      'is lender',
+      await this.getSignerAddress(),
+      contractAddress,
+      id,
+      await this.getLenderByCreditID(contractAddress, id)
+    );
     return (await this.getSignerAddress()) === (await this.getLenderByCreditID(contractAddress, id));
   }
 

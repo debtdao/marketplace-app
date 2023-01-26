@@ -1,7 +1,7 @@
-// TODO: This file is a work in progress. It currently just mimicks the WithdrawCreditTx.tsx file.
 import { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ethers } from 'ethers';
+import { getAddress } from '@ethersproject/address';
 
 import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
 import { LinesSelectors, LinesActions, WalletSelectors } from '@store';
@@ -25,14 +25,12 @@ const StyledAmountInput = styled(TxTTLInput)``;
 interface RevokeConsentProps {
   header: string;
   onClose: () => void;
-  onSelectedCreditLineChange: Function;
-  onPositionChange: (data: { credit?: string; amount?: string }) => void;
 }
 
 export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
-  const { header, onClose, onPositionChange } = props;
+  const { header, onClose } = props;
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionLoading, setLoading] = useState(false);
   const [targetAmount, setTargetAmount] = useState('1');
@@ -41,56 +39,28 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
   const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
   const selectedProposal = useAppSelector(LinesSelectors.selectSelectedProposal);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
-  // const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const walletAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
-  const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
 
-  //state for params
-  // const { header, onClose } = props;
-  // const [transactionCompleted, setTransactionCompleted] = useState(0);
-  // const [transactionApproved, setTransactionApproved] = useState(true);
-  // const [transactionLoading, setLoading] = useState(false);
+  // state for proposal params
   const [targetTokenAmount, setTargetTokenAmount] = useState('0');
   const [drate, setDrate] = useState('');
   const [frate, setFrate] = useState('');
   const [msgData, setMsgData] = useState('');
-  const [lenderAddress, setLenderAddress] = useState(walletAddress ? walletAddress : '');
-  const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
-  const [transactionType, setTransactionType] = useState('propose');
+  // const [lenderAddress, setLenderAddress] = useState(walletAddress ? walletAddress : '');
+  // const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
 
   useEffect(() => {
     if (selectedPosition?.status === PROPOSED_STATUS && selectedProposal) {
-      console.log('Selected Proposal: ', selectedProposal);
-
-      // set values based on selectedProposal
       const [dRate, fRate, deposit, tokenAddress, lenderAddress] = [...selectedProposal.args];
+      // setSelectedTokenAddress(tokenAddress);
+      // setLenderAddress(lenderAddress);
       setTargetTokenAmount(normalizeAmount(deposit, selectedPosition.token.decimals));
-      setSelectedTokenAddress(tokenAddress);
       setDrate(normalizeAmount(dRate, 0));
       setFrate(normalizeAmount(fRate, 0));
-      setLenderAddress(lenderAddress);
       setMsgData(selectedProposal.msgData);
-      setTransactionType('accept');
     }
   }, [selectedPosition]);
-
-  const _updatePosition = () =>
-    onPositionChange({
-      credit: selectedCredit?.id,
-      amount: targetAmount,
-    });
-
-  // Event Handlers
-  const onAmountChange = (amount: string): void => {
-    setTargetAmount(amount);
-    _updatePosition();
-  };
-
-  const onSelectedCreditLineChange = (addr: string): void => {
-    setSelectedCredit(addr);
-    _updatePosition();
-  };
 
   const onTransactionCompletedDismissed = () => {
     if (onClose) {
@@ -129,15 +99,8 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
     }
 
     dispatch(
-      // LinesActions.withdrawLine({
-      //   id: selectedPosition.id,
-      //   lineAddress: selectedCredit.id,
-      //   amount: ethers.utils.parseEther(targetAmount),
-      //   network: walletNetwork,
-      // })
       LinesActions.revokeConsent({
         id: selectedPosition.id,
-        // lenderAddress: lenderAddress,
         lineAddress: selectedCredit.id,
         network: walletNetwork,
         msgData: msgData,
@@ -149,6 +112,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
       }
       if (res.meta.requestStatus === 'fulfilled') {
         setTransactionCompleted(1);
+        // TODO: update the proposal when the transaction is completed
         // const updatedPosition = withdrawUpdate(selectedPosition, targetAmount);
         // dispatch(
         //   LinesActions.setPosition({
@@ -161,7 +125,6 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
     });
   };
 
-  // TODO: onAction should be revokeConsent
   const txActions = [
     {
       label: t('components.transaction.revoke-consent.cta'),
@@ -173,7 +136,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
   ];
 
   if (!selectedCredit) {
-    console.log('withdraw modal selected credit is undefined: ', selectedCredit);
+    console.log('revoke consent modal selected credit is undefined: ', selectedCredit);
     return null;
   }
 
@@ -209,7 +172,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
       <TxCreditLineInput
         key={'credit-input'}
         headerText={t('components.transaction.revoke-consent.select-credit')}
-        onSelectedCreditLineChange={onSelectedCreditLineChange}
+        // onSelectedCreditLineChange={onSelectedCreditLineChange}
         selectedCredit={selectedCredit}
         readOnly={true}
       />

@@ -43,7 +43,6 @@ const ActionButton = styled(Button)<{ hide?: boolean }>`
 interface ActionButtonsProps {
   actions: Array<{
     name: string;
-    // handler: (value?: string) => void;
     handler: (value1?: string, value2?: string) => void;
     disabled?: boolean;
     hide?: boolean;

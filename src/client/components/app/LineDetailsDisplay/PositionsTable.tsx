@@ -135,7 +135,6 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
       connectWallet();
     } else {
       dispatch(LinesActions.setSelectedLinePosition({ position }));
-      // TODO
       dispatch(LinesActions.setSelectedLinePositionProposal({ proposal }));
       dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
     }
@@ -156,7 +155,6 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
   const revokeConsentHandler = (position?: string, proposal?: string) => {
     if (!position) return;
     dispatch(LinesActions.setSelectedLinePosition({ position }));
-    // TODO
     dispatch(LinesActions.setSelectedLinePositionProposal({ proposal }));
     dispatch(ModalsActions.openModal({ modalName: 'revokeConsent' }));
   };
@@ -248,24 +246,27 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
   // Returns a list of transactions to display on positions table for proposals
   const getUserProposalActions = (proposal: CreditProposal) => {
     console.log('Proposal: ', proposal);
+
+    const approveMutualConsent = {
+      name: t('components.transaction.add-credit.accept-terms'),
+      handler: depositHandler,
+      disabled: false,
+    };
+
+    const revokeMutualConsent = {
+      name: t('components.transaction.revoke-consent.cta'),
+      handler: revokeConsentHandler,
+      disabled: false,
+    };
+
+    // Display button to approve proposal for the borrower of the proposal
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
-      const approveMutualConsent = {
-        name: t('components.transaction.add-credit.accept-terms'),
-        handler: depositHandler,
-        disabled: false,
-      };
       return [approveMutualConsent];
     }
-    // TODO: change from position.lender to position.maker
-    // If user is lender and position status is PROPOSED, return revoke consent action
+
+    // Display button to cancel proposal for the maker of the proposal
     if (getAddress(proposal.maker) === userWallet) {
-      return [
-        {
-          name: t('components.transaction.revoke-consent.cta'),
-          handler: revokeConsentHandler,
-          disabled: false,
-        },
-      ];
+      return [revokeMutualConsent];
     }
 
     return [];

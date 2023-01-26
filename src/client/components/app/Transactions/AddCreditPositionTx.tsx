@@ -108,20 +108,6 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   console.log('selectedPosition', selectedPosition, selectedCredit);
   useEffect(() => {
     if (selectedPosition?.status === PROPOSED_STATUS && selectedProposal) {
-      console.log('Selected Proposal: ', selectedProposal);
-      // //  selectedPosition.token.decimals instead of 0 as deci
-      // const deposit = normalizeAmount(selectedPosition.deposit, selectedPosition.token.decimals);
-      // console.log('position deposit user input vs norm val', selectedPosition.deposit, deposit);
-
-      // // set these values based on selectedProposal
-      // if (!targetTokenAmount) setTargetTokenAmount(deposit);
-      // if (!selectedSellTokenAddress) setSelectedTokenAddress(selectedPosition.token.address);
-      // if (!drate) setDrate(normalizeAmount(selectedPosition.dRate, 0));
-      // if (!frate) setFrate(normalizeAmount(selectedPosition.fRate, 0));
-      // setLenderAddress(selectedPosition.lender);
-      // setTargetTokenAmount(deposit);
-      // setTransactionType('accept');
-
       // set values based on selectedProposal
       const [dRate, fRate, deposit, tokenAddress, lenderAddress] = [...selectedProposal.args];
       setTargetTokenAmount(normalizeAmount(deposit, selectedPosition.token.decimals));

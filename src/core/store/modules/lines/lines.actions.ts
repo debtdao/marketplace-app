@@ -682,7 +682,38 @@ const withdrawLine = createAsyncThunk<
   }
 );
 
-// TODO: add revokeConsent
+const revokeConsent = createAsyncThunk<
+  void,
+  {
+    lineAddress: string;
+    lenderAddress: string;
+    msgData: string;
+    network: Network;
+  },
+  ThunkAPI
+>(
+  'lines/revokeConsent',
+  async ({ lineAddress, lenderAddress, msgData, network }, { extra, getState }) => {
+    const { wallet } = getState();
+    const { services } = extra;
+
+    const userAddress = wallet.selectedAddress;
+    if (!userAddress) throw new Error('WALLET NOT CONNECTED');
+
+    const { creditLineService } = services;
+    console.log(lineAddress, 'lineaddress', lenderAddress, 'lenderAddress', msgData, 'msgData', network, 'network');
+    const tx = await creditLineService.revokeConsent({
+      lineAddress: lineAddress,
+      lenderAddress: lenderAddress,
+      msgData: msgData,
+      network: network,
+    });
+    console.log(tx);
+  },
+  {
+    // serializeError: parseError,
+  }
+);
 
 const getDepositAllowance = createAsyncThunk<
   TokenAllowance,
@@ -868,7 +899,7 @@ export const LinesActions = {
   // approveZapOut,
   // signZapOut,
   withdrawLine,
-
+  revokeConsent,
   close,
   depositAndRepay,
   depositAndClose,

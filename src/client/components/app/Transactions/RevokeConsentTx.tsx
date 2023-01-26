@@ -54,6 +54,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
   const [targetTokenAmount, setTargetTokenAmount] = useState('0');
   const [drate, setDrate] = useState('');
   const [frate, setFrate] = useState('');
+  const [msgData, setMsgData] = useState('');
   const [lenderAddress, setLenderAddress] = useState(walletAddress ? walletAddress : '');
   const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
   const [transactionType, setTransactionType] = useState('propose');
@@ -69,39 +70,10 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
       setDrate(normalizeAmount(dRate, 0));
       setFrate(normalizeAmount(fRate, 0));
       setLenderAddress(lenderAddress);
+      setMsgData(selectedProposal.msgData);
       setTransactionType('accept');
     }
   }, [selectedPosition]);
-
-  //Calculate maximum withdraw amount, then humanize for readability
-  const getMaxWithdraw = () => {
-    if (!selectedPosition) {
-      setErrors([...errors, 'no selected position']);
-      return '0';
-    }
-    const maxWithdrawAmount: number =
-      Number(selectedPosition.deposit) - Number(selectedPosition.principal) + Number(selectedPosition.interestRepaid);
-
-    // 1 is the smallest possible unit for the token decimal
-    const maxWithdrawAmountLessDust: number = maxWithdrawAmount >= 1 ? maxWithdrawAmount - 1 : 0;
-    const maxWithdrawLessDustNormalized = normalize(
-      'amount',
-      String(maxWithdrawAmountLessDust),
-      selectedPosition.token.decimals
-    );
-    return maxWithdrawLessDustNormalized;
-  };
-
-  //Used to determine if amount user wants to withdraw is valid
-  const isWithdrawable = () => {
-    if (!selectedPosition) {
-      return;
-    }
-    const maxWithdrawAmount = Number(toWei(getMaxWithdraw()!, selectedPosition.token.decimals));
-    const amountToWithdraw = Number(toWei(targetAmount, selectedPosition.token.decimals));
-
-    return amountToWithdraw > maxWithdrawAmount;
-  };
 
   const _updatePosition = () =>
     onPositionChange({
@@ -157,10 +129,17 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
     }
 
     dispatch(
-      LinesActions.withdrawLine({
-        id: selectedPosition.id,
+      // LinesActions.withdrawLine({
+      //   id: selectedPosition.id,
+      //   lineAddress: selectedCredit.id,
+      //   amount: ethers.utils.parseEther(targetAmount),
+      //   network: walletNetwork,
+      // })
+      LinesActions.revokeConsent({
+        // id: selectedPosition.id,
+        lenderAddress: lenderAddress,
         lineAddress: selectedCredit.id,
-        amount: ethers.utils.parseEther(targetAmount),
+        msgData: msgData,
         network: walletNetwork,
       })
     ).then((res) => {
@@ -170,13 +149,13 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
       }
       if (res.meta.requestStatus === 'fulfilled') {
         setTransactionCompleted(1);
-        const updatedPosition = withdrawUpdate(selectedPosition, targetAmount);
-        dispatch(
-          LinesActions.setPosition({
-            id: selectedPosition.id,
-            position: selectedPosition,
-          })
-        );
+        // const updatedPosition = withdrawUpdate(selectedPosition, targetAmount);
+        // dispatch(
+        //   LinesActions.setPosition({
+        //     id: selectedPosition.id,
+        //     position: selectedPosition,
+        //   })
+        // );
         setLoading(false);
       }
     });
@@ -188,7 +167,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
       label: t('components.transaction.revoke-consent.cta'),
       onAction: revokeConsent,
       status: true,
-      disabled: isWithdrawable(),
+      disabled: false,
       contrast: false,
     },
   ];
@@ -215,7 +194,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'could not borrow credit'}
+          transactionCompletedLabel={'could not cancel proposed deal'}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>

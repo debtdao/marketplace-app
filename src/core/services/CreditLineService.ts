@@ -21,7 +21,7 @@ import {
   AddCreditProps,
   CloseProps,
   WithdrawLineProps,
-  // TODO: RevokeConsentProps,
+  RevokeConsentProps,
   SetRatesProps,
   IncreaseCreditProps,
   DepositAndRepayProps,
@@ -107,21 +107,21 @@ export class CreditLineServiceImpl implements CreditLineService {
   }
 
   // TODO: Add revokeConsent method
-  // public async revokeConsent(props: RevokeConsentProps): Promise<TransactionResponse | PopulatedTransaction> {
-  //   try {
-  //     if (!(await this.isLender(props.lineAddress, props.id))) {
-  //       throw new Error('Cannot revoke consent. Signer is not lender');
-  //     }
-  //     // TODO: throw error if STATUS !== PROPOSED
+  public async revokeConsent(props: RevokeConsentProps): Promise<TransactionResponse | PopulatedTransaction> {
+    try {
+      if (!(await this.isLender(props.lineAddress, props.lenderAddress))) {
+        throw new Error('Cannot revoke consent. Signer is not lender');
+      }
+      // TODO: throw error if STATUS !== PROPOSED
 
-  //     return <TransactionResponse>(
-  //       await this.executeContractMethod(props.lineAddress, 'revokeConsent', [props.id, props.amount], props.network)
-  //     );
-  //   } catch (e) {
-  //     console.log(`An error occured while withdrawing credit, error = [${JSON.stringify(e)}]`);
-  //     return Promise.reject(e);
-  //   }
-  // }
+      return <TransactionResponse>(
+        await this.executeContractMethod(props.lineAddress, 'revokeConsent', [props.msgData], props.network)
+      );
+    } catch (e) {
+      console.log(`An error occured while revoking consent, error = [${JSON.stringify(e)}]`);
+      return Promise.reject(e);
+    }
+  }
 
   public async setRates(props: SetRatesProps): Promise<string> {
     try {

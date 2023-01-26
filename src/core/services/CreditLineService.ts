@@ -109,7 +109,7 @@ export class CreditLineServiceImpl implements CreditLineService {
   // TODO: Add revokeConsent method
   public async revokeConsent(props: RevokeConsentProps): Promise<TransactionResponse | PopulatedTransaction> {
     try {
-      if (!(await this.isLender(props.lineAddress, props.lenderAddress))) {
+      if (!(await this.isLender(props.lineAddress, props.id))) {
         throw new Error('Cannot revoke consent. Signer is not lender');
       }
       // TODO: throw error if STATUS !== PROPOSED

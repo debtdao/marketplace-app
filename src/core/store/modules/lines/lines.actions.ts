@@ -686,14 +686,14 @@ const revokeConsent = createAsyncThunk<
   void,
   {
     lineAddress: string;
-    lenderAddress: string;
+    id: string;
     msgData: string;
     network: Network;
   },
   ThunkAPI
 >(
   'lines/revokeConsent',
-  async ({ lineAddress, lenderAddress, msgData, network }, { extra, getState }) => {
+  async ({ lineAddress, id, msgData, network }, { extra, getState }) => {
     const { wallet } = getState();
     const { services } = extra;
 
@@ -701,10 +701,10 @@ const revokeConsent = createAsyncThunk<
     if (!userAddress) throw new Error('WALLET NOT CONNECTED');
 
     const { creditLineService } = services;
-    console.log(lineAddress, 'lineaddress', lenderAddress, 'lenderAddress', msgData, 'msgData', network, 'network');
+    console.log(lineAddress, 'lineaddress', id, 'id', msgData, 'msgData', network, 'network');
     const tx = await creditLineService.revokeConsent({
       lineAddress: lineAddress,
-      lenderAddress: lenderAddress,
+      id: id,
       msgData: msgData,
       network: network,
     });

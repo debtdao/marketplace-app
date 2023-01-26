@@ -246,7 +246,7 @@ export interface WithdrawLineProps {
 export interface RevokeConsentProps {
   // dryRun?: boolean;
   lineAddress: string;
-  lenderAddress: string;
+  id: string;
   // id: string;
   network: Network;
   msgData: string;

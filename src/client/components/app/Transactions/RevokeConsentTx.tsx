@@ -136,8 +136,8 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
       //   network: walletNetwork,
       // })
       LinesActions.revokeConsent({
-        // id: selectedPosition.id,
-        lenderAddress: lenderAddress,
+        id: selectedPosition.id,
+        // lenderAddress: lenderAddress,
         lineAddress: selectedCredit.id,
         msgData: msgData,
         network: walletNetwork,

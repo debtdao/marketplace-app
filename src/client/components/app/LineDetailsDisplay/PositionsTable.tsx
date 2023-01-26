@@ -312,45 +312,51 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
       const proposals = position.status === PROPOSED_STATUS ? position.proposalsMap : {};
       const proposalsToDisplay =
         position.status === PROPOSED_STATUS
-          ? Object.values(position.proposalsMap).map((proposal) => {
-              console.log('Proposal: ', proposal);
-              return {
-                deposit: humanize('amount', proposal.args[2], position.token.decimals, 2),
-                drate: `${normalizeAmount(proposal.args[0], 2)} %`,
-                frate: `${normalizeAmount(proposal.args[1], 2)} %`,
-                line: (
-                  <RouterLink to={`/${currentNetwork}/lines/${position.line}`} key={position.line} selected={false}>
-                    {formatAddress(position.line)}
-                    <RedirectLinkIcon />
-                  </RouterLink>
-                ),
-                status: position.status, // TODO: remove this if keep original way to display proposals
-                principal: humanize('amount', '0', position.token.decimals, 2),
-                interest: humanize('amount', '0', position.token.decimals, 2),
-                lender: (
-                  <RouterLink
-                    to={`/${currentNetwork}/portfolio/${proposal.args[4]}`}
-                    key={position.id}
-                    selected={false}
-                  >
-                    {formatAddress(getENS(proposal.args[4], ensMap)!)}
-                    <RedirectLinkIcon />
-                  </RouterLink>
-                ),
-                token: (
-                  <RouterLink
-                    key={proposal.args[3]}
-                    to={`https://etherscan.io/address/${proposal.args[3]}`}
-                    selected={false}
-                  >
-                    {position.token.symbol}
-                  </RouterLink>
-                ),
-                actions: (
-                  <ActionButtons value1={position.id} value2={proposal.id} actions={getUserProposalActions(proposal)} />
-                ),
-              };
-            })
+          ? Object.values(position.proposalsMap)
+              .filter((proposal) => proposal.revokedAt === null)
+              .map((proposal) => {
+                console.log('Proposal: ', proposal);
+                return {
+                  deposit: humanize('amount', proposal.args[2], position.token.decimals, 2),
+                  drate: `${normalizeAmount(proposal.args[0], 2)} %`,
+                  frate: `${normalizeAmount(proposal.args[1], 2)} %`,
+                  line: (
+                    <RouterLink to={`/${currentNetwork}/lines/${position.line}`} key={position.line} selected={false}>
+                      {formatAddress(position.line)}
+                      <RedirectLinkIcon />
+                    </RouterLink>
+                  ),
+                  status: position.status, // TODO: remove this if keep original way to display proposals
+                  principal: humanize('amount', '0', position.token.decimals, 2),
+                  interest: humanize('amount', '0', position.token.decimals, 2),
+                  lender: (
+                    <RouterLink
+                      to={`/${currentNetwork}/portfolio/${proposal.args[4]}`}
+                      key={position.id}
+                      selected={false}
+                    >
+                      {formatAddress(getENS(proposal.args[4], ensMap)!)}
+                      <RedirectLinkIcon />
+                    </RouterLink>
+                  ),
+                  token: (
+                    <RouterLink
+                      key={proposal.args[3]}
+                      to={`https://etherscan.io/address/${proposal.args[3]}`}
+                      selected={false}
+                    >
+                      {position.token.symbol}
+                    </RouterLink>
+                  ),
+                  actions: (
+                    <ActionButtons
+                      value1={position.id}
+                      value2={proposal.id}
+                      actions={getUserProposalActions(proposal)}
+                    />
+                  ),
+                };
+              })
           : [];
       // TODO: remove this if keep original way to display proposals
       const positionsAndProposalsToDisplay =

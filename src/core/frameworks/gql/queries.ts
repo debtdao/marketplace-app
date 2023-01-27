@@ -402,14 +402,18 @@ const LENDER_POSITIONS_FRAGMENT = gql`
 // fetches all of a user's positions in their portfolio for which they are a borrower, lender, and/or arbiter
 export const GET_USER_PORTFOLIO_QUERY = gql`
   ${LINE_OF_CREDIT_FRAGMENT}
-  ${LENDER_POSITIONS_FRAGMENT}
+  #${LENDER_POSITIONS_FRAGMENT}
+  ${BASE_POSITION_FRAGMENT}
 
   query getUserPortfolio($user: String!) {
     borrowerLineOfCredits: lineOfCredits(where: { borrower: $user }) {
       ...LineOfCreditFrag
     }
-    lenderPositions: lender(id: $user) {
-      ...LenderPositionsFrag
+    #lenderPositions: lender(id: $user) {
+    #  ...LenderPositionsFrag
+    #}
+    lenderPositions: marketplaceActor(id: $user) {
+      ...BasePositionFrag
     }
     arbiterLineOfCredits: lineOfCredits(where: { arbiter: $user }) {
       ...LineOfCreditFrag

@@ -266,6 +266,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       );
       // add lender positions to object for state.positionsMap and update state.positionsMap
       allPositions = { ...allPositions, ...lenderPositions };
+      console.log('User Portfolio 5: ', allPositions);
       state.positionsMap = { ...state.positionsMap, ...allPositions };
 
       state.user.portfolio = {

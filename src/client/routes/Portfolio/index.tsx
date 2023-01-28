@@ -107,10 +107,6 @@ export const Portfolio = () => {
     _.merge(borrowerLineOfCredits.map((loc: SecuredLine) => _.values(loc.positions)))
   );
 
-  console.log('User Portfolio: ', userPortfolio);
-  console.log('Lender Positions: ', lenderPositions);
-  console.log('Borrower Positions: ', borrowerPositions);
-
   useEffect(() => {
     if (userPortfolio) {
       if (selectedRole === BORROWER_POSITION_ROLE) {

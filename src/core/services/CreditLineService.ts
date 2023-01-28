@@ -515,10 +515,7 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   public async getUserPortfolio(prop: GetUserPortfolioProps): Promise<GetUserPortfolioResponse | undefined> {
     const response = getUserPortfolio(prop)
-      .then((data) => {
-        console.log('User Portfolio 2: ', prop, data);
-        return data;
-      })
+      .then((data) => data)
       .catch((err) => {
         console.log('CreditLineService error fetching user portfolio', err);
         return undefined;

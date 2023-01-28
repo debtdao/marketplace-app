@@ -1,10 +1,4 @@
-import {
-  TokenFragRepsonse,
-  GetUserPortfolioResponse,
-  LineOfCreditsResponse,
-  BasePositionFragResponse,
-  LenderPositionsResponse,
-} from '@types';
+import { TokenFragRepsonse, GetUserPortfolioResponse, LineOfCreditsResponse, BasePositionFragResponse } from '@types';
 
 import { Alert } from './Alerts';
 import { Address, Network } from './Blockchain';

@@ -63,6 +63,9 @@ const BASE_POSITION_FRAGMENT = gql`
     lender {
       id
     }
+    line {
+      id
+    }
     principal
     deposit
     interestAccrued
@@ -366,54 +369,23 @@ const LENDER_POSITIONS_FRAGMENT = gql`
   ${SPIGOT_EVENT_FRAGMENT}
   ${ESCROW_FRAGMENT}
 
-  fragment LenderPositionsFrag on Lender {
-    positions: positions {
-      ...BasePositionFrag
-
-      line {
-        ...BaseLineFrag
-
-        events {
-          ...LineEventFrag
-        }
-
-        spigot {
-          id
-          spigots {
-            ...BaseSpigotFrag
-          }
-
-          summaries {
-            ...SpigotSummaryFrag
-          }
-          events {
-            ...SpigotEventFrag
-          }
-        }
-
-        escrow {
-          ...EscrowFrag
-        }
-      }
-    }
+  fragment LenderPositionsFrag on Position {
+    ...BasePositionFrag
   }
 `;
 
 // fetches all of a user's positions in their portfolio for which they are a borrower, lender, and/or arbiter
 export const GET_USER_PORTFOLIO_QUERY = gql`
   ${LINE_OF_CREDIT_FRAGMENT}
-  #${LENDER_POSITIONS_FRAGMENT}
+  ${LENDER_POSITIONS_FRAGMENT}
   ${BASE_POSITION_FRAGMENT}
 
   query getUserPortfolio($user: String!) {
     borrowerLineOfCredits: lineOfCredits(where: { borrower: $user }) {
       ...LineOfCreditFrag
     }
-    #lenderPositions: lender(id: $user) {
-    #  ...LenderPositionsFrag
-    #}
-    lenderPositions: marketplaceActor(id: $user) {
-      ...BasePositionFrag
+    lenderPositions: positions(where: { lender: $user }) {
+      ...LenderPositionsFrag
     }
     arbiterLineOfCredits: lineOfCredits(where: { arbiter: $user }) {
       ...LineOfCreditFrag

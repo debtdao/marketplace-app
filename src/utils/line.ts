@@ -215,8 +215,50 @@ export function formatGetLinesData(
   });
 }
 
+export const createPositionsMap = (
+  positionFrags: (BasePositionFragResponse | BasePositionFragResponse)[],
+  tokenPrices: { [token: string]: BigNumber }
+): PositionMap => {
+  // Create positionsMap
+  const positionsMap = positionFrags.reduce((obj: any, c: BasePositionFragResponse): PositionMap => {
+    const { dRate, fRate, id, lender, line, token, proposal, principal, ...financials } = c;
+    const lenderAddress = lender.id;
+
+    // Create proposalMap
+    const proposalsMap = proposal.reduce((propAgg: any, p: ProposalFragResponse): ProposalMap => {
+      const { id: proposalId, maker, taker, ...rest } = p;
+      return {
+        ...propAgg,
+        [proposalId]: {
+          id: proposalId,
+          maker: maker.id,
+          taker: taker ? taker.id : taker,
+          ...rest,
+        },
+      };
+    }, {});
+
+    const currentUsdPrice = tokenPrices[c.token?.id];
+    return {
+      ...obj,
+      [id]: {
+        id,
+        lender: lenderAddress,
+        line: line.id,
+        proposalsMap,
+        principal,
+        ...financials,
+        dRate,
+        fRate,
+        token: _createTokenView(token, BigNumber.from(principal), currentUsdPrice),
+      },
+    };
+  }, {});
+  return positionsMap;
+};
+
 export const formatSecuredLineData = (
-  line: Address, // BaseLineFrag
+  line: Address,
   spigotId: Address,
   escrowId: Address,
   positionFrags: (BasePositionFragResponse | BasePositionFragResponse)[],
@@ -379,42 +421,7 @@ export const formatSecuredLineData = (
     spigots: spigotRevenueContracts,
   };
 
-  // Create positionMap
-  const positions = positionFrags.reduce((obj: any, c: BasePositionFragResponse): PositionMap => {
-    const { dRate, fRate, id, lender, line: lineObj, token, proposal: proposals, ...financials } = c;
-    const lenderAddress = lender.id;
-
-    // Create proposalMap
-    const proposalsMap = proposals.reduce((propAgg: any, p: ProposalFragResponse): ProposalMap => {
-      const { id: proposalId, maker, taker, ...rest } = p;
-
-      return {
-        ...propAgg,
-        [proposalId]: {
-          id: proposalId,
-          maker: maker.id,
-          taker: taker ? taker.id : taker,
-          ...rest,
-        },
-      };
-    }, {});
-
-    const currentUsdPrice = tokenPrices[c.token?.id];
-    return {
-      ...obj,
-      [id]: {
-        id,
-        lender: lenderAddress,
-        line,
-        proposalsMap,
-        ...financials,
-        dRate,
-        fRate,
-        token: _createTokenView(token, BigNumber.from(principal), currentUsdPrice),
-        // events,
-      },
-    };
-  }, {});
+  const positions = createPositionsMap(positionFrags, tokenPrices);
 
   return {
     credit: {
@@ -667,20 +674,7 @@ export const formatUserPortfolioData = (
     })
     .reduce((lines, line) => ({ ...lines, [line.id]: line }), {});
 
-  // positions tokenFragResponse -> TokenView
-  const positions: PositionMap =
-    lenderPositions?.positions?.reduce(
-      (map, p) => ({
-        ...map,
-        [p.id]: {
-          ...p,
-          lender: p.lender.id,
-          line: p.line.id,
-          token: _createTokenView(p.token, unnullify(p.principal, true), tokenPrices[p.token.id]),
-        },
-      }),
-      {}
-    ) ?? {};
+  const positions = createPositionsMap(lenderPositions, tokenPrices);
 
   return { lines, positions };
 };

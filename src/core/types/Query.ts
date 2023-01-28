@@ -307,10 +307,6 @@ export interface SupportedOracleTokenResponse {
   supportedTokens?: [token: TokenFragRepsonse];
 }
 
-export interface LenderPositionsResponse {
-  positions?: BasePositionFragResponse[];
-}
-
 export interface LineOfCreditsResponse extends BaseLineFragResponse {
   positions?: BasePositionFragResponse[];
 
@@ -333,8 +329,8 @@ export interface LineOfCreditsResponse extends BaseLineFragResponse {
   };
 }
 
-export interface GetUserPortfolioResponse extends LineOfCreditsResponse, LenderPositionsResponse {
+export interface GetUserPortfolioResponse extends LineOfCreditsResponse {
   borrowerLineOfCredits: LineOfCreditsResponse[];
-  lenderPositions: LenderPositionsResponse;
+  lenderPositions: BasePositionFragResponse[];
   arbiterLineOfCredits: LineOfCreditsResponse[];
 }

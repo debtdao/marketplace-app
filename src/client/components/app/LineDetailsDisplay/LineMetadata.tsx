@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import { device } from '@themes/default';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
-import { prettyNumbers, getEtherscanUrlStub, unnullify, prettyNumbers2 } from '@src/utils';
+import { prettyNumbers, getEtherscanUrlStub, unnullify } from '@src/utils';
 import {
   AggregatedEscrow,
   ARBITER_POSITION_ROLE,

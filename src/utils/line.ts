@@ -47,7 +47,7 @@ import {
   ProposalMap,
 } from '@types';
 
-import { humanize, normalizeAmount, normalize } from './format';
+import { humanize, normalizeAmount, normalize, format, toUnit, toTargetDecimalUnits, BASE_DECIMALS } from './format';
 
 const { parseUnits, formatUnits } = utils;
 
@@ -302,16 +302,16 @@ export const formatSecuredLineData = (
     (agg: any, c) => {
       const checkSumAddress = ethers.utils.getAddress(c.token?.id);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
-      const tokenDecimals = c.token.decimals;
-      console.log('Collateral Value - Token: ', c.token?.symbol);
-      console.log('Collateral Value - USDC Price: ', usdcPrice.toString());
-      console.log('Collateral Value - Principal: ', c.principal);
-      console.log('Collateral Value - Deposit: ', c.deposit);
+      // TODO: remove after testing spigot revenue conversion to USD
+      // const usdcPrice = c.token.symbol === 'SEERO' ? BigNumber.from(1000000) : BigNumber.from(2000000);
+      const positionPrincipal = toTargetDecimalUnits(c.principal, c.token.decimals, BASE_DECIMALS);
+      const positionDeposit = toTargetDecimalUnits(c.deposit, c.token.decimals, BASE_DECIMALS);
+      const positionInterestRepaid = toTargetDecimalUnits(c.interestRepaid, c.token.decimals, BASE_DECIMALS);
       return {
-        principal: agg.principal.add(usdcPrice.mul(unnullify(c.principal).toString())),
-        deposit: agg.deposit.add(usdcPrice.mul(unnullify(c.deposit)).toString()),
+        principal: agg.principal.add(usdcPrice.mul(unnullify(positionPrincipal).toString())),
+        deposit: agg.deposit.add(usdcPrice.mul(unnullify(positionDeposit)).toString()),
         highestApy,
-        totalInterestRepaid: agg.totalInterestRepaid.add(usdcPrice.mul(unnullify(c.interestRepaid)).toString()),
+        totalInterestRepaid: agg.totalInterestRepaid.add(usdcPrice.mul(unnullify(positionInterestRepaid)).toString()),
       };
     },
     { principal, deposit, highestApy, totalInterestRepaid }
@@ -323,17 +323,21 @@ export const formatSecuredLineData = (
     (agg, collateralDeposit) => {
       const checkSumAddress = ethers.utils.getAddress(collateralDeposit.token.id);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
+      // TODO: remove after testing spigot revenue conversion to USD
+      // const usdcPrice = collateralDeposit.token.symbol === 'SEERO' ? BigNumber.from(1000000) : BigNumber.from(2000000);
+      const amount = toTargetDecimalUnits(collateralDeposit.amount, collateralDeposit.token.decimals, BASE_DECIMALS);
+
       return !collateralDeposit.enabled
         ? agg
         : [
-            agg[0].add(unnullify(collateralDeposit.amount, true).mul(usdcPrice)),
+            agg[0].add(unnullify(amount, true).mul(usdcPrice)),
             {
               ...agg[1],
               [collateralDeposit.token.id]: {
                 ...collateralDeposit,
                 type: COLLATERAL_TYPE_ASSET,
-                token: _createTokenView(collateralDeposit.token, BigNumber.from(collateralDeposit.amount), usdcPrice),
-                value: formatUnits(unnullify(collateralDeposit.amount, true).mul(usdcPrice).toString(), 6).toString(),
+                token: _createTokenView(collateralDeposit.token, BigNumber.from(amount), usdcPrice),
+                value: formatUnits(unnullify(amount, true).mul(usdcPrice).toString(), 6).toString(),
               },
             },
           ];
@@ -392,6 +396,9 @@ export const formatSecuredLineData = (
     (agg, { token, totalVolume, totalVolumeUsd, ...summary }) => {
       const checkSumAddress = ethers.utils.getAddress(token.id);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
+      // TODO: remove after testing spigot revenue conversion to USD
+      // const usdcPrice = collateralDeposit.token.symbol === 'SEERO' ? BigNumber.from(1000000) : BigNumber.from(2000000);
+      // const totalVolume = toTargetDecimalUnits(totalVolume, token.decimals, BASE_DECIMALS);
       return [
         agg[0].add(unnullify(totalVolume).toString()).mul(usdcPrice),
         {

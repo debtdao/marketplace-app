@@ -129,8 +129,8 @@ const MetricDataDisplay = ({ title, data, displaySubmetrics = false, submetrics 
       <DataMetric>{data}</DataMetric>
       {displaySubmetrics && (
         <DataSubMetricsContainer>
-          {submetrics?.map(({ title, data }) => (
-            <DataSubMetric>
+          {submetrics?.map(({ title, data }, index) => (
+            <DataSubMetric key={index}>
               {title} : {data}
             </DataSubMetric>
           ))}

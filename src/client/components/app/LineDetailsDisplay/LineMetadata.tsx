@@ -196,7 +196,6 @@ export const LineMetadata = () => {
     if (!walletIsConnected) {
       connectWallet();
     } else {
-      console.log('Token: ', token);
       dispatch(CollateralActions.setSelectedCollateralAsset({ assetAddress: token.address }));
       dispatch(ModalsActions.openModal({ modalName: 'addCollateral', modalProps: { assetAddress: token.address } }));
     }
@@ -293,7 +292,6 @@ export const LineMetadata = () => {
   // TODO: fix types on args
   // TODO: What is the action button for revenue?
   const renderButtons = (token: any, type: any) => {
-    console.log('TYPE BUTTONS', type);
     if (type === 'revenue') {
       return;
     }

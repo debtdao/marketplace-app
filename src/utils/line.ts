@@ -302,8 +302,6 @@ export const formatSecuredLineData = (
     (agg: any, c) => {
       const checkSumAddress = ethers.utils.getAddress(c.token?.id);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
-      // TODO: remove after testing spigot revenue conversion to USD
-      // const usdcPrice = c.token.symbol === 'SEERO' ? BigNumber.from(1000000) : BigNumber.from(2000000);
       const positionPrincipal = toTargetDecimalUnits(c.principal, c.token.decimals, BASE_DECIMALS);
       const positionDeposit = toTargetDecimalUnits(c.deposit, c.token.decimals, BASE_DECIMALS);
       const positionInterestRepaid = toTargetDecimalUnits(c.interestRepaid, c.token.decimals, BASE_DECIMALS);
@@ -316,15 +314,12 @@ export const formatSecuredLineData = (
     },
     { principal, deposit, highestApy, totalInterestRepaid }
   );
-  console.log('Collateral Value - Principal 2: ', credit.principal.toString());
 
   // Sum value of deposits and create deposits map
   const [collateralValue, deposits]: [BigNumber, EscrowDepositMap] = collateralDeposits.reduce(
     (agg, collateralDeposit) => {
       const checkSumAddress = ethers.utils.getAddress(collateralDeposit.token.id);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
-      // TODO: remove after testing spigot revenue conversion to USD
-      // const usdcPrice = collateralDeposit.token.symbol === 'SEERO' ? BigNumber.from(1000000) : BigNumber.from(2000000);
       const amount = toTargetDecimalUnits(collateralDeposit.amount, collateralDeposit.token.decimals, BASE_DECIMALS);
 
       return !collateralDeposit.enabled
@@ -396,11 +391,9 @@ export const formatSecuredLineData = (
     (agg, { token, totalVolume, totalVolumeUsd, ...summary }) => {
       const checkSumAddress = ethers.utils.getAddress(token.id);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
-      // TODO: remove after testing spigot revenue conversion to USD
-      // const usdcPrice = collateralDeposit.token.symbol === 'SEERO' ? BigNumber.from(1000000) : BigNumber.from(2000000);
-      // const totalVolume = toTargetDecimalUnits(totalVolume, token.decimals, BASE_DECIMALS);
+      const totalRevenueVolume = toTargetDecimalUnits(totalVolume, token.decimals, BASE_DECIMALS);
       return [
-        agg[0].add(unnullify(totalVolume).toString()).mul(usdcPrice),
+        agg[0].add(unnullify(totalRevenueVolume).toString()).mul(usdcPrice),
         {
           ...agg[1],
           [getAddress(token.id)]: {
@@ -411,8 +404,10 @@ export const formatSecuredLineData = (
               BigNumber.from(totalVolume),
               BigNumber.from(totalVolumeUsd).div(BigNumber.from(totalVolume))
             ), // use avg price at time of revenue
-            amount: totalVolume,
-            value: (totalVolumeUsd ?? '0').toString(),
+            // amount: totalVolume,
+            // value: (totalVolumeUsd ?? '0').toString(),
+            amount: totalRevenueVolume,
+            value: formatUnits(usdcPrice.mul(unnullify(totalRevenueVolume).toString()), 6).toString(),
           },
         },
       ];
@@ -509,11 +504,11 @@ export const formatLineWithEvents = (
   const revenues: SpigotRevenueSummaryFragResponse[] = lineEvents.spigot.summaries || [];
   const [revenueValue, revenueSummary]: [BigNumber, RevenueSummaryMap] = revenues.reduce<any>(
     (agg, { token, totalVolume, totalVolumeUsd, ...summary }) => {
-      console.log('rev', agg, { ...summary, totalVolume, totalVolumeUsd });
       const checkSumAddress = ethers.utils.getAddress(token.id);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
+      const totalRevenueVolume = toTargetDecimalUnits(totalVolume, token.decimals, BASE_DECIMALS);
       return [
-        agg[0].add(unnullify(totalVolume).toString()).mul(usdcPrice),
+        agg[0].add(unnullify(totalRevenueVolume).toString()).mul(usdcPrice),
         {
           ...agg[1],
           [getAddress(token.id)]: {
@@ -524,8 +519,10 @@ export const formatLineWithEvents = (
               BigNumber.from(totalVolume),
               BigNumber.from(totalVolumeUsd).div(BigNumber.from(totalVolume))
             ), // use avg price at time of revenue
-            amount: totalVolume,
-            value: (totalVolumeUsd ?? '0').toString(),
+            // amount: totalVolume,
+            // value: (totalVolumeUsd ?? '0').toString(),
+            amount: totalRevenueVolume,
+            value: formatUnits(usdcPrice.mul(unnullify(totalRevenueVolume).toString()), 6).toString(),
           },
         },
       ];

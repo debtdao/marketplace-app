@@ -253,8 +253,6 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
   ];
   const txActions = userMetadata.role === BORROWER_POSITION_ROLE ? escrowCollateralSettings : [];
 
-  console.log('Escrow Collateral Settings: ', escrowCollateralSettings);
-
   console.log('selected collat', selectedCollateralAsset);
   if (!selectedCollateralAsset) return null;
   console.log('all collat options', allCollateralOptions);

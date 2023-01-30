@@ -215,11 +215,12 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
       label: t('components.transaction.release'),
       onAction: releaseCollateral,
       status: true,
-      disabled: transactionApproved,
+      disabled: !transactionApproved,
       contrast: true,
     },
   ];
   const txActions = userMetadata.role === BORROWER_POSITION_ROLE ? escrowCollateralSettings : [];
+  console.log('escrow collateral settings: ', escrowCollateralSettings);
 
   console.log('selected collat', selectedCollateralAsset);
   if (!selectedCollateralAsset) return null;
@@ -248,7 +249,7 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'could not add credit'}
+          transactionCompletedLabel={'could not release collateral'}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>

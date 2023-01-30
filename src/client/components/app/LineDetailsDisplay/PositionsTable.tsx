@@ -13,7 +13,7 @@ import {
   OnchainMetaDataSelector,
   NetworkSelectors,
 } from '@store';
-import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
+import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL } from '@hooks';
 import { device } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer } from '@components/app';
 import { Input, SearchIcon, Button, RedirectIcon, Link } from '@components/common';
@@ -115,6 +115,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
   const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
+  const explorerUrl = useExplorerURL(currentNetwork);
   const { NETWORK } = getEnv();
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
 
@@ -294,7 +295,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
         token: (
           <RouterLink
             key={position.token.address}
-            to={`https://etherscan.io/address/${position.token.address}`}
+            to={`${explorerUrl}/address/${position.token.address}`}
             selected={false}
           >
             {position.token.symbol}

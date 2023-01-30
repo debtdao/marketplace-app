@@ -638,7 +638,7 @@ export const formatUserPortfolioData = (
   // const { spigot, escrow, positions, borrower, status, ...metadata } = lineData;
   const { borrowerLineOfCredits, lenderPositions, arbiterLineOfCredits } = portfolioData;
   const lines = [...borrowerLineOfCredits, ...arbiterLineOfCredits]
-    .map(({ borrower, status, positions = [], events = [], escrow, spigot, ...rest }) => {
+    .map(({ borrower, arbiter, status, positions = [], events = [], escrow, spigot, ...rest }) => {
       const {
         credit,
         spigot: spigotData,
@@ -658,6 +658,7 @@ export const formatUserPortfolioData = (
         ...rest,
         ...credit,
         borrower: borrower.id,
+        arbiter: arbiter.id,
         status: status.toLowerCase() as LineStatusTypes,
 
         spigotId: spigot?.id ?? '',

@@ -263,9 +263,7 @@ const selectUserPositionMetadata = createSelector(
     if (!line || !userAddress) return defaultRole;
 
     const position = selectedPosition || positions[0];
-    console.log('user position metadata - userAddress', userAddress);
-    console.log('user position metadata - borrower', line.borrower);
-    console.log('user position metadata - arbiter', line.arbiter);
+
     switch (getAddress(userAddress!)) {
       case getAddress(line.borrower):
         const borrowerData = position

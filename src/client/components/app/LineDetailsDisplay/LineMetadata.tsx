@@ -149,7 +149,6 @@ export const LineMetadata = () => {
   const { NETWORK } = getEnv();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
-  console.log('Selected Line', selectedLine);
 
   const {
     start: startTime,

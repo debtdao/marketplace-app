@@ -191,15 +191,18 @@ export const LineMetadata = () => {
     );
   };
 
+  // TODO: rename to addCollateralHandler
   const depositHandler = (token: TokenView) => {
     if (!walletIsConnected) {
       connectWallet();
     } else {
+      console.log('Token: ', token);
       dispatch(CollateralActions.setSelectedCollateralAsset({ assetAddress: token.address }));
       dispatch(ModalsActions.openModal({ modalName: 'addCollateral', modalProps: { assetAddress: token.address } }));
     }
   };
 
+  // TODO: rename to releaseCollateralhandler
   const withdrawHandler = (token: TokenView) => {
     if (!walletIsConnected) {
       connectWallet();
@@ -300,6 +303,11 @@ export const LineMetadata = () => {
         <ActionButtons
           actions={[
             {
+              name: t('components.transaction.deposit'),
+              handler: () => depositHandler(token),
+              disabled: !walletIsConnected,
+            },
+            {
               name: t('components.transaction.release'),
               handler: () => withdrawHandler(token),
               disabled: !walletIsConnected,
@@ -308,17 +316,19 @@ export const LineMetadata = () => {
         />
       );
     }
-    return (
-      <ActionButtons
-        actions={[
-          {
-            name: t('components.transaction.deposit'),
-            handler: () => depositHandler(token),
-            disabled: !walletIsConnected,
-          },
-        ]}
-      />
-    );
+    // TODO: should any action buttons be returned if the user is not the borrower
+    // return (
+    //   <ActionButtons
+    //     actions={[
+    //       {
+    //         name: t('components.transaction.deposit'),
+    //         handler: () => depositHandler(token),
+    //         disabled: !walletIsConnected,
+    //       },
+    //     ]}
+    //   />
+    // );
+    return;
   };
   return (
     <>

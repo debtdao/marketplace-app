@@ -3,6 +3,7 @@ import { BigNumber } from 'ethers';
 import styled from 'styled-components';
 import _ from 'lodash';
 import { useHistory } from 'react-router-dom';
+import { getAddress } from 'ethers/lib/utils';
 
 import { formatAmount, normalizeAmount, toUnit, toWei } from '@utils';
 import {
@@ -222,7 +223,7 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
 
   console.log('selected collat', selectedCollateralAsset);
   if (!selectedCollateralAsset) return null;
-  const tokenView = _.find(allCollateralOptions, (t) => t.address === selectedCollateralAsset.address);
+  const tokenView = _.find(allCollateralOptions, (t) => t.address === getAddress(selectedCollateralAsset.address));
   console.log('add collat', tokenView);
   if (!tokenView) return null;
   if (!selectedLine) return null;

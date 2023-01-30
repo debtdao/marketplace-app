@@ -303,6 +303,10 @@ export const formatSecuredLineData = (
       const checkSumAddress = ethers.utils.getAddress(c.token?.id);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
       const tokenDecimals = c.token.decimals;
+      console.log('Collateral Value - Token: ', c.token?.symbol);
+      console.log('Collateral Value - USDC Price: ', usdcPrice.toString());
+      console.log('Collateral Value - Principal: ', c.principal);
+      console.log('Collateral Value - Deposit: ', c.deposit);
       return {
         principal: agg.principal.add(usdcPrice.mul(unnullify(c.principal).toString())),
         deposit: agg.deposit.add(usdcPrice.mul(unnullify(c.deposit)).toString()),
@@ -312,6 +316,7 @@ export const formatSecuredLineData = (
     },
     { principal, deposit, highestApy, totalInterestRepaid }
   );
+  console.log('Collateral Value - Principal 2: ', credit.principal.toString());
 
   // Sum value of deposits and create deposits map
   const [collateralValue, deposits]: [BigNumber, EscrowDepositMap] = collateralDeposits.reduce(

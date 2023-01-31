@@ -1,10 +1,4 @@
-import {
-  TokenFragRepsonse,
-  GetUserPortfolioResponse,
-  LineOfCreditsResponse,
-  BasePositionFragResponse,
-  LenderPositionsResponse,
-} from '@types';
+import { TokenFragRepsonse, GetUserPortfolioResponse, LineOfCreditsResponse, BasePositionFragResponse } from '@types';
 
 import { Alert } from './Alerts';
 import { Address, Network } from './Blockchain';
@@ -105,6 +99,7 @@ export interface IdToCreditPositionMap {
 export interface CreditLineState {
   selectedLineAddress: string | undefined;
   selectedPosition: string | undefined;
+  selectedProposal: string | undefined;
   linesMap: { [lineAddress: string]: SecuredLine };
   positionsMap: { [id: string]: CreditPosition };
   eventsMap: { [line: string]: CreditEvent[] };

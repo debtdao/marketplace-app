@@ -55,7 +55,13 @@ import { LinesSelectors } from './lines.selectors';
 
 const setSelectedLineAddress = createAction<{ lineAddress?: string }>('lines/setSelectedLineAddress');
 const setSelectedLinePosition = createAction<{ position?: string }>('lines/setSelectedLinePosition');
+const setSelectedLinePositionProposal = createAction<{ position?: string; proposal?: string }>(
+  'lines/setSelectedLinePositionProposal'
+);
 const setPosition = createAction<{ id: string; position: CreditPosition }>('lines/setPosition');
+
+// TODO: update this to fetch the updated proposal from the subgraph to set revokedAt
+const setProposal = createAction<{ lineAddress: string; positionId: string; proposalId: string }>('lines/setProposal');
 
 /* -------------------------------------------------------------------------- */
 /*                                 Clear State                                */
@@ -679,7 +685,38 @@ const withdrawLine = createAsyncThunk<
   }
 );
 
-// TODO: add revokeConsent
+const revokeConsent = createAsyncThunk<
+  void,
+  {
+    lineAddress: string;
+    id: string;
+    msgData: string;
+    network: Network;
+  },
+  ThunkAPI
+>(
+  'lines/revokeConsent',
+  async ({ lineAddress, id, msgData, network }, { extra, getState }) => {
+    const { wallet } = getState();
+    const { services } = extra;
+
+    const userAddress = wallet.selectedAddress;
+    if (!userAddress) throw new Error('WALLET NOT CONNECTED');
+
+    const { creditLineService } = services;
+    console.log(lineAddress, 'lineaddress', id, 'id', msgData, 'msgData', network, 'network');
+    const tx = await creditLineService.revokeConsent({
+      lineAddress: lineAddress,
+      id: id,
+      msgData: msgData,
+      network: network,
+    });
+    console.log(tx);
+  },
+  {
+    // serializeError: parseError,
+  }
+);
 
 const getDepositAllowance = createAsyncThunk<
   TokenAllowance,
@@ -843,7 +880,9 @@ const getWithdrawAllowance = createAsyncThunk<
 export const LinesActions = {
   setSelectedLineAddress,
   setSelectedLinePosition,
+  setSelectedLinePositionProposal,
   setPosition,
+  setProposal,
   clearLinesData,
   clearUserData,
   clearSelectedLine,
@@ -864,7 +903,7 @@ export const LinesActions = {
   // approveZapOut,
   // signZapOut,
   withdrawLine,
-
+  revokeConsent,
   close,
   depositAndRepay,
   depositAndClose,

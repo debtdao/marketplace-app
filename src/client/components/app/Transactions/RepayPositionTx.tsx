@@ -643,7 +643,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'completed'}
+          transactionCompletedLabel={t('components.transaction.success-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>
@@ -655,7 +655,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'could not deposit and repay'}
+          transactionCompletedLabel={t('components.transaction.repay.deposit-and-repay.error-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>

@@ -180,7 +180,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'Transaction complete'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'deployed line successfully'}
+          transactionCompletedLabel={t('components.transaction.deploy-line.success-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>
@@ -192,7 +192,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'Transaction failed'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'Could not deploy line'}
+          transactionCompletedLabel={t('components.transaction.deploy-line.error-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>

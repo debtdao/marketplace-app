@@ -58,6 +58,8 @@ export interface LineOfCredit {
 
 export type PositionMap = { [id: string]: CreditPosition };
 
+export type ProposalMap = { [id: string]: CreditProposal };
+
 export type LineCollateral = {
   // real-time aggregate usd value across all credits
   escrow?: AggregatedEscrow;
@@ -86,6 +88,19 @@ export interface LineEvents {
 
 export interface SecuredLineWithEvents extends SecuredLine, LineEvents {}
 
+export interface CreditProposal {
+  id: string;
+  proposedAt: number;
+  revokedAt: number;
+  acceptedAt: number;
+  endedAt: number;
+  maker: string;
+  taker: string;
+  mutualConsentFunc: string;
+  msgData: string;
+  args: string[];
+}
+
 export interface CreditPosition {
   id: string;
   line: string;
@@ -97,9 +112,9 @@ export interface CreditPosition {
   interestAccrued: string;
   interestRepaid: string;
   totalInterestRepaid: string;
-  // borrower: Address;
   dRate: string;
   fRate: string;
+  proposalsMap: ProposalMap;
 }
 
 // bare minimum to display about a user on a position

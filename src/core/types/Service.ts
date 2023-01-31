@@ -180,7 +180,7 @@ export interface CreditLineService {
   addCredit: (props: AddCreditProps) => Promise<TransactionResponse | PopulatedTransaction>;
   borrow: (props: BorrowCreditProps) => Promise<TransactionResponse | PopulatedTransaction>;
   withdraw: (props: WithdrawLineProps) => Promise<TransactionResponse | PopulatedTransaction>;
-  // TODO: revokeConsent: (props: RevokeConsentProps) => Promise<TransactionResponse | PopulatedTransaction>;
+  revokeConsent: (props: RevokeConsentProps) => Promise<TransactionResponse | PopulatedTransaction>;
   // setRates: (props: SetRatesProps) => Promise<TransactionResponse | PopulatedTransaction>;
   // increaseCredit: (props: IncreaseCreditProps) => Promise<TransactionResponse | PopulatedTransaction>;
 
@@ -243,13 +243,12 @@ export interface WithdrawLineProps {
 }
 
 // TODO: add back when implementing RevokeConsent.
-// export interface RevokeConsentProps {
-//   // dryRun?: boolean;
-//   // lineAddress: string;
-//   id: string;
-//   // network: Network;
-//   amount: BigNumber;
-// }
+export interface RevokeConsentProps {
+  lineAddress: string;
+  id: string;
+  network: Network;
+  msgData: string;
+}
 
 export interface SetRatesProps {
   dryRun?: boolean;

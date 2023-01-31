@@ -42,9 +42,12 @@ import {
   SpigotRevenueContractFragResponse,
   SpigotRevenueContract,
   SpigotRevenueContractMap,
+  ProposalFragResponse,
+  CreditProposal,
+  ProposalMap,
 } from '@types';
 
-import { humanize, normalizeAmount, normalize } from './format';
+import { humanize, normalizeAmount, normalize, format, toUnit, toTargetDecimalUnits, BASE_DECIMALS } from './format';
 
 const { parseUnits, formatUnits } = utils;
 
@@ -212,8 +215,50 @@ export function formatGetLinesData(
   });
 }
 
+export const createPositionsMap = (
+  positionFrags: (BasePositionFragResponse | BasePositionFragResponse)[],
+  tokenPrices: { [token: string]: BigNumber }
+): PositionMap => {
+  // Create positionsMap
+  const positionsMap = positionFrags.reduce((obj: any, c: BasePositionFragResponse): PositionMap => {
+    const { dRate, fRate, id, lender, line, token, proposal, principal, ...financials } = c;
+    const lenderAddress = lender.id;
+
+    // Create proposalMap
+    const proposalsMap = proposal.reduce((propAgg: any, p: ProposalFragResponse): ProposalMap => {
+      const { id: proposalId, maker, taker, ...rest } = p;
+      return {
+        ...propAgg,
+        [proposalId]: {
+          id: proposalId,
+          maker: maker.id,
+          taker: taker ? taker.id : taker,
+          ...rest,
+        },
+      };
+    }, {});
+
+    const currentUsdPrice = tokenPrices[c.token?.id];
+    return {
+      ...obj,
+      [id]: {
+        id,
+        lender: lenderAddress,
+        line: line.id,
+        proposalsMap,
+        principal,
+        ...financials,
+        dRate,
+        fRate,
+        token: _createTokenView(token, BigNumber.from(principal), currentUsdPrice),
+      },
+    };
+  }, {});
+  return positionsMap;
+};
+
 export const formatSecuredLineData = (
-  line: Address, // BaseLineFrag
+  line: Address,
   spigotId: Address,
   escrowId: Address,
   positionFrags: (BasePositionFragResponse | BasePositionFragResponse)[],
@@ -257,12 +302,14 @@ export const formatSecuredLineData = (
     (agg: any, c) => {
       const checkSumAddress = ethers.utils.getAddress(c.token?.id);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
-      const tokenDecimals = c.token.decimals;
+      const positionPrincipal = toTargetDecimalUnits(c.principal, c.token.decimals, BASE_DECIMALS);
+      const positionDeposit = toTargetDecimalUnits(c.deposit, c.token.decimals, BASE_DECIMALS);
+      const positionInterestRepaid = toTargetDecimalUnits(c.interestRepaid, c.token.decimals, BASE_DECIMALS);
       return {
-        principal: agg.principal.add(usdcPrice.mul(unnullify(c.principal).toString())),
-        deposit: agg.deposit.add(usdcPrice.mul(unnullify(c.deposit)).toString()),
+        principal: agg.principal.add(usdcPrice.mul(unnullify(positionPrincipal).toString())),
+        deposit: agg.deposit.add(usdcPrice.mul(unnullify(positionDeposit)).toString()),
         highestApy,
-        totalInterestRepaid: agg.totalInterestRepaid.add(usdcPrice.mul(unnullify(c.interestRepaid)).toString()),
+        totalInterestRepaid: agg.totalInterestRepaid.add(usdcPrice.mul(unnullify(positionInterestRepaid)).toString()),
       };
     },
     { principal, deposit, highestApy, totalInterestRepaid }
@@ -273,17 +320,19 @@ export const formatSecuredLineData = (
     (agg, collateralDeposit) => {
       const checkSumAddress = ethers.utils.getAddress(collateralDeposit.token.id);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
+      const amount = toTargetDecimalUnits(collateralDeposit.amount, collateralDeposit.token.decimals, BASE_DECIMALS);
+
       return !collateralDeposit.enabled
         ? agg
         : [
-            agg[0].add(unnullify(collateralDeposit.amount, true).mul(usdcPrice)),
+            agg[0].add(unnullify(amount, true).mul(usdcPrice)),
             {
               ...agg[1],
               [collateralDeposit.token.id]: {
                 ...collateralDeposit,
                 type: COLLATERAL_TYPE_ASSET,
-                token: _createTokenView(collateralDeposit.token, BigNumber.from(collateralDeposit.amount), usdcPrice),
-                value: formatUnits(unnullify(collateralDeposit.amount, true).mul(usdcPrice).toString(), 6).toString(),
+                token: _createTokenView(collateralDeposit.token, BigNumber.from(amount), usdcPrice),
+                value: formatUnits(unnullify(amount, true).mul(usdcPrice).toString(), 6).toString(),
               },
             },
           ];
@@ -342,8 +391,9 @@ export const formatSecuredLineData = (
     (agg, { token, totalVolume, totalVolumeUsd, ...summary }) => {
       const checkSumAddress = ethers.utils.getAddress(token.id);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
+      const totalRevenueVolume = toTargetDecimalUnits(totalVolume, token.decimals, BASE_DECIMALS);
       return [
-        agg[0].add(unnullify(totalVolume).toString()).mul(usdcPrice),
+        agg[0].add(unnullify(totalRevenueVolume).toString()).mul(usdcPrice),
         {
           ...agg[1],
           [getAddress(token.id)]: {
@@ -354,8 +404,10 @@ export const formatSecuredLineData = (
               BigNumber.from(totalVolume),
               BigNumber.from(totalVolumeUsd).div(BigNumber.from(totalVolume))
             ), // use avg price at time of revenue
-            amount: totalVolume,
-            value: (totalVolumeUsd ?? '0').toString(),
+            // amount: totalVolume,
+            // value: (totalVolumeUsd ?? '0').toString(),
+            amount: totalRevenueVolume,
+            value: formatUnits(usdcPrice.mul(unnullify(totalRevenueVolume).toString()), 6).toString(),
           },
         },
       ];
@@ -376,27 +428,7 @@ export const formatSecuredLineData = (
     spigots: spigotRevenueContracts,
   };
 
-  const positions = positionFrags.reduce((obj: any, c: BasePositionFragResponse): PositionMap => {
-    const { dRate, fRate, id, lender, line: lineObj, token, ...financials } = c;
-    const lenderAddress = lender.id;
-
-    const currentUsdPrice = tokenPrices[c.token?.id];
-    return {
-      ...obj,
-      [id]: {
-        id,
-        lender: lenderAddress,
-        line,
-        ...financials,
-        // dRate: normalizeAmount(fRate, 2),
-        // fRate: normalizeAmount(dRate, 2),
-        dRate,
-        fRate,
-        token: _createTokenView(token, BigNumber.from(principal), currentUsdPrice),
-        // events,
-      },
-    };
-  }, {});
+  const positions = createPositionsMap(positionFrags, tokenPrices);
 
   return {
     credit: {
@@ -472,11 +504,11 @@ export const formatLineWithEvents = (
   const revenues: SpigotRevenueSummaryFragResponse[] = lineEvents.spigot.summaries || [];
   const [revenueValue, revenueSummary]: [BigNumber, RevenueSummaryMap] = revenues.reduce<any>(
     (agg, { token, totalVolume, totalVolumeUsd, ...summary }) => {
-      console.log('rev', agg, { ...summary, totalVolume, totalVolumeUsd });
       const checkSumAddress = ethers.utils.getAddress(token.id);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
+      const totalRevenueVolume = toTargetDecimalUnits(totalVolume, token.decimals, BASE_DECIMALS);
       return [
-        agg[0].add(unnullify(totalVolume).toString()).mul(usdcPrice),
+        agg[0].add(unnullify(totalRevenueVolume).toString()).mul(usdcPrice),
         {
           ...agg[1],
           [getAddress(token.id)]: {
@@ -487,8 +519,10 @@ export const formatLineWithEvents = (
               BigNumber.from(totalVolume),
               BigNumber.from(totalVolumeUsd).div(BigNumber.from(totalVolume))
             ), // use avg price at time of revenue
-            amount: totalVolume,
-            value: (totalVolumeUsd ?? '0').toString(),
+            // amount: totalVolume,
+            // value: (totalVolumeUsd ?? '0').toString(),
+            amount: totalRevenueVolume,
+            value: formatUnits(usdcPrice.mul(unnullify(totalRevenueVolume).toString()), 6).toString(),
           },
         },
       ];
@@ -613,7 +647,7 @@ export const formatUserPortfolioData = (
   // const { spigot, escrow, positions, borrower, status, ...metadata } = lineData;
   const { borrowerLineOfCredits, lenderPositions, arbiterLineOfCredits } = portfolioData;
   const lines = [...borrowerLineOfCredits, ...arbiterLineOfCredits]
-    .map(({ borrower, status, positions = [], events = [], escrow, spigot, ...rest }) => {
+    .map(({ borrower, arbiter, status, positions = [], events = [], escrow, spigot, ...rest }) => {
       const {
         credit,
         spigot: spigotData,
@@ -633,6 +667,7 @@ export const formatUserPortfolioData = (
         ...rest,
         ...credit,
         borrower: borrower.id,
+        arbiter: arbiter.id,
         status: status.toLowerCase() as LineStatusTypes,
 
         spigotId: spigot?.id ?? '',
@@ -649,20 +684,7 @@ export const formatUserPortfolioData = (
     })
     .reduce((lines, line) => ({ ...lines, [line.id]: line }), {});
 
-  // positions tokenFragResponse -> TokenView
-  const positions: PositionMap =
-    lenderPositions?.positions?.reduce(
-      (map, p) => ({
-        ...map,
-        [p.id]: {
-          ...p,
-          lender: p.lender.id,
-          line: p.line.id,
-          token: _createTokenView(p.token, unnullify(p.principal, true), tokenPrices[p.token.id]),
-        },
-      }),
-      {}
-    ) ?? {};
+  const positions = createPositionsMap(lenderPositions, tokenPrices);
 
   return { lines, positions };
 };

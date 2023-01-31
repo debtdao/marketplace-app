@@ -1,5 +1,6 @@
 import { FC, useState, useEffect } from 'react';
 import { BigNumber } from 'ethers';
+import { getAddress } from 'ethers/lib/utils';
 import styled from 'styled-components';
 import _ from 'lodash';
 import { useHistory } from 'react-router-dom';
@@ -254,7 +255,8 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
 
   console.log('selected collat', selectedCollateralAsset);
   if (!selectedCollateralAsset) return null;
-  const tokenView = _.find(allCollateralOptions, (t) => t.address === selectedCollateralAsset.address);
+  console.log('all collat options', allCollateralOptions);
+  const tokenView = _.find(allCollateralOptions, (t) => t.address === getAddress(selectedCollateralAsset.address));
   console.log('add collat', tokenView);
   if (!tokenView) return null;
   if (!selectedLine) return null;
@@ -267,7 +269,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'completed'}
+          transactionCompletedLabel={t('components.transaction.success-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>
@@ -279,7 +281,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'could not add credit'}
+          transactionCompletedLabel={t('components.transaction.add-collateral.error-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>

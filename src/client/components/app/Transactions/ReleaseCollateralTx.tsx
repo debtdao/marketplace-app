@@ -3,6 +3,7 @@ import { BigNumber } from 'ethers';
 import styled from 'styled-components';
 import _ from 'lodash';
 import { useHistory } from 'react-router-dom';
+import { getAddress } from 'ethers/lib/utils';
 
 import { formatAmount, normalizeAmount, toUnit, toWei } from '@utils';
 import {
@@ -214,15 +215,16 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
       label: t('components.transaction.release'),
       onAction: releaseCollateral,
       status: true,
-      disabled: transactionApproved,
+      disabled: !transactionApproved,
       contrast: true,
     },
   ];
   const txActions = userMetadata.role === BORROWER_POSITION_ROLE ? escrowCollateralSettings : [];
+  console.log('escrow collateral settings: ', escrowCollateralSettings);
 
   console.log('selected collat', selectedCollateralAsset);
   if (!selectedCollateralAsset) return null;
-  const tokenView = _.find(allCollateralOptions, (t) => t.address === selectedCollateralAsset.address);
+  const tokenView = _.find(allCollateralOptions, (t) => t.address === getAddress(selectedCollateralAsset.address));
   console.log('add collat', tokenView);
   if (!tokenView) return null;
   if (!selectedLine) return null;
@@ -235,7 +237,7 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'completed'}
+          transactionCompletedLabel={t('components.transaction.success-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>
@@ -247,7 +249,7 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'could not add credit'}
+          transactionCompletedLabel={t('components.transaction.release-collateral.error-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>

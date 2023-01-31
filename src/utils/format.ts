@@ -9,6 +9,7 @@ BigNumber.set({ EXPONENTIAL_AT: 50 });
 
 export const USDC_DECIMALS = 6;
 export const COLLATERAL_FACTOR_DECIMALS = 18;
+export const BASE_DECIMALS = 18;
 export const USD_PRICE_DECIMALS = 8;
 export const GWEI = 9;
 
@@ -39,6 +40,20 @@ export const toWei = (amount: Unit, decimals: number): Wei => {
 export const toUnit = (amount: Wei | undefined, decimals: number): Unit => {
   const ONE_UNIT = toBN(10).pow(decimals);
   return toBN(amount).div(ONE_UNIT).toString();
+};
+
+export const toTargetDecimalUnits = (
+  amount: Wei | undefined,
+  // amount: string,
+  currentDecimals: number,
+  targetDecimals: number = 18
+): Unit => {
+  const diff = Math.abs(targetDecimals - currentDecimals);
+  if (diff === 0) return toBN(amount).toString();
+  if (diff > 0) {
+    return toBN(amount).times(toBN(10).pow(diff)).toString();
+  }
+  return toBN(amount).div(toBN(10).pow(diff)).toString();
 };
 
 /* -------------------------------------------------------------------------- */
@@ -127,17 +142,6 @@ export const humanize = (
 
 export const prettyNumbers = (x: string) => {
   return numberWithCommas(parseInt(normalizeAmount(x, 18)).toFixed(2));
-};
-
-export const prettyNumbers2 = (x: string) => {
-  console.log('Pretty Numbers: Normalize Amount', normalizeAmount(x, 18));
-  console.log('Pretty Numbers: Format Normalize Amount', ethers.utils.formatUnits(normalizeAmount(x, 18), 24));
-  console.log(
-    'Pretty Numbers: Parse Normalize Amount',
-    parseFloat(ethers.utils.formatUnits(normalizeAmount(x, 18), 24)).toFixed(2)
-  );
-  console.log('Pretty Numbers: Add Commas', numberWithCommas(ethers.utils.formatUnits(normalizeAmount(x, 18), 24)));
-  return numberWithCommas(parseFloat(ethers.utils.formatUnits(normalizeAmount(x, 18), 24)).toFixed(2));
 };
 
 export const formatAddress = (address: string) => {

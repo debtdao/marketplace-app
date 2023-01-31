@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { useEffect, useState } from 'react';
 import { BigNumber, ethers } from 'ethers';
 import { getAddress, parseUnits } from 'ethers/lib/utils';
+import _ from 'lodash';
 
 import {
   ModalsActions,
@@ -12,11 +13,19 @@ import {
   OnchainMetaDataSelector,
   NetworkSelectors,
 } from '@store';
-import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
+import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL } from '@hooks';
 import { device } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer } from '@components/app';
 import { Input, SearchIcon, Button, RedirectIcon, Link } from '@components/common';
-import { ARBITER_POSITION_ROLE, BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE, CreditPosition } from '@src/core/types';
+import {
+  ARBITER_POSITION_ROLE,
+  BORROWER_POSITION_ROLE,
+  LENDER_POSITION_ROLE,
+  CreditPosition,
+  CreditProposal,
+  PROPOSED_STATUS,
+  CLOSED_STATUS,
+} from '@src/core/types';
 import { humanize, formatAddress, normalizeAmount, getENS } from '@src/utils';
 import { getEnv } from '@config/env';
 
@@ -106,10 +115,13 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
   const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
+  const explorerUrl = useExplorerURL(currentNetwork);
   const { NETWORK } = getEnv();
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
 
-  //Initial set up for positions table
+  const { borrower } = selectedLine!;
+
+  // Initial set up for positions table
   useEffect(() => {
     if (selectedLine && !lineAddress) {
       dispatch(LinesActions.setSelectedLineAddress({ lineAddress: selectedLine.id }));
@@ -118,14 +130,14 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
     }
   }, [lineAddress, selectedLine]);
 
-  //Action Handlers for positions table
+  // Action Handlers for positions table
 
-  const depositHandler = (position?: string) => {
+  const depositHandler = (position?: string, proposal?: string) => {
     if (!userWallet) {
       connectWallet();
     } else {
-      console.log('accept Proposal', position);
       dispatch(LinesActions.setSelectedLinePosition({ position }));
+      dispatch(LinesActions.setSelectedLinePositionProposal({ proposal }));
       dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
     }
   };
@@ -142,9 +154,10 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
     dispatch(ModalsActions.openModal({ modalName: 'withdraw' }));
   };
 
-  const revokeConsentHandler = (position?: string) => {
+  const revokeConsentHandler = (position?: string, proposal?: string) => {
     if (!position) return;
     dispatch(LinesActions.setSelectedLinePosition({ position }));
+    dispatch(LinesActions.setSelectedLinePositionProposal({ proposal }));
     dispatch(ModalsActions.openModal({ modalName: 'revokeConsent' }));
   };
 
@@ -164,7 +177,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
     ? `${t('lineDetails:positions-table.new-position')}`
     : `${t('components.connect-button.connect')}`;
 
-  //Returns a list of transactions to display on positions table
+  // Returns a list of transactions to display on positions table
   const getUserPositionActions = (position: CreditPosition) => {
     const repayAction = {
       name: t('components.transaction.repay.header'),
@@ -184,16 +197,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
     }
 
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
-      if (position.status === 'CLOSED') return [];
-
-      if (position.status === 'PROPOSED') {
-        const approveMutualConsent = {
-          name: t('components.transaction.add-credit.accept-terms'),
-          handler: depositHandler,
-          disabled: false,
-        };
-        return [approveMutualConsent];
-      }
+      if (position.status === CLOSED_STATUS) return [];
 
       const borrowAction = {
         name: t('components.transaction.borrow'),
@@ -205,17 +209,8 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
       else return [borrowAction, repayAction];
     }
 
-    // If user is lender and position status is PROPOSED, return revoke consent action
-    if (getAddress(position.lender) === userWallet && position.status === 'PROPOSED') {
-      return [
-        {
-          name: t('components.transaction.revoke-consent.cta'),
-          handler: revokeConsentHandler,
-          disabled: false,
-        },
-      ];
-      // If user is lender, and line has amount to withdraw, return withdraw action
-    } else if (
+    // If user is lender, and line has amount to withdraw, return withdraw action
+    if (
       getAddress(position.lender) === userWallet &&
       BigNumber.from(position.deposit).gt(BigNumber.from(position.principal))
     ) {
@@ -232,7 +227,126 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
     return [];
   };
 
-  console.log('positions table display line', displayLine, !displayLine);
+  // Returns a list of transactions to display on positions table for proposals
+  const getUserProposalActions = (proposal: CreditProposal) => {
+    const approveMutualConsent = {
+      name: t('components.transaction.add-credit.accept-terms'),
+      handler: depositHandler,
+      disabled: false,
+    };
+
+    const revokeMutualConsent = {
+      name: t('components.transaction.revoke-consent.cta'),
+      handler: revokeConsentHandler,
+      disabled: false,
+    };
+
+    // Display button to approve proposal for the taker/borrower of the proposal
+    if (getAddress(borrower) === userWallet && getAddress(proposal.maker) === userWallet) {
+      return [approveMutualConsent, revokeMutualConsent];
+    }
+
+    // Display button to approve proposal for the taker/borrower of the proposal
+    if (getAddress(borrower) === userWallet) {
+      return [approveMutualConsent];
+    }
+
+    // Display button to cancel proposal for the maker of the proposal
+    if (getAddress(proposal.maker) === userWallet) {
+      return [revokeMutualConsent];
+    }
+
+    return [];
+  };
+
+  const formattedPositionsAndProposals = _.flatten(
+    positions?.map((position) => {
+      // get position (not in PROPOSED_STATUS)
+      const positionToDisplay = {
+        deposit: humanize('amount', position.deposit, position.token.decimals, 2),
+        drate: `${normalizeAmount(position.dRate, 2)} %`,
+        frate: `${normalizeAmount(position.fRate, 2)} %`,
+        line: (
+          <RouterLink to={`/${currentNetwork}/lines/${position.line}`} key={position.line} selected={false}>
+            {formatAddress(position.line)}
+            <RedirectLinkIcon />
+          </RouterLink>
+        ),
+        status: position.status,
+        principal: humanize('amount', position.principal, position.token.decimals, 2),
+        interest: humanize('amount', position.interestAccrued, position.token.decimals, 2),
+        lender: (
+          <RouterLink to={`/${currentNetwork}/portfolio/${position.lender}`} key={position.id} selected={false}>
+            {formatAddress(getENS(position.lender, ensMap)!)}
+            <RedirectLinkIcon />
+          </RouterLink>
+        ),
+        token: (
+          <RouterLink
+            key={position.token.address}
+            to={`${explorerUrl}/address/${position.token.address}`}
+            selected={false}
+          >
+            {position.token.symbol}
+          </RouterLink>
+        ),
+        actions: (
+          <ActionButtons
+            value1={position.id}
+            // Note: if position is in PROPOSED_STATUS, then we want to display the proposal actions instead
+            actions={position.status !== PROPOSED_STATUS ? getUserPositionActions(position) : []}
+          />
+        ),
+      };
+      // generate list of proposals from each position in PROPOSED_STATUS
+      const proposalsToDisplay =
+        position.status === PROPOSED_STATUS
+          ? Object.values(position.proposalsMap)
+              .filter((proposal) => proposal.revokedAt === null)
+              .map((proposal) => {
+                const [dRate, fRate, deposit, tokenAddress, lenderAddress] = [...proposal.args];
+                return {
+                  deposit: humanize('amount', deposit, position.token.decimals, 2),
+                  drate: `${normalizeAmount(dRate, 2)} %`,
+                  frate: `${normalizeAmount(fRate, 2)} %`,
+                  line: (
+                    <RouterLink to={`/${currentNetwork}/lines/${position.line}`} key={position.line} selected={false}>
+                      {formatAddress(position.line)}
+                      <RedirectLinkIcon />
+                    </RouterLink>
+                  ),
+                  status: position.status,
+                  principal: humanize('amount', '0', position.token.decimals, 2),
+                  interest: humanize('amount', '0', position.token.decimals, 2),
+                  lender: (
+                    <RouterLink to={`/${currentNetwork}/portfolio/${lenderAddress}`} key={position.id} selected={false}>
+                      {formatAddress(getENS(lenderAddress, ensMap)!)}
+                      <RedirectLinkIcon />
+                    </RouterLink>
+                  ),
+                  token: (
+                    <RouterLink key={tokenAddress} to={`${explorerUrl}/address/${tokenAddress}`} selected={false}>
+                      {position.token.symbol}
+                    </RouterLink>
+                  ),
+                  actions: (
+                    <ActionButtons
+                      value1={position.id}
+                      value2={proposal.id}
+                      actions={getUserProposalActions(proposal)}
+                    />
+                  ),
+                };
+              })
+          : [];
+
+      const positionsAndProposalsToDisplay =
+        position.status === PROPOSED_STATUS ? [...proposalsToDisplay] : [positionToDisplay];
+
+      return positionsAndProposalsToDisplay;
+    })
+  );
+
   return (
     <>
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
@@ -312,37 +426,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
               grow: '1',
             },
           ]}
-          data={positions?.map((position) => ({
-            // this needs to be humanized to correct amount depending on the token.
-            deposit: humanize('amount', position.deposit, position.token.decimals, 2),
-            drate: `${normalizeAmount(position.dRate, 2)} %`,
-            frate: `${normalizeAmount(position.fRate, 2)} %`,
-            line: (
-              <RouterLink to={`/${currentNetwork}/lines/${position.line}`} key={position.line} selected={false}>
-                {formatAddress(position.line)}
-                <RedirectLinkIcon />
-              </RouterLink>
-            ),
-            status: position.status,
-            principal: humanize('amount', position.principal, position.token.decimals, 2),
-            interest: humanize('amount', position.interestAccrued, position.token.decimals, 2),
-            lender: (
-              <RouterLink to={`/${currentNetwork}/portfolio/${position.lender}`} key={position.id} selected={false}>
-                {formatAddress(getENS(position.lender, ensMap)!)}
-                <RedirectLinkIcon />
-              </RouterLink>
-            ),
-            token: (
-              <RouterLink
-                key={position.token.address}
-                to={`https://etherscan.io/address/${position.token.address}`}
-                selected={false}
-              >
-                {position.token.symbol}
-              </RouterLink>
-            ),
-            actions: <ActionButtons value={position.id} actions={getUserPositionActions(position)} />,
-          }))}
+          data={formattedPositionsAndProposals}
           SearchBar={
             <>
               {/* // TODO: Add search bar back when there is a need for it. */}

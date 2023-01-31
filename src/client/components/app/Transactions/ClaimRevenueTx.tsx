@@ -126,7 +126,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'completed'}
+          transactionCompletedLabel={t('components.transaction.success-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>
@@ -138,7 +138,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'could not add credit'}
+          transactionCompletedLabel={t('components.transaction.claim-revenue.error-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>

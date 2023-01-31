@@ -34,12 +34,36 @@ const BASE_LINE_FRAGMENT = gql`
   }
 `;
 
+const BASE_PROPOSAL_FRAGMENT = gql`
+  ${TOKEN_FRAGMENT}
+  fragment BaseProposalFrag on Proposal {
+    id
+    proposedAt
+    revokedAt
+    acceptedAt
+    endedAt
+    maker {
+      id
+    }
+    taker {
+      id
+    }
+    mutualConsentFunc
+    msgData
+    args
+  }
+`;
+
 const BASE_POSITION_FRAGMENT = gql`
   ${TOKEN_FRAGMENT}
+  ${BASE_PROPOSAL_FRAGMENT}
   fragment BasePositionFrag on Position {
     id
     status
     lender {
+      id
+    }
+    line {
       id
     }
     principal
@@ -50,6 +74,9 @@ const BASE_POSITION_FRAGMENT = gql`
     fRate
     token {
       ...TokenFrag
+    }
+    proposal {
+      ...BaseProposalFrag
     }
   }
 `;
@@ -342,36 +369,8 @@ const LENDER_POSITIONS_FRAGMENT = gql`
   ${SPIGOT_EVENT_FRAGMENT}
   ${ESCROW_FRAGMENT}
 
-  fragment LenderPositionsFrag on Lender {
-    positions: positions {
-      ...BasePositionFrag
-
-      line {
-        ...BaseLineFrag
-
-        events {
-          ...LineEventFrag
-        }
-
-        spigot {
-          id
-          spigots {
-            ...BaseSpigotFrag
-          }
-
-          summaries {
-            ...SpigotSummaryFrag
-          }
-          events {
-            ...SpigotEventFrag
-          }
-        }
-
-        escrow {
-          ...EscrowFrag
-        }
-      }
-    }
+  fragment LenderPositionsFrag on Position {
+    ...BasePositionFrag
   }
 `;
 
@@ -379,12 +378,13 @@ const LENDER_POSITIONS_FRAGMENT = gql`
 export const GET_USER_PORTFOLIO_QUERY = gql`
   ${LINE_OF_CREDIT_FRAGMENT}
   ${LENDER_POSITIONS_FRAGMENT}
+  ${BASE_POSITION_FRAGMENT}
 
   query getUserPortfolio($user: String!) {
     borrowerLineOfCredits: lineOfCredits(where: { borrower: $user }) {
       ...LineOfCreditFrag
     }
-    lenderPositions: lender(id: $user) {
+    lenderPositions: positions(where: { lender: $user }) {
       ...LenderPositionsFrag
     }
     arbiterLineOfCredits: lineOfCredits(where: { arbiter: $user }) {

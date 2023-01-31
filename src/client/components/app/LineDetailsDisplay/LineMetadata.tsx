@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import { device } from '@themes/default';
 import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
-import { prettyNumbers, getEtherscanUrlStub, unnullify, prettyNumbers2 } from '@src/utils';
+import { prettyNumbers, getEtherscanUrlStub, unnullify } from '@src/utils';
 import {
   AggregatedEscrow,
   ARBITER_POSITION_ROLE,
@@ -129,8 +129,8 @@ const MetricDataDisplay = ({ title, data, displaySubmetrics = false, submetrics 
       <DataMetric>{data}</DataMetric>
       {displaySubmetrics && (
         <DataSubMetricsContainer>
-          {submetrics?.map(({ title, data }) => (
-            <DataSubMetric>
+          {submetrics?.map(({ title, data }, index) => (
+            <DataSubMetric key={index}>
               {title} : {data}
             </DataSubMetric>
           ))}
@@ -149,7 +149,6 @@ export const LineMetadata = () => {
   const { NETWORK } = getEnv();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
-  console.log('Selected Line', selectedLine);
 
   const {
     start: startTime,
@@ -192,6 +191,7 @@ export const LineMetadata = () => {
     );
   };
 
+  // TODO: rename to addCollateralHandler
   const depositHandler = (token: TokenView) => {
     if (!walletIsConnected) {
       connectWallet();
@@ -201,6 +201,7 @@ export const LineMetadata = () => {
     }
   };
 
+  // TODO: rename to releaseCollateralhandler
   const withdrawHandler = (token: TokenView) => {
     if (!walletIsConnected) {
       connectWallet();
@@ -291,7 +292,6 @@ export const LineMetadata = () => {
   // TODO: fix types on args
   // TODO: What is the action button for revenue?
   const renderButtons = (token: any, type: any) => {
-    console.log('TYPE BUTTONS', type);
     if (type === 'revenue') {
       return;
     }
@@ -301,6 +301,11 @@ export const LineMetadata = () => {
         <ActionButtons
           actions={[
             {
+              name: t('components.transaction.deposit'),
+              handler: () => depositHandler(token),
+              disabled: !walletIsConnected,
+            },
+            {
               name: t('components.transaction.release'),
               handler: () => withdrawHandler(token),
               disabled: !walletIsConnected,
@@ -309,17 +314,19 @@ export const LineMetadata = () => {
         />
       );
     }
-    return (
-      <ActionButtons
-        actions={[
-          {
-            name: t('components.transaction.deposit'),
-            handler: () => depositHandler(token),
-            disabled: !walletIsConnected,
-          },
-        ]}
-      />
-    );
+    // TODO: should any action buttons be returned if the user is not the borrower
+    // return (
+    //   <ActionButtons
+    //     actions={[
+    //       {
+    //         name: t('components.transaction.deposit'),
+    //         handler: () => depositHandler(token),
+    //         disabled: !walletIsConnected,
+    //       },
+    //     ]}
+    //   />
+    // );
+    return;
   };
   return (
     <>

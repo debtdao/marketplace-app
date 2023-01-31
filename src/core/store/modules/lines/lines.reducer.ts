@@ -14,6 +14,7 @@ import {
   LinesByRole,
   PositionMap,
   CreditEvent,
+  CreditProposal,
 } from '@types';
 import { getNetworkId } from '@src/utils';
 
@@ -41,6 +42,7 @@ export const initialUserMetadataStatusMap: UserLineMetadataStatusMap = {
 export const linesInitialState: CreditLineState = {
   selectedLineAddress: undefined,
   selectedPosition: undefined,
+  selectedProposal: undefined,
   linesMap: {},
   positionsMap: {},
   eventsMap: {},
@@ -80,7 +82,9 @@ const {
   // initiateSaveLines,
   setSelectedLineAddress,
   setSelectedLinePosition,
+  setSelectedLinePositionProposal,
   setPosition,
+  setProposal,
   getUserLinePositions,
   getUserPortfolio,
   clearLinesData,
@@ -105,8 +109,18 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.selectedPosition = position;
     })
 
+    .addCase(setSelectedLinePositionProposal, (state, { payload: { position, proposal } }) => {
+      state.selectedProposal = proposal;
+    })
+
     .addCase(setPosition, (state, { payload: { id, position } }) => {
       state.positionsMap[id] = position;
+    })
+
+    .addCase(setProposal, (state, { payload: { lineAddress, positionId, proposalId } }) => {
+      const { revokedAt, ...rest } = state.positionsMap[positionId]?.proposalsMap[proposalId];
+      const updatedProposal = { ...rest, revokedAt: 1234 }; // TODO: replace with actual time the proposal was revoked
+      state.positionsMap[positionId].proposalsMap[proposalId] = updatedProposal;
     })
     /* -------------------------------------------------------------------------- */
     /*                                 Clear State                                */
@@ -251,6 +265,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       );
       // add lender positions to object for state.positionsMap and update state.positionsMap
       allPositions = { ...allPositions, ...lenderPositions };
+      console.log('User Portfolio 5: ', allPositions);
       state.positionsMap = { ...state.positionsMap, ...allPositions };
 
       state.user.portfolio = {

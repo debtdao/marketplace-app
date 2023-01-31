@@ -119,6 +119,8 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
   const { NETWORK } = getEnv();
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
 
+  const { borrower } = selectedLine!;
+
   // Initial set up for positions table
   useEffect(() => {
     if (selectedLine && !lineAddress) {
@@ -197,15 +199,6 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
       if (position.status === CLOSED_STATUS) return [];
 
-      if (position.status === PROPOSED_STATUS) {
-        const approveMutualConsent = {
-          name: t('components.transaction.add-credit.accept-terms'),
-          handler: depositHandler,
-          disabled: false,
-        };
-        return [approveMutualConsent];
-      }
-
       const borrowAction = {
         name: t('components.transaction.borrow'),
         handler: borrowHandler,
@@ -216,17 +209,8 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
       else return [borrowAction, repayAction];
     }
 
-    // If user is lender and position status is PROPOSED, return revoke consent action
-    if (getAddress(position.lender) === userWallet && position.status === PROPOSED_STATUS) {
-      return [
-        {
-          name: t('components.transaction.revoke-consent.cta'),
-          handler: revokeConsentHandler,
-          disabled: false,
-        },
-      ];
-      // If user is lender, and line has amount to withdraw, return withdraw action
-    } else if (
+    // If user is lender, and line has amount to withdraw, return withdraw action
+    if (
       getAddress(position.lender) === userWallet &&
       BigNumber.from(position.deposit).gt(BigNumber.from(position.principal))
     ) {
@@ -257,8 +241,13 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
       disabled: false,
     };
 
-    // Display button to approve proposal for the borrower of the proposal
-    if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
+    // Display button to approve proposal for the taker/borrower of the proposal
+    if (getAddress(borrower) === userWallet && getAddress(proposal.maker) === userWallet) {
+      return [approveMutualConsent, revokeMutualConsent];
+    }
+
+    // Display button to approve proposal for the taker/borrower of the proposal
+    if (getAddress(borrower) === userWallet) {
       return [approveMutualConsent];
     }
 
@@ -304,6 +293,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
         actions: (
           <ActionButtons
             value1={position.id}
+            // Note: if position is in PROPOSED_STATUS, then we want to display the proposal actions instead
             actions={position.status !== PROPOSED_STATUS ? getUserPositionActions(position) : []}
           />
         ),
@@ -314,10 +304,11 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
           ? Object.values(position.proposalsMap)
               .filter((proposal) => proposal.revokedAt === null)
               .map((proposal) => {
+                const [dRate, fRate, deposit, tokenAddress, lenderAddress] = [...proposal.args];
                 return {
-                  deposit: humanize('amount', proposal.args[2], position.token.decimals, 2),
-                  drate: `${normalizeAmount(proposal.args[0], 2)} %`,
-                  frate: `${normalizeAmount(proposal.args[1], 2)} %`,
+                  deposit: humanize('amount', deposit, position.token.decimals, 2),
+                  drate: `${normalizeAmount(dRate, 2)} %`,
+                  frate: `${normalizeAmount(fRate, 2)} %`,
                   line: (
                     <RouterLink to={`/${currentNetwork}/lines/${position.line}`} key={position.line} selected={false}>
                       {formatAddress(position.line)}
@@ -328,21 +319,13 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
                   principal: humanize('amount', '0', position.token.decimals, 2),
                   interest: humanize('amount', '0', position.token.decimals, 2),
                   lender: (
-                    <RouterLink
-                      to={`/${currentNetwork}/portfolio/${proposal.args[4]}`}
-                      key={position.id}
-                      selected={false}
-                    >
-                      {formatAddress(getENS(proposal.args[4], ensMap)!)}
+                    <RouterLink to={`/${currentNetwork}/portfolio/${lenderAddress}`} key={position.id} selected={false}>
+                      {formatAddress(getENS(lenderAddress, ensMap)!)}
                       <RedirectLinkIcon />
                     </RouterLink>
                   ),
                   token: (
-                    <RouterLink
-                      key={proposal.args[3]}
-                      to={`https://etherscan.io/address/${proposal.args[3]}`}
-                      selected={false}
-                    >
+                    <RouterLink key={tokenAddress} to={`${explorerUrl}/address/${tokenAddress}`} selected={false}>
                       {position.token.symbol}
                     </RouterLink>
                   ),

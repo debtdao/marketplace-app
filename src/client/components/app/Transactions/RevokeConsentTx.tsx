@@ -33,34 +33,19 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
   const { header, onClose } = props;
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionLoading, setLoading] = useState(false);
-  const [targetAmount, setTargetAmount] = useState('1');
   const [errors, setErrors] = useState<string[]>(['']);
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
   const selectedProposal = useAppSelector(LinesSelectors.selectSelectedProposal);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
-  const walletAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
-  const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
 
-  // state for proposal params
-  const [targetTokenAmount, setTargetTokenAmount] = useState('0');
-  const [drate, setDrate] = useState('');
-  const [frate, setFrate] = useState('');
-  const [msgData, setMsgData] = useState('');
-  // const [lenderAddress, setLenderAddress] = useState(walletAddress ? walletAddress : '');
-  // const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
+  if (!selectedProposal || !selectedPosition) {
+    return null;
+  }
 
-  useEffect(() => {
-    if (selectedPosition?.status === PROPOSED_STATUS && selectedProposal) {
-      const [dRate, fRate, deposit, tokenAddress, lenderAddress] = [...selectedProposal.args];
-      // setSelectedTokenAddress(tokenAddress);
-      // setLenderAddress(lenderAddress);
-      setTargetTokenAmount(normalizeAmount(deposit, selectedPosition.token.decimals));
-      setDrate(normalizeAmount(dRate, 0));
-      setFrate(normalizeAmount(fRate, 0));
-      setMsgData(selectedProposal.msgData);
-    }
-  }, [selectedPosition]);
+  const [dRate, fRate, deposit, tokenAddress, lenderAddress] = [...selectedProposal!.args];
+  const { msgData } = selectedProposal!;
+  const targetTokenAmount = normalizeAmount(deposit, selectedPosition!.token.decimals);
 
   const onTransactionCompletedDismissed = () => {
     if (onClose) {
@@ -77,23 +62,13 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
       setLoading(false);
       return;
     }
-    if (!targetAmount) {
+    if (!targetTokenAmount) {
       setErrors([...errors, 'no selected target amount']);
       setLoading(false);
       return;
     }
     if (!selectedPosition) {
       setErrors([...errors, 'no selected position']);
-      setLoading(false);
-      return;
-    }
-    if (!walletNetwork) {
-      setErrors([...errors, 'wallet not connected']);
-      setLoading(false);
-      return;
-    }
-    if (!positions) {
-      setErrors([...errors, 'no positions available']);
       setLoading(false);
       return;
     }
@@ -196,8 +171,8 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
       <TxRateInput
         key={'frate'}
         headerText={t('components.transaction.revoke-consent.select-rates')}
-        frate={frate}
-        drate={drate}
+        frate={fRate}
+        drate={dRate}
         amount={selectedPosition!.fRate}
         readOnly={true}
       />

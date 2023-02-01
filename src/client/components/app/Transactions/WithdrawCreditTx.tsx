@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import styled from 'styled-components';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 
 import {
   useAppTranslation,
@@ -49,9 +49,17 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
       setErrors([...errors, 'no selected position']);
       return '0';
     }
-    let maxWithdraw: string = `${Number(selectedPosition.deposit) - Number(selectedPosition.principal)}`;
-    maxWithdraw = normalize('amount', maxWithdraw, selectedPosition.token.decimals);
-    return maxWithdraw;
+    const deposit: BigNumber = BigNumber.from(selectedPosition.deposit);
+    const principal: BigNumber = BigNumber.from(selectedPosition.principal);
+    const interestRepaid: BigNumber = BigNumber.from(selectedPosition.interestRepaid);
+    const maxWithdrawAmount = deposit.sub(principal).add(interestRepaid);
+    const maxWithdrawAmountLessDust = maxWithdrawAmount.gte(1) ? maxWithdrawAmount.sub(1) : BigNumber.from(0);
+    const maxWithdrawLessDustNormalized = normalize(
+      'amount',
+      maxWithdrawAmountLessDust.toString(),
+      selectedPosition.token.decimals
+    );
+    return maxWithdrawLessDustNormalized;
   };
 
   //Used to determine if amount user wants to withdraw is valid
@@ -154,14 +162,17 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
     },
   ];
 
-  if (!selectedCredit) return null;
+  if (!selectedCredit) {
+    console.log('withdraw modal selected credit is undefined: ', selectedCredit);
+    return null;
+  }
 
   if (transactionCompleted === 1) {
     return (
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'completed'}
+          transactionCompletedLabel={t('components.transaction.success-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>
@@ -173,7 +184,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'could not borrow credit'}
+          transactionCompletedLabel={t('components.transaction.withdraw-credit.error-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>

@@ -14,6 +14,7 @@ import {
   TokenAllowance,
   GetLineArgs,
   GetLinesArgs,
+  GetLineEventsArgs,
   GetLinePageArgs,
   AddCreditProps,
   UseCreditLinesParams,
@@ -28,10 +29,12 @@ import {
   BaseLineFragResponse,
   GetLinesResponse,
   MarketPageData,
+  GetLineEventsResponse,
 } from '@types';
 import {
   formatGetLinesData,
   formatLinePageData,
+  formatLineWithEvents,
   formatUserPortfolioData,
   // validateLineDeposit,
   // validateLineWithdraw,
@@ -44,13 +47,21 @@ import { TokensActions } from '../tokens/tokens.actions';
 import { TokensSelectors } from '../tokens/tokens.selectors';
 import { OnchainMetaDataActions } from '../metadata/metadata.actions';
 
+import { LinesSelectors } from './lines.selectors';
+
 /* -------------------------------------------------------------------------- */
 /*                                   Setters                                  */
 /* -------------------------------------------------------------------------- */
 
 const setSelectedLineAddress = createAction<{ lineAddress?: string }>('lines/setSelectedLineAddress');
 const setSelectedLinePosition = createAction<{ position?: string }>('lines/setSelectedLinePosition');
+const setSelectedLinePositionProposal = createAction<{ position?: string; proposal?: string }>(
+  'lines/setSelectedLinePositionProposal'
+);
 const setPosition = createAction<{ id: string; position: CreditPosition }>('lines/setPosition');
+
+// TODO: update this to fetch the updated proposal from the subgraph to set revokedAt
+const setProposal = createAction<{ lineAddress: string; positionId: string; proposalId: string }>('lines/setProposal');
 
 /* -------------------------------------------------------------------------- */
 /*                                 Clear State                                */
@@ -59,7 +70,7 @@ const setPosition = createAction<{ id: string; position: CreditPosition }>('line
 const clearLinesData = createAction<void>('lines/clearLinesData');
 const clearUserData = createAction<void>('lines/clearUserData');
 const clearTransactionData = createAction<void>('lines/clearTransactionData');
-const clearSelectedLineAndStatus = createAction<void>('lines/clearSelectedLineAndStatus');
+const clearSelectedLine = createAction<void>('lines/clearSelectedLine');
 const clearLineStatus = createAction<{ lineAddress: string }>('lines/clearLineStatus');
 
 /* -------------------------------------------------------------------------- */
@@ -77,7 +88,7 @@ const getLine = createAsyncThunk<{ lineData: SecuredLine | undefined }, GetLineA
   'lines/getLine',
   async (params, { getState, extra }) => {
     const { wallet } = getState();
-    const network = getNetwork(`${wallet.networkVersion}`);
+    const network = getNetwork(wallet.networkVersion);
     const { creditLineService } = extra.services;
     const lineData = await creditLineService.getLine({ network: network, ...params });
     return { lineData };
@@ -93,14 +104,13 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
     } = getState();
 
     const { creditLineService, onchainMetaDataService } = extra.services;
-    const network = getNetwork(`${wallet.networkVersion}`);
+    const network = getNetwork(wallet.networkVersion);
     const tokenPrices = Object.entries(tokensMap).reduce(
-      (prices, [addy, { priceUsdc }]) => ({ ...prices, [addy]: priceUsdc }),
+      (prices, [addy, { priceUsdc }]) => ({ ...prices, [addy]: BigNumber.from(priceUsdc) }),
       {}
     );
 
     // ensure consistent ordering of categories
-    console.log(categories);
     const categoryKeys = Object.keys(categories);
     const promises = await Promise.all(
       categoryKeys
@@ -123,82 +133,43 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
       },
       { linesData: {}, allBorrowers: [] }
     );
-
+    console.log('Lines Data: ', linesData);
     allBorrowers.map((b) => dispatch(OnchainMetaDataActions.getENS(b)));
 
     return { linesData };
   }
 );
 
-// TODO: Add this back so not always refetching line page data for a given line of credit.
-// const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | undefined }, GetLinePageArgs, ThunkAPI>(
-//   'lines/getLinePage',
-//   async ({ id }, { getState, extra, dispatch }) => {
-//     const state: RootState = getState();
-//     const { creditLineService } = extra.services;
-//     // gets all primary + aux line data avaliable by defeault
-
-//     const selectedLine = LinesSelectors.selectSelectedLinePage(state);
-//     const tokenPrices = TokensSelectors.selectTokenPrices(state);
-
-//     // @TODO check if events exist to
-//     console.log('User Portfolio actions state: ', state);
-//     console.log('User Portfolio actions state: ', state);
-//     console.log('User Portfolio actions tokenPrices: ', tokenPrices);
-
-//     // debugger;
-//     if (selectedLine) {
-//       console.log('User Portfolio actions selectedLine: ', selectedLine);
-//       // console.log('user portfolio')
-//       return { linePageData: selectedLine };
-//     } else {
-//       try {
-//         const linePageData = formatLinePageData(
-//           await creditLineService.getLinePage({ network: state.network.current, id }),
-//           tokenPrices
-//         );
-
-//         console.log('user portfolio getLinePage data ', linePageData);
-
-//         // @TODO dispatch actions to save collateral and events
-//         // enable collateral or add collateral
-//         // save module to Map
-//         // dispatch(CollateralActions.saveModuleToMap(spigot.id, spigot ));
-//         // function does not exist in this file
-//         // save events to map
-//         // dispatch(LineActions.setCreditEvetntsModule(spigot.id, collateralEvents ));
-//         // save events to map
-//         // dispatch(CollateralActions.saveEventsToMap(spigot.id, collateralEvents ));
-
-//         if (!linePageData) throw new Error();
-//         return { linePageData };
-//       } catch (e) {
-//         console.log('failed getting full line page data', e);
-//         return { linePageData: undefined };
-//       }
-//     }
-//   }
-// );
-
 const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | undefined }, GetLinePageArgs, ThunkAPI>(
   'lines/getLinePage',
   async ({ id }, { getState, extra, dispatch }) => {
     const state: RootState = getState();
     const { creditLineService } = extra.services;
-    // gets all primary + aux line data avaliable by defeault
-    const network = getNetwork(`${state.wallet.networkVersion}`);
-    // const selectedLine = LinesSelectors.selectSelectedLinePage(state);
+    // gets all primary + aux line data avaliable by default
+    const selectedLine = LinesSelectors.selectSelectedLinePage(state);
     const tokenPrices = TokensSelectors.selectTokenPrices(state);
-    const linePageResponse = await creditLineService.getLinePage({
-      network,
-      id,
-    });
-
-    if (!linePageResponse) {
-      return { linePageData: undefined };
+    const network = getNetwork(state.wallet.networkVersion);
+    // query and add credit and collateral events to pre-existing line data
+    if (selectedLine) {
+      if (selectedLine.creditEvents.length === 0 && selectedLine.collateralEvents.length === 0) {
+        const lineEvents = await creditLineService.getLineEvents({ network, id });
+        console.log('selected line events: ', lineEvents, network, id);
+        const selectedLineWithEvents = formatLineWithEvents(selectedLine, lineEvents, tokenPrices);
+        console.log('selected line with events 1: ', selectedLineWithEvents);
+        return { linePageData: selectedLineWithEvents };
+      }
+      return { linePageData: selectedLine };
+    } else {
+      try {
+        const linePageData = formatLinePageData(await creditLineService.getLinePage({ network, id }), tokenPrices);
+        console.log('selected line with events 2: ', linePageData);
+        if (!linePageData) throw new Error();
+        return { linePageData };
+      } catch (e) {
+        console.log('failed getting full line page data', e);
+        return { linePageData: undefined };
+      }
     }
-    const linePageData = linePageResponse ? formatLinePageData(linePageResponse, tokenPrices) : undefined;
-    return { linePageData: linePageData };
   }
 );
 
@@ -326,13 +297,14 @@ const approveDeposit = createAsyncThunk<
 
   const accountAddress = wallet.selectedAddress;
   if (!accountAddress) throw new Error('WALLET NOT CONNECTED');
+  console.log('approve token', tokenAddress, accountAddress, lineAddress, amount);
 
   const approveDepositTx = await tokenService.approve({
     network,
     tokenAddress,
     accountAddress,
     spenderAddress: lineAddress,
-    amount: unnullify(amount, true),
+    amount,
   });
   console.log('this is approval', approveDepositTx);
 });
@@ -433,7 +405,7 @@ const depositAndRepay = createAsyncThunk<
     //dispatch(getLinePage({ id: lineAddress }));
     // dispatch(getUserLinesSummary());
     // dispatch(getUserLinesMetadata({ linesAddresses: [lineAddress] }));
-    //dispatch(TokensActions.getUserTokens({ addresses: [tokenAddress, lineAddress] }));
+    // dispatch(TokensActions.getUserTokens({ addresses: [tokenAddress, lineAddress] }));
   },
   {
     // serializeError: parseError,
@@ -460,12 +432,76 @@ const claimAndRepay = createAsyncThunk<
     const network = getNetwork(`${wallet.networkVersion}`);
     if (!userAddress) throw new Error('Wallet not connected');
 
-    const { collateralService } = services;
+    const { creditLineService } = services;
 
-    const tx = await collateralService.claimAndRepay({
+    const tx = await creditLineService.claimAndRepay({
       lineAddress,
       claimToken,
       zeroExTradeData: calldata,
+      network: network,
+      dryRun: false,
+    });
+    console.log(tx);
+  }
+);
+
+const claimAndTrade = createAsyncThunk<
+  void,
+  {
+    lineAddress: Address;
+    claimToken: Address;
+    calldata: BytesLike;
+    network: Network;
+  },
+  ThunkAPI
+>(
+  'lines/claimAndRepay',
+
+  async ({ lineAddress, claimToken, calldata }, { extra, getState, dispatch }) => {
+    const { wallet } = getState();
+    const { services } = extra;
+
+    const userAddress = wallet.selectedAddress;
+    const network = getNetwork(`${wallet.networkVersion}`);
+    if (!userAddress) throw new Error('Wallet not connected');
+
+    const { creditLineService } = services;
+
+    const tx = await creditLineService.claimAndTrade({
+      lineAddress,
+      claimToken,
+      zeroExTradeData: calldata,
+      network: network,
+      dryRun: false,
+    });
+    console.log(tx);
+  }
+);
+
+const useAndRepay = createAsyncThunk<
+  void,
+  {
+    lineAddress: Address;
+    amount: BigNumber;
+    network: Network;
+  },
+  ThunkAPI
+>(
+  'lines/useAndRepay',
+
+  async ({ lineAddress, amount }, { extra, getState, dispatch }) => {
+    const { wallet } = getState();
+    const { services } = extra;
+
+    const userAddress = wallet.selectedAddress;
+    const network = getNetwork(`${wallet.networkVersion}`);
+    if (!userAddress) throw new Error('Wallet not connected');
+
+    const { creditLineService } = services;
+
+    const tx = await creditLineService.useAndRepay({
+      lineAddress,
+      amount,
       network: network,
       dryRun: false,
     });
@@ -494,6 +530,34 @@ const depositAndClose = createAsyncThunk<
     const { creditLineService } = services;
 
     const tx = await creditLineService.depositAndClose({
+      lineAddress: lineAddress,
+      network: network,
+    });
+    console.log(tx);
+  }
+);
+
+const close = createAsyncThunk<
+  void,
+  {
+    lineAddress: Address;
+    network: Network;
+    id: string;
+  },
+  ThunkAPI
+>(
+  'lines/depositAndClose',
+
+  async ({ lineAddress, network, id }, { extra, getState, dispatch }) => {
+    const { wallet } = getState();
+    const { services } = extra;
+
+    const userAddress = wallet.selectedAddress;
+    if (!userAddress) throw new Error('Wallet not connected');
+
+    const { creditLineService } = services;
+
+    const tx = await creditLineService.close({
       lineAddress: lineAddress,
       id: id,
       network: network,
@@ -553,7 +617,6 @@ const liquidate = createAsyncThunk<
     // dispatch(getLinePage({ id: lineAddress }));
     // // dispatch(getUserLinesSummary());
     // // dispatch(getUserLinesMetadata({ linesAddresses: [lineAddress] }));
-    // dispatch(TokensActions.getUserTokens({ addresses: [tokenAddress, lineAddress] }));
   },
   {
     // serializeError: parseError,
@@ -616,6 +679,39 @@ const withdrawLine = createAsyncThunk<
     // dispatch(getUserLinesSummary());
     // dispatch(getUserLinesMetadata({ linesAddresses: [lineAddress] }));
     //dispatch(TokensActions.getUserTokens({ addresses: [targetTokenAddress, lineAddress] }));
+  },
+  {
+    // serializeError: parseError,
+  }
+);
+
+const revokeConsent = createAsyncThunk<
+  void,
+  {
+    lineAddress: string;
+    id: string;
+    msgData: string;
+    network: Network;
+  },
+  ThunkAPI
+>(
+  'lines/revokeConsent',
+  async ({ lineAddress, id, msgData, network }, { extra, getState }) => {
+    const { wallet } = getState();
+    const { services } = extra;
+
+    const userAddress = wallet.selectedAddress;
+    if (!userAddress) throw new Error('WALLET NOT CONNECTED');
+
+    const { creditLineService } = services;
+    console.log(lineAddress, 'lineaddress', id, 'id', msgData, 'msgData', network, 'network');
+    const tx = await creditLineService.revokeConsent({
+      lineAddress: lineAddress,
+      id: id,
+      msgData: msgData,
+      network: network,
+    });
+    console.log(tx);
   },
   {
     // serializeError: parseError,
@@ -784,35 +880,41 @@ const getWithdrawAllowance = createAsyncThunk<
 export const LinesActions = {
   setSelectedLineAddress,
   setSelectedLinePosition,
+  setSelectedLinePositionProposal,
   setPosition,
+  setProposal,
+  clearLinesData,
+  clearUserData,
+  clearSelectedLine,
+  clearLineStatus,
   // initiateSaveLines,
+
   getLine,
   getLines,
   getLinePage,
   getUserLinePositions,
   getUserPortfolio,
+
   approveDeposit,
   addCredit,
-  depositAndRepay,
-  depositAndClose,
   borrowCredit,
   deploySecuredLine,
   deploySecuredLineWithConfig,
   // approveZapOut,
   // signZapOut,
   withdrawLine,
-  liquidate,
-  // migrateLine,
-  // initSubscriptions,
-  clearLinesData,
-  clearUserData,
-  getExpectedTransactionOutcome,
+  revokeConsent,
+  close,
+  depositAndRepay,
+  depositAndClose,
+  claimAndTrade,
   claimAndRepay,
-  clearTransactionData,
-  // getUserLinesSummary,
-  // getUserLinesMetadata,
-  clearSelectedLineAndStatus,
-  clearLineStatus,
+  useAndRepay,
+
+  liquidate,
+
   getDepositAllowance,
   getWithdrawAllowance,
+  getExpectedTransactionOutcome,
+  clearTransactionData,
 };

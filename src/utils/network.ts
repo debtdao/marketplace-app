@@ -25,8 +25,8 @@ export const getNetworkRpc = (network: Network): string => {
   switch (network) {
     case 'mainnet':
       return MAINNET_PROVIDER_HTTPS;
-    // case 'arbitrum':
-    //   return ARBITRUM_PROVIDER_HTTPS;
+    case 'arbitrum':
+      return ARBITRUM_PROVIDER_HTTPS;
     case 'goerli':
       return GOERLI_PROVIDER_HTTPS;
     default:
@@ -38,11 +38,17 @@ export const getProviderType = (network: Network): ProviderType => {
   switch (network) {
     case 'mainnet':
       return 'ethereum';
-    // case 'arbitrum':
-    //   return 'arbitrum';
+    case 'arbitrum':
+      return 'arbitrum';
     case 'goerli':
       return 'goerli';
     default:
       throw Error('Unknown Network');
   }
+};
+
+export const getEtherscanUrlStub = (network: string) => {
+  if (network === 'mainnet') return 'https://etherscan.io/address/';
+  if (network === 'goerli') return 'https://goerli.etherscan.io/address/';
+  else return '';
 };

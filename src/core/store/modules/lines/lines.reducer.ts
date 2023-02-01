@@ -13,6 +13,8 @@ import {
   Address,
   LinesByRole,
   PositionMap,
+  CreditEvent,
+  CreditProposal,
 } from '@types';
 import { getNetworkId } from '@src/utils';
 
@@ -40,6 +42,7 @@ export const initialUserMetadataStatusMap: UserLineMetadataStatusMap = {
 export const linesInitialState: CreditLineState = {
   selectedLineAddress: undefined,
   selectedPosition: undefined,
+  selectedProposal: undefined,
   linesMap: {},
   positionsMap: {},
   eventsMap: {},
@@ -79,13 +82,15 @@ const {
   // initiateSaveLines,
   setSelectedLineAddress,
   setSelectedLinePosition,
+  setSelectedLinePositionProposal,
   setPosition,
+  setProposal,
   getUserLinePositions,
   getUserPortfolio,
   clearLinesData,
   clearUserData,
   // getUserLinesMetadata,
-  clearSelectedLineAndStatus,
+  clearSelectedLine,
   clearLineStatus,
 } = LinesActions;
 
@@ -100,11 +105,22 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
 
     .addCase(setSelectedLinePosition, (state, { payload: { position } }) => {
+      console.log('set position', position, state.positionsMap[position ?? ''], state.positionsMap);
       state.selectedPosition = position;
+    })
+
+    .addCase(setSelectedLinePositionProposal, (state, { payload: { position, proposal } }) => {
+      state.selectedProposal = proposal;
     })
 
     .addCase(setPosition, (state, { payload: { id, position } }) => {
       state.positionsMap[id] = position;
+    })
+
+    .addCase(setProposal, (state, { payload: { lineAddress, positionId, proposalId } }) => {
+      const { revokedAt, ...rest } = state.positionsMap[positionId]?.proposalsMap[proposalId];
+      const updatedProposal = { ...rest, revokedAt: 1234 }; // TODO: replace with actual time the proposal was revoked
+      state.positionsMap[positionId].proposalsMap[proposalId] = updatedProposal;
     })
     /* -------------------------------------------------------------------------- */
     /*                                 Clear State                                */
@@ -126,11 +142,10 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     //   state.statusMap.getExpectedTransactionOutcome = {};
     // })
 
-    .addCase(clearSelectedLineAndStatus, (state) => {
+    .addCase(clearSelectedLine, (state) => {
       if (!state.selectedLineAddress) return;
-      //const currentAddress = state.selectedLineAddress;
-      // state.statusMap.linesActionsStatusMap[currentAddress] = initialLineActionsStatusMap;
       state.selectedLineAddress = undefined;
+      state.selectedPosition = undefined;
     })
 
     .addCase(clearLineStatus, (state, { payload: { lineAddress } }) => {
@@ -179,18 +194,16 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 
       // loop over nested structure of new Lines and update state
       Object.entries(linesData).map(([category, ls]) =>
-        ls?.map((l) => {
-          lines[l.id] = l;
+        ls?.map((line) => {
+          lines[line.id] = line;
           // update positions for each line
-          const linePositionMap = _.zipObject(_.values(l.positionIds), _.values(l.positions));
+          const linePositionMap = _.zipObject(_.values(line.positionIds), _.values(line.positions));
           positions = { ...positions, ...linePositionMap };
-
-          state.statusMap.user.linesActionsStatusMap[l.id] = initialLineActionsStatusMap;
+          state.statusMap.user.linesActionsStatusMap[line.id] = initialLineActionsStatusMap;
           // save line id to category for reference
-          categories[category] = [...(categories[category] || []), l.id];
+          categories[category] = [...(categories[category] || []), line.id];
         })
       );
-      // console.log('User Portfolio get line positions: ', positions);
       state.linesMap = { ...state.linesMap, ...lines };
       state.positionsMap = { ...state.positionsMap, ...positions };
       state.categories = { ...state.categories, ...categories };
@@ -205,7 +218,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(getLinePage.fulfilled, (state, { payload: { linePageData } }) => {
       if (linePageData) {
         // overwrite actual positions with referential ids
-        const { positions, collateralEvents, creditEvents, ...metadata } = linePageData;
+        const { positions, creditEvents, ...metadata } = linePageData;
         state.linesMap = { ...state.linesMap, [linePageData.id]: { ...metadata } };
         state.positionsMap = { ...state.positionsMap, ...positions };
         state.eventsMap = { ...state.eventsMap, [metadata.id]: creditEvents };
@@ -252,6 +265,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       );
       // add lender positions to object for state.positionsMap and update state.positionsMap
       allPositions = { ...allPositions, ...lenderPositions };
+      console.log('User Portfolio 5: ', allPositions);
       state.positionsMap = { ...state.positionsMap, ...allPositions };
 
       state.user.portfolio = {

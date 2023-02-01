@@ -168,7 +168,7 @@ export const LiquidateBorrowerTx: FC<LiquidateBorrowerProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'completed'}
+          transactionCompletedLabel={t('components.transaction.success-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>
@@ -180,7 +180,7 @@ export const LiquidateBorrowerTx: FC<LiquidateBorrowerProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'could not add credit'}
+          transactionCompletedLabel={t('components.transaction.arbiter-liquidate.error-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>

@@ -17,7 +17,9 @@ import {
   ARBITER_POSITION_ROLE,
   LineEvents,
   AggregatedEscrow,
-  AggregatedSpigot, // prev. GeneralVaultView, Super indepth data, SecuredLineWithEvents is most similar atm
+  AggregatedSpigot,
+  CollateralEvent, // prev. GeneralVaultView, Super indepth data, SecuredLineWithEvents is most similar atm
+  CreditProposal,
 } from '@types';
 import { toBN, unnullify } from '@utils';
 import { getConstants } from '@src/config/constants';
@@ -42,6 +44,7 @@ const selectUserTokensMap = (state: RootState) => state.tokens.user.userTokensMa
 const selectTokensMap = (state: RootState) => state.tokens.tokensMap;
 const selectSelectedLineAddress = (state: RootState) => state.lines.selectedLineAddress;
 const selectSelectedPositionId = (state: RootState) => state.lines.selectedPosition;
+const selectSelectedProposalId = (state: RootState) => state.lines.selectedProposal;
 
 const selectCollateralMap = (state: RootState) => state.collateral.collateralMap;
 const selectCollateralEventsMap = (state: RootState) => state.collateral.eventsMap;
@@ -77,14 +80,22 @@ const selectSelectedPosition = createSelector(
     return positions[id];
   }
 );
+
+const selectSelectedProposal = createSelector(
+  [selectPositionsMap, selectSelectedPositionId, selectSelectedProposalId],
+  (positions, positionId = '', proposalId = ''): CreditProposal | undefined => {
+    return positions[positionId] ? positions[positionId].proposalsMap[proposalId] : undefined;
+  }
+);
+
 const selectPositionsForSelectedLine = createSelector(
   [selectPositionsMap, selectSelectedLineAddress],
-  (positions, line): PositionMap => {
+  (positionsMap, line): PositionMap => {
     if (!line) {
       return {};
     } else {
       // Create and return PositionMap of only positions for a given line
-      const linePositions = _.values(positions).filter((p) => p.line === line);
+      const linePositions = _.values(positionsMap).filter((p) => p.line === line);
       const linePositionsObj = _.transform(
         linePositions,
         function (result, position) {
@@ -108,21 +119,20 @@ const selectCollateralForSelectedLine = createSelector(
 );
 
 const selectCollateralEventsForSelectedLine = createSelector(
-  [selectCollateralEventsMap, selectCollateralForSelectedLine],
-  (events, collateral) => {
-    const escrowEvents = events[collateral.escrow?.id ?? ''] ?? [];
-    const spigotEvents = events[collateral.spigot?.id ?? ''] ?? [];
-    return { collateralEvents: _.concat(escrowEvents, spigotEvents) };
+  [selectCollateralEventsMap, selectSelectedLineAddress, selectCollateralForSelectedLine],
+  (events, lineAddress, collateral) => {
+    if (!lineAddress) return { collateralEvents: [] };
+    return { collateralEvents: events[lineAddress] ?? [] };
   }
 );
 
 const selectCreditEventsForSelectedLine = createSelector(
   [selectCreditEventsMap, selectSelectedLineAddress],
-  (events, line = '') => ({ creditEvents: events[line] })
+  (events, line = '') => ({ creditEvents: events[line] ?? [] })
 );
 
 const selectEventsForLine = createSelector(
-  [selectCreditEventsForSelectedLine, selectCollateralEventsForSelectedLine], // selectCollateralEvents, - from collateral state
+  [selectCreditEventsForSelectedLine, selectCollateralEventsForSelectedLine],
   (creditEvents, collateralEvents): LineEvents => {
     // @TODO return xhecksum address
     return { ...creditEvents, ...collateralEvents };
@@ -132,10 +142,6 @@ const selectEventsForLine = createSelector(
 const selectSelectedLinePage = createSelector(
   [selectSelectedLine, selectPositionsForSelectedLine, selectCollateralForSelectedLine, selectEventsForLine],
   (line, positions, collateral, events): SecuredLineWithEvents | undefined => {
-    // console.log('User Portfolio actions selectedLine line: ', line);
-    // console.log('User Portfolio actions selectedLine line positions: ', positions);
-    // console.log('User Portfolio actions selectedLine line collateral: ', collateral);
-    // console.log('User Portfolio actions selectedLine line events: ', events);
     if (!line) return undefined;
     return { ...line, positions, ...collateral, ...events };
   }
@@ -278,7 +284,7 @@ const selectUserPositionMetadata = createSelector(
           ...arbiterData,
         };
 
-      case getAddress(position?.lender ?? ZERO_ADDRESS):
+      case typeof position?.lender === 'string' && getAddress(position?.lender ?? ZERO_ADDRESS):
         const lenderData = {
           amount: position!.deposit,
           available: toBN(position!.deposit).minus(toBN(position!.principal)).toString(),
@@ -331,8 +337,10 @@ export const LinesSelectors = {
   selectSelectedLine,
   selectSelectedLinePage,
   selectSelectedPositionId,
+  selectSelectedProposalId,
   selectSelectedLineActionsStatusMap,
   selectSelectedPosition,
+  selectSelectedProposal,
   // selectDepositedLines,
   selectSummaryData,
   //selectRecommendations,

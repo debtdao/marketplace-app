@@ -78,14 +78,16 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionApproved, setTransactionApproved] = useState(true);
   const [transactionLoading, setLoading] = useState(false);
+  const [selectedCollateralAssetAddress, setSelectedCollateralAssetAddress] = useState('');
 
   // @cleanup CollateralSelectors.selectedCollateralAsset
   const selectedAssetAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress) || TOKEN_ADDRESSES.DAI;
 
-  //const enabledCollateralAddressess = _.values(selectedLine?.escrow?.deposits)?.map((d) => d.token.address);
   // @cleanup TODO pull colalteralOptions from subgraph instread of default yearn tokens
   const collateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
-  const selectedAsset = _.find(collateralOptions, (t) => t.address === selectedAssetAddress);
+  const selectedAsset =
+    _.find(collateralOptions, (t) => t.address === selectedCollateralAssetAddress) || collateralOptions[0];
+  console.log('Selected Collateral Asset: ', selectedAsset);
   console.log('collateralOption', collateralOptions, selectedAsset);
 
   useEffect(() => {
@@ -97,7 +99,6 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
   });
 
   useEffect(() => {
-    console.log('add position tx useEffect token/creditLine', selectedAsset, selectedLine);
     if (collateralOptions.length > 0 && !selectedAsset) {
       dispatch(
         TokensActions.setSelectedTokenAddress({
@@ -123,6 +124,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
 
   const setSelectedAsset = (assetAddress: string) => {
     dispatch(CollateralActions.setSelectedCollateralAsset({ assetAddress }));
+    setSelectedCollateralAssetAddress(assetAddress);
   };
 
   if (collateralOptions.length === 0) {
@@ -163,7 +165,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
 
     // TODO set error in state to display no line selected
 
-    if (!selectedEscrow || !selectedAssetAddress) {
+    if (!selectedEscrow || !selectedCollateralAssetAddress) {
       setLoading(false);
       return; // TODO throw error ot UI component
     }
@@ -176,7 +178,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
 
     const transactionData: EnableCollateralAssetProps = {
       escrowAddress: selectedEscrow.id,
-      token: selectedAssetAddress,
+      token: selectedCollateralAssetAddress,
       network: walletNetwork,
       dryRun: false,
     };
@@ -204,7 +206,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'completed'}
+          transactionCompletedLabel={t('components.transaction.success-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>

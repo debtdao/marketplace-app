@@ -45,6 +45,7 @@ export interface LineOfCredit {
   deposit: string;
   interest: string;
   // lifetime stats
+  defaultSplit: string;
   totalInterestRepaid: string;
   // id, symbol, APY (4 decimals)
   highestApy: [string, string, string];
@@ -56,6 +57,8 @@ export interface LineOfCredit {
 }
 
 export type PositionMap = { [id: string]: CreditPosition };
+
+export type ProposalMap = { [id: string]: CreditProposal };
 
 export type LineCollateral = {
   // real-time aggregate usd value across all credits
@@ -77,13 +80,26 @@ export interface Item extends SecuredLine {
   onAction?: () => void;
 }
 // data that isnt included in SecuredLine that we need to fetch for full SecuredLineWithEvents dattype
-// gets merged into existing AggregatedCredit to form LinePageData
+// gets merged into existing SecuredLine to form SecuredLineWithEvents
 export interface LineEvents {
   collateralEvents: CollateralEvent[];
   creditEvents: CreditEvent[];
 }
 
 export interface SecuredLineWithEvents extends SecuredLine, LineEvents {}
+
+export interface CreditProposal {
+  id: string;
+  proposedAt: number;
+  revokedAt: number;
+  acceptedAt: number;
+  endedAt: number;
+  maker: string;
+  taker: string;
+  mutualConsentFunc: string;
+  msgData: string;
+  args: string[];
+}
 
 export interface CreditPosition {
   id: string;
@@ -96,9 +112,9 @@ export interface CreditPosition {
   interestAccrued: string;
   interestRepaid: string;
   totalInterestRepaid: string;
-  // borrower: Address;
   dRate: string;
   fRate: string;
+  proposalsMap: ProposalMap;
 }
 
 // bare minimum to display about a user on a position
@@ -144,7 +160,7 @@ export interface Collateral {
 export interface BaseEscrow extends BaseCollateralModule {
   id: Address;
   cratio: string;
-  minCRatio: string;
+  minCRatio: number;
   collateralValue: string;
 }
 
@@ -154,20 +170,27 @@ export interface EscrowDeposit extends Collateral {
   amount: string;
   value: string;
   enabled: boolean;
-
   displayIcon?: string; // url to token icon
+  events?: CollateralEvent[];
 }
 
-export interface EscrowDepositList {
+export interface EscrowDepositMap {
   [token: string]: EscrowDeposit;
+}
+
+export interface SpigotRevenueContractMap {
+  [address: string]: SpigotRevenueContract;
 }
 
 export interface AggregatedEscrow extends BaseEscrow {
   id: Address;
   cratio: string;
-  minCRatio: string;
+  minCRatio: number;
   collateralValue: string;
-  deposits?: EscrowDepositList;
+  type: CollateralTypes;
+  line: string;
+  events?: CollateralEvent[];
+  deposits?: EscrowDepositMap;
 }
 
 export interface RevenueSummary extends Collateral {
@@ -175,15 +198,20 @@ export interface RevenueSummary extends Collateral {
   token: TokenView;
   amount: string;
   value: string;
-  firstRevenueTimestamp: number;
-  lastRevenueTimestamp: number;
+  timeOfFirstIncome: number;
+  timeOfLastIncome: number;
 }
 
+export interface RevenueSummaryMap {
+  [key: string]: RevenueSummary;
+}
 export interface AggregatedSpigot extends BaseCollateralModule {
   id: Address;
+  revenueValue: string;
   // aggregated revenue in USD by token across all spigots
-  tokenRevenue: { [key: string]: string }; // TODO: RevenueSummary
-  // revenueSummary: RevenueSummary;
+  revenueSummary: RevenueSummaryMap;
+  events?: CollateralEvent[];
+  spigots?: { [address: string]: SpigotRevenueContract };
 }
 
 export interface MarketLines {
@@ -195,20 +223,22 @@ export interface MarketPageData {
   allBorrowers: string[];
 }
 
-export interface LinePageSpigot extends AggregatedSpigot {
-  spigots?: { [address: string]: RevenueContract };
-}
-
 export type CollateralModule = AggregatedEscrow | AggregatedSpigot;
 export type CollateralMap = { [address: string]: CollateralModule };
+export type ReservesMap = {
+  [address: string]: { [address: string]: { operatorTokens: string; ownerTokens: string; unusedTokens: string } };
+};
 
-export interface RevenueContract {
+export interface SpigotRevenueContract extends Collateral {
+  id: Address;
+  type: CollateralTypeRevenue;
   active: boolean;
   contract: Address;
+  claimFunc: string;
+  transferFunc: string;
   startTime: number;
   ownerSplit: number;
-  token: TokenView;
-
+  totalVolumeUsd: string;
   events?: SpigotEvents[];
 }
 
@@ -238,9 +268,9 @@ export type ModuleNames = SPIGOT_NAME | CREDIT_NAME | ESCROW_NAME;
 export interface EventWithValue {
   __typename?: string;
   timestamp: number;
-  amount?: number;
-  value?: number;
-  valueNow?: number;
+  amount?: string;
+  value?: string;
+  valueNow?: string;
   [key: string]: any;
 }
 
@@ -250,9 +280,9 @@ export interface CreditEvent extends EventWithValue {
   id: string; // position id
   token?: string;
   timestamp: number;
-  amount: number;
-  valueAtTime?: number;
-  valueNow?: number;
+  amount: string;
+  valueAtTime?: string;
+  valueNow?: string;
 }
 
 export interface SetRateEvent {
@@ -268,8 +298,8 @@ export interface CollateralEvent extends EventWithValue {
   type: CollateralTypes;
   id: Address; // token earned as revenue or used as collateral
   timestamp: number;
-  amount: number;
-  value?: number;
+  amount: string;
+  value?: string;
 }
 
 // Spigot Events
@@ -277,8 +307,8 @@ type SpigotEvents = ClaimRevenueEvent;
 
 export interface ClaimRevenueEvent extends CollateralEvent {
   revenueToken: TokenView;
-  escrowed: number;
-  netIncome: number;
+  amount: string;
+  value: string;
 }
 
 // Redux State

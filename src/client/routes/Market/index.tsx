@@ -13,6 +13,7 @@ import {
   WalletSelectors,
   OnchainMetaDataActions,
   OnchainMetaDataSelector,
+  NetworkSelectors,
 } from '@store';
 import { RecommendationsCard, SliderCard, ViewContainer } from '@components/app';
 import { SpinnerLoading, Text, Button } from '@components/common';
@@ -20,6 +21,9 @@ import { SecuredLine, UseCreditLinesParams, Item } from '@src/core/types';
 import { DebtDAOBanner } from '@assets/images';
 import { getEnv } from '@config/env';
 import { getENS } from '@src/utils';
+import { getConstants } from '@src/config/constants';
+
+const { SUPPORTED_NETWORKS } = getConstants();
 
 const StyledRecommendationsCard = styled(RecommendationsCard)``;
 
@@ -47,6 +51,7 @@ export const Market = () => {
   // const { isTablet, isMobile, width: DWidth } = useWindowDimensions();
   const [search, setSearch] = useState('');
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
+  const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
 
@@ -90,7 +95,6 @@ export const Market = () => {
     if (shouldFetch) {
       fetchMarketData();
     }
-    console.log('search', search);
   }, []);
 
   const onLenderCtaClick = () => {
@@ -142,7 +146,8 @@ export const Market = () => {
         background={<img src={DebtDAOBanner} alt={'Debt DAO Banner?'} />}
       />
 
-      {getLinesStatus.loading || _.isEmpty(lineCategoriesForDisplay) ? (
+      {getLinesStatus.loading ||
+      (_.isEmpty(lineCategoriesForDisplay) && SUPPORTED_NETWORKS.includes(currentNetwork)) ? (
         <SpinnerLoading flex="1" width="100%" />
       ) : (
         Object.entries(lineCategoriesForDisplay!).map(([key, val]: [string, SecuredLine[]], i: number) => {
@@ -154,7 +159,7 @@ export const Market = () => {
                 val.map(({ id, ...stuff }) => ({
                   ...stuff,
                   icon: '',
-                  onAction: () => history.push(`/lines/${id}`),
+                  onAction: () => history.push(`/${currentNetwork}/lines/${id}`),
                 })) as Item[]
               }
             />

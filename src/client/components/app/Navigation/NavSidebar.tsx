@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { useLocation, useHistory } from 'react-router-dom';
 
 import { useAppTranslation, useAppSelector } from '@hooks';
-import { SettingsSelectors } from '@store';
+import { NetworkSelectors, SettingsSelectors, WalletSelectors } from '@store';
 import { NavigationLink } from '@components/app';
 import { Link, Icon, Logo, RedirectIcon } from '@components/common';
 
@@ -147,7 +147,6 @@ export const NavSidebar = ({ navLinks, ...props }: NavSidebarProps) => {
   const location = useLocation();
   const history = useHistory();
   const collapsedSidebar = useAppSelector(SettingsSelectors.selectSidebarCollapsed);
-
   const currentPath = '/' + location.pathname.toLowerCase().split('/')[1];
 
   // const toggleSidebar = () => {
@@ -176,7 +175,7 @@ export const NavSidebar = ({ navLinks, ...props }: NavSidebarProps) => {
   return (
     <StyledSidebar collapsed={collapsedSidebar}>
       <SidebarHeader>
-        <StyledLogo full={false} onClick={() => history.push('/portfolio')} />
+        <StyledLogo full={false} />
         {/* {!isMobile && <ToggleSidebarButton Component={CollapseIcon} onClick={toggleSidebar} />} */}
       </SidebarHeader>
 

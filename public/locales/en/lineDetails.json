@@ -4,15 +4,22 @@
     "content": ""
   },
   "metadata": {
+    "borrower": "Borrower",
+    "lender": "Lender",
     "principal": "Total Outstanding Debt",
-    "deposit": "Total Credit Provided",
-    "totalInterestPaid": "Lifetime Interest Paid",
+    "deposit": "Credit Limit",
+    "total-interest-paid": "Lifetime Interest Paid",
+    "revenue-split":"Revenue Split",
+    "min-cratio":"Minimum Collateralization Ratio",
+    "cratio":"Collateralization Ratio",
     "secured-by": "Secured By ",
     "unsecured": "This is an unsecured line of credit. You MUST trust the borrower.",
+    "status": "Status",
+    "start": "Deployment",
+    "end": "Deadline",
     "revenue": {
       "title": "Revenue",
-      "per-month": "/ month",
-      "no-revenue": "No revenue earned on Spigot"
+      "total": "Total Spigoted Revenue"
     },
     "escrow": {
       "title": "Collateral",
@@ -29,7 +36,7 @@
     },
     "collateral-table": {
       "enable-spigot": "Add Spigot",
-      "enable-asset": "Enable",
+      "enable-asset": "Enable Collateral",
       "add-collateral": "Deposit",
       "no-table": "No Collateral added"
     }

@@ -45,17 +45,18 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
 
   // Deploy Line base data state
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
+  const walletAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
 
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const { header, onClose } = props;
-  const [borrower, setBorrower] = useState('');
+  const [borrowerAddress, setBorrowerAddress] = useState(walletAddress ? walletAddress : '');
   const [inputAddressWarning, setWarning] = useState('');
   const [inputTTLWarning, setTTLWarning] = useState('');
   const [loading, setLoading] = useState(false);
   const [timeToLive, setTimeToLive] = useState('0');
 
   // Deploy Line with config state
-  const [advancedMode, setAdvancedMode] = useState(false);
+  const [advancedMode, setAdvancedMode] = useState(true);
   const [cratio, setCratio] = useState('0');
   const [revenueSplit, setRevenueSplit] = useState('0');
 
@@ -92,12 +93,12 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
   };
 
   const onBorrowerAddressChange = (address: string) => {
-    setBorrower(address);
+    setBorrowerAddress(address);
   };
 
   const deploySecuredLineNoConfig = async () => {
     setLoading(true);
-    let checkSumAddress = await isAddress(borrower);
+    let checkSumAddress = await isAddress(borrowerAddress);
     let ttl = Number(timeToLive) * 24 * 60 * 60;
 
     if (!checkSumAddress || walletNetwork === undefined) {
@@ -116,13 +117,13 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       dispatch(
         LinesActions.deploySecuredLine({
           factory: getLineFactoryforNetwork(walletNetwork!)!,
-          borrower,
+          borrower: borrowerAddress,
           ttl: BigNumber.from(ttl.toFixed(0)),
           network: walletNetwork,
         })
       ).then((res) => {
         if (res.meta.requestStatus === 'rejected') {
-          setTransactionCompleted(2);
+          // setTransactionCompleted(2);
           setLoading(false);
         }
         if (res.meta.requestStatus === 'fulfilled') {
@@ -137,7 +138,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
 
   const deploySecuredLineWithConfig = async () => {
     setLoading(true);
-    let checkSumAddress = await isAddress(borrower);
+    let checkSumAddress = await isAddress(borrowerAddress);
 
     let ttl = Number(timeToLive) * 24 * 60 * 60;
 
@@ -153,7 +154,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       dispatch(
         LinesActions.deploySecuredLineWithConfig({
           factory: getLineFactoryforNetwork(walletNetwork!)!,
-          borrower,
+          borrower: borrowerAddress,
           ttl: BigNumber.from(ttl.toFixed(0)),
           network: walletNetwork,
           revenueSplit: BigNumber.from(revenueSplit),
@@ -161,7 +162,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
         })
       ).then((res) => {
         if (res.meta.requestStatus === 'rejected') {
-          setTransactionCompleted(2);
+          // setTransactionCompleted(2);
           setLoading(false);
         }
         if (res.meta.requestStatus === 'fulfilled') {
@@ -179,7 +180,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'Transaction complete'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'deployed line successfully'}
+          transactionCompletedLabel={t('components.transaction.deploy-line.success-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>
@@ -191,7 +192,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'Transaction failed'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'Could not deploy line'}
+          transactionCompletedLabel={t('components.transaction.deploy-line.error-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>
@@ -203,9 +204,9 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       <TxAddressInput
         key={'credit-input'}
         headerText={t('components.transaction.deploy-line.select-borrower')}
-        inputText={t('components.transaction.deploy-line.select-borrower')}
+        inputText={t('components.transaction.deploy-line.borrower-address-text')}
         onAddressChange={onBorrowerAddressChange}
-        address={borrower}
+        address={borrowerAddress}
         // creditOptions={sourceCreditOptions}
         // inputError={!!sourceStatus.error}
         readOnly={false}
@@ -232,6 +233,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
             headerText={t('components.transaction.deploy-line.cratio')}
             inputLabel={t('components.transaction.deploy-line.cratio-input')}
             width={'sm'}
+            placeholder={'30%'}
             amount={cratio}
             maxAmount={'max string'}
             onInputChange={onCratioChange}
@@ -243,6 +245,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
             headerText={t('components.transaction.deploy-line.revenue-split')}
             inputLabel={t('components.transaction.deploy-line.revenue-split-input')}
             width={'sm'}
+            placeholder={'90%'}
             amount={revenueSplit}
             maxAmount={'max string'}
             onInputChange={onRevenueSplitChange}
@@ -254,21 +257,6 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       ) : (
         <h6>You should not deploy a line without discussing terms.</h6>
       )}
-      <SectionContent>
-        <>
-          Advanced Mode
-          <ToggleButton
-            selected={advancedMode}
-            setSelected={() => toggleSecuredMode()}
-            className=""
-            disabled={false}
-            color=""
-            onClick={() => {}}
-            ariaLabel=""
-          />
-        </>
-      </SectionContent>
-
       <TxActions>
         <TxActionButton
           key={''}

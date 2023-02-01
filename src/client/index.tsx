@@ -76,12 +76,12 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-const container = new Container();
-const store = getStore(container);
-const state = store.getState();
-const graphQLClient = getClient(state.network.current);
-
 export const App = () => {
+  const container = new Container();
+  const store = getStore(container);
+  const state = store.getState();
+  const graphQLClient = getClient(state.network.current);
+
   return (
     <Provider store={store}>
       <AppContextProvider context={container.context}>

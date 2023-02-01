@@ -1,7 +1,18 @@
 import { createReducer } from '@reduxjs/toolkit';
 import _ from 'lodash';
+import { BigNumber } from 'ethers';
 
-import { CollateralState, CollateralActionsStatusMap, CollateralModule, CollateralMap, SecuredLine } from '@types';
+import {
+  CollateralState,
+  CollateralActionsStatusMap,
+  CollateralModule,
+  CollateralMap,
+  SecuredLine,
+  CollateralEvent,
+  BaseEscrowDepositFragResponse,
+  ReservesMap,
+} from '@types';
+import { formatCollateralEvents, formatSpigotCollateralEvents } from '@src/utils';
 
 import { LinesActions } from '../lines/lines.actions';
 
@@ -22,6 +33,7 @@ export const collateralInitialState: CollateralState = {
   selectedSpigot: undefined,
   selectedCollateralAsset: undefined,
   selectedRevenueContract: undefined,
+  reservesMap: {},
   collateralMap: {},
   eventsMap: {},
   user: {
@@ -30,7 +42,7 @@ export const collateralInitialState: CollateralState = {
   statusMap: initialCollateralActionsStatusMap,
 };
 
-const { getLinePage, getUserPortfolio } = LinesActions;
+const { getLines, getLinePage, getUserPortfolio } = LinesActions;
 
 const {
   setSelectedEscrow,
@@ -40,6 +52,7 @@ const {
   addCollateral,
   enableCollateral,
   addSpigot,
+  tradeable,
 } = CollateralActions;
 
 const collateralReducer = createReducer(collateralInitialState, (builder) => {
@@ -92,6 +105,21 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
 
     // State changes from non collateral actions
 
+    /* -------------------------------- getLines ------------------------------- */
+    .addCase(getLines.fulfilled, (state, { payload: { linesData: lines } }) => {
+      if (!lines) return;
+      let map: CollateralMap = {};
+
+      // loop over array of lines and update collateral state
+      Object.entries(lines).map(([category, ls]) =>
+        ls?.map((line) => {
+          if (line.escrow) map[line.escrowId!] = line.escrow;
+          if (line.spigot) map[line.spigotId!] = line.spigot;
+        })
+      );
+      state.collateralMap = { ...state.collateralMap, ...map };
+    })
+
     /* -------------------------------- getLinePage ------------------------------- */
     .addCase(getLinePage.fulfilled, (state, { payload: { linePageData: line } }) => {
       if (!line) return;
@@ -99,6 +127,8 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
       if (line.escrow) map[line.escrowId!] = line.escrow;
       if (line.spigot) map[line.spigotId!] = line.spigot;
       state.collateralMap = { ...state.collateralMap, ...map };
+      const combinedCollateralEvents = [...(line.escrow?.events ?? []), ...(line.spigot?.events ?? [])];
+      state.eventsMap = { ...state.eventsMap, [line.id]: combinedCollateralEvents };
     })
 
     /* -------------------------------- getUserPortfolio ------------------------------- */
@@ -109,6 +139,14 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
         if (line.spigot) map[line.spigotId!] = line.spigot;
       });
       state.collateralMap = { ...state.collateralMap, ...map };
+    })
+    /* -------------------------------- reserves ------------------------------- */
+    .addCase(tradeable.fulfilled, (state, { payload: { tokenAddressMap, tokenAddress, lineAddress } }) => {
+      const map = { [tokenAddress]: tokenAddressMap };
+      state.reservesMap = {
+        ...state.reservesMap,
+        [lineAddress]: { ...(state.reservesMap[lineAddress] || {}), ...map },
+      };
     });
 });
 

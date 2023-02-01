@@ -3,7 +3,11 @@ import { Interface } from '@ethersproject/abi';
 
 import { ThunkAPI } from '@frameworks/redux';
 
-const getABI = createAsyncThunk<{ abi: string; functionSigs: string[]; address: string }, String, ThunkAPI>(
+const getABI = createAsyncThunk<
+  { abi: string; functionSigs: { [funcSelector: string]: string }; address: string },
+  String,
+  ThunkAPI
+>(
   'metadata/getABI',
   //@ts-ignore
   async (address, { extra, getState }) => {
@@ -18,12 +22,12 @@ const getABI = createAsyncThunk<{ abi: string; functionSigs: string[]; address: 
     const abi = OnchainMetaDataServiceResponse.data.result;
 
     const contract = new Interface(OnchainMetaDataServiceResponse.data.result);
-    const functionSigs = [];
+    const functionSigs: { [funcSelector: string]: string } = {};
     const inputs = [];
     console.log(contract);
 
     for (const key in contract.functions) {
-      functionSigs.push(contract.functions[key].name);
+      functionSigs[contract.getSighash(key)] = contract.functions[key].name;
       const obj = { funcname: contract.functions[key].name, funcinputs: contract.functions[key].inputs };
       inputs.push(obj);
     }

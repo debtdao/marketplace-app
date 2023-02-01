@@ -13,7 +13,7 @@ import {
   Web3Provider,
   ProviderType,
 } from '@types';
-import { getProviderType } from '@utils';
+import { getProviderType, isGoerli } from '@utils';
 import { getContract } from '@frameworks/ethers';
 
 export class TransactionServiceImpl implements TransactionService {
@@ -27,7 +27,6 @@ export class TransactionServiceImpl implements TransactionService {
 
   public async execute(props: ExecuteTransactionProps): Promise<TransactionResponse> {
     const { network, methodName, abi, contractAddress, args, overrides } = props;
-    console.log('subgraph inside TXN service execute', network);
     let gasFees: GasFees = {};
     try {
       if (network === 'mainnet') {
@@ -82,7 +81,8 @@ export class TransactionServiceImpl implements TransactionService {
 
     let gasFees: GasFees = {};
     try {
-      if (network === 'goerli') {
+      const isThisGoerli = isGoerli(network);
+      if (isThisGoerli) {
         // TODO: Analyze if gas service required
         gasFees = await this.gasService.getGasFees();
       }

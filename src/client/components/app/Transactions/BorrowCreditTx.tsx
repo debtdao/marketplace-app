@@ -41,8 +41,6 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
   const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
 
-  console.log('positions', positions);
-
   const _updatePosition = () =>
     onPositionChange({
       credit: selectedCredit?.id,
@@ -115,7 +113,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
         dispatch(
           LinesActions.setPosition({
             id: selectedPosition.id,
-            position: selectedPosition,
+            position: updatedPosition,
           })
         );
         setTransactionCompleted(1);
@@ -141,7 +139,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'completed'}
+          transactionCompletedLabel={t('components.transaction.success-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>
@@ -153,7 +151,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
-          transactionCompletedLabel={'could not borrow credit'}
+          transactionCompletedLabel={t('components.transaction.borrow-credit.error-message')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>

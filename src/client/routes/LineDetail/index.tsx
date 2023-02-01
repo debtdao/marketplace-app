@@ -35,6 +35,7 @@ const LineDetailView = styled(ViewContainer)`
 
 export interface LineDetailRouteParams {
   lineAddress: string;
+  network: string;
 }
 
 export const LineDetail = () => {
@@ -43,30 +44,27 @@ export const LineDetail = () => {
   const history = useHistory();
   const isMounting = useIsMounting();
   const { NETWORK_SETTINGS } = getConfig();
-  const { lineAddress } = useParams<LineDetailRouteParams>();
+  const { network, lineAddress } = useParams<LineDetailRouteParams>();
   const appStatus = useAppSelector(AppSelectors.selectAppStatus);
-  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
-  // const selectedLineCreditEvents = useAppSelector(LinesSelectors.selectSelectedLineCreditEvents);
-  const getLinePageStatus = useAppSelector(LinesSelectors.selectGetLinePageStatus);
-  // const linesPageData = useAppSelector(LinesSelectors.selectLinePageData);
   const tokensStatus = useAppSelector(TokensSelectors.selectWalletTokensStatus);
+  const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
+  const getLinePageStatus = useAppSelector(LinesSelectors.selectGetLinePageStatus);
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
-  //const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
-  //const walletName = useAppSelector(WalletSelectors.selectWallet);
   const currentNetworkSettings = NETWORK_SETTINGS[currentNetwork];
 
   useEffect(() => {
     if (!lineAddress || !isValidAddress(lineAddress)) {
       dispatch(AlertsActions.openAlert({ message: 'INVALID_ADDRESS', type: 'error' }));
-      history.push('/market');
+      history.push(`${currentNetwork}/market`);
       return;
     }
 
     dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineAddress }));
     dispatch(LinesActions.getLinePage({ id: lineAddress }));
-    return () => {
-      dispatch(LinesActions.clearSelectedLineAndStatus());
-    };
+    // TODO: Why is this here? It makes it so you cannot grab the selectedLine when you switch to a new page.
+    // return () => {
+    //   dispatch(LinesActions.clearSelectedLine());
+    // };
   }, []);
 
   const [firstTokensFetch, setFirstTokensFetch] = useState(true);
@@ -92,13 +90,13 @@ export const LineDetail = () => {
     getLinePageStatus.loading ||
     tokensStatus.loading ||
     (isMounting && (!tokensInitialized || !linesInitialized));
-  console.log('genewral linedetails loading', generalLoading);
 
   // TODO: 0xframe also supports this
   //const displayAddToken = walletIsConnected && walletName.name === 'MetaMask';
   return (
     <LineDetailView>
-      {generalLoading && <SpinnerLoading flex="1" width="100%" height="100%" />}
+      {selectedLine && <LineDetailsDisplay lineNetwork={network} />}
+      {generalLoading && <SpinnerLoading flex="1" width="100%" height="20%" />}
 
       {!generalLoading && !selectedLine && (
         <StyledSliderCard
@@ -110,7 +108,6 @@ export const LineDetail = () => {
           }
         />
       )}
-      {selectedLine && <LineDetailsDisplay />}
     </LineDetailView>
   );
 };

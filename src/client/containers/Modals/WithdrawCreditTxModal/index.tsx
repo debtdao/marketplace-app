@@ -21,7 +21,6 @@ export const WithdrawCreditTxModal: FC<WithdrawTxModalProps> = ({ onClose, ...pr
   const onPositionChange = () => {
     // update deposit params
   };
-
   return (
     <StyledWithdrawTxModal {...props}>
       <WithdrawCreditTx

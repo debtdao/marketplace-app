@@ -120,6 +120,7 @@ export interface TxNumberInputProps {
   headerText?: string;
   inputLabel?: string;
   width?: 'sm' | 'md';
+  placeholder?: string;
   amount: string;
   maxAmount?: string;
   onInputChange: Function;
@@ -133,18 +134,9 @@ export const TxNumberInput: FC<TxNumberInputProps> = ({
   inputLabel,
   width = 'sm',
   inputError,
+  placeholder,
   amount,
   onInputChange,
-  // openedTokenSearch,
-  // setOpenedTokenSearch,
-  // selectedToken,
-  // setSelectedToken,
-  // tokenList,
-  // openedCreditSearch,
-  // setOpenedCreditSearch,
-  // selectedCredit,
-  // setSelectedCredit,
-  // creditList,
   maxAmount,
   readOnly,
   hideAmount,
@@ -165,7 +157,7 @@ export const TxNumberInput: FC<TxNumberInputProps> = ({
                   <StyledAmountInput
                     value={amount}
                     onChange={onInputChange ? (e) => onInputChange(e.target.value) : undefined}
-                    placeholder={'15.00'}
+                    placeholder={placeholder ?? '15.00'}
                     readOnly={readOnly}
                     error={inputError}
                     type="number"

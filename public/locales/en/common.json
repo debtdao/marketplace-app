@@ -15,14 +15,15 @@
       "content": "No User Content"
     },
     "positions-card": {
+      "line": "Line",
       "positions": "Positions",
-      "drate": "dRate",
-      "frate": "fRate",
+      "drate": "Drawn Rate",
+      "frate": "Facility Rate",
       "total-deposits": "Supplied",
       "token": "Token",
       "status": "Status",
       "principal": "Borrowed",
-      "interest": "Interest",
+      "interest": "Interest Accrued",
       "lender": "Lender"
     },
     "list-card": {
@@ -57,8 +58,9 @@
       "total-debt": "Outstanding Debt",
       "total-credit": "Total Credit",
       "collateral": "Collateral",
-      "start": "Start Time",
-      "end": "End Time",
+      "start": "Deployment",
+      "end": "Deadline",
+      "time-to-live": "Days Remaining",
       "line": "Line Id",
       "revenue": "Spigoted Revenue"
     },
@@ -93,6 +95,7 @@
       "borrow": "Borrow",
       "deposit-and-repay-header": "Deposit and Repay",
       "claim-and-repay-header": "Claim and Repay",
+      "claim-operator-revenue":"Claim Revenue",
       "deposit-and-close-header": "Deposit and Close",
       "withdraw": "Withdraw",
       "borrow-limit": {
@@ -120,7 +123,7 @@
       "max": "MAX",
       "migrate": "Migrate",
       "reinvest": "Reinvest",
-      "repay": "Repay",
+      "release": "Release",
       "reward": "Reward",
       "sign": "Sign",
       "stake": "Stake",
@@ -162,12 +165,18 @@
         "select-token": "2. The token being lent",
         "select-lender": "3. Lender:",
         "select-rates": "4. Set Interest Rates",
+        "rates": {
+          "facility-rate":"Facility  Rate",
+          "drawn-rate":"Drawn Rate"
+        },
         "lender-address": "Ethereum Address",
         "back-to-market": "Head back to the Market",
+        "accept-terms": "Accept",
         "bad-line": {
           "title": "This line can not be deposited into",
           "body": "Your chosen line is not in a healthy state. You can find more lines to deposit into back in the marketplace."
-        }
+        },
+        "error-message": "could not add credit"
       },
       "add-collateral": {
         "header": "Setup deal terms",
@@ -182,51 +191,139 @@
           "find-cta": "Go to Discord",
           "login-cta": "Login as Arbiter",
           "enable-cta": "Enable token"
-        }
+        },
+        "error-message": "could not add collateral"
+      },
+      "deposit-collateral": {
+        "header": "Deposit Collateral",
+        "select-token": "The Token Used As Collateral"
+      },
+
+      "release-collateral": {
+        "header": "Release Collateral",
+        "select-token": "The Token Used As Collateral",
+        "error-message": "could not release collateral"
       },
       "arbiter-liquidate": {
         "header": "Liquidate Borrowers",
         "select-credit": "1. Select a borrower to liquidate",
-        "select-token": "2. Select token and amount"
+        "select-token": "2. Select token and amount",
+        "error-message": "could not liquidate collateral"
       },
       "deploy-line": {
         "header": "Deploy Credit Line",
         "select-borrower": "1. Insert a borrower for the line",
+        "borrower-address-text": "Borrower Address",
         "select-ttl": "2. Insert a deadline for the line",
         "time-to-live": "Time this line will remain active for (in days):",
         "cratio": "3. Select a Collateralization Ratio",
-        "cratio-input": "Your Cratio",
+        "cratio-input": "Collaterization Ratio",
         "revenue-split": "4. Select a Revenue Split",
-        "revenue-split-input": "Your revenue split"
+        "revenue-split-input": "Revenue Split",
+        "error-message": "could not deploy line",
+        "success-message": "deployed line successfully"
       },
       "borrow-credit": {
         "header": "Borrow",
         "select-line": "1. Select a Position:",
-        "select-amount": "2. Select Token and Amount:",
-        "your-rates": "3. Your Rates:"
+        "select-amount": "2. Amount to Borrow:",
+        "your-rates": "3. Your Rates:",
+        "error-message": "could not borrow credit"
       },
-      "deposit-and-repay": {
+      "repay": {
         "header": "Repay",
         "select-position": "1. Select Position to Repay:",
-        "repay-type": "2. Select Repay Type:",
-        "select-amount": "3. You Owe:",
-        "your-rates": "4. Your Interest Rates:",
-        "select-repay": "Select Repayment Method"
+        "your-rates": "2. Your Current Rates:",
+        "repay-type": "3. Select Source of Funds:",
+        "select-amount": "4. You Owe:",
+        "select-repay-option": "Select Repayment Method",
+        "repaying-from": "Repaying from your",
+        "close": {
+          "title": "Close Line",
+          "desc": "from your wallet",
+          "cta": "Close"
+        },
+        "deposit-and-repay": {
+          "title": "Deposit & repay",
+          "desc": "from your wallet",
+          "cta": "Deposit & Repay",
+          "error-message": "could not deposit and repay"
+        },
+        "deposit-and-close": {
+          "title": "Repay & close",
+          "desc": "from your wallet",
+          "cta": "Close"
+        },
+        "claim-and-repay": {
+          "title": "Repay with revenue",
+          "desc": "claim revenue and repay",
+          "cta": "Claim & Repay",
+          "claim-token": "Revenue token to claim",
+          "credit-token": "Credit Token To Purchase",
+          "buy-amount": "Purchase Amount",
+          "insufficient-liquidity": "Insufficient Liquidity for revenue token"
+        },
+        "approve-funds-for-repayment": {
+          "cta": "Approve Funds For Repayment"
+        },
+        "claim-and-trade": {
+          "title": "Fund reserves",
+          "desc": "approve revenue for repayment",
+          "cta": "Trade & Approve For Repayment"
+        },
+        "use-and-repay": {
+          "title": "Repay with reserves",
+          "desc": "from excess revenue",
+          "cta": "Use and Repay"
+        }
       },
       "withdraw-credit": {
         "header": "Withdraw",
         "select-line": "1. Selected line to withdraw",
-        "select-amount": "2. Select amount to withdraw"
+        "select-amount": "2. Select amount to withdraw",
+        "error-message": "could not withdraw credit"
+      },
+      "revoke-consent": {
+        "header": "Cancel Proposed Deal",
+        "cta": "Cancel Proposal",
+        "select-credit": "1. Borrower:",
+        "select-token": "2. Token:",
+        "select-lender": "3. Lender:",
+        "select-rates": "4. Interest Rates:",
+        "rates": {
+          "facility-rate": "Facility Rate",
+          "drawn-rate": "Drawn Rate"
+        },
+        "lender-address": "Ethereum Address",
+        "error-message": "could not cancel proposed deal"
       },
       "enable-spigot": {
         "header":"Enable Spigot",
         "select-function": "Select Function",
         "revenue-contract": "1. Revenue Contract",
+        "revenue-token-to-claim": "2. Revenue Token to Claim",
         "function-revenue": "3. Select function to claim revenue",
         "function-transfer": "2. Select function to transfer ownership of revenue contract",
         "cta": "Enable Spigot",
         "enable-failed": "Enable Spigot Failed."
-      }
+      },
+      "claim-revenue": {
+        "header": "Claim Revenue via Spigot",
+        "rev-contract-input": "Contract to claim from",
+        "rev-contract-input-text": "Revenue Contract Address",
+        "rev-token-input-header": "Revenue token to claim",
+        "rev-token-input-text": "Token Address",
+        "rev-contract-inputs": "4. Fill Function Input Values",
+        "claim-data-header": "Transaction data to call on revenue contract",
+        "claim-data-input": "Hexcode (0xdebfda05....)",
+        "cta": "Claim",
+        "claim-operator-tokens":{
+          "cta":"Claim Operator Tokens",
+          "error-message": "could not claim operator tokens"
+        },
+        "error-message": "could not claim revenue"
+      },
+      "success-message": "completed"
     }
   },
   "dashboard": {
@@ -291,6 +388,7 @@
   "pages": {
     "market": "Debt DAO Credit Market",
     "lines": "Line Of Credit",
+    "spigot": "Spigot",
     "portfolio": "Credit Investment Portfolio",
     "disclaimer": "Disclaimer",
     "settings": "Settings",

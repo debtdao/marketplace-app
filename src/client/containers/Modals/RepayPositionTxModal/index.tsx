@@ -3,14 +3,14 @@ import styled from 'styled-components';
 
 import { useAppTranslation } from '@hooks';
 import { ModalTx } from '@components/common';
-import { DepositAndRepayTx } from '@components/app';
+import { RepayPositionTx } from '@components/app';
 
-const StyledDepositAndRepayTxModal = styled(ModalTx)``;
-export interface DepositAndRepayTxModalProps {
+const StyledRepayPositionTxModal = styled(ModalTx)``;
+export interface RepayPositionTxModalProps {
   onClose: () => void;
 }
 
-export const DepositAndRepayTxModal: FC<DepositAndRepayTxModalProps> = ({ onClose, ...props }) => {
+export const RepayPositionTxModal: FC<RepayPositionTxModalProps> = ({ onClose, ...props }) => {
   console.log('deposit and repay modal', props);
   const { t } = useAppTranslation('common');
   // if (!creditLine) return; // TODO error or creditLine selector input
@@ -25,14 +25,14 @@ export const DepositAndRepayTxModal: FC<DepositAndRepayTxModalProps> = ({ onClos
   };
 
   return (
-    <StyledDepositAndRepayTxModal {...props}>
-      <DepositAndRepayTx
-        header={t('components.transaction.deposit-and-repay.header')} // TODO
+    <StyledRepayPositionTxModal {...props}>
+      <RepayPositionTx
+        header={t('components.transaction.repay.header')} // TODO
         acceptingOffer={false}
         onClose={onClose}
         onSelectedCreditLineChange={onSelectedCreditLineChange}
         onPositionChange={onPositionChange}
       />
-    </StyledDepositAndRepayTxModal>
+    </StyledRepayPositionTxModal>
   );
 };

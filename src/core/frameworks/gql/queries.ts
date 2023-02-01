@@ -22,21 +22,48 @@ const BASE_LINE_FRAGMENT = gql`
     type
     start
     status
-    arbiter
+    arbiter {
+      id
+    }
     oracle
     dex
     borrower {
       id
     }
+    defaultSplit
+  }
+`;
+
+const BASE_PROPOSAL_FRAGMENT = gql`
+  ${TOKEN_FRAGMENT}
+  fragment BaseProposalFrag on Proposal {
+    id
+    proposedAt
+    revokedAt
+    acceptedAt
+    endedAt
+    maker {
+      id
+    }
+    taker {
+      id
+    }
+    mutualConsentFunc
+    msgData
+    args
   }
 `;
 
 const BASE_POSITION_FRAGMENT = gql`
   ${TOKEN_FRAGMENT}
+  ${BASE_PROPOSAL_FRAGMENT}
   fragment BasePositionFrag on Position {
     id
     status
     lender {
+      id
+    }
+    line {
       id
     }
     principal
@@ -48,10 +75,12 @@ const BASE_POSITION_FRAGMENT = gql`
     token {
       ...TokenFrag
     }
+    proposal {
+      ...BaseProposalFrag
+    }
   }
 `;
 
-// lewv = line event with value
 const LINE_EVENT_FRAGMENT = gql`
   ${TOKEN_FRAGMENT}
   fragment LineEventFrag on LineEventWithValue {
@@ -75,7 +104,10 @@ const BASE_SPIGOT_FRAGMENT = gql`
     id
     active
     contract
+    claimFunc
+    transferFunc
     startTime
+    ownerSplit
     totalVolumeUsd
   }
 `;
@@ -85,6 +117,7 @@ const SPIGOT_SUMMARY_FRAGMENT = gql`
   fragment SpigotSummaryFrag on SpigotRevenueSummary {
     id
 
+    totalVolume
     totalVolumeUsd
     timeOfFirstIncome
     timeOfLastIncome
@@ -105,29 +138,13 @@ const SPIGOT_EVENT_FRAGMENT = gql`
       revenueToken {
         ...TokenFrag
       }
-      escrowed
-      netIncome
+      amount
       value
     }
   }
 `;
 
 // Escrow Frags
-
-const ESCROW_FRAGMENT = gql`
-  ${TOKEN_FRAGMENT}
-  fragment EscrowFrag on Escrow {
-    id
-    minCRatio
-    deposits {
-      amount
-      enabled
-      token {
-        ...TokenFrag
-      }
-    }
-  }
-`;
 
 const ESCROW_EVENT_FRAGMENT = gql`
   fragment EscrowEventFrag on EscrowEvent {
@@ -140,6 +157,25 @@ const ESCROW_EVENT_FRAGMENT = gql`
     ... on RemoveCollateralEvent {
       amount
       value
+    }
+  }
+`;
+
+const ESCROW_FRAGMENT = gql`
+  ${TOKEN_FRAGMENT}
+  ${ESCROW_EVENT_FRAGMENT}
+  fragment EscrowFrag on Escrow {
+    id
+    minCRatio
+    deposits {
+      amount
+      enabled
+      token {
+        ...TokenFrag
+      }
+      events {
+        ...EscrowEventFrag
+      }
     }
   }
 `;
@@ -225,19 +261,42 @@ export const GET_LINE_PAGE_QUERY = gql`
   }
 `;
 
-export const GET_LINE_PAGE_AUX_QUERY = gql`
+export const GET_LINE_EVENTS_QUERY = gql`
   ${LINE_EVENT_FRAGMENT}
+  ${TOKEN_FRAGMENT}
+  ${BASE_SPIGOT_FRAGMENT}
+  ${SPIGOT_SUMMARY_FRAGMENT}
+  ${ESCROW_EVENT_FRAGMENT}
   ${SPIGOT_EVENT_FRAGMENT}
 
-  query getLinePageAux($id: ID) {
+  query getLineEvents($id: ID) {
     lineOfCredit(id: $id) {
-      events(first: 20) {
+      events {
         ...LineEventFrag
       }
 
+      escrow {
+        deposits {
+          amount
+          enabled
+          token {
+            ...TokenFrag
+          }
+          events {
+            ...EscrowEventFrag
+          }
+        }
+      }
+
       spigot {
-        events(first: 20) {
+        events {
           ...SpigotEventFrag
+        }
+        spigots {
+          ...BaseSpigotFrag
+        }
+        summaries {
+          ...SpigotSummaryFrag
         }
       }
     }
@@ -252,7 +311,12 @@ export const GET_LINES_QUERY = gql`
   ${TOKEN_FRAGMENT}
 
   query getLines($first: Int, $orderBy: String, $orderDirection: String, $blacklist: [ID]) {
-    lineOfCredits(first: $first, orderBy: $orderBy, orderDirection: $orderDirection, where: { id_not_in: $blacklist }) {
+    lineOfCredits(
+      first: $first
+      orderBy: $orderBy
+      orderDirection: $orderDirection
+      where: { id_not_in: $blacklist, status: "ACTIVE" }
+    ) {
       ...BaseLineFrag
 
       positions {
@@ -305,36 +369,8 @@ const LENDER_POSITIONS_FRAGMENT = gql`
   ${SPIGOT_EVENT_FRAGMENT}
   ${ESCROW_FRAGMENT}
 
-  fragment LenderPositionsFrag on Lender {
-    positions: positions {
-      ...BasePositionFrag
-
-      line {
-        ...BaseLineFrag
-
-        events {
-          ...LineEventFrag
-        }
-
-        spigot {
-          id
-          spigots {
-            ...BaseSpigotFrag
-          }
-
-          summaries {
-            ...SpigotSummaryFrag
-          }
-          events {
-            ...SpigotEventFrag
-          }
-        }
-
-        escrow {
-          ...EscrowFrag
-        }
-      }
-    }
+  fragment LenderPositionsFrag on Position {
+    ...BasePositionFrag
   }
 `;
 
@@ -342,12 +378,13 @@ const LENDER_POSITIONS_FRAGMENT = gql`
 export const GET_USER_PORTFOLIO_QUERY = gql`
   ${LINE_OF_CREDIT_FRAGMENT}
   ${LENDER_POSITIONS_FRAGMENT}
+  ${BASE_POSITION_FRAGMENT}
 
   query getUserPortfolio($user: String!) {
     borrowerLineOfCredits: lineOfCredits(where: { borrower: $user }) {
       ...LineOfCreditFrag
     }
-    lenderPositions: lender(id: $user) {
+    lenderPositions: positions(where: { lender: $user }) {
       ...LenderPositionsFrag
     }
     arbiterLineOfCredits: lineOfCredits(where: { arbiter: $user }) {

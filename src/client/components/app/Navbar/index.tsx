@@ -9,6 +9,7 @@ import { Network } from '@types';
 import { device } from '@themes/default';
 import { getConfig } from '@config';
 import { getConstants } from '@src/config/constants';
+import { isGoerli } from '@src/utils';
 
 const StyledOptionList = styled(OptionList)`
   width: 15rem;
@@ -74,7 +75,7 @@ const StyledNavbar = styled.header<{ warning?: boolean }>`
   margin-top: 1%;
   margin-bottom: 1%;
   background-color: ${({ theme }) => theme.colors.surface};
-  // z-index: ${({ theme }) => theme.zindex.navbar};
+  z-index: ${({ theme }) => theme.zindex.navbar};
   ${({ warning, theme }) =>
     !warning &&
     `
@@ -161,6 +162,7 @@ export const Navbar = ({
   const secondTitleEnabled = !!subTitle?.length;
 
   const titleText = secondTitleEnabled ? <>{title}&nbsp;/&nbsp;</> : title;
+  const isThisGoerli = isGoerli(walletNetwork);
 
   return (
     <div>
@@ -197,7 +199,8 @@ export const Navbar = ({
 
       {/* Display warning if not connected to supported network! */}
       {/* TODO: Add goerli to SUPPORTED_NETWORKS. Difficult to do because goerli is not supported by Yearn SDK. */}
-      {!(SUPPORTED_NETWORKS.includes(walletNetwork ?? 'other') || walletNetwork === 'goerli') && (
+
+      {!(SUPPORTED_NETWORKS.includes(walletNetwork ?? 'other') || isThisGoerli) && (
         <StyledNavbar warning={true}>
           {title && (
             <>

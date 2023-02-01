@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 
 import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
 import { RedirectIcon, Text, Link } from '@components/common';
-import { OnchainMetaDataActions, OnchainMetaDataSelector, LinesSelectors } from '@store';
+import { OnchainMetaDataActions, OnchainMetaDataSelector, LinesSelectors, NetworkSelectors } from '@store';
+import { Collateral, Network } from '@src/core/types';
 import { getENS } from '@src/utils';
 
 import { LineMetadata } from './LineMetadata';
@@ -12,9 +13,10 @@ import { PositionsTable } from './PositionsTable';
 
 interface LineDetailsProps {
   onAddCollateral?: Function;
+  lineNetwork: Network;
 }
 
-const Container = styled.div`
+export const Container = styled.div`
   margin: 0;
   padding: 1em;
   width: 100%;
@@ -59,14 +61,13 @@ const RouterLink = styled(Link)<{ selected: boolean }>`
   `}
 `;
 
-const BorrowerName = styled(Text)`
+export const BorrowerName = styled(Text)`
   max-width: 100%;
 `;
 
 export const LineDetailsDisplay = (props: LineDetailsProps) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
-
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
@@ -78,44 +79,26 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
 
   useEffect(() => {
     const ensName = getENS(selectedLine?.borrower!, ensMap);
-
-    if (!ensName) {
-      setBorrowerId(selectedLine?.borrower!);
-    } else {
-      setBorrowerId(ensName);
-    }
+    setBorrowerId(ensName!);
   }, [selectedLine, ensMap]);
 
   if (!selectedLine) return <Container>{t('lineDetails:line.no-data')}</Container>;
-  const { principal, deposit, escrow, borrower, spigot, start, end } = selectedLine;
-
-  const StandardMetadata = (metadataProps: any) => (
-    <>
-      <Header>
-        <RouterLink to={`/portfolio/${borrower}`} key={borrower} selected={false}>
-          <BorrowerName>
-            {borrowerID}'s Line Of Credit
-            <Redirect />
-          </BorrowerName>
-        </RouterLink>
-      </Header>
-      <LineMetadata {...metadataProps} />
-    </>
-  );
+  const { principal, deposit, totalInterestRepaid, escrow, borrower, spigot, start, end, defaultSplit } = selectedLine;
+  const StandardMetadata = (metadataProps: any) => <></>;
 
   // allow passing in core data first if we have it already and let Page data render once returned
   // if we have all data render full UI
   return (
     <Container>
-      <StandardMetadata
-        revenue={spigot?.tokenRevenue}
-        deposits={escrow?.deposits}
-        deposit={deposit}
-        principal={principal}
-        totalInterestPaid={'0'}
-        startTime={start}
-        endTime={end}
-      />
+      <Header>
+        <RouterLink to={`/${props.lineNetwork}/portfolio/${borrower}`} key={borrower} selected={false}>
+          <BorrowerName>
+            {t('lineDetails:metadata.borrower')} {'  :  '} {borrowerID}
+            <Redirect />
+          </BorrowerName>
+        </RouterLink>
+      </Header>
+      <LineMetadata />
 
       {positions && <PositionsTable positions={_.values(positions)} />}
     </Container>

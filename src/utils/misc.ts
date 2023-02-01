@@ -1,5 +1,14 @@
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { keyBy, merge, values, orderBy, toNumber, isString, get } from 'lodash';
+
+export const bn = (value: string | number) => {
+  if (value.toString().includes('.')) {
+    // BN cant handle decimals
+    return;
+  }
+
+  return BigNumber.from(value);
+};
 
 export const isValidAddress = (address: string): boolean => {
   try {

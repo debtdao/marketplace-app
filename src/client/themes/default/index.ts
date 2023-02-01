@@ -111,7 +111,7 @@ const sharedTheme: SharedTheme = {
   },
 
   txModal: {
-    width: '38.4rem',
+    width: '48rem', // original default: 38.4rem
     gap: '.8rem',
   },
 

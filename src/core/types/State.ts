@@ -1,10 +1,4 @@
-import {
-  TokenFragRepsonse,
-  GetUserPortfolioResponse,
-  LineOfCreditsResponse,
-  BasePositionFragResponse,
-  LenderPositionsResponse,
-} from '@types';
+import { TokenFragRepsonse, GetUserPortfolioResponse, LineOfCreditsResponse, BasePositionFragResponse } from '@types';
 
 import { Alert } from './Alerts';
 import { Address, Network } from './Blockchain';
@@ -105,7 +99,8 @@ export interface IdToCreditPositionMap {
 export interface CreditLineState {
   selectedLineAddress: string | undefined;
   selectedPosition: string | undefined;
-  linesMap: { [lineAddress: string]: LineOfCredit };
+  selectedProposal: string | undefined;
+  linesMap: { [lineAddress: string]: SecuredLine };
   positionsMap: { [id: string]: CreditPosition };
   eventsMap: { [line: string]: CreditEvent[] };
   categories: { [category: string]: string[] };
@@ -121,6 +116,7 @@ export interface CreditLineState {
   statusMap: {
     getLines: Status;
     getLine: Status;
+    // getLineEvents: Status;
     getLinePage: Status;
     getAllowances: Status;
     getUserPortfolio: Status;
@@ -141,8 +137,17 @@ export interface CollateralState {
     escrowAllowances: { [line: string]: { [token: string]: string } };
   };
   statusMap: CollateralActionsStatusMap;
+  // reservesMap: { [reserveAddress: string]: { [tokenAddress: string]: string } }; //
+  reservesMap: {
+    [reserveAddress: string]: {
+      [tokenAddress: string]: {
+        unusedTokens: string;
+        ownerTokens: string;
+        operatorTokens: string;
+      };
+    };
+  };
 }
-
 interface TokenCollateralMap {
   [contract: string]: { [token: string]: Status };
 }
@@ -238,12 +243,7 @@ export interface VaultActionsStatusMap {
 
 export interface OnchainMetaDataState {
   contractABI: { [address: string]: string };
-  contractFunctions: { [address: string]: string[] };
-  // contractFunctions: {
-  //   [address: string]: {
-  //     [functionName: string]: string;
-  //   };
-  // };
+  contractFunctions: { [address: string]: { [address: string]: string } };
   ens: { [address: string]: string };
 }
 

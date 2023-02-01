@@ -96,7 +96,7 @@ const RedirectLinkIcon = styled(RedirectIcon)`
 `;
 
 interface PositionsProps {
-  borrower: string;
+  borrower?: string;
   lender?: string;
   positions: CreditPosition[];
   displayLine?: boolean; // whether to add the positions line to the table
@@ -244,12 +244,12 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
     };
 
     // Display button to approve proposal for the taker/borrower of the proposal
-    if (getAddress(borrower) === userWallet && getAddress(proposal.maker) === userWallet) {
+    if (borrower && getAddress(borrower) === userWallet && getAddress(proposal.maker) === userWallet) {
       return [approveMutualConsent, revokeMutualConsent];
     }
 
     // Display button to approve proposal for the taker/borrower of the proposal
-    if (getAddress(borrower) === userWallet) {
+    if (borrower && getAddress(borrower) === userWallet) {
       return [approveMutualConsent];
     }
 

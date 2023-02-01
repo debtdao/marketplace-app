@@ -48,6 +48,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
   const { msgData } = selectedProposal!;
   const targetTokenAmount = normalizeAmount(deposit, selectedPosition!.token.decimals);
   const selectedCredit = linesMap[selectedPosition?.line];
+  // console.log('linesMap: ', linesMap);
 
   const onTransactionCompletedDismissed = () => {
     if (onClose) {
@@ -89,7 +90,9 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
         setLoading(false);
       }
       if (res.meta.requestStatus === 'fulfilled') {
+        console.log('revoke consent fulfilled: ', '1');
         setTransactionCompleted(1);
+        console.log('revoke consent fulfilled: ', '2');
         dispatch(
           LinesActions.setProposal({
             lineAddress: selectedCredit.id,
@@ -99,7 +102,9 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
             // network: walletNetwork,
           })
         );
+        console.log('revoke consent fulfilled: ', '3');
         setLoading(false);
+        console.log('revoke consent fulfilled: ', '4');
       }
     });
   };

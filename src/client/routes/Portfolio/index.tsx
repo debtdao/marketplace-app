@@ -7,7 +7,13 @@ import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
 import { WalletSelectors, LinesActions, LinesSelectors, AlertsActions } from '@store';
 import { SummaryCard, ViewContainer } from '@components/app';
 import { isValidAddress } from '@utils';
-import { LENDER_POSITION_ROLE, BORROWER_POSITION_ROLE, CreditPosition, SecuredLine } from '@src/core/types';
+import {
+  LENDER_POSITION_ROLE,
+  BORROWER_POSITION_ROLE,
+  CreditPosition,
+  SecuredLine,
+  UseCreditLinesParams,
+} from '@src/core/types';
 import { PositionsTable } from '@src/client/components/app/LineDetailsDisplay/PositionsTable';
 import { device } from '@themes/default';
 
@@ -92,11 +98,35 @@ export const Portfolio = () => {
 
   const availableRoles = [BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE];
 
+  // TODO: Move this from market and portfolio pages into a shared location
+  const defaultLineCategories: UseCreditLinesParams = {
+    // using i18m translation as keys for easy display
+    'market:featured.highest-credit': {
+      first: 3,
+      // NOTE: terrible proxy for total credit (oldest = most). Currently getLines only allows filtering by line metadata not modules'
+      orderBy: 'start',
+      orderDirection: 'asc',
+    },
+    'market:featured.highest-revenue': {
+      first: 16,
+      // NOTE: terrible proxy for total revenue earned (highest % = highest notional). Currently getLines only allows filtering by line metadata not modules'
+      orderBy: 'defaultSplit',
+      orderDirection: 'desc',
+    },
+    'market:featured.newest': {
+      first: 15,
+      orderBy: 'start', // NOTE: theoretically gets lines that start in the future, will have to refine query
+      orderDirection: 'desc',
+    },
+  };
+
   useEffect(() => {
     if (!isValidAddress(portfolioAddress!)) {
       dispatch(AlertsActions.openAlert({ message: 'Please connect wallet.', type: 'error' }));
     } else if (portfolioAddress && isValidAddress(portfolioAddress)) {
       dispatch(LinesActions.getUserPortfolio({ user: portfolioAddress.toLocaleLowerCase() }));
+      // TODO: only dispatch if userPortfolio doesn't provide what we need to populate linesMap
+      dispatch(LinesActions.getLines(defaultLineCategories));
     }
   }, [portfolioAddress]);
 
@@ -140,7 +170,7 @@ export const Portfolio = () => {
         <StyledBorrowerContainer>
           <PositionsTable
             borrower={portfolioAddress!}
-            lender={portfolioAddress}
+            lender={undefined}
             positions={borrowerPositions}
             displayLine={true}
           />
@@ -150,78 +180,13 @@ export const Portfolio = () => {
       {selectedRole === LENDER_POSITION_ROLE && (
         <StyledBorrowerContainer>
           <PositionsTable
-            borrower={portfolioAddress!}
+            borrower={undefined}
             lender={portfolioAddress}
             positions={lenderPositions.map((id) => allPositions[id])}
             displayLine={true}
           />
         </StyledBorrowerContainer>
       )}
-
-      {/* {!portfolioLoaded && <StyledNoWalletCard />} */}
-      {/* {!userTokensLoading && (
-        <TokensCard
-          header={t('components.list-card.wallet')}
-          metadata={[
-            {
-              key: 'balanceUsdc',
-              header: t('components.list-card.value'),
-              format: ({ balanceUsdc }) => humanize('usd', balanceUsdc),
-              sortable: true,
-              width: '11rem',
-              className: 'col-value',
-            },
-            {
-              key: 'displayName',
-              header: t('components.list-card.asset'),
-              transform: ({ displayIcon, displayName, symbol }) => (
-                <>
-                  <TokenIcon icon={displayIcon} symbol={symbol} />
-                  <Text ellipsis>{displayName}</Text>
-                </>
-              ),
-              width: '23rem',
-              sortable: true,
-              className: 'col-name',
-            },
-            {
-              key: 'tokenBalance',
-              header: t('components.list-card.balance'),
-              format: ({ balance, decimals }) => humanize('amount', balance, decimals, 2),
-              sortable: true,
-              width: '13rem',
-              className: 'col-balance',
-            },
-            {
-              key: 'priceUsdc',
-              header: t('components.list-card.price'),
-              format: ({ priceUsdc }) => humanize('usd', priceUsdc),
-              sortable: true,
-              width: '11rem',
-              className: 'col-price',
-            },
-
-            {
-              key: 'invest',
-              transform: ({ address }) => <ActionButtons actions={[...investButton(address, false)]} />,
-              align: 'flex-end',
-              width: 'auto',
-              grow: '1',
-            },
-          ]}
-          data={userTokens.map((token) => ({
-            ...token,
-            displayName: token.symbol,
-            displayIcon: token.icon ?? '',
-            tokenBalance: normalizeAmount(token.balance, token.decimals),
-            invest: null,
-          }))}
-          initialSortBy="balanceUsdc"
-          wrap
-          filterBy={filterDustTokens}
-          filterLabel="Show dust"
-        />
-      // )} */}
     </StyledViewContainer>
   );
 };

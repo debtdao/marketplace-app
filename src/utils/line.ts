@@ -646,6 +646,7 @@ export const formatUserPortfolioData = (
   // add token Prices as arg
   // const { spigot, escrow, positions, borrower, status, ...metadata } = lineData;
   const { borrowerLineOfCredits, lenderPositions, arbiterLineOfCredits } = portfolioData;
+  console.log('format borrowerLineOfCredits - lines: ', borrowerLineOfCredits, arbiterLineOfCredits);
   const lines = [...borrowerLineOfCredits, ...arbiterLineOfCredits]
     .map(({ borrower, arbiter, status, positions = [], events = [], escrow, spigot, ...rest }) => {
       const {
@@ -684,6 +685,7 @@ export const formatUserPortfolioData = (
     })
     .reduce((lines, line) => ({ ...lines, [line.id]: line }), {});
 
+  console.log('format user porfolio data - lines: ', lines);
   const positions = createPositionsMap(lenderPositions, tokenPrices);
 
   return { lines, positions };

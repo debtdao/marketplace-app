@@ -251,6 +251,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.linesMap = { ...state.linesMap, ...lines };
       let allPositions = {};
       let allEvents = {};
+      console.log('lines reducer: ', lines);
       const linesByRole: LinesByRole = _.entries<SecuredLine>(lines).reduce(
         ({ borrowing, arbiting }: LinesByRole, [addy, line]) => {
           // add borrower and arbiter positions to object for state.positionsMap
@@ -265,7 +266,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       );
       // add lender positions to object for state.positionsMap and update state.positionsMap
       allPositions = { ...allPositions, ...lenderPositions };
-      console.log('User Portfolio 5: ', allPositions);
       state.positionsMap = { ...state.positionsMap, ...allPositions };
 
       state.user.portfolio = {

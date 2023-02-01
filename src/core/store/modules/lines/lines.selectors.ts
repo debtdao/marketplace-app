@@ -210,31 +210,6 @@ const selectSummaryData = createSelector([selectUserLinesSummary], (userLinesSum
   };
 });
 
-//const selectRecommendations = createSelector([selectLiveLines, selectLinesMap], (activeLines, linesMap) => {
-//const stableCoinSymbols = ['DAI', 'sUSD'];
-//const targetTokenSymbols = ['ETH'];
-//const stableLines: SecuredLineWithEvents[] = [];
-//const tokenLines: SecuredLineWithEvents[] = [];
-// stableCoinsSymbols.forEach((symbol) => {
-//   const line = lines.find((line) => line.token.symbol === symbol);
-//   if (!line) return;
-//   stableLines.push(line);
-// });
-
-// targetTokenSymbols.forEach((symbol) => {
-//   const line = lines.find((line) => line.token.symbol === symbol);
-//   if (!line) return;
-//   tokenLines.push(line);
-// });
-
-// return [stableLine, derivativeLines[1], derivativeLines[0]].filter((item) => !!item);
-// const sortedLines = [...lines].sort((a, b) => {
-//   return toBN(b.apyData).minus(a.apyData).toNumber();
-// });
-
-// return object with fields for categories
-//});
-
 const selectLine = createSelector([selectLinesMap], (linesMap) =>
   memoize((lineAddress: string) => linesMap[lineAddress])
 );

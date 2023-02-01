@@ -100,7 +100,7 @@ export const LineDetailsDisplay = (props: LineDetailsProps) => {
       </Header>
       <LineMetadata />
 
-      {positions && <PositionsTable positions={_.values(positions)} />}
+      {positions && <PositionsTable borrower={borrower} positions={_.values(positions)} />}
     </Container>
   );
 };

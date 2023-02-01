@@ -138,13 +138,23 @@ export const Portfolio = () => {
 
       {selectedRole === BORROWER_POSITION_ROLE && (
         <StyledBorrowerContainer>
-          <PositionsTable positions={borrowerPositions} displayLine={true} />
+          <PositionsTable
+            borrower={portfolioAddress!}
+            lender={portfolioAddress}
+            positions={borrowerPositions}
+            displayLine={true}
+          />
         </StyledBorrowerContainer>
       )}
 
       {selectedRole === LENDER_POSITION_ROLE && (
         <StyledBorrowerContainer>
-          <PositionsTable positions={lenderPositions.map((id) => allPositions[id])} displayLine={true} />
+          <PositionsTable
+            borrower={portfolioAddress!}
+            lender={portfolioAddress}
+            positions={lenderPositions.map((id) => allPositions[id])}
+            displayLine={true}
+          />
         </StyledBorrowerContainer>
       )}
 

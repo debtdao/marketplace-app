@@ -96,17 +96,19 @@ const RedirectLinkIcon = styled(RedirectIcon)`
 `;
 
 interface PositionsProps {
+  borrower: string;
+  lender?: string;
   positions: CreditPosition[];
   displayLine?: boolean; // whether to add the positions line to the table
 }
 
-interface ActionButtonProps {
-  name: string;
-  handler: (position?: string) => void;
-  disabled: boolean;
-}
+// interface ActionButtonProps {
+//   name: string;
+//   handler: (position?: string) => void;
+//   disabled: boolean;
+// }
 
-export const PositionsTable = ({ positions, displayLine = false }: PositionsProps) => {
+export const PositionsTable = ({ borrower, lender, positions, displayLine = false }: PositionsProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const dispatch = useAppDispatch();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
@@ -119,7 +121,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
   const { NETWORK } = getEnv();
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
 
-  const { borrower } = selectedLine!;
+  // const { borrower } = selectedLine!;
 
   // Initial set up for positions table
   useEffect(() => {

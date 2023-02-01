@@ -34,7 +34,8 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionLoading, setLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>(['']);
-  const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
+  // const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
+  const linesMap = useAppSelector(LinesSelectors.selectLinesMap);
   const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
   const selectedProposal = useAppSelector(LinesSelectors.selectSelectedProposal);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
@@ -46,6 +47,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
   const [dRate, fRate, deposit, tokenAddress, lenderAddress] = [...selectedProposal!.args];
   const { msgData } = selectedProposal!;
   const targetTokenAmount = normalizeAmount(deposit, selectedPosition!.token.decimals);
+  const selectedCredit = linesMap[selectedPosition?.line];
 
   const onTransactionCompletedDismissed = () => {
     if (onClose) {
@@ -77,6 +79,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
       LinesActions.revokeConsent({
         id: selectedPosition.id,
         lineAddress: selectedCredit.id,
+        // lineAddress: selectedPosition.line,
         network: walletNetwork,
         msgData: msgData,
       })
@@ -90,6 +93,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
         dispatch(
           LinesActions.setProposal({
             lineAddress: selectedCredit.id,
+            // lineAddress: selectedPosition.line,
             positionId: selectedPosition.id,
             proposalId: selectedProposal!.id,
             // network: walletNetwork,

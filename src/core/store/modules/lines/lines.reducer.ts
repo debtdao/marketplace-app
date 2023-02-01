@@ -20,6 +20,7 @@ import { getNetworkId } from '@src/utils';
 
 import { NetworkActions } from '../network/network.actions';
 import { WalletActions } from '../wallet/wallet.actions';
+import { CollateralActions } from '../collateral/collateral.actions';
 
 import { LinesActions } from './lines.actions';
 
@@ -33,6 +34,8 @@ export const initialLineActionsStatusMap: LineActionsStatusMap = {
 const { networkChange } = WalletActions;
 
 const { changeNetwork } = NetworkActions;
+
+const { enableCollateral } = CollateralActions;
 
 export const initialUserMetadataStatusMap: UserLineMetadataStatusMap = {
   getUserPortfolio: initialStatus,
@@ -334,6 +337,20 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       //const lineAddress = meta.arg.lineAddress;
       console.log('error', error);
       //state.statusMap.user.linesActionsStatusMap[lineAddress].deposit = { error: error.message };
+    })
+
+    /* ------------------------------ withdrawLine ----------------------------- */
+    /* -------------------------------- enableCollateral ------------------------------- */
+    .addCase(enableCollateral.pending, (state, payload) => {
+      // state.statusMap.enableCollateral = { loading: true };
+    })
+    .addCase(enableCollateral.fulfilled, (state, { payload: { lineAddress, contract, token, success } }) => {
+      // state.statusMap.enableCollateral = {};
+      console.log('enable collateral reducer: ', contract, token, success);
+      // state.linesMap[lineAddress].collateral = { contract, token, enabled: success };
+    })
+    .addCase(enableCollateral.rejected, (state, { error }) => {
+      // state.statusMap.enableCollateral = { error: error.message };
     })
 
     /* ------------------------------ withdrawLine ----------------------------- */

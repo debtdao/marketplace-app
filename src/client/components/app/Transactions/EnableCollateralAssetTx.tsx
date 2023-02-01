@@ -85,8 +85,6 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
 
   const selectedAsset =
     _.find(collateralOptions, (t) => t.address === selectedCollateralAssetAddress) || collateralOptions[0];
-  console.log('Selected Collateral Asset: ', selectedAsset);
-  console.log('collateralOption', collateralOptions, selectedAsset);
 
   useEffect(() => {
     // if escrow not set yet then correct state
@@ -175,6 +173,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
     }
 
     const transactionData: EnableCollateralAssetProps = {
+      lineAddress: selectedLine!.id,
       escrowAddress: selectedEscrow.id,
       token: selectedCollateralAssetAddress,
       network: walletNetwork,
@@ -225,9 +224,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
       </StyledTransaction>
     );
   }
-  console.log('Selected Asset: ', selectedAsset);
-  console.log('Selected Escrow: ', selectedEscrow);
-  console.log('Selected Collateral Asset Address: ', selectedCollateralAssetAddress);
+
   return (
     <StyledTransaction onClose={onClose} header={header}>
       <TxTokenInput

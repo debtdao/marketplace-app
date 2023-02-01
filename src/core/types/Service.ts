@@ -359,6 +359,7 @@ export interface GetUserPortfolioProps {
 // Colalteral Service Function Props
 export interface EnableCollateralAssetProps {
   // userPositionMetadata: UserPositionMetadata;
+  lineAddress: Address;
   escrowAddress: Address;
   token: Address;
   network: Network;

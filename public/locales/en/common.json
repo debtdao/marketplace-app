@@ -239,7 +239,7 @@
         "select-repay-option": "Select Repayment Method",
         "repaying-from": "Repaying from your",
         "close": {
-          "title": "Close Line",
+          "title": "Close Position",
           "desc": "from your wallet",
           "cta": "Close"
         },

@@ -474,16 +474,15 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         setLoading(false);
       }
       if (res.meta.requestStatus === 'fulfilled') {
-        // TODO
-        // const updatedPosition = repayCreditUpdate(selectedPosition);
-        // dispatch(
-        //   LinesActions.setPosition({
-        //     id: selectedPosition.id,
-        //     position: updatedPosition,
-        //   })
-        // );
+        const updatedPosition = repayCreditUpdate(selectedPosition);
+        dispatch(
+          LinesActions.setPosition({
+            id: selectedPosition.id,
+            position: updatedPosition,
+          })
+        );
         setTransactionCompleted(1);
-        window.location.reload();
+        // window.location.reload();
         setLoading(false);
       }
     });

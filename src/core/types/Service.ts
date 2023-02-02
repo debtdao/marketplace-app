@@ -35,6 +35,7 @@ import {
   GetUserPortfolioResponse,
   GetLineEventsResponse,
   LineEventFragResponse,
+  TokenView,
 } from '@types';
 
 // *************** USER ***************
@@ -361,7 +362,7 @@ export interface EnableCollateralAssetProps {
   // userPositionMetadata: UserPositionMetadata;
   lineAddress: Address;
   escrowAddress: Address;
-  token: Address;
+  token: TokenView;
   network: Network;
   dryRun?: boolean;
 }

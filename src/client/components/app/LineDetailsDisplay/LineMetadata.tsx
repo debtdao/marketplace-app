@@ -406,7 +406,8 @@ export const LineMetadata = () => {
             {
               key: 'amount',
               header: t('lineDetails:metadata.escrow.assets-list.amount'),
-              transform: ({ token: { balance } }) => <Text ellipsis> {balance} </Text>,
+              // transform: ({ token: { balance } }) => <Text ellipsis> {balance} </Text>,
+              format: ({ amount }) => `$ ${humanize('amount', amount, 18, 2)}`,
               sortable: true,
               width: '20rem',
               className: 'col-amount',
@@ -415,6 +416,7 @@ export const LineMetadata = () => {
               key: 'value',
               header: t('lineDetails:metadata.escrow.assets-list.value'),
               format: ({ value }) => `$ ${humanize('amount', value, 18, 2)}`,
+              // format: ({ value }) => `$ ${humanize('value', value, 18, 2)}`,
               sortable: true,
               width: '20rem',
               className: 'col-value',

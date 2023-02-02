@@ -175,7 +175,8 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
     const transactionData: EnableCollateralAssetProps = {
       lineAddress: selectedLine!.id,
       escrowAddress: selectedEscrow.id,
-      token: selectedCollateralAssetAddress,
+      // token: selectedCollateralAssetAddress,
+      token: selectedAsset,
       network: walletNetwork,
       dryRun: false,
     };

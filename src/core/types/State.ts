@@ -155,7 +155,7 @@ export interface CollateralActionsStatusMap {
   getLineCollateralData: Status;
   approve: TokenCollateralMap;
   addCollateral: TokenCollateralMap;
-  enableCollateral: TokenCollateralMap;
+  enableCollateral: Status;
 
   addSpigot: Status;
   releaseSpigot: Status;

@@ -691,7 +691,7 @@ export const formatUserPortfolioData = (
   return { lines, positions };
 };
 
-const _createTokenView = (tokenResponse: TokenFragRepsonse, amount?: BigNumber, price?: BigNumber) => {
+export const _createTokenView = (tokenResponse: TokenFragRepsonse, amount?: BigNumber, price?: BigNumber) => {
   // might already have for token in state but we only pass in prices to these util functions
   // will need to merge and prefer state vs this jank
   return {

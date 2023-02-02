@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { BigNumber } from 'ethers';
 
 import {
+  initialStatus,
   CollateralState,
   CollateralActionsStatusMap,
   CollateralModule,
@@ -11,6 +12,8 @@ import {
   CollateralEvent,
   BaseEscrowDepositFragResponse,
   ReservesMap,
+  AggregatedEscrow,
+  EscrowDepositMap,
 } from '@types';
 import { formatCollateralEvents, formatSpigotCollateralEvents } from '@src/utils';
 
@@ -21,7 +24,7 @@ import { CollateralActions } from './collateral.actions';
 export const initialCollateralActionsStatusMap: CollateralActionsStatusMap = {
   approve: {},
   addCollateral: {},
-  enableCollateral: {},
+  enableCollateral: initialStatus,
   addSpigot: {},
   releaseSpigot: {},
   updateOwnerSplit: {},
@@ -53,6 +56,7 @@ const {
   enableCollateral,
   addSpigot,
   tradeable,
+  releaseCollateral,
 } = CollateralActions;
 
 const collateralReducer = createReducer(collateralInitialState, (builder) => {
@@ -73,24 +77,47 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
       state.selectedCollateralAsset = assetAddress;
     })
     /* -------------------------------- enableCollateral ------------------------------- */
-    .addCase(enableCollateral.pending, (state, payload) => {
-      // state.statusMap.enableCollateral = { loading: true };
+    .addCase(enableCollateral.pending, (state) => {
+      state.statusMap.enableCollateral = { loading: true };
     })
-    .addCase(enableCollateral.fulfilled, (state, payload) => {
-      // state.statusMap.enableCollateral = {};
-    })
+    .addCase(
+      enableCollateral.fulfilled,
+      (state, { payload: { escrowDeposit, lineAddress, contract, token, success } }) => {
+        const escrow = state.collateralMap[contract] as AggregatedEscrow;
+        const escrowDeposits = escrow.deposits ?? ({} as EscrowDepositMap);
+        escrowDeposits[token.address] = escrowDeposit;
+        state.collateralMap[contract] = { ...escrow, deposits: escrowDeposits };
+      }
+    )
     .addCase(enableCollateral.rejected, (state, { error }) => {
-      // state.statusMap.enableCollateral = { error: error.message };
+      state.statusMap.enableCollateral = { error: error.message };
     })
     /* -------------------------------- addCollateral ------------------------------- */
     .addCase(addCollateral.pending, (state, payload) => {
-      // state.statusMap.addCollateral = { loading: true };
+      state.statusMap.enableCollateral = { loading: true };
     })
-    .addCase(addCollateral.fulfilled, (state, payload) => {
-      // state.statusMap.addCollateral = {};
+    .addCase(addCollateral.fulfilled, (state, { payload: { contract, token, amount, success } }) => {
+      const escrow = state.collateralMap[contract] as AggregatedEscrow;
+      const escrowDeposits = escrow.deposits ?? ({} as EscrowDepositMap);
+      escrowDeposits[token].amount = BigNumber.from(escrowDeposits[token].amount).add(amount).toString();
+      state.collateralMap[contract] = { ...escrow, deposits: escrowDeposits };
     })
     .addCase(addCollateral.rejected, (state, { error }) => {
-      // _.assignIn(state.statusMap.addCollateral, { [contract]: { [token]: { error: error.message } } });
+      state.statusMap.enableCollateral = { error: error.message };
+    })
+
+    /* -------------------------------- releaseCollateral ------------------------------- */
+    .addCase(releaseCollateral.pending, (state, payload) => {
+      state.statusMap.enableCollateral = { loading: true };
+    })
+    .addCase(releaseCollateral.fulfilled, (state, { payload: { contract, token, amount, success } }) => {
+      const escrow = state.collateralMap[contract] as AggregatedEscrow;
+      const escrowDeposits = escrow.deposits ?? ({} as EscrowDepositMap);
+      escrowDeposits[token].amount = BigNumber.from(escrowDeposits[token].amount).sub(amount).toString();
+      state.collateralMap[contract] = { ...escrow, deposits: escrowDeposits };
+    })
+    .addCase(releaseCollateral.rejected, (state, { error }) => {
+      state.statusMap.enableCollateral = { error: error.message };
     })
 
     /* ---------------------------------- addSpigot ----------------------------------------*/

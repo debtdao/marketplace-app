@@ -252,6 +252,8 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         setLoading(false);
       }
       if (res.meta.requestStatus === 'fulfilled' && transactionType === 'propose') {
+        // TODO:
+        // LineActions.makeProposal (AddCreditProps)
         setTransactionCompleted(1);
         setLoading(false);
       }

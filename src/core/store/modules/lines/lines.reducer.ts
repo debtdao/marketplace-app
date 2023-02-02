@@ -17,6 +17,7 @@ import {
   CreditProposal,
   EscrowDeposit,
   EscrowDepositMap,
+  ProposalMap,
 } from '@types';
 import { getNetworkId } from '@src/utils';
 
@@ -87,7 +88,7 @@ const {
   setSelectedLinePosition,
   setSelectedLinePositionProposal,
   setPosition,
-  setProposal,
+  revokeProposal,
   getUserLinePositions,
   getUserPortfolio,
   clearLinesData,
@@ -95,6 +96,7 @@ const {
   // getUserLinesMetadata,
   clearSelectedLine,
   clearLineStatus,
+  makeProposal,
 } = LinesActions;
 
 const linesReducer = createReducer(linesInitialState, (builder) => {
@@ -120,7 +122,65 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.positionsMap[id] = position;
     })
 
-    .addCase(setProposal, (state, { payload: { lineAddress, positionId, proposalId } }) => {
+    .addCase(makeProposal, (state, { payload: { lineAddress, drate, frate, amount, token, lender, network } }) => {
+      const {};
+      const positionIds = state.linesMap[lineAddress].positionIds ?? [];
+      const positionId = '0x' + Math.random().toString(16).substr(2, 40);
+      positionIds.push(positionId);
+      const proposalId = '0x' + Math.random().toString(16).substr(2, 40);
+      const proposalsMap = {
+        id: proposalId,
+        proposedAt: null,
+        revokedAt: null,
+        acceptedAt: null,
+        endedAt: null,
+        maker,
+        taker: null,
+        mutualConsentFunc: '',
+        msgData: '',
+        args: [],
+      } as ProposalMap;
+      // id: string;
+      // proposedAt: number;
+      // revokedAt: number;
+      // acceptedAt: number;
+      // endedAt: number;
+      // maker: string;
+      // taker: string;
+      // mutualConsentFunc: string;
+      // msgData: string;
+      // args: string[];
+
+      const position = {
+        id: positionId,
+        line: lineAddress,
+        status: 'PROPOSED',
+        token,
+        lender,
+        proposalsMap,
+      } as CreditPosition;
+      // id: string;
+      // line: string;
+      // status: PositionStatusTypes;
+      // lender: string;
+      // token: TokenView;
+      // deposit: string;
+      // principal: string;
+      // interestAccrued: string;
+      // interestRepaid: string;
+      // totalInterestRepaid: string;
+      // dRate: string;
+      // fRate: string;
+      // proposalsMap: ProposalMap;
+
+      // save positonIds array in state.linesMap.positionIds
+      // save position object to state.positionsMap
+
+      // state.linesMap = { ...state.linesMap, ...lines };
+      // state.positionsMap = { ...state.positionsMap, ...positions };
+    })
+
+    .addCase(revokeProposal, (state, { payload: { lineAddress, positionId, proposalId } }) => {
       const { revokedAt, ...rest } = state.positionsMap[positionId]?.proposalsMap[proposalId];
       const updatedProposal = { ...rest, revokedAt: 1234 }; // TODO: replace with actual time the proposal was revoked
       state.positionsMap[positionId].proposalsMap[proposalId] = updatedProposal;
@@ -311,16 +371,72 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.getAllowances = { error: error.message };
     })
 
-    .addCase(addCredit.pending, (state) => {
-      state.statusMap.getAllowances = { loading: true };
-    })
-    .addCase(addCredit.fulfilled, (state) => {
-      // deployLine action emits a getLine action if tx is successful
-      state.statusMap.getAllowances = {};
-    })
-    .addCase(addCredit.rejected, (state, { error }) => {
-      state.statusMap.getAllowances = { error: error.message };
-    })
+    /* ----------------------------- addCredit ----------------------------- */
+    // .addCase(addCredit.pending, (state) => {
+    //   state.statusMap.addCredit = { loading: true };
+    // })
+    // .addCase(
+    //   addCredit.fulfilled,
+    //   (state, { payload: { lineAddress, drate, frate, amount, token, lender, network } }) => {
+    //     const positionIds = state.linesMap[lineAddress].positionIds ?? [];
+    //     const positionId = '0x' + Math.random().toString(16).substr(2, 40);
+    //     positionIds.push(positionId);
+    //     const proposalId = '0x' + Math.random().toString(16).substr(2, 40);
+    //     const proposalsMap = {
+    //       id: proposalId,
+    //       proposedAt: null,
+    //       revokedAt: null,
+    //       acceptedAt: null,
+    //       endedAt: null,
+    //       maker,
+    //       taker: null,
+    //       mutualConsentFunc: '',
+    //       msgData: '',
+    //       args: [],
+    //     } as ProposalMap;
+    //     // id: string;
+    //     // proposedAt: number;
+    //     // revokedAt: number;
+    //     // acceptedAt: number;
+    //     // endedAt: number;
+    //     // maker: string;
+    //     // taker: string;
+    //     // mutualConsentFunc: string;
+    //     // msgData: string;
+    //     // args: string[];
+
+    //     const position = {
+    //       id: positionId,
+    //       line: lineAddress,
+    //       status: 'PROPOSED',
+    //       token,
+    //       lender,
+    //       proposalsMap,
+    //     } as CreditPosition;
+    //     // id: string;
+    //     // line: string;
+    //     // status: PositionStatusTypes;
+    //     // lender: string;
+    //     // token: TokenView;
+    //     // deposit: string;
+    //     // principal: string;
+    //     // interestAccrued: string;
+    //     // interestRepaid: string;
+    //     // totalInterestRepaid: string;
+    //     // dRate: string;
+    //     // fRate: string;
+    //     // proposalsMap: ProposalMap;
+
+    //     // save positonIds array in state.linesMap.positionIds
+    //     // save position object to state.positionsMap
+
+    //     // state.linesMap = { ...state.linesMap, ...lines };
+    //     // state.positionsMap = { ...state.positionsMap, ...positions };
+    //   }
+    // )
+    // .addCase(addCredit.rejected, (state, { error }) => {
+    //   state.statusMap.addCredit = { error: error.message };
+    // })
 
     /* ------------------------------ depositAndRepay ------------------------------ */
     .addCase(depositAndRepay.pending, (state, { meta }) => {

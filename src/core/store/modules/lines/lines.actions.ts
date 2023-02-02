@@ -60,8 +60,12 @@ const setSelectedLinePositionProposal = createAction<{ position?: string; propos
 );
 const setPosition = createAction<{ id: string; position: CreditPosition }>('lines/setPosition');
 
+const makeProposal = createAction<{ position: AddCreditProps }>('lines/makeProposal');
+
 // TODO: update this to fetch the updated proposal from the subgraph to set revokedAt
-const setProposal = createAction<{ lineAddress: string; positionId: string; proposalId: string }>('lines/setProposal');
+const revokeProposal = createAction<{ lineAddress: string; positionId: string; proposalId: string }>(
+  'lines/revokeProposal'
+);
 
 /* -------------------------------------------------------------------------- */
 /*                                 Clear State                                */
@@ -349,7 +353,21 @@ const addCredit = createAsyncThunk<void, AddCreditProps, ThunkAPI>(
       dryRun: true,
       network: network,
     });
-    console.log(tx);
+    console.log('Add Credit Transaction: ', tx);
+    if (!tx) {
+      throw new Error('failed to add Credit');
+    }
+
+    // return {
+    //   lineAddress,
+    //   drate,
+    //   frate,
+    //   amount,
+    //   token,
+    //   lender,
+    //   network,
+    // };
+    // return;
     // const notifyEnabled = app.servicesEnabled.notify;
     // await transactionService.handleTransaction({ tx, network: network.current, useExternalService: notifyEnabled });
   }
@@ -882,7 +900,7 @@ export const LinesActions = {
   setSelectedLinePosition,
   setSelectedLinePositionProposal,
   setPosition,
-  setProposal,
+  revokeProposal,
   clearLinesData,
   clearUserData,
   clearSelectedLine,
@@ -910,7 +928,7 @@ export const LinesActions = {
   claimAndTrade,
   claimAndRepay,
   useAndRepay,
-
+  makeProposal,
   liquidate,
 
   getDepositAllowance,

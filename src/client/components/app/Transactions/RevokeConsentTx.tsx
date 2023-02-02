@@ -94,7 +94,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
         setTransactionCompleted(1);
         console.log('revoke consent fulfilled: ', '2');
         dispatch(
-          LinesActions.setProposal({
+          LinesActions.revokeProposal({
             lineAddress: selectedCredit.id,
             // lineAddress: selectedPosition.line,
             positionId: selectedPosition.id,

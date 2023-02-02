@@ -1,4 +1,4 @@
-import { CreditPosition, CreditProposal, OPENED_STATUS } from '@src/core/types';
+import { CLOSED_STATUS, CreditPosition, CreditProposal, OPENED_STATUS } from '@src/core/types';
 
 import { toWei } from './format';
 
@@ -40,5 +40,12 @@ export const addCreditUpdate = (position: CreditPosition, proposal: CreditPropos
     fRate,
     deposit,
     lender,
+  };
+};
+
+export const repayCreditUpdate = (position: CreditPosition): CreditPosition => {
+  return {
+    ...position,
+    status: CLOSED_STATUS,
   };
 };

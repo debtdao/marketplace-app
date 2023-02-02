@@ -97,15 +97,14 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const [transactionApproved, setTransactionApproved] = useState(true);
   const [transactionLoading, setLoading] = useState(false);
   const [targetTokenAmount, setTargetTokenAmount] = useState('0');
-  const [drate, setDrate] = useState('');
-  const [frate, setFrate] = useState('');
+  const [drate, setDrate] = useState('0');
+  const [frate, setFrate] = useState('0');
   const [lenderAddress, setLenderAddress] = useState(walletAddress ? walletAddress : '');
   const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
   const [transactionType, setTransactionType] = useState('propose');
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
 
-  console.log('selectedPosition', selectedPosition, selectedCredit);
   useEffect(() => {
     if (selectedPosition?.status === PROPOSED_STATUS && selectedProposal) {
       // set values based on selectedProposal
@@ -118,14 +117,6 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       setTransactionType('accept');
     }
   }, [selectedPosition]);
-
-  // if(1selectedSellToken || selectedSellToken?.address !== selectedPosition?.token.address) {
-  //   setSelectedTokenAddress(selectedPosition?.token.address);
-  //   dispatch(
-  //     TokensActions.setSelectedTokenAddress({
-  //       tokenAddress: selectedPosition?.token.address,
-  //     });
-  // }
 
   useEffect(() => {
     if (!selectedSellToken) {
@@ -237,14 +228,11 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         setTransactionApproved(transactionApproved);
         setLoading(false);
       }
-      console.log('Transaction Type: ', transactionType);
       if (res.meta.requestStatus === 'fulfilled' && transactionType === 'accept') {
         if (!selectedPosition) {
           return;
         }
-        const updatedPosition = addCreditUpdate(selectedPosition);
-        console.log('Selected Position', selectedPosition);
-        console.log('Updated Position', updatedPosition);
+        const updatedPosition = addCreditUpdate(selectedPosition, selectedProposal!);
         dispatch(
           LinesActions.setPosition({
             id: selectedPosition.id,

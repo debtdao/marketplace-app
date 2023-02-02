@@ -120,7 +120,6 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
   const explorerUrl = useExplorerURL(currentNetwork);
   const { NETWORK } = getEnv();
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
-
   // const { borrower } = selectedLine!;
 
   // Initial set up for positions table
@@ -263,7 +262,6 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
 
   const formattedPositionsAndProposals = _.flatten(
     positions?.map((position) => {
-      // get position (not in PROPOSED_STATUS)
       const positionToDisplay = {
         deposit: humanize('amount', position.deposit, position.token.decimals, 2),
         drate: `${normalizeAmount(position.dRate, 2)} %`,
@@ -304,7 +302,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
       const proposalsToDisplay =
         position.status === PROPOSED_STATUS
           ? Object.values(position.proposalsMap)
-              .filter((proposal) => proposal.revokedAt === null)
+              .filter((proposal) => proposal.revokedAt === null || proposal.revokedAt === 0)
               .map((proposal) => {
                 const [dRate, fRate, deposit, tokenAddress, lenderAddress] = [...proposal.args];
                 return {

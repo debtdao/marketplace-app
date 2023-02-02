@@ -237,11 +237,14 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         setTransactionApproved(transactionApproved);
         setLoading(false);
       }
+      console.log('Transaction Type: ', transactionType);
       if (res.meta.requestStatus === 'fulfilled' && transactionType === 'accept') {
         if (!selectedPosition) {
           return;
         }
         const updatedPosition = addCreditUpdate(selectedPosition);
+        console.log('Selected Position', selectedPosition);
+        console.log('Updated Position', updatedPosition);
         dispatch(
           LinesActions.setPosition({
             id: selectedPosition.id,

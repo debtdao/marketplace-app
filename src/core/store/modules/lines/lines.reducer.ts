@@ -121,27 +121,28 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 
     .addCase(setPosition, (state, { payload: { id, position } }) => {
       state.positionsMap[id] = position;
+      console.log('Updated Positions Map: ', state.positionsMap[id]);
     })
 
     .addCase(makeProposal, (state, { payload: { maker, position } }) => {
       const { lineAddress, drate, frate, amount, token, lender } = position;
 
       const positionIds = state.linesMap[lineAddress].positionIds ?? [];
-      const positionId = '0x' + Math.random().toString(16).substr(2, 40);
+      // const positionId = '0x' + Math.random().toString(16).substr(2, 40);
+      const positionId = '0x' + Math.random().toFixed(64).slice(2, 68);
       positionIds.push(positionId);
-      const proposalId = '0x' + Math.random().toString(16).substr(2, 40);
+      // const proposalId = '0x' + Math.random().toString(16).substr(2, 40);
+      const proposalId = '0x' + Math.random().toFixed(64).slice(2, 68);
 
       const proposal = {
         id: proposalId,
-        proposedAt: Number(null),
-        revokedAt: Number(null),
-        acceptedAt: Number(null),
-        endedAt: Number(null),
-        maker,
+        proposedAt: 1234,
+        acceptedAt: 1234,
+        revokedAt: 0,
+        maker: maker.toLowerCase(),
         taker: String(null),
         mutualConsentFunc: '',
         msgData: '',
-        // args: [drate, frate, deposit, tokenAddress, lenderAddress], // TODO
         args: [drate.toString(), frate.toString(), amount.toString(), token.address, lender],
       } as CreditProposal;
       const proposalsMap: ProposalMap = {};
@@ -152,7 +153,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
         line: lineAddress,
         status: PROPOSED_STATUS,
         token,
-        lender,
+        lender: lender.toLowerCase(),
         deposit: '0',
         principal: '0',
         interestAccrued: '0',

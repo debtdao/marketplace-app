@@ -37,11 +37,18 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
   const [transactionLoading, setLoading] = useState(false);
   const [targetAmount, setTargetAmount] = useState('1');
   const [errors, setErrors] = useState<string[]>(['']);
-  const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
+  // const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
+  const linesMap = useAppSelector(LinesSelectors.selectLinesMap);
   const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
+
+  if (!selectedPosition) {
+    return null;
+  }
+
+  const selectedCredit = linesMap[selectedPosition?.line];
 
   //Calculate maximum withdraw amount, then humanize for readability
   const getMaxWithdraw = () => {
@@ -126,6 +133,8 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
       return;
     }
 
+    console.log('Selected Credit: ', selectedCredit);
+    console.log('Selected Position: ', selectedPosition);
     dispatch(
       LinesActions.withdrawLine({
         id: selectedPosition.id,
@@ -144,7 +153,8 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
         dispatch(
           LinesActions.setPosition({
             id: selectedPosition.id,
-            position: selectedPosition,
+            // position: selectedPosition,
+            position: updatedPosition,
           })
         );
         setLoading(false);

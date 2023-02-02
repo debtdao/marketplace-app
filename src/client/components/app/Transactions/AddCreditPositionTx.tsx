@@ -226,7 +226,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       drate: BigNumber.from(drate),
       frate: BigNumber.from(frate),
       amount: BigNumber.from(amountInWei),
-      token: positionToken.address,
+      token: positionToken,
       lender: lenderAddress,
       network: walletNetwork!,
       dryRun: false,
@@ -252,8 +252,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         setLoading(false);
       }
       if (res.meta.requestStatus === 'fulfilled' && transactionType === 'propose') {
-        // TODO:
-        // LineActions.makeProposal (AddCreditProps)
+        dispatch(LinesActions.makeProposal({ maker: walletAddress!, position: transactionObj }));
         setTransactionCompleted(1);
         setLoading(false);
       }

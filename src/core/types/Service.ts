@@ -214,7 +214,8 @@ export interface CreditLineService {
 
 export interface AddCreditProps {
   lineAddress: string;
-  token: Address;
+  // token: Address;
+  token: TokenView;
   drate: BigNumber;
   frate: BigNumber;
   amount: BigNumber;

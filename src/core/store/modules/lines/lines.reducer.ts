@@ -18,6 +18,7 @@ import {
   EscrowDeposit,
   EscrowDepositMap,
   ProposalMap,
+  PROPOSED_STATUS,
 } from '@types';
 import { getNetworkId } from '@src/utils';
 
@@ -122,62 +123,48 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.positionsMap[id] = position;
     })
 
-    .addCase(makeProposal, (state, { payload: { lineAddress, drate, frate, amount, token, lender, network } }) => {
-      const {};
+    .addCase(makeProposal, (state, { payload: { maker, position } }) => {
+      const { lineAddress, drate, frate, amount, token, lender } = position;
+
       const positionIds = state.linesMap[lineAddress].positionIds ?? [];
       const positionId = '0x' + Math.random().toString(16).substr(2, 40);
       positionIds.push(positionId);
       const proposalId = '0x' + Math.random().toString(16).substr(2, 40);
-      const proposalsMap = {
+
+      const proposal = {
         id: proposalId,
-        proposedAt: null,
-        revokedAt: null,
-        acceptedAt: null,
-        endedAt: null,
+        proposedAt: Number(null),
+        revokedAt: Number(null),
+        acceptedAt: Number(null),
+        endedAt: Number(null),
         maker,
-        taker: null,
+        taker: String(null),
         mutualConsentFunc: '',
         msgData: '',
-        args: [],
-      } as ProposalMap;
-      // id: string;
-      // proposedAt: number;
-      // revokedAt: number;
-      // acceptedAt: number;
-      // endedAt: number;
-      // maker: string;
-      // taker: string;
-      // mutualConsentFunc: string;
-      // msgData: string;
-      // args: string[];
+        // args: [drate, frate, deposit, tokenAddress, lenderAddress], // TODO
+        args: [drate.toString(), frate.toString(), amount.toString(), token.address, lender],
+      } as CreditProposal;
+      const proposalsMap: ProposalMap = {};
+      proposalsMap[proposalId] = proposal;
 
-      const position = {
+      const proposedPosition = {
         id: positionId,
         line: lineAddress,
-        status: 'PROPOSED',
+        status: PROPOSED_STATUS,
         token,
         lender,
+        deposit: '0',
+        principal: '0',
+        interestAccrued: '0',
+        interestRepaid: '0',
+        totalInterestRepaid: '0',
+        dRate: '0',
+        fRate: '0',
         proposalsMap,
       } as CreditPosition;
-      // id: string;
-      // line: string;
-      // status: PositionStatusTypes;
-      // lender: string;
-      // token: TokenView;
-      // deposit: string;
-      // principal: string;
-      // interestAccrued: string;
-      // interestRepaid: string;
-      // totalInterestRepaid: string;
-      // dRate: string;
-      // fRate: string;
-      // proposalsMap: ProposalMap;
 
-      // save positonIds array in state.linesMap.positionIds
-      // save position object to state.positionsMap
-
-      // state.linesMap = { ...state.linesMap, ...lines };
-      // state.positionsMap = { ...state.positionsMap, ...positions };
+      state.linesMap[lineAddress].positionIds = positionIds;
+      state.positionsMap[positionId] = proposedPosition;
     })
 
     .addCase(revokeProposal, (state, { payload: { lineAddress, positionId, proposalId } }) => {

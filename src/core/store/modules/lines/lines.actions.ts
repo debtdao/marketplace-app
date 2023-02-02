@@ -60,7 +60,7 @@ const setSelectedLinePositionProposal = createAction<{ position?: string; propos
 );
 const setPosition = createAction<{ id: string; position: CreditPosition }>('lines/setPosition');
 
-const makeProposal = createAction<{ position: AddCreditProps }>('lines/makeProposal');
+const makeProposal = createAction<{ maker: string; position: AddCreditProps }>('lines/makeProposal');
 
 // TODO: update this to fetch the updated proposal from the subgraph to set revokedAt
 const revokeProposal = createAction<{ lineAddress: string; positionId: string; proposalId: string }>(

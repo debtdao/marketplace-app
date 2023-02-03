@@ -19,6 +19,11 @@ import {
   RevenueSummary,
   SpigotRevenueContractMap,
   TokenView,
+  UNINITIALIZED_STATUS,
+  ACTIVE_STATUS,
+  LIQUIDATABLE_STATUS,
+  REPAID_STATUS,
+  INSOLVENT_STATUS,
 } from '@src/core/types';
 import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
 import { Button, Text, RedirectIcon, Link, CardEmptyList } from '@components/common';
@@ -73,6 +78,40 @@ const DataMetric = styled.h5`
   `}
 `;
 
+const MetadataBox = styled.div`
+  ${({ theme }) => `
+    font-size: ${theme.fonts.sizes.md};
+  `}
+`;
+
+const MetadataTitle = styled.span`
+  ${({ theme }) => `color: ${theme.colors.primary}; `}
+`;
+
+const StatusWithColor = styled.span<{ status: string }>`
+  color: ${({ status }) => {
+    console.log('stats color', status);
+    switch (status) {
+      case UNINITIALIZED_STATUS:
+        return '#E6E600'; // darkish yellow
+      case ACTIVE_STATUS:
+      case REPAID_STATUS:
+        return '#6AFF4D'; // light green
+      case INSOLVENT_STATUS:
+      case LIQUIDATABLE_STATUS:
+        return '#FF1919'; // bright red
+    }
+  }};
+`;
+
+const CratioWithColor = styled.span<{ diff: number }>`
+  color: ${({ diff }) => {
+    if (diff >= 15) return '#6AFF4D'; // decent margin - light green
+    else if (diff < 0) return '#FF1919'; // liquidatable - bright red
+    else return '#E6E600'; // close to liquidatable - darkish yellow
+  }};
+`;
+
 const DataSubMetricsContainer = styled.div``;
 
 const DataSubMetric = styled.p``;
@@ -119,23 +158,15 @@ interface MetricDisplay extends Metric {
   title: string;
   data: string;
   displaySubmetrics?: boolean;
-  submetrics?: Metric[];
+  children?: any;
 }
 
-const MetricDataDisplay = ({ title, data, displaySubmetrics = false, submetrics }: MetricDisplay) => {
+const MetricDataDisplay = ({ title, data, displaySubmetrics = false, children }: MetricDisplay) => {
   return (
     <MetricContainer>
       <MetricName>{title}</MetricName>
       <DataMetric>{data}</DataMetric>
-      {displaySubmetrics && (
-        <DataSubMetricsContainer>
-          {submetrics?.map(({ title, data }, index) => (
-            <DataSubMetric key={index}>
-              {title} : {data}
-            </DataSubMetric>
-          ))}
-        </DataSubMetricsContainer>
-      )}
+      {displaySubmetrics && <DataSubMetricsContainer>{children}</DataSubMetricsContainer>}
     </MetricContainer>
   );
 };
@@ -184,15 +215,37 @@ export const LineMetadata = () => {
   const renderSpigotMetadata = () => {
     if (!revenue) return null;
     return (
-      <MetricDataDisplay
-        title={t('lineDetails:metadata.revenue.total')}
-        data={`$ ${humanize('amount', revenueValue, 18, 2)}`}
-      />
+      <>
+        <div>
+          <p>
+            <MetadataTitle>
+              {`${t('lineDetails:metadata.lender')}  ${t('lineDetails:metadata.revenue-split')}`}:
+            </MetadataTitle>{' '}
+            {defaultSplit}%
+          </p>
+          <p>
+            <MetadataTitle>
+              {`${t('lineDetails:metadata.borrower')}  ${t('lineDetails:metadata.revenue-split')}`}:
+            </MetadataTitle>{' '}
+            {100 - Number(defaultSplit)}%
+          </p>
+          <p>
+            <MetadataTitle>{t('lineDetails:metadata.cratio')}: </MetadataTitle>{' '}
+            <CratioWithColor diff={Number(cratio) - Number(minCRatio)}>{cratio}%</CratioWithColor>
+          </p>
+          <p>
+            <MetadataTitle>{t('lineDetails:metadata.min-cratio')}: </MetadataTitle> {minCRatio}%
+          </p>
+        </div>
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.revenue.total')}
+          data={`$ ${humanize('amount', revenueValue, 18, 2)}`}
+        />
+      </>
     );
   };
 
-  // TODO: rename to addCollateralHandler
-  const depositHandler = (token: TokenView) => {
+  const addCollateralHandler = (token: TokenView) => {
     if (!walletIsConnected) {
       connectWallet();
     } else {
@@ -201,8 +254,7 @@ export const LineMetadata = () => {
     }
   };
 
-  // TODO: rename to releaseCollateralhandler
-  const withdrawHandler = (token: TokenView) => {
+  const releaseCollateralhandler = (token: TokenView) => {
     if (!walletIsConnected) {
       connectWallet();
     } else {
@@ -249,17 +301,18 @@ export const LineMetadata = () => {
     actions: getCollateralRowActionForRole(userPositionMetadata.role),
   }));
 
+  const connectWalletText = t('components.connect-button.connect');
   const enableCollateralText = walletIsConnected
-    ? `${t('lineDetails:metadata.collateral-table.enable-asset')}`
-    : `${t('components.connect-button.connect')}`;
+    ? t('lineDetails:metadata.collateral-table.enable-asset')
+    : connectWalletText;
 
   const enableSpigotText = walletIsConnected
-    ? `${t('lineDetails:metadata.collateral-table.enable-spigot')}`
-    : `${t('components.connect-button.connect')}`;
+    ? t('lineDetails:metadata.collateral-table.enable-spigot')
+    : connectWalletText;
 
   const depositCollateralText = walletIsConnected
-    ? `${t('lineDetails:metadata.collateral-table.add-collateral')}`
-    : `${t('components.connect-button.connect')}`;
+    ? t('lineDetails:metadata.collateral-table.add-collateral')
+    : connectWalletText;
 
   const getCollateralTableActions = () => {
     switch (userPositionMetadata.role) {
@@ -282,12 +335,13 @@ export const LineMetadata = () => {
 
   const startDateHumanized = format(new Date(startTime * 1000), 'MMMM dd, yyyy');
   const endDateHumanized = format(new Date(endTime * 1000), 'MMMM dd, yyyy');
-  const revenueSplitFormatted: Metric[] = [];
-  revenueSplitFormatted.push({
-    title: `${t('lineDetails:metadata.borrower')}`,
-    data: 100 - Number(defaultSplit) + '%',
-  });
-  revenueSplitFormatted.push({ title: `${t('lineDetails:metadata.lender')}`, data: defaultSplit + '%' });
+  const revenueSplitFormatted: Metric[] = [
+    { title: `${t('lineDetails:metadata.lender')}`, data: defaultSplit + '%' },
+    {
+      title: `${t('lineDetails:metadata.borrower')}`,
+      data: 100 - Number(defaultSplit) + '%',
+    },
+  ];
 
   // TODO: fix types on args
   // TODO: What is the action button for revenue?
@@ -302,12 +356,12 @@ export const LineMetadata = () => {
           actions={[
             {
               name: t('components.transaction.deposit'),
-              handler: () => depositHandler(token),
+              handler: () => addCollateralHandler(token),
               disabled: !walletIsConnected,
             },
             {
               name: t('components.transaction.release'),
-              handler: () => withdrawHandler(token),
+              handler: () => releaseCollateralhandler(token),
               disabled: !walletIsConnected,
             },
           ]}
@@ -328,32 +382,32 @@ export const LineMetadata = () => {
     // );
     return;
   };
+
+  console.log('Metadata staus', status);
   return (
     <>
       <ThreeColumnLayout>
+        <MetadataBox>
+          <p>
+            <MetadataTitle>{t('lineDetails:metadata.status')}: </MetadataTitle>{' '}
+            <StatusWithColor status={status}>{status[0].toUpperCase() + status.substring(1)}</StatusWithColor>{' '}
+          </p>
+          <p>
+            <MetadataTitle>{t('lineDetails:metadata.start')}: </MetadataTitle> {startDateHumanized}
+          </p>
+          <p>
+            <MetadataTitle>{t('lineDetails:metadata.end')}: </MetadataTitle> {endDateHumanized}
+          </p>
+          <p>
+            <MetadataTitle>{t('lineDetails:metadata.total-interest-paid')}: </MetadataTitle> $
+            {humanize('amount', totalInterestRepaid, 18, 2)}
+          </p>
+        </MetadataBox>
         <MetricDataDisplay
           title={t('lineDetails:metadata.principal')}
           data={`$ ${humanize('amount', principal, 18, 2)}`}
         />
         <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${humanize('amount', deposit, 18, 2)}`} />
-        <MetricDataDisplay
-          title={t('lineDetails:metadata.total-interest-paid')}
-          data={`$ ${humanize('amount', totalInterestRepaid, 18, 2)}`}
-        />
-        <MetricDataDisplay
-          title={t('lineDetails:metadata.revenue-split')}
-          data={''}
-          displaySubmetrics={true}
-          submetrics={revenueSplitFormatted}
-        />
-        <MetricDataDisplay title={t('lineDetails:metadata.min-cratio')} data={minCRatio + '%'} />
-        <MetricDataDisplay title={t('lineDetails:metadata.cratio')} data={cratio + '%'} />
-        <MetricDataDisplay
-          title={t('lineDetails:metadata.status')}
-          data={status[0].toUpperCase() + status.substring(1)}
-        />
-        <MetricDataDisplay title={t('lineDetails:metadata.start')} data={startDateHumanized} />
-        <MetricDataDisplay title={t('lineDetails:metadata.end')} data={endDateHumanized} />
       </ThreeColumnLayout>
       <SectionHeader>
         {t('lineDetails:metadata.secured-by')}

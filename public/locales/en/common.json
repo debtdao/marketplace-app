@@ -24,7 +24,17 @@
       "status": "Status",
       "principal": "Borrowed",
       "interest": "Interest Accrued",
-      "lender": "Lender"
+      "lender": "Lender",
+      "tooltip": {
+        "drate": "Fixed rate APR for drawn credit",
+        "frate": "Fixed rate APR for undrawn credit",
+        "total-deposits": "The total amount of the token supplied",
+        "token": "The token supplied to the position",
+        "status": "Status of the position: proposed, open, or closed",
+        "principal": "The total amount of the token borrowed",
+        "interest": "The amount of interest accrued on the borrowed token",
+        "lender": "The lender address for the position"
+      }
     },
     "list-card": {
       "apy": "APY",

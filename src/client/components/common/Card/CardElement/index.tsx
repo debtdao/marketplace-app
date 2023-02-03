@@ -69,6 +69,7 @@ const Content = styled.div`
 type SortType = 'asc' | 'desc';
 interface CardElementProps {
   header?: string;
+  description?: string;
   sortable?: boolean;
   activeSort?: boolean;
   sortType?: SortType;
@@ -84,6 +85,7 @@ interface CardElementProps {
 export const CardElement: FC<CardElementProps> = ({
   children,
   header,
+  description,
   sortable,
   activeSort,
   sortType,
@@ -96,15 +98,19 @@ export const CardElement: FC<CardElementProps> = ({
   className,
   ...props
 }) => {
-  // console.log('Card Element: ', className);
+  // console.log('Card Element - props: ', props);
+  // console.log('Card Element - content: ', content);
+  console.log('Card Element - description: ', description);
+  // const stuff = 'text';
   return (
     <Container width={width} align={align} grow={grow} fontWeight={fontWeight} className={className} {...props}>
       {header && (
         <Header onClick={onClick}>
           {header}
-          {/* <Tooltip placement="bottom" tooltipComponent={<>stuff</>}>
+          <Tooltip placement="top" tooltipComponent={<>{description}</>}>
             <StyledIcon Component={InfoIcon} size="1.5rem" />
-          </Tooltip> */}
+            {/* <InfoIcon title={description} /> */}
+          </Tooltip>
           {sortable && <SortIcon activeSort={activeSort} sortType={sortType} Component={ArrowDownIcon} />}
         </Header>
       )}

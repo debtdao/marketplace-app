@@ -380,6 +380,7 @@ export const LineMetadata = () => {
             {
               key: 'type',
               header: t('lineDetails:metadata.escrow.assets-list.type'),
+              description: t('lineDetails:metadata.escrow.tooltip.type'),
               transform: ({ type }) => (
                 <>
                   <Text>{type?.toUpperCase()}</Text>
@@ -392,6 +393,7 @@ export const LineMetadata = () => {
             {
               key: 'token',
               header: t('lineDetails:metadata.escrow.assets-list.symbol'),
+              description: t('lineDetails:metadata.escrow.tooltip.symbol'),
               transform: ({ token: { symbol, icon, address } }) => (
                 <Link to={getEtherscanUrlStub(network) + `${address}`}>
                   {icon && <TokenIcon icon={icon} symbol={symbol} />}
@@ -406,8 +408,9 @@ export const LineMetadata = () => {
             {
               key: 'amount',
               header: t('lineDetails:metadata.escrow.assets-list.amount'),
+              description: t('lineDetails:metadata.escrow.tooltip.amount'),
               // transform: ({ token: { balance } }) => <Text ellipsis> {balance} </Text>,
-              format: ({ amount }) => `$ ${humanize('amount', amount, 18, 2)}`,
+              format: ({ amount }) => `${humanize('amount', amount, 18, 2)}`,
               sortable: true,
               width: '20rem',
               className: 'col-amount',
@@ -415,6 +418,7 @@ export const LineMetadata = () => {
             {
               key: 'value',
               header: t('lineDetails:metadata.escrow.assets-list.value'),
+              description: t('lineDetails:metadata.escrow.tooltip.value'),
               format: ({ value }) => `$ ${humanize('amount', value, 18, 2)}`,
               // format: ({ value }) => `$ ${humanize('value', value, 18, 2)}`,
               sortable: true,

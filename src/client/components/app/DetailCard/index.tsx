@@ -106,6 +106,7 @@ const SectionContent = styled.div`
 interface Metadata<T> {
   key: Extract<keyof T, string>;
   header?: string;
+  description?: string;
   align?: 'flex-start' | 'center' | 'flex-end';
   fontWeight?: number;
   width?: string;
@@ -119,6 +120,7 @@ interface Metadata<T> {
 
 interface DetailCardProps<T> {
   header: string;
+  // description: string;
   metadata: Metadata<T>[];
   data: T[];
   stripes?: boolean;

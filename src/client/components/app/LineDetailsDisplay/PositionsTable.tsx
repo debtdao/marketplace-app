@@ -358,6 +358,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
             {
               key: 'status',
               header: t('components.positions-card.status'),
+              description: t('components.positions-card.tooltip.status'),
               sortable: true,
               width: '12rem',
               className: 'col-apy',
@@ -366,6 +367,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
               key: 'line',
               hide: !displayLine,
               header: t('components.positions-card.line'),
+              description: t('components.positions-card.tooltip.line'),
               sortable: true,
               width: '13rem',
               className: 'col-apy',
@@ -373,6 +375,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
             {
               key: 'lender',
               header: t('components.positions-card.lender'),
+              description: t('components.positions-card.tooltip.lender'),
               sortable: true,
               width: '13rem',
               className: 'col-available',
@@ -380,6 +383,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
             {
               key: 'token',
               header: t('components.positions-card.token'),
+              description: t('components.positions-card.tooltip.token'),
               sortable: true,
               width: '8rem',
               className: 'col-available',
@@ -387,6 +391,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
             {
               key: 'deposit',
               header: t('components.positions-card.total-deposits'),
+              description: t('components.positions-card.tooltip.total-deposits'),
               sortable: true,
               width: '13rem',
               className: 'col-assets',
@@ -394,6 +399,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
             {
               key: 'principal',
               header: t('components.positions-card.principal'),
+              description: t('components.positions-card.tooltip.principal'),
               sortable: true,
               width: '13rem',
               className: 'col-assets',
@@ -401,6 +407,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
             {
               key: 'interest',
               header: t('components.positions-card.interest'),
+              description: t('components.positions-card.tooltip.interest'),
               sortable: true,
               width: '8rem',
               className: 'col-assets',
@@ -408,6 +415,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
             {
               key: 'drate',
               header: t('components.positions-card.drate'),
+              description: t('components.positions-card.tooltip.drate'),
               sortable: true,
               width: '10rem',
               className: 'col-assets',
@@ -415,6 +423,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
             {
               key: 'frate',
               header: t('components.positions-card.frate'),
+              description: t('components.positions-card.tooltip.frate'),
               sortable: true,
               width: '10rem',
               className: 'col-assets',

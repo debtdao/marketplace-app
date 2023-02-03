@@ -32,7 +32,9 @@ const StyledTooltip = styled.div`
   position: relative;
   font-size: 1.6rem;
   padding: 0.8rem;
-  width: max-content;
+  //width: max-content;
+  max-height: 20rem;
+  max-width: 40rem;
   min-width: 11rem;
   z-index: ${({ theme }) => theme.zindex.tooltips};
 

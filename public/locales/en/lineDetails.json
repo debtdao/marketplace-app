@@ -46,6 +46,17 @@
       "enable-asset": "Enable Collateral",
       "add-collateral": "Deposit",
       "no-table": "No Collateral added"
+    },
+    "tooltip": {
+      "principal": "",
+      "deposit": "",
+      "total-interest-paid": "",
+      "revenue-split": "Default revenue split between borrowers and lenders for the line of credit",
+      "cratio": "",
+      "status": "",
+      "start": "",
+      "end": ""
+
     }
   },
   "credit-events": {

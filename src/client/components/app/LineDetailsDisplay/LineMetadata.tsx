@@ -21,7 +21,7 @@ import {
   TokenView,
 } from '@src/core/types';
 import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
-import { Button, Text, RedirectIcon, Link, CardEmptyList } from '@components/common';
+import { Button, Text, RedirectIcon, Link, CardEmptyList, Tooltip, InfoIcon } from '@components/common';
 import {
   LinesSelectors,
   ModalsActions,
@@ -117,15 +117,21 @@ interface Metric {
 
 interface MetricDisplay extends Metric {
   title: string;
+  description: string;
   data: string;
   displaySubmetrics?: boolean;
   submetrics?: Metric[];
 }
 
-const MetricDataDisplay = ({ title, data, displaySubmetrics = false, submetrics }: MetricDisplay) => {
+const MetricDataDisplay = ({ title, description, data, displaySubmetrics = false, submetrics }: MetricDisplay) => {
   return (
     <MetricContainer>
-      <MetricName>{title}</MetricName>
+      <MetricName>
+        {title}
+        {/* <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
+          <InfoIcon title={description} />
+        </Tooltip> */}
+      </MetricName>
       <DataMetric>{data}</DataMetric>
       {displaySubmetrics && (
         <DataSubMetricsContainer>
@@ -171,12 +177,14 @@ export const LineMetadata = () => {
       return (
         <MetricDataDisplay
           title={t('lineDetails:metadata.escrow.no-collateral')}
+          description={t('lineDetails:metadata.escrow.no-collateral')}
           data={`$ ${prettyNumbers(collateralValue)}`}
         />
       );
     return (
       <MetricDataDisplay
         title={t('lineDetails:metadata.escrow.total')}
+        description={t('lineDetails:metadata.escrow.total')}
         data={`$ ${humanize('amount', collateralValue, 18, 2)}`}
       />
     );
@@ -186,6 +194,7 @@ export const LineMetadata = () => {
     return (
       <MetricDataDisplay
         title={t('lineDetails:metadata.revenue.total')}
+        description={t('lineDetails:metadata.escrow.revenue.total')}
         data={`$ ${humanize('amount', revenueValue, 18, 2)}`}
       />
     );
@@ -333,27 +342,51 @@ export const LineMetadata = () => {
       <ThreeColumnLayout>
         <MetricDataDisplay
           title={t('lineDetails:metadata.principal')}
+          description={t('lineDetails:metadata.tooltip.principal')}
           data={`$ ${humanize('amount', principal, 18, 2)}`}
         />
-        <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${humanize('amount', deposit, 18, 2)}`} />
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.deposit')}
+          description={t('lineDetails:metadata.tooltip.deposit')}
+          data={`$ ${humanize('amount', deposit, 18, 2)}`}
+        />
         <MetricDataDisplay
           title={t('lineDetails:metadata.total-interest-paid')}
+          description={t('lineDetails:metadata.tooltip.total-interest-paid')}
           data={`$ ${humanize('amount', totalInterestRepaid, 18, 2)}`}
         />
         <MetricDataDisplay
           title={t('lineDetails:metadata.revenue-split')}
+          description={t('lineDetails:metadata.tooltip.revenue-split')}
           data={''}
           displaySubmetrics={true}
           submetrics={revenueSplitFormatted}
         />
-        <MetricDataDisplay title={t('lineDetails:metadata.min-cratio')} data={minCRatio + '%'} />
-        <MetricDataDisplay title={t('lineDetails:metadata.cratio')} data={cratio + '%'} />
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.min-cratio')}
+          description={t('lineDetails:metadata.tooltip.min-cratio')}
+          data={minCRatio + '%'}
+        />
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.cratio')}
+          description={t('lineDetails:metadata.tooltip.cratio')}
+          data={cratio + '%'}
+        />
         <MetricDataDisplay
           title={t('lineDetails:metadata.status')}
+          description={t('lineDetails:metadata.tooltip.status')}
           data={status[0].toUpperCase() + status.substring(1)}
         />
-        <MetricDataDisplay title={t('lineDetails:metadata.start')} data={startDateHumanized} />
-        <MetricDataDisplay title={t('lineDetails:metadata.end')} data={endDateHumanized} />
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.start')}
+          description={t('lineDetails:metadata.tooltip.start')}
+          data={startDateHumanized}
+        />
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.end')}
+          description={t('lineDetails:metadata.tooltip.end')}
+          data={endDateHumanized}
+        />
       </ThreeColumnLayout>
       <SectionHeader>
         {t('lineDetails:metadata.secured-by')}

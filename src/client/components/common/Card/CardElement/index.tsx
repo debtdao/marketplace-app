@@ -34,10 +34,11 @@ const SortIcon = styled(({ activeSort, sortType, ...props }: SortIconProps) => <
   `}
 `;
 
-const StyledIcon = styled(Icon)`
-  margin-left: 1rem;
-  flex-shrink: 0;
-`;
+// TODO: determine why adding this creates an error
+// const StyledIcon = styled(Icon)`
+//   margin-left: 1rem;
+//   flex-shrink: 0;
+// `;
 
 const Header = styled.h3<{ onClick?: () => void }>`
   display: flex;
@@ -107,10 +108,11 @@ export const CardElement: FC<CardElementProps> = ({
       {header && (
         <Header onClick={onClick}>
           {header}
-          <Tooltip placement="top" tooltipComponent={<>{description}</>}>
-            <StyledIcon Component={InfoIcon} size="1.5rem" />
-            {/* <InfoIcon title={description} /> */}
+          <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
+            <InfoIcon title={description} />
           </Tooltip>
+          {/* TODO: fix error with StyledIcon */}
+          {/* <StyledIcon Component={InfoIcon} size="1.5rem" /> */}
           {sortable && <SortIcon activeSort={activeSort} sortType={sortType} Component={ArrowDownIcon} />}
         </Header>
       )}

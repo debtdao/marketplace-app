@@ -10,7 +10,7 @@
     "deposit": "Credit Limit",
     "total-interest-paid": "Lifetime Interest Paid",
     "revenue-split":"Revenue Split",
-    "min-cratio":"Minimum Collateralization Ratio",
+    "min-cratio":"Min. Collateralization Ratio",
     "cratio":"Collateralization Ratio",
     "secured-by": "Secured By ",
     "unsecured": "This is an unsecured line of credit. You MUST trust the borrower.",

@@ -216,7 +216,7 @@ export const LineMetadata = () => {
     if (!revenue) return null;
     return (
       <>
-        <div>
+        <MetadataBox>
           <p>
             <MetadataTitle>
               {`${t('lineDetails:metadata.lender')}  ${t('lineDetails:metadata.revenue-split')}`}:
@@ -236,7 +236,7 @@ export const LineMetadata = () => {
           <p>
             <MetadataTitle>{t('lineDetails:metadata.min-cratio')}: </MetadataTitle> {minCRatio}%
           </p>
-        </div>
+        </MetadataBox>
         <MetricDataDisplay
           title={t('lineDetails:metadata.revenue.total')}
           data={`$ ${humanize('amount', revenueValue, 18, 2)}`}

@@ -193,7 +193,7 @@ export const LineMetadata = () => {
     return (
       <MetricDataDisplay
         title={t('lineDetails:metadata.escrow.total')}
-        description={t('lineDetails:metadata.escrow.total')}
+        description={t('lineDetails:metadata.escrow.tooltip.total')}
         data={`$ ${humanize('amount', collateralValue, 18, 2)}`}
       />
     );
@@ -203,7 +203,7 @@ export const LineMetadata = () => {
     return (
       <MetricDataDisplay
         title={t('lineDetails:metadata.revenue.total')}
-        description={t('lineDetails:metadata.escrow.revenue.total')}
+        description={t('lineDetails:metadata.revenue.tooltip')}
         data={`$ ${humanize('amount', revenueValue, 18, 2)}`}
       />
     );

@@ -104,6 +104,14 @@ const StatusWithColor = styled.span<{ status: string }>`
   }};
 `;
 
+const CratioWithColor = styled.span<{ diff: number }>`
+  color: ${({ diff }) => {
+    if (diff >= 15) return '#6AFF4D'; // decent margin - light green
+    else if (diff < 0) return '#FF1919'; // liquidatable - bright red
+    else return '#E6E600'; // close to liquidatable - darkish yellow
+  }};
+`;
+
 const DataSubMetricsContainer = styled.div``;
 
 const DataSubMetric = styled.p``;
@@ -222,7 +230,8 @@ export const LineMetadata = () => {
             {100 - Number(defaultSplit)}%
           </p>
           <p>
-            <MetadataTitle>{t('lineDetails:metadata.cratio')}: </MetadataTitle> {cratio}%
+            <MetadataTitle>{t('lineDetails:metadata.cratio')}: </MetadataTitle>{' '}
+            <CratioWithColor diff={Number(cratio) - Number(minCRatio)}>{cratio}%</CratioWithColor>
           </p>
           <p>
             <MetadataTitle>{t('lineDetails:metadata.min-cratio')}: </MetadataTitle> {minCRatio}%

@@ -232,6 +232,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
           <TxNumberInput
             headerText={t('components.transaction.deploy-line.cratio')}
             inputLabel={t('components.transaction.deploy-line.cratio-input')}
+            inputAlign="right"
             width={'sm'}
             placeholder={'30%'}
             amount={cratio}
@@ -244,6 +245,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
           <TxNumberInput
             headerText={t('components.transaction.deploy-line.revenue-split')}
             inputLabel={t('components.transaction.deploy-line.revenue-split-input')}
+            inputAlign="right"
             width={'sm'}
             placeholder={'90%'}
             amount={revenueSplit}

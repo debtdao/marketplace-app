@@ -23,7 +23,7 @@ const StyledTooltipArrow = styled.div`
 `;
 
 const StyledTooltip = styled.div`
-  background: ${({ theme }) => theme.colors.background};
+  background: ${({ theme }) => theme.colors.backgroundVariant};
   color: ${({ theme }) => theme.colors.titles};
   fill: currentColor;
   stroke: currentColor;

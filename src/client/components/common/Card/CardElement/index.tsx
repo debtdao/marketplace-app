@@ -1,7 +1,7 @@
 import { FC, ReactNode } from 'react';
 import styled from 'styled-components';
 
-import { Icon, ArrowDownIcon, IconProps } from '@components/common';
+import { Icon, ArrowDownIcon, IconProps, InfoIcon, Tooltip } from '@components/common';
 
 const Container = styled.div<{ width?: string; align?: string; grow?: string; fontWeight?: number }>`
   display: flex;
@@ -32,6 +32,11 @@ const SortIcon = styled(({ activeSort, sortType, ...props }: SortIconProps) => <
     color: ${theme.colors.titles};
     transform: ${sortType === 'asc' ? 'rotateZ(180deg)' : 'rotateZ(0deg)'};
   `}
+`;
+
+const StyledIcon = styled(Icon)`
+  margin-left: 1rem;
+  flex-shrink: 0;
 `;
 
 const Header = styled.h3<{ onClick?: () => void }>`
@@ -91,11 +96,15 @@ export const CardElement: FC<CardElementProps> = ({
   className,
   ...props
 }) => {
+  // console.log('Card Element: ', className);
   return (
     <Container width={width} align={align} grow={grow} fontWeight={fontWeight} className={className} {...props}>
       {header && (
         <Header onClick={onClick}>
           {header}
+          {/* <Tooltip placement="bottom" tooltipComponent={<>stuff</>}>
+            <StyledIcon Component={InfoIcon} size="1.5rem" />
+          </Tooltip> */}
           {sortable && <SortIcon activeSort={activeSort} sortType={sortType} Component={ArrowDownIcon} />}
         </Header>
       )}

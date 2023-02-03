@@ -150,23 +150,15 @@ interface MetricDisplay extends Metric {
   title: string;
   data: string;
   displaySubmetrics?: boolean;
-  submetrics?: Metric[];
+  children?: any;
 }
 
-const MetricDataDisplay = ({ title, data, displaySubmetrics = false, submetrics }: MetricDisplay) => {
+const MetricDataDisplay = ({ title, data, displaySubmetrics = false, children }: MetricDisplay) => {
   return (
     <MetricContainer>
       <MetricName>{title}</MetricName>
       <DataMetric>{data}</DataMetric>
-      {displaySubmetrics && (
-        <DataSubMetricsContainer>
-          {submetrics?.map(({ title, data }, index) => (
-            <DataSubMetric key={index}>
-              {title} : {data}
-            </DataSubMetric>
-          ))}
-        </DataSubMetricsContainer>
-      )}
+      {displaySubmetrics && <DataSubMetricsContainer>{children}</DataSubMetricsContainer>}
     </MetricContainer>
   );
 };
@@ -216,12 +208,26 @@ export const LineMetadata = () => {
     if (!revenue) return null;
     return (
       <>
-        <MetricDataDisplay
-          title={t('lineDetails:metadata.revenue-split')}
-          data={`${t('lineDetails:metadata.lender')} ${defaultSplit}%  --  ${t('lineDetails:metadata.borrower')} ${
-            100 - Number(defaultSplit)
-          }% `}
-        />
+        <div>
+          <p>
+            <MetadataTitle>
+              {`${t('lineDetails:metadata.lender')}  ${t('lineDetails:metadata.revenue-split')}`}:
+            </MetadataTitle>{' '}
+            {defaultSplit}%
+          </p>
+          <p>
+            <MetadataTitle>
+              {`${t('lineDetails:metadata.borrower')}  ${t('lineDetails:metadata.revenue-split')}`}:
+            </MetadataTitle>{' '}
+            {100 - Number(defaultSplit)}%
+          </p>
+          <p>
+            <MetadataTitle>{t('lineDetails:metadata.cratio')}: </MetadataTitle> {cratio}%
+          </p>
+          <p>
+            <MetadataTitle>{t('lineDetails:metadata.min-cratio')}: </MetadataTitle> {minCRatio}%
+          </p>
+        </div>
         <MetricDataDisplay
           title={t('lineDetails:metadata.revenue.total')}
           data={`$ ${humanize('amount', revenueValue, 18, 2)}`}
@@ -372,11 +378,6 @@ export const LineMetadata = () => {
   return (
     <>
       <ThreeColumnLayout>
-        <MetricDataDisplay
-          title={t('lineDetails:metadata.principal')}
-          data={`$ ${humanize('amount', principal, 18, 2)}`}
-        />
-        <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${humanize('amount', deposit, 18, 2)}`} />
         <MetadataBox>
           <p>
             <MetadataTitle>{t('lineDetails:metadata.status')}: </MetadataTitle>{' '}
@@ -392,13 +393,12 @@ export const LineMetadata = () => {
             <MetadataTitle>{t('lineDetails:metadata.total-interest-paid')}: </MetadataTitle> $
             {humanize('amount', totalInterestRepaid, 18, 2)}
           </p>
-          <p>
-            <MetadataTitle>{t('lineDetails:metadata.min-cratio')}: </MetadataTitle> {minCRatio}%
-          </p>
-          <p>
-            <MetadataTitle>{t('lineDetails:metadata.cratio')}: </MetadataTitle> {cratio}%
-          </p>
         </MetadataBox>
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.principal')}
+          data={`$ ${humanize('amount', principal, 18, 2)}`}
+        />
+        <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${humanize('amount', deposit, 18, 2)}`} />
       </ThreeColumnLayout>
       <SectionHeader>
         {t('lineDetails:metadata.secured-by')}

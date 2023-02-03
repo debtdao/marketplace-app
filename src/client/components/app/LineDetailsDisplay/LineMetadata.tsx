@@ -89,6 +89,13 @@ const MetadataTitle = styled.span`
   ${({ theme }) => `color: ${theme.colors.primary}; `}
 `;
 
+const MetadataRow = styled.p`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-left: 0rem;
+`;
+
 const StatusWithColor = styled.span<{ status: string }>`
   color: ${({ status }) => {
     console.log('stats color', status);
@@ -232,25 +239,43 @@ export const LineMetadata = () => {
     return (
       <>
         <div>
-          <p>
+          <MetadataRow>
+            <Tooltip
+              placement="bottom-start"
+              tooltipComponent={<>{t('lineDetails:metadata.tooltip.lender-revenue-split')}</>}
+            >
+              <StyledIcon Component={InfoIcon} size="1.5rem" />
+            </Tooltip>
             <MetadataTitle>
               {`${t('lineDetails:metadata.lender')}  ${t('lineDetails:metadata.revenue-split')}`}:
             </MetadataTitle>{' '}
             {defaultSplit}%
-          </p>
-          <p>
+          </MetadataRow>
+          <MetadataRow>
+            <Tooltip
+              placement="bottom-start"
+              tooltipComponent={<>{t('lineDetails:metadata.tooltip.borrower-revenue-split')}</>}
+            >
+              <StyledIcon Component={InfoIcon} size="1.5rem" />
+            </Tooltip>
             <MetadataTitle>
               {`${t('lineDetails:metadata.borrower')}  ${t('lineDetails:metadata.revenue-split')}`}:
             </MetadataTitle>{' '}
             {100 - Number(defaultSplit)}%
-          </p>
-          <p>
+          </MetadataRow>
+          <MetadataRow>
+            <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.cratio')}</>}>
+              <StyledIcon Component={InfoIcon} size="1.5rem" />
+            </Tooltip>
             <MetadataTitle>{t('lineDetails:metadata.cratio')}: </MetadataTitle>{' '}
             <CratioWithColor diff={Number(cratio) - Number(minCRatio)}>{cratio}%</CratioWithColor>
-          </p>
-          <p>
+          </MetadataRow>
+          <MetadataRow>
+            <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.min-cratio')}</>}>
+              <StyledIcon Component={InfoIcon} size="1.5rem" />
+            </Tooltip>
             <MetadataTitle>{t('lineDetails:metadata.min-cratio')}: </MetadataTitle> {minCRatio}%
-          </p>
+          </MetadataRow>
         </div>
         <MetricDataDisplay
           title={t('lineDetails:metadata.revenue.total')}
@@ -399,30 +424,49 @@ export const LineMetadata = () => {
     return;
   };
 
-  console.log('Metadata staus', status);
   return (
     <>
       <ThreeColumnLayout>
         <MetadataBox>
-          <p>
+          <MetadataRow>
+            <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.status')}</>}>
+              <StyledIcon Component={InfoIcon} size="1.5rem" />
+            </Tooltip>
             <MetadataTitle>{t('lineDetails:metadata.status')}: </MetadataTitle>{' '}
             <StatusWithColor status={status}>{status[0].toUpperCase() + status.substring(1)}</StatusWithColor>{' '}
-          </p>
-          <p>
+          </MetadataRow>
+          <MetadataRow>
+            <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.start')}</>}>
+              <StyledIcon Component={InfoIcon} size="1.5rem" />
+            </Tooltip>
             <MetadataTitle>{t('lineDetails:metadata.start')}: </MetadataTitle> {startDateHumanized}
-          </p>
-          <p>
+          </MetadataRow>
+          <MetadataRow>
+            <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.end')}</>}>
+              <StyledIcon Component={InfoIcon} size="1.5rem" />
+            </Tooltip>
             <MetadataTitle>{t('lineDetails:metadata.end')}: </MetadataTitle> {endDateHumanized}
-          </p>
-          <p>
+          </MetadataRow>
+          <MetadataRow>
+            <Tooltip
+              placement="bottom-start"
+              tooltipComponent={<>{t('lineDetails:metadata.tooltip.total-interest-paid')}</>}
+            >
+              <StyledIcon Component={InfoIcon} size="1.5rem" />
+            </Tooltip>
             <MetadataTitle>{t('lineDetails:metadata.total-interest-paid')}: </MetadataTitle> $
             {humanize('amount', totalInterestRepaid, 18, 2)}
-          </p>
+          </MetadataRow>
         </MetadataBox>
         <MetricDataDisplay
           title={t('lineDetails:metadata.principal')}
           description={t('lineDetails:metadata.tooltip.principal')}
           data={`$ ${humanize('amount', principal, 18, 2)}`}
+        />
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.deposit')}
+          description={t('lineDetails:metadata.tooltip.deposit')}
+          data={`$ ${humanize('amount', deposit, 18, 2)}`}
         />
       </ThreeColumnLayout>
       <SectionHeader>

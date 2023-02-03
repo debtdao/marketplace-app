@@ -1,7 +1,7 @@
 import { FC, ReactNode } from 'react';
 import styled from 'styled-components';
 
-import { Icon, ArrowDownIcon, IconProps, InfoIcon, Tooltip } from '@components/common';
+import { Icon, ArrowDownIcon, IconProps, InfoIcon, Tooltip, TooltipProps } from '@components/common';
 
 const Container = styled.div<{ width?: string; align?: string; grow?: string; fontWeight?: number }>`
   display: flex;
@@ -18,10 +18,23 @@ interface SortIconProps extends Omit<IconProps, 'ref'> {
   sortType?: SortType;
 }
 
+interface StyledIconProps extends Omit<IconProps, 'ref'> {}
+
+interface StyledTooltipProps extends Omit<TooltipProps, 'ref'> {}
+
+const StyledIcon = styled(({ ...props }: StyledIconProps) => <Icon {...props} />)`
+  height: 1.1rem;
+  // position: relative;
+  margin-left: 0.4rem;
+  flex-shrink: 0;
+  transition: transform 200ms ease-in-out;
+`;
+
 const SortIcon = styled(({ activeSort, sortType, ...props }: SortIconProps) => <Icon {...props} />)`
   height: 1.1rem;
+  // position: relative;
   margin-left: 0.4rem;
-  fill: currentColor;
+  // fill: currentColor;
   transition: transform 200ms ease-in-out;
   flex-shrink: 0;
   transform: rotateZ(0);
@@ -29,19 +42,22 @@ const SortIcon = styled(({ activeSort, sortType, ...props }: SortIconProps) => <
   ${({ activeSort, sortType, theme }) =>
     activeSort &&
     `
-    color: ${theme.colors.titles};
+    color: ${theme.colors.texts};
     transform: ${sortType === 'asc' ? 'rotateZ(180deg)' : 'rotateZ(0deg)'};
   `}
 `;
 
-// TODO: determine why adding this creates an error
-// const StyledIcon = styled(Icon)`
-//   margin-left: 1rem;
-//   flex-shrink: 0;
-// `;
+const StyledTooltip = styled(({ ...props }: StyledTooltipProps) => <Tooltip {...props} />)`
+  // height: 60rem;
+  position: absolute;
+  // width: 30rem;
+  // top: 2rem;
+  // left: 10rem;
+`;
 
 const Header = styled.h3<{ onClick?: () => void }>`
   display: flex;
+  position: relative;
   align-items: center;
   font-size: 1.6rem;
   font-weight: 400;
@@ -108,11 +124,9 @@ export const CardElement: FC<CardElementProps> = ({
       {header && (
         <Header onClick={onClick}>
           {header}
-          <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
-            <InfoIcon title={description} />
-          </Tooltip>
-          {/* TODO: fix error with StyledIcon */}
-          {/* <StyledIcon Component={InfoIcon} size="1.5rem" /> */}
+          <StyledTooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
+            <StyledIcon Component={InfoIcon} size="1.5rem" />
+          </StyledTooltip>
           {sortable && <SortIcon activeSort={activeSort} sortType={sortType} Component={ArrowDownIcon} />}
         </Header>
       )}

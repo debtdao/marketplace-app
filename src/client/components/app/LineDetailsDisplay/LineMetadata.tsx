@@ -86,7 +86,6 @@ const RedirectLinkIcon = styled(RedirectIcon)`
   padding-bottom: 0.2rem;
 `;
 
-// TODO: determine why adding this creates an error
 const StyledIcon = styled(Icon)`
   margin-left: 1rem;
   flex-shrink: 0;
@@ -137,7 +136,6 @@ const MetricDataDisplay = ({ title, description, data, displaySubmetrics = false
       <MetricName>
         {title}
         <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
-          {/* <InfoIcon title={description} /> */}
           <StyledIcon Component={InfoIcon} size="1.5rem" />
         </Tooltip>
       </MetricName>

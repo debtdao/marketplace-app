@@ -21,7 +21,7 @@ import {
   TokenView,
 } from '@src/core/types';
 import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
-import { Button, Text, RedirectIcon, Link, CardEmptyList, Tooltip, InfoIcon } from '@components/common';
+import { Button, Text, RedirectIcon, Link, CardEmptyList, Tooltip, InfoIcon, Icon } from '@components/common';
 import {
   LinesSelectors,
   ModalsActions,
@@ -59,6 +59,7 @@ const MetricContainer = styled.div`
 `;
 
 const MetricName = styled.h3`
+  display: flex;
   ${({ theme }) => `
     font-size: ${theme.fonts.sizes.lg};
     font-weight: 600;
@@ -83,6 +84,13 @@ const RedirectLinkIcon = styled(RedirectIcon)`
   width: 1.2rem;
   margin-left: 1rem;
   padding-bottom: 0.2rem;
+`;
+
+// TODO: determine why adding this creates an error
+const StyledIcon = styled(Icon)`
+  margin-left: 1rem;
+  flex-shrink: 0;
+  fill: ${({ theme, color, fill }) => fill ?? color ?? theme.colors.titles};
 `;
 
 const AssetsListCard = styled(DetailCard)`
@@ -128,9 +136,10 @@ const MetricDataDisplay = ({ title, description, data, displaySubmetrics = false
     <MetricContainer>
       <MetricName>
         {title}
-        {/* <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
-          <InfoIcon title={description} />
-        </Tooltip> */}
+        <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
+          {/* <InfoIcon title={description} /> */}
+          <StyledIcon Component={InfoIcon} size="1.5rem" />
+        </Tooltip>
       </MetricName>
       <DataMetric>{data}</DataMetric>
       {displaySubmetrics && (

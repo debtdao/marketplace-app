@@ -48,14 +48,15 @@
       "no-table": "No Collateral added"
     },
     "tooltip": {
-      "principal": "",
-      "deposit": "",
-      "total-interest-paid": "",
-      "revenue-split": "Default revenue split between borrowers and lenders for the line of credit",
-      "cratio": "",
-      "status": "",
-      "start": "",
-      "end": ""
+      "principal": "Total credit utilized by the borrower.",
+      "deposit": "Total credit available for the borrower.",
+      "total-interest-paid": "The total interest paid by the borrower across all credit positions.",
+      "revenue-split": "Default revenue split between borrowers and lenders for the line of credit.",
+      "min-cratio": "The minimum collateralization ratio for the line of credit.",
+      "cratio": "The current collateralization ratio for the line of credit.",
+      "status": "Current status of the line of credit. Status can be Active, Liqudidable, Repaid, Insolvent, Unitialized, or No Status.",
+      "start": "The day the line of credit was deployed by the borrower.",
+      "end": "The expiration date of the line of credit."
 
     }
   },

@@ -32,7 +32,8 @@ import { humanize, formatAddress, normalizeAmount, getENS } from '@src/utils';
 import { getEnv } from '@config/env';
 
 const PositionsCard = styled(DetailCard)`
-  max-width: ${({ theme }) => theme.globalMaxWidth};
+  // max-width: ${({ theme }) => theme.globalMaxWidth};
+  max-width: 90%;
   padding: ${({ theme }) => theme.card.padding};
   @media ${device.tablet} {
     .col-name {

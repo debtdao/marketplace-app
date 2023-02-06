@@ -3,21 +3,22 @@ import styled from 'styled-components';
 
 const Container = styled.div`
   width: 100%;
-  padding: 0 ${({ theme }) => theme.card.padding};
+  // padding: 0 ${({ theme }) => theme.card.padding};
 `;
 
 const BigHeader = styled.h2`
   font-size: 2.4rem;
   font-weight: 700;
   margin: 0;
-  padding: 0;
+  // padding: 0;
+  padding: 0 ${({ theme }) => theme.card.padding};
 `;
 
 const Header = styled.h2`
   font-size: ${({ theme }) => theme.fonts.sizes.xl};
   font-weight: 700;
   margin: 0;
-  padding: 0;
+  // padding: 0;
 `;
 
 const SubHeader = styled.h3`

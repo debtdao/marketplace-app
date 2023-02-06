@@ -171,7 +171,8 @@ const StyledIcon = styled(Icon)`
 `;
 
 const AssetsListCard = styled(DetailCard)`
-  max-width: ${({ theme }) => theme.globalMaxWidth};
+  // max-width: ${({ theme }) => theme.globalMaxWidth};
+  max-width: 90%;
   padding: ${({ theme }) => theme.card.padding};
   @media ${device.tablet} {
     .col-name {

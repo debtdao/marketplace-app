@@ -25,7 +25,9 @@ const StyledCardContent = styled(CardContent)`
   flex-wrap: wrap;
   grid-gap: ${({ theme }) => theme.card.padding};
   margin-top: ${({ theme }) => theme.card.padding};
-  padding: 0 ${({ theme }) => theme.card.padding};
+  // margin-left: 0.5rem;
+  // margin-right: 0.5rem;
+  // padding: 0 ${({ theme }) => theme.card.padding};
 `;
 
 const ItemCard = styled(Card)<{ onClick: any }>`
@@ -38,7 +40,7 @@ const ItemCard = styled(Card)<{ onClick: any }>`
   padding-right: calc(${({ theme }) => theme.card.padding} + ${TokenListIconSize} * 2.5);
   background-color: ${({ theme }) => theme.colors.surfaceVariantA};
   color: ${({ theme }) => theme.colors.primary};
-  box-shadow: ${({ theme }) => `${theme.colors.accents.purp} 0 0 ${theme.spacing.sm};`}
+  box-shadow: ${({ theme }) => `inset ${theme.colors.accents.purp} 0 0 ${theme.spacing.sm};`}
   position: relative;
   transition: filter 200ms ease-in-out;
 

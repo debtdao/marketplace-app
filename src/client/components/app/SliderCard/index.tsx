@@ -87,7 +87,8 @@ const StyledCard = styled(Card)`
   display: flex;
   padding: 0;
   background: ${({ theme }) => theme.colors.backgroundVariant};
-  border: 2px solid ${({ theme }) => theme.colors.primary};
+  // border: 2px solid ${({ theme }) => theme.colors.accents.purp};
+  box-shadow: ${({ theme }) => `inset ${theme.colors.accents.purp} 0 0 ${theme.spacing.sm};`}
   color: ${({ theme }) => theme.colors.primary};
   min-width: 28rem;
   position: relative;

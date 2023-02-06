@@ -318,8 +318,6 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
           ? Object.values(position.proposalsMap)
               .filter((proposal) => proposal.revokedAt === null || proposal.revokedAt === 0)
               .map((proposal) => {
-                console.log('Position: ', position);
-                console.log('Proposal: ', proposal);
                 const tokenIcon = tokensMap[getAddress(position.token.address)]?.icon;
                 const [dRate, fRate, deposit, tokenAddress, lenderAddress] = [...proposal.args];
                 return {

@@ -88,7 +88,6 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
     allowTokenSelect: true,
   });
   const positionToken = selectedPosition?.token ?? selectedSellToken;
-  console.log('Position Token: ', positionToken);
   const acceptingOffer = props.acceptingOffer || (userMetadata.role === BORROWER_POSITION_ROLE && !!selectedPosition);
 
   //state for params

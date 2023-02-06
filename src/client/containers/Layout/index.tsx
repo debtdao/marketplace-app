@@ -143,7 +143,6 @@ export const Layout: FC = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    console.log('location: ', location);
     dispatch(RouteActions.changeRoute({ path: location.pathname }));
     dispatch(TokensActions.getTokens());
   }, [location]);

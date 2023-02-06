@@ -372,7 +372,7 @@ export const LineMetadata = () => {
   };
 
   const formattedCollateralData = allCollateral.map((c) => {
-    const tokenIcon = tokensMap[getAddress(c.token.address)]?.icon;
+    const tokenIcon = tokensMap[getAddress(c.token.address)]?.icon ?? '';
     const tokenInfo = { icon: tokenIcon, ...c.token };
     const collateral = { ...c, token: tokenInfo };
     return {

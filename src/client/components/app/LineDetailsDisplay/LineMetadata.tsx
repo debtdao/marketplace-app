@@ -100,7 +100,6 @@ const MetadataRow = styled.p`
 
 const StatusWithColor = styled.span<{ status: string }>`
   color: ${({ status }) => {
-    console.log('stats color', status);
     switch (status) {
       case UNINITIALIZED_STATUS:
         return '#E6E600'; // darkish yellow
@@ -273,7 +272,7 @@ export const LineMetadata = () => {
     if (!revenue) return null;
     return (
       <>
-        <div>
+        <MetadataBox>
           <MetadataRow>
             <Tooltip
               placement="bottom-start"
@@ -311,7 +310,7 @@ export const LineMetadata = () => {
             </Tooltip>
             <MetadataTitle>{t('lineDetails:metadata.min-cratio')}: </MetadataTitle> {minCRatio}%
           </MetadataRow>
-        </div>
+        </MetadataBox>
         <MetricDataDisplay
           title={t('lineDetails:metadata.revenue.total')}
           description={t('lineDetails:metadata.revenue.tooltip')}

@@ -229,7 +229,11 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
   if (!tokenView) return null;
   if (!selectedLine) return null;
 
-  const targetBalance = normalizeAmount(tokenView.balance, tokenView.decimals);
+  // const targetBalance = normalizeAmount(tokenView.balance, tokenView.decimals);
+  const targetBalance = normalizeAmount(
+    selectedEscrow!.deposits![selectedCollateralAssetAddress].amount,
+    selectedEscrow!.deposits![selectedCollateralAssetAddress].token.decimals
+  );
   const tokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(targetBalance, 4)}`;
 
   if (transactionCompleted === 1) {

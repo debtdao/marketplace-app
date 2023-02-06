@@ -14,7 +14,7 @@ const BigHeader = styled.h2`
 `;
 
 const Header = styled.h2`
-  font-size: 2rem;
+  font-size: ${({ theme }) => theme.fonts.sizes.xl};
   font-weight: 700;
   margin: 0;
   padding: 0;

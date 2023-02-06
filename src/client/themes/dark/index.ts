@@ -92,7 +92,10 @@ const darkTheme: DefaultTheme = {
         color: 'white',
       },
     },
-
+    accents: {
+      purp: '#8658DA',
+      gnar: '#20B10D',
+    },
     vaultActionButton: {
       background: '#272727',
       borderColor: 'transparent',

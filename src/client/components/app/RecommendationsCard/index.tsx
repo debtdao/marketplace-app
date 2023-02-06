@@ -16,6 +16,7 @@ const ContainerCard = styled(Card)`
   width: 100%;
   min-width: 56%;
   border-radius: 0.2rem;
+  background: none;
 `;
 
 const StyledCardContent = styled(CardContent)`
@@ -35,7 +36,9 @@ const ItemCard = styled(Card)<{ onClick: any }>`
   flex: 1;
   padding: ${({ theme }) => theme.layoutPadding};
   padding-right: calc(${({ theme }) => theme.card.padding} + ${TokenListIconSize} * 2.5);
-  background-color: ${({ theme }) => theme.colors.background};
+  background-color: ${({ theme }) => theme.colors.surfaceVariantB};
+  color: ${({ theme }) => theme.colors.primary};
+  box-shadow: ${({ theme }) => `${theme.colors.accents.purp} 0 0 ${theme.spacing.sm};`}
   position: relative;
   transition: filter 200ms ease-in-out;
 
@@ -46,7 +49,7 @@ const ItemCard = styled(Card)<{ onClick: any }>`
     &:hover {
       filter: brightness(85%);
       ${TokenListIcon} {
-        color: ${theme.colors.primary};
+        color: ${theme.colors.secondary};
       }
     }
   `};
@@ -54,7 +57,7 @@ const ItemCard = styled(Card)<{ onClick: any }>`
 
 const ItemHeader = styled(Text)`
   position: absolute;
-  font-size: 1.4rem;
+  font-size: ${({ theme }) => theme.fonts.sizes.md};
 `;
 
 const ItemInfo = styled(Text)`
@@ -64,17 +67,14 @@ const ItemInfo = styled(Text)`
 `;
 
 const ItemInfoLabel = styled(Text)`
-  color: ${({ theme }) => theme.colors.titles};
   margin-top: 0.8rem;
-  font-weight: 700;
-  font-size: 2.4rem;
+  font-size: ${({ theme }) => theme.fonts.sizes.md};
   overflow: hidden;
   text-overflow: ellipsis;
 `;
 
 const ItemName = styled(Text)`
-  color: ${({ theme }) => theme.colors.icons.variant};
-  font-size: 3rem;
+  font-size: ${({ theme }) => theme.fonts.sizes.md};
   width: 100%;
   white-space: nowrap;
   overflow: hidden;
@@ -111,8 +111,7 @@ const Metric = styled.span`
 `;
 
 const MetricsText = styled.span`
-  font-size: 1.6rem;
-  font-weight: normal;
+  font-size: ${({ theme }) => theme.fonts.sizes.md};
 `;
 
 interface RecommendationsProps {

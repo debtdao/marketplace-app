@@ -315,7 +315,7 @@ export const GET_LINES_QUERY = gql`
       first: $first
       orderBy: $orderBy
       orderDirection: $orderDirection
-      where: { id_not_in: $blacklist, status: "ACTIVE" }
+      where: { id_not_in: $blacklist } #, status: "ACTIVE"
     ) {
       ...BaseLineFrag
 

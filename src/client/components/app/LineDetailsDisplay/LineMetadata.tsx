@@ -2,6 +2,7 @@ import { isEmpty } from 'lodash';
 import { BigNumber, ethers } from 'ethers';
 import styled from 'styled-components';
 import { format } from 'date-fns';
+import { getAddress } from 'ethers/lib/utils';
 
 import { device } from '@themes/default';
 import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL } from '@hooks';
@@ -34,6 +35,7 @@ import {
   WalletActions,
   CollateralActions,
   NetworkSelectors,
+  TokensSelectors,
 } from '@src/core/store';
 import { humanize } from '@src/utils';
 import { getEnv } from '@config/env';
@@ -232,6 +234,7 @@ export const LineMetadata = () => {
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const explorerUrl = useExplorerURL(network);
+  const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
 
   const {
     start: startTime,
@@ -367,12 +370,17 @@ export const LineMetadata = () => {
     }
   };
 
-  const formattedCollateralData = allCollateral.map((c) => ({
-    ...c,
-    key: c.type + c.token.toString(),
-    align: 'flex-start',
-    actions: getCollateralRowActionForRole(userPositionMetadata.role),
-  }));
+  const formattedCollateralData = allCollateral.map((c) => {
+    const tokenIcon = tokensMap[getAddress(c.token.address)]?.icon;
+    const tokenInfo = { icon: tokenIcon, ...c.token };
+    const collateral = { ...c, token: tokenInfo };
+    return {
+      ...collateral,
+      key: c.type + c.token.toString(),
+      align: 'flex-start',
+      actions: getCollateralRowActionForRole(userPositionMetadata.role),
+    };
+  });
 
   const connectWalletText = t('components.connect-button.connect');
   const enableCollateralText = walletIsConnected

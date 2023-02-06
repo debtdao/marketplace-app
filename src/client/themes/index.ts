@@ -8,7 +8,7 @@ import { lightTheme } from './light';
 import { classicTheme } from './classic';
 import { explorerTheme } from './explorer';
 
-export const getTheme = (theme: Theme = 'classic'): DefaultTheme => {
+export const getTheme = (theme?: Theme): DefaultTheme => {
   switch (theme) {
     case 'light':
       return lightTheme;
@@ -24,6 +24,6 @@ export const getTheme = (theme: Theme = 'classic'): DefaultTheme => {
       const { matches: prefersColorSchemeDark } = window?.matchMedia('(prefers-color-scheme: dark)');
       return prefersColorSchemeDark ? darkTheme : lightTheme;
     default:
-      return classicTheme;
+      return lightTheme;
   }
 };

@@ -243,7 +243,8 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
           metadata={[
             {
               key: 'contract',
-              header: 'Contract Address', //t('lineDetails:metadata.escrow.assets-list.contract'),
+              header: t('spigot:metadata.contract-address'),
+              description: t('spigot:metadata.tooltips.contract-address'),
               transform: ({ contract }) => (
                 <Link to={`${explorerUrl}/address/${contract}`}>
                   <Text>{formatAddress(getENS(contract, ensMap)!)}</Text>
@@ -256,7 +257,8 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
             },
             {
               key: 'token',
-              header: 'Contract Symbol', //t('lineDetails:metadata.escrow.assets-list.symbol'),
+              header: t('spigot:metadata.symbol'),
+              description: t('spigot:metadata.tooltips.symbol'),
               transform: ({ contract }) => (
                 <Link to={`${explorerUrl}/address/${contract}`}>
                   <Text>{tokensMap[formatAddress(contract)] ? tokensMap[formatAddress(contract)].symbol : 'N/A'}</Text>
@@ -268,7 +270,8 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
             },
             {
               key: 'ownerSplit',
-              header: 'Revenue Split', //t('lineDetails:metadata.escrow.assets-list.symbol'),
+              header: t('spigot:metadata.revenue-split'),
+              description: t('spigot:metadata.tooltips.revenue-split'),
               transform: ({ ownerSplit }) => {
                 const borrowerSplit = 100 - Number(ownerSplit) + '%';
                 const lenderSplit = ownerSplit + '%';

@@ -120,7 +120,7 @@ interface Metadata<T> {
 
 interface DetailCardProps<T> {
   header: string;
-  // description: string;
+  description?: string;
   metadata: Metadata<T>[];
   data: T[];
   stripes?: boolean;

@@ -10,7 +10,15 @@
       "30d-revenue": ""
     },
     "claim-operator-tokens":"Claim Operator Tokens",
-    "add-revenue-contract": "Add Revenue Contract"
+    "add-revenue-contract": "Add Revenue Contract",
+    "contract-address": "Contract Address",
+    "symbol": "Contract Symbol",
+    "revenue-split": "Revenue Split",
+    "tooltips": {
+      "contract-address": "The address of the revenue contract.",
+      "symbol": "The ticker symbol of the revenue contract.",
+      "revenue-split": "The percentage of revenue split between the borrower and lender."
+    }
   },
   "no-spigot-supported-card": {
     "header": "No Spigot available at this address",

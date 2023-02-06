@@ -75,6 +75,7 @@ const sharedTheme: SharedTheme = {
   },
   globalFont: '"Roboto", sans-serif',
   globalMaxWidth: '120rem',
+  // globalMaxWidth: '150rem',
   globalRadius: '0.8rem',
 
   sideBar: {

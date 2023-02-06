@@ -30,7 +30,7 @@ const StyledRecommendationsCard = styled(RecommendationsCard)``;
 
 const StyledSliderCard = styled(SliderCard)`
   width: 100%;
-  min-height: 24rem;
+  // min-height: 24rem;
 `;
 
 const BannerCtaButton = styled(Button)`
@@ -139,15 +139,24 @@ export const Market = () => {
             <Text>
               <p>{t('market:banner.body')}</p>
             </Text>
-            <BannerCtaButton styling="primary" onClick={onBorrowerCtaClick}>
-              {ctaButtonText}
-            </BannerCtaButton>
-            <BannerCtaButton styling="secondary" outline onClick={onLenderCtaClick}>
-              {t('market:banner.cta-lender')}
-            </BannerCtaButton>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                gap: '2.4rem', // match grid-gap in Market Page
+              }}
+            >
+              <BannerCtaButton styling="primary" onClick={onBorrowerCtaClick}>
+                {ctaButtonText}
+              </BannerCtaButton>
+              <BannerCtaButton styling="secondary" outline onClick={onLenderCtaClick}>
+                {t('market:banner.cta-lender')}
+              </BannerCtaButton>
+            </div>
           </div>
         }
-        background={<img src={DebtDAOBanner} alt={'Debt DAO Banner?'} />}
+        // TODO: decide if we want to remove Debt DAO banner from Market page
+        // background={<img src={DebtDAOBanner} alt={'Debt DAO Banner?'} />}
       />
 
       {getLinesStatus.loading ||

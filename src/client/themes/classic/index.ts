@@ -2,7 +2,7 @@ import { DefaultTheme } from 'styled-components';
 
 import { sharedTheme } from '../default';
 
-import ClassicBackground from './background.jpg';
+import ClassicBackground from './yearn-background.jpg';
 
 // TODO Dehardcode this
 const classic = {
@@ -47,9 +47,10 @@ const classic = {
 
 const classicTheme: DefaultTheme = {
   ...sharedTheme,
-  background: {
-    image: ClassicBackground,
-  },
+  // TODO: Replace with a custom Debt DAO branded background
+  // background: {
+  //   image: ClassicBackground,
+  // },
   colors: {
     logo: '#006AE3',
 

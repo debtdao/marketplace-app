@@ -73,6 +73,10 @@ const explorerTheme: DefaultTheme = {
         color: '#F59E3D',
       },
     },
+    accents: {
+      purp: '#8658DA',
+      gnar: '#20B10D',
+    },
 
     txModalColors: {
       background: 'rgba(173, 50, 53, 0.5)',

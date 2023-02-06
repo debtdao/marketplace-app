@@ -84,7 +84,10 @@ const classicTheme: DefaultTheme = {
 
     onPrimaryVariant: '#E5E5E5',
     onBackground: '#E5E5E5',
-
+    accents: {
+      purp: '#8658DA',
+      gnar: '#20B10D',
+    },
     toggleSwitch: {
       background: 'transparent',
       color: classic.colors.primary,

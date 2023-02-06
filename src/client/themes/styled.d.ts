@@ -156,6 +156,11 @@ declare module 'styled-components' {
         };
       };
 
+      accents: {
+        purp: string;
+        gnar: string;
+      };
+
       vaultActionButton: {
         background: string;
         borderColor: string;

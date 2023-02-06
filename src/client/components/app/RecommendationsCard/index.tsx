@@ -36,7 +36,7 @@ const ItemCard = styled(Card)<{ onClick: any }>`
   flex: 1;
   padding: ${({ theme }) => theme.layoutPadding};
   padding-right: calc(${({ theme }) => theme.card.padding} + ${TokenListIconSize} * 2.5);
-  background-color: ${({ theme }) => theme.colors.surfaceVariantB};
+  background-color: ${({ theme }) => theme.colors.surfaceVariantA};
   color: ${({ theme }) => theme.colors.primary};
   box-shadow: ${({ theme }) => `${theme.colors.accents.purp} 0 0 ${theme.spacing.sm};`}
   position: relative;

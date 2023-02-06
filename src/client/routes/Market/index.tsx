@@ -93,6 +93,7 @@ export const Market = () => {
     expectedCategories.forEach((cat) => (shouldFetch = shouldFetch || !currentCategories.includes(cat)));
 
     if (shouldFetch) {
+      console.log('do I get here?');
       fetchMarketData();
     }
   }, []);

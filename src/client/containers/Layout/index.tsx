@@ -126,6 +126,7 @@ export const Layout: FC = ({ children }) => {
   // TODO: Reset this before merging into develop.
   useEffect(() => {
     dispatch(AppActions.initApp());
+    // dispatch(TokensActions.getTokens());
 
     // NOTE Test zapper API
     //   fetch('https://api.zapper.fi/v2/prices', {
@@ -144,12 +145,12 @@ export const Layout: FC = ({ children }) => {
 
   useEffect(() => {
     dispatch(RouteActions.changeRoute({ path: location.pathname }));
-    dispatch(TokensActions.getTokens());
+    // dispatch(TokensActions.getTokens());
   }, [location]);
 
-  useEffect(() => {
-    dispatch(TokensActions.getTokens());
-  }, [userWalletAddress]);
+  // useEffect(() => {
+  //   dispatch(TokensActions.getTokens());
+  // }, [userWalletAddress]);
 
   useEffect(() => {
     if (previousAddress) dispatch(AppActions.clearUserAppData());

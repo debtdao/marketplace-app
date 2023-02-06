@@ -89,6 +89,7 @@ const MetadataBox = styled.div`
 
 const MetadataTitle = styled.span`
   ${({ theme }) => `color: ${theme.colors.primary}; `}
+  font-weight: 800;
 `;
 
 const MetadataRow = styled.p`

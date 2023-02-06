@@ -148,6 +148,10 @@ export const Layout: FC = ({ children }) => {
   }, [location]);
 
   useEffect(() => {
+    dispatch(TokensActions.getTokens());
+  }, [userWalletAddress]);
+
+  useEffect(() => {
     if (previousAddress) dispatch(AppActions.clearUserAppData());
     // if (previousAddress) dispatch(UserActions.clearNftBalance());
     // if (selectedAddress) dispatch(UserActions.getNftBalance());

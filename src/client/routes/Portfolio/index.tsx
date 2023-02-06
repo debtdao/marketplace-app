@@ -126,7 +126,9 @@ export const Portfolio = () => {
     } else if (portfolioAddress && isValidAddress(portfolioAddress)) {
       dispatch(LinesActions.getUserPortfolio({ user: portfolioAddress.toLocaleLowerCase() }));
       // TODO: only dispatch if userPortfolio doesn't provide what we need to populate linesMap
-      dispatch(TokensActions.getTokens()).then((res) => dispatch(LinesActions.getLines(defaultLineCategories)));
+      dispatch(TokensActions.getTokens())
+        .then((res) => dispatch(LinesActions.getLines(defaultLineCategories)))
+        .then((error) => dispatch(LinesActions.getLines(defaultLineCategories)));
     }
   }, [portfolioAddress]);
 

@@ -80,7 +80,9 @@ export const Market = () => {
     },
   };
   const fetchMarketData = () =>
-    dispatch(TokensActions.getTokens()).then((res) => dispatch(LinesActions.getLines(defaultLineCategories)));
+    dispatch(TokensActions.getTokens())
+      .then((res) => dispatch(LinesActions.getLines(defaultLineCategories)))
+      .then((error) => dispatch(LinesActions.getLines(defaultLineCategories)));
   const lineCategoriesForDisplay = useAppSelector(LinesSelectors.selectLinesForCategories);
   const getLinesStatus = useAppSelector(LinesSelectors.selectLinesStatusMap).getLines;
 

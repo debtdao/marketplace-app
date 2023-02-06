@@ -161,7 +161,7 @@ export class LineFactoryServiceImpl {
       };
 
       let tx;
-      console.log('subgraph network props: ', props.network);
+      // console.log('subgraph network props: ', props.network);
       tx = await this.transactionService.execute(props);
       await tx.wait();
       return tx;

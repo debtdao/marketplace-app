@@ -4,9 +4,9 @@ import styled from 'styled-components';
 import { format } from 'date-fns';
 
 import { device } from '@themes/default';
-import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
+import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
-import { prettyNumbers, getEtherscanUrlStub, unnullify } from '@src/utils';
+import { prettyNumbers, unnullify } from '@src/utils';
 import {
   AggregatedEscrow,
   ARBITER_POSITION_ROLE,
@@ -132,6 +132,37 @@ const RedirectLinkIcon = styled(RedirectIcon)`
   padding-bottom: 0.2rem;
 `;
 
+const RouterLink = styled(Link)<{ selected: boolean }>`
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  color: inherit;
+  font-size: 1.2rem;
+  flex: 1;
+  padding: 0.5rem;
+
+  &:hover span {
+    filter: brightness(90%);
+  }
+
+  span {
+    transition: filter 200ms ease-in-out;
+  }
+  ${(props) =>
+    props.selected &&
+    `
+    color: ${props.theme.colors.titlesVariant};
+  `}
+`;
+
+const TokenIconContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+`;
+
 const StyledIcon = styled(Icon)`
   margin-left: 1rem;
   flex-shrink: 0;
@@ -200,6 +231,7 @@ export const LineMetadata = () => {
   const { NETWORK } = getEnv();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
+  const explorerUrl = useExplorerURL(network);
 
   const {
     start: startTime,
@@ -509,11 +541,13 @@ export const LineMetadata = () => {
               header: t('lineDetails:metadata.escrow.assets-list.symbol'),
               description: t('lineDetails:metadata.escrow.tooltip.symbol'),
               transform: ({ token: { symbol, icon, address } }) => (
-                <Link to={getEtherscanUrlStub(network) + `${address}`}>
-                  {icon && <TokenIcon icon={icon} symbol={symbol} />}
-                  <Text>{symbol}</Text>
-                  <RedirectLinkIcon />
-                </Link>
+                <TokenIconContainer>
+                  <TokenIcon icon={icon} symbol={symbol} size="small" margin="0.5rem" />
+                  <RouterLink key={address} to={`${explorerUrl}/address/${address}`} selected={false}>
+                    {symbol}
+                    <RedirectLinkIcon />
+                  </RouterLink>
+                </TokenIconContainer>
               ),
               width: '15rem',
               sortable: true,

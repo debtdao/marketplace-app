@@ -4,9 +4,9 @@ import styled from 'styled-components';
 import { useEffect } from 'react';
 
 import { device } from '@themes/default';
-import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
+import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
-import { formatAddress, prettyNumbers, getENS, humanize, getEtherscanUrlStub } from '@src/utils';
+import { formatAddress, prettyNumbers, getENS, humanize } from '@src/utils';
 import {
   ARBITER_POSITION_ROLE,
   BORROWER_POSITION_ROLE,
@@ -144,7 +144,7 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
   const { NETWORK } = getEnv();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
-  const etherscanUrl = getEtherscanUrlStub(network);
+  const explorerUrl = useExplorerURL(network);
   const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
 
@@ -245,7 +245,7 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
               key: 'contract',
               header: 'Contract Address', //t('lineDetails:metadata.escrow.assets-list.contract'),
               transform: ({ contract }) => (
-                <Link to={etherscanUrl + `${contract}`}>
+                <Link to={`${explorerUrl}/address/${contract}`}>
                   <Text>{formatAddress(getENS(contract, ensMap)!)}</Text>
                   <RedirectLinkIcon />
                 </Link>
@@ -258,7 +258,7 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
               key: 'token',
               header: 'Contract Symbol', //t('lineDetails:metadata.escrow.assets-list.symbol'),
               transform: ({ contract }) => (
-                <Link to={etherscanUrl + `${contract}`}>
+                <Link to={`${explorerUrl}/address/${contract}`}>
                   <Text>{tokensMap[formatAddress(contract)] ? tokensMap[formatAddress(contract)].symbol : 'N/A'}</Text>
                 </Link>
               ),

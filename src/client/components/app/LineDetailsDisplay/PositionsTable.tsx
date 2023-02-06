@@ -12,10 +12,11 @@ import {
   WalletActions,
   OnchainMetaDataSelector,
   NetworkSelectors,
+  TokensSelectors,
 } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL } from '@hooks';
 import { device } from '@themes/default';
-import { DetailCard, ActionButtons, ViewContainer } from '@components/app';
+import { DetailCard, ActionButtons, ViewContainer, TokenIcon } from '@components/app';
 import { Input, SearchIcon, Button, RedirectIcon, Link } from '@components/common';
 import {
   ARBITER_POSITION_ROLE,
@@ -95,6 +96,13 @@ const RedirectLinkIcon = styled(RedirectIcon)`
   padding-bottom: 0.2rem;
 `;
 
+const TokenIconContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+`;
+
 interface PositionsProps {
   borrower?: string;
   lender?: string;
@@ -120,6 +128,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
   const explorerUrl = useExplorerURL(currentNetwork);
   const { NETWORK } = getEnv();
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
+  const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
   // const { borrower } = selectedLine!;
 
   // Initial set up for positions table
@@ -262,6 +271,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
 
   const formattedPositionsAndProposals = _.flatten(
     positions?.map((position) => {
+      const tokenIcon = tokensMap[getAddress(position.token.address)]?.icon;
       const positionToDisplay = {
         deposit: humanize('amount', position.deposit, position.token.decimals, 2),
         drate: `${normalizeAmount(position.dRate, 2)} %`,
@@ -282,13 +292,17 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
           </RouterLink>
         ),
         token: (
-          <RouterLink
-            key={position.token.address}
-            to={`${explorerUrl}/address/${position.token.address}`}
-            selected={false}
-          >
-            {position.token.symbol}
-          </RouterLink>
+          <TokenIconContainer>
+            <TokenIcon icon={tokenIcon} symbol={position.token.symbol} size="small" margin="0.5rem" />
+            <RouterLink
+              key={position.token.address}
+              to={`${explorerUrl}/address/${position.token.address}`}
+              selected={false}
+            >
+              {position.token.symbol}
+              <RedirectLinkIcon />
+            </RouterLink>
+          </TokenIconContainer>
         ),
         actions: (
           <ActionButtons
@@ -304,6 +318,9 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
           ? Object.values(position.proposalsMap)
               .filter((proposal) => proposal.revokedAt === null || proposal.revokedAt === 0)
               .map((proposal) => {
+                console.log('Position: ', position);
+                console.log('Proposal: ', proposal);
+                const tokenIcon = tokensMap[getAddress(position.token.address)]?.icon;
                 const [dRate, fRate, deposit, tokenAddress, lenderAddress] = [...proposal.args];
                 return {
                   deposit: humanize('amount', deposit, position.token.decimals, 2),
@@ -325,9 +342,17 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
                     </RouterLink>
                   ),
                   token: (
-                    <RouterLink key={tokenAddress} to={`${explorerUrl}/address/${tokenAddress}`} selected={false}>
-                      {position.token.symbol}
-                    </RouterLink>
+                    <TokenIconContainer>
+                      <TokenIcon icon={tokenIcon} symbol={position.token.symbol} size="small" margin="0.5rem" />
+                      <RouterLink
+                        key={position.token.address}
+                        to={`${explorerUrl}/address/${position.token.address}`}
+                        selected={false}
+                      >
+                        {position.token.symbol}
+                        <RedirectLinkIcon />
+                      </RouterLink>
+                    </TokenIconContainer>
                   ),
                   actions: (
                     <ActionButtons
@@ -385,7 +410,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
               header: t('components.positions-card.token'),
               description: t('components.positions-card.tooltip.token'),
               sortable: true,
-              width: '8rem',
+              width: '12rem',
               className: 'col-available',
             },
             {

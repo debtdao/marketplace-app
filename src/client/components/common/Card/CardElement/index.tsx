@@ -113,7 +113,7 @@ export const CardElement: FC<CardElementProps> = ({
 }) => {
   // console.log('Card Element - props: ', props);
   // console.log('Card Element - content: ', content);
-  console.log('Card Element - description: ', description);
+  // console.log('Card Element - description: ', description);
   // const stuff = 'text';
   return (
     <Container width={width} align={align} grow={grow} fontWeight={fontWeight} className={className} {...props}>

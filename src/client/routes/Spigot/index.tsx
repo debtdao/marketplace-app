@@ -11,6 +11,7 @@ import {
   NetworkSelectors,
   CollateralSelectors,
   CollateralActions,
+  TokensActions,
 } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation, useIsMounting } from '@hooks';
 import { ViewContainer, SliderCard, SpigotDisplay } from '@components/app';
@@ -71,7 +72,7 @@ export const Spigot = () => {
     // TODO: implement getSpigot gql query and replace dispatch to getLinePage
     // dispatch(CollateralActions.getSpigotPage({ id: spigotAddress }));
     if (spigotAddress && !selectedSpigot) {
-      dispatch(LinesActions.getLinePage({ id: lineAddress }));
+      dispatch(TokensActions.getTokens()).then((res) => dispatch(LinesActions.getLinePage({ id: lineAddress })));
       dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
     }
 

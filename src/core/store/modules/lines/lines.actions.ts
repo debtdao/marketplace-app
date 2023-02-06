@@ -102,17 +102,23 @@ const getLine = createAsyncThunk<{ lineData: SecuredLine | undefined }, GetLineA
 const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine[] } }, UseCreditLinesParams, ThunkAPI>(
   'lines/getLines',
   async (categories, { getState, extra, dispatch }) => {
+    // const {
+    //   wallet,
+    //   tokens: { tokensMap },
+    // } = getState();
+    const state: RootState = getState();
     const {
       wallet,
       tokens: { tokensMap },
-    } = getState();
-
+    } = state;
     const { creditLineService, onchainMetaDataService } = extra.services;
     const network = getNetwork(wallet.networkVersion);
-    const tokenPrices = Object.entries(tokensMap).reduce(
-      (prices, [addy, { priceUsdc }]) => ({ ...prices, [addy]: BigNumber.from(priceUsdc) }),
-      {}
-    );
+    const tokenPrices = TokensSelectors.selectTokenPrices(state);
+    console.log('Token Prices: ', tokenPrices);
+    // const tokenPrices = Object.entries(tokensMap).reduce(
+    //   (prices, [addy, { priceUsdc }]) => ({ ...prices, [addy]: BigNumber.from(priceUsdc) }),
+    //   {}
+    // );
 
     // ensure consistent ordering of categories
     const categoryKeys = Object.keys(categories);
@@ -137,7 +143,7 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
       },
       { linesData: {}, allBorrowers: [] }
     );
-    console.log('Lines Data: ', linesData);
+    // console.log('Lines Data: ', linesData);
     allBorrowers.map((b) => dispatch(OnchainMetaDataActions.getENS(b)));
 
     return { linesData };
@@ -157,16 +163,16 @@ const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | und
     if (selectedLine) {
       if (selectedLine.creditEvents.length === 0 && selectedLine.collateralEvents.length === 0) {
         const lineEvents = await creditLineService.getLineEvents({ network, id });
-        console.log('selected line events: ', lineEvents, network, id);
+        // console.log('selected line events: ', lineEvents, network, id);
         const selectedLineWithEvents = formatLineWithEvents(selectedLine, lineEvents, tokenPrices);
-        console.log('selected line with events 1: ', selectedLineWithEvents);
+        // console.log('selected line with events 1: ', selectedLineWithEvents);
         return { linePageData: selectedLineWithEvents };
       }
       return { linePageData: selectedLine };
     } else {
       try {
         const linePageData = formatLinePageData(await creditLineService.getLinePage({ network, id }), tokenPrices);
-        console.log('selected line with events 2: ', linePageData);
+        // console.log('selected line with events 2: ', linePageData);
         if (!linePageData) throw new Error();
         return { linePageData };
       } catch (e) {

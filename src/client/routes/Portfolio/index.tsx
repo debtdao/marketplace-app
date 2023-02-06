@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { useParams } from 'react-router-dom';
 
 import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
-import { WalletSelectors, LinesActions, LinesSelectors, AlertsActions } from '@store';
+import { WalletSelectors, LinesActions, LinesSelectors, AlertsActions, TokensActions } from '@store';
 import { SummaryCard, ViewContainer } from '@components/app';
 import { isValidAddress } from '@utils';
 import {
@@ -126,7 +126,7 @@ export const Portfolio = () => {
     } else if (portfolioAddress && isValidAddress(portfolioAddress)) {
       dispatch(LinesActions.getUserPortfolio({ user: portfolioAddress.toLocaleLowerCase() }));
       // TODO: only dispatch if userPortfolio doesn't provide what we need to populate linesMap
-      dispatch(LinesActions.getLines(defaultLineCategories));
+      dispatch(TokensActions.getTokens()).then((res) => dispatch(LinesActions.getLines(defaultLineCategories)));
     }
   }, [portfolioAddress]);
 

@@ -13,6 +13,7 @@ import {
   OnchainMetaDataSelector,
   NetworkSelectors,
   TokensSelectors,
+  TokensActions,
 } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL } from '@hooks';
 import { device } from '@themes/default';
@@ -136,7 +137,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
     if (selectedLine && !lineAddress) {
       dispatch(LinesActions.setSelectedLineAddress({ lineAddress: selectedLine.id }));
     } else if (lineAddress && !selectedLine) {
-      dispatch(LinesActions.getLinePage({ id: lineAddress }));
+      dispatch(TokensActions.getTokens()).then((res) => dispatch(LinesActions.getLinePage({ id: lineAddress })));
     }
   }, [lineAddress, selectedLine]);
 

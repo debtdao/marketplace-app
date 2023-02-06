@@ -14,6 +14,7 @@ import {
   OnchainMetaDataActions,
   OnchainMetaDataSelector,
   NetworkSelectors,
+  TokensActions,
 } from '@store';
 import { RecommendationsCard, SliderCard, ViewContainer } from '@components/app';
 import { SpinnerLoading, Text, Button } from '@components/common';
@@ -78,7 +79,8 @@ export const Market = () => {
       orderDirection: 'desc',
     },
   };
-  const fetchMarketData = () => dispatch(LinesActions.getLines(defaultLineCategories));
+  const fetchMarketData = () =>
+    dispatch(TokensActions.getTokens()).then((res) => dispatch(LinesActions.getLines(defaultLineCategories)));
   const lineCategoriesForDisplay = useAppSelector(LinesSelectors.selectLinesForCategories);
   const getLinesStatus = useAppSelector(LinesSelectors.selectLinesStatusMap).getLines;
 
@@ -93,7 +95,6 @@ export const Market = () => {
     expectedCategories.forEach((cat) => (shouldFetch = shouldFetch || !currentCategories.includes(cat)));
 
     if (shouldFetch) {
-      console.log('do I get here?');
       fetchMarketData();
     }
   }, []);

@@ -8,7 +8,7 @@ import { lightTheme } from './light';
 import { classicTheme } from './classic';
 import { explorerTheme } from './explorer';
 
-export const getTheme = (theme?: Theme): DefaultTheme => {
+export const getTheme = (theme: Theme = 'classic'): DefaultTheme => {
   switch (theme) {
     case 'light':
       return lightTheme;

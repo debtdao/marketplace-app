@@ -1,25 +1,15 @@
 import { useState, useEffect, ReactNode } from 'react';
 import styled from 'styled-components';
 
-import {
-  Card,
-  CardHeader,
-  CardContent,
-  CardElement,
-  CardEmptyList,
-  ToggleButton,
-  Tooltip,
-  InfoIcon,
-} from '@components/common';
+import { Card, CardHeader, CardContent, CardElement, CardEmptyList, ToggleButton } from '@components/common';
 import { sort } from '@utils';
-import { PROPOSED_STATUS } from '@src/core/types';
 
 const StyledCardElement = styled(CardElement)<{ stripes?: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
   margin: 0;
-  width: 15rem;
+  width: 14rem;
   // NOTE Card element uses card padding and layout padding, also other card child components too, doing this
   // all the card components will work fine when modifying either of the paddings, since the paddings are
   // related between them
@@ -61,7 +51,7 @@ const TitleCardElement = styled(CardElement)`
   padding: 0.6rem calc(${({ theme }) => theme.layoutPadding} / 2);
   flex-shrink: 2;
   user-select: none;
-  width: 15rem;
+  width: 14rem;
   align-items: center;
 
   // &:first-child {

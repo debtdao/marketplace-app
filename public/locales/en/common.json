@@ -26,6 +26,7 @@
       "interest": "Interest Accrued",
       "lender": "Lender",
       "tooltip": {
+        "line": "The line of credit that the position belongs to.",
         "drate": "Fixed rate APR for drawn credit",
         "frate": "Fixed rate APR for undrawn credit",
         "total-deposits": "The total amount of the token supplied",

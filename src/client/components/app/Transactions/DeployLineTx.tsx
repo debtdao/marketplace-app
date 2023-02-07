@@ -5,10 +5,11 @@ import styled from 'styled-components';
 import { getLineFactoryforNetwork } from '@utils';
 import { isAddress, toWei } from '@utils';
 import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
-import { LinesActions, LinesSelectors, WalletSelectors } from '@store';
+import { LinesActions, LinesSelectors, NetworkSelectors, RouteActions, WalletSelectors } from '@store';
 import { getConstants } from '@src/config/constants';
+import { DeploySecuredLineWithConfigProps } from '@src/core/types';
 
-import { ToggleButton } from '../../common';
+import { Link, ToggleButton } from '../../common';
 
 import { TxContainer } from './components/TxContainer';
 import { TxAddressInput } from './components/TxAddressInput';
@@ -27,6 +28,29 @@ const SectionContent = styled.div`
   justify-content: right;
 `;
 
+const RouterLink = styled(Link)<{ selected: boolean }>`
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  color: inherit;
+  font-size: 1.2rem;
+  flex: 1;
+  padding: 0.5rem;
+
+  &:hover span {
+    filter: brightness(90%);
+  }
+
+  span {
+    transition: filter 200ms ease-in-out;
+  }
+  ${(props) =>
+    props.selected &&
+    `
+    color: ${props.theme.colors.titlesVariant};
+  `}
+`;
 interface DeployLineProps {
   header: string;
   onClose: () => void;
@@ -44,6 +68,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
   const dispatch = useAppDispatch();
 
   // Deploy Line base data state
+  const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const walletAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
 
@@ -54,6 +79,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
   const [inputTTLWarning, setTTLWarning] = useState('');
   const [loading, setLoading] = useState(false);
   const [timeToLive, setTimeToLive] = useState('0');
+  const [lineAddress, setLineAddress] = useState('');
 
   // Deploy Line with config state
   const [advancedMode, setAdvancedMode] = useState(true);
@@ -168,6 +194,11 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
         if (res.meta.requestStatus === 'fulfilled') {
           console.log('Deployed Line Response: ', res);
           // dispatch changeRoute
+          const { lineAddress } = res.payload as {
+            lineAddress: string;
+            deployData: DeploySecuredLineWithConfigProps;
+          };
+          setLineAddress(lineAddress);
           setTransactionCompleted(1);
           setLoading(false);
         }
@@ -180,6 +211,10 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
   if (transactionCompleted === 1) {
     return (
       <StyledTransaction onClose={onClose} header={'Transaction complete'}>
+        {/* <RouterLink key={lineAddress} to={`${network}/lines/${address}`} selected={false}>
+          {'Go to your newly deployed line of credit'}
+        </RouterLink> */}
+        <Link to={`/${currentNetwork}/lines/${lineAddress}`}>{t('Go to Line of Credit')}</Link>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.deploy-line.success-message')}

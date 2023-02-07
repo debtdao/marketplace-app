@@ -280,7 +280,7 @@ const deploySecuredLine = createAsyncThunk<void, DeploySecuredLineProps, ThunkAP
 );
 
 const deploySecuredLineWithConfig = createAsyncThunk<
-  { lineAddress: string; deployData: DeploySecuredLineWithConfigProps },
+  { lineAddress: string; escrowId: string; spigotId: string; deployData: DeploySecuredLineWithConfigProps },
   DeploySecuredLineWithConfigProps,
   ThunkAPI
 >('lines/deploySecuredLineWithConfigProps', async (deployData, { getState, extra }) => {
@@ -288,11 +288,12 @@ const deploySecuredLineWithConfig = createAsyncThunk<
   const [deploySecuredLineWithConfigData, lineAddress] = await lineFactoryService.deploySecuredLineWtihConfig({
     ...deployData,
   });
-
+  const escrowId = '0x';
+  const spigotId = '0x';
   console.log('new secured line with Config deployed. tx response', deploySecuredLineWithConfigData);
   console.log('new secured line with Config deployed. line address: ', lineAddress);
   // await dispatch(getLine(deployedLineData.))
-  return { lineAddress, deployData };
+  return { lineAddress, escrowId, spigotId, deployData };
 });
 
 const approveDeposit = createAsyncThunk<

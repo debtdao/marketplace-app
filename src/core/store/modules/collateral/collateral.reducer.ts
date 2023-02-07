@@ -14,6 +14,9 @@ import {
   ReservesMap,
   AggregatedEscrow,
   EscrowDepositMap,
+  RevenueSummaryMap,
+  COLLATERAL_TYPE_ASSET,
+  COLLATERAL_TYPE_REVENUE,
 } from '@types';
 import { formatCollateralEvents, formatSpigotCollateralEvents } from '@src/utils';
 
@@ -45,7 +48,7 @@ export const collateralInitialState: CollateralState = {
   statusMap: initialCollateralActionsStatusMap,
 };
 
-const { getLines, getLinePage, getUserPortfolio } = LinesActions;
+const { deploySecuredLineWithConfig, getLines, getLinePage, getUserPortfolio } = LinesActions;
 
 const {
   setSelectedEscrow,
@@ -131,6 +134,35 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
     })
 
     // State changes from non collateral actions
+
+    /* -------------------------------- getLinePage ------------------------------- */
+    .addCase(
+      deploySecuredLineWithConfig.fulfilled,
+      (state, { payload: { lineAddress, escrowId, spigotId, deployData } }) => {
+        if (!lineAddress || !escrowId || !spigotId) return;
+        const { cratio } = deployData;
+        let map: CollateralMap = {};
+        const escrow = {
+          id: escrowId,
+          cratio: '0',
+          collateralValue: '0',
+          minCRatio: Number(cratio.toString()),
+          deposits: {} as EscrowDepositMap,
+          type: COLLATERAL_TYPE_ASSET,
+          line: lineAddress,
+        };
+        const spigot = {
+          id: spigotId,
+          revenueValue: '0',
+          revenueSummary: {} as RevenueSummaryMap,
+          type: COLLATERAL_TYPE_REVENUE,
+          line: lineAddress,
+        };
+        map[escrowId] = escrow;
+        map[spigotId] = spigot;
+        state.collateralMap = { ...state.collateralMap, ...map };
+      }
+    )
 
     /* -------------------------------- getLines ------------------------------- */
     .addCase(getLines.fulfilled, (state, { payload: { linesData: lines } }) => {

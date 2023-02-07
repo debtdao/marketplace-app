@@ -21,6 +21,7 @@ import {
   PROPOSED_STATUS,
   LineOfCredit,
   ACTIVE_STATUS,
+  RevenueSummaryMap,
 } from '@types';
 import { getNetworkId } from '@src/utils';
 
@@ -384,28 +385,33 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(deploySecuredLineWithConfig.pending, (state, { meta }) => {
       console.log('state', state);
     })
-    .addCase(deploySecuredLineWithConfig.fulfilled, (state, { payload: { lineAddress, deployData } }) => {
-      const { borrower, revenueSplit, ttl, cratio } = deployData;
+    .addCase(
+      deploySecuredLineWithConfig.fulfilled,
+      (state, { payload: { lineAddress, escrowId, spigotId, deployData } }) => {
+        const { borrower, revenueSplit, ttl, cratio } = deployData;
 
-      const lineObj = {
-        id: lineAddress,
-        borrower: borrower,
-        arbiter: '',
-        status: ACTIVE_STATUS,
-        start: 0,
-        end: 0,
-        principal: '0',
-        deposit: '0',
-        interest: '0',
-        defaultSplit: revenueSplit.toString(),
-        totalInterestRepaid: '0',
-        highestApy: ['', '', '0'],
-        spigotId: '',
-        escrowId: '',
-      } as LineOfCredit;
-      console.log('New Line of Credit: ', lineObj);
-      state.linesMap[lineAddress] = lineObj;
-    })
+        const lineObj = {
+          id: lineAddress,
+          borrower: borrower,
+          arbiter: '',
+          status: ACTIVE_STATUS,
+          start: 0, // TODO
+          end: 0, // TODO
+          principal: '0',
+          deposit: '0',
+          interest: '0',
+          defaultSplit: revenueSplit.toString(),
+          totalInterestRepaid: '0',
+          highestApy: ['', '', '0'],
+          spigotId: spigotId,
+          escrowId: escrowId,
+          escrow: {},
+          spigot: {},
+        } as LineOfCredit;
+        console.log('New Line of Credit: ', lineObj);
+        state.linesMap[lineAddress] = lineObj;
+      }
+    )
     .addCase(deploySecuredLineWithConfig.rejected, (state, { error, meta }) => {
       console.log('error', error);
     })

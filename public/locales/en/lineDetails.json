@@ -28,7 +28,7 @@
       "no-collateral": "No collateral deposited",
       "assets-list": {
         "title": "Collateral",
-        "symbol": "Symbol",
+        "symbol": "Token",
         "token": "Token",
         "type": "Type",
         "amount": "Amount",

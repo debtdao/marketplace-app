@@ -33,7 +33,8 @@ import { getEnv } from '@config/env';
 
 const PositionsCard = styled(DetailCard)`
   // max-width: ${({ theme }) => theme.globalMaxWidth};
-  max-width: 90%;
+  max-width: 100%;
+  width: 100%;
   padding: ${({ theme }) => theme.card.padding};
   @media ${device.tablet} {
     .col-name {
@@ -375,7 +376,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
   return (
     <>
       <TableHeader>{t('components.positions-card.positions')}</TableHeader>
-      <ViewContainer>
+      <>
         <PositionsCard
           header={' '}
           data-testid="vaults-opportunities-list"
@@ -385,7 +386,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
               header: t('components.positions-card.status'),
               description: t('components.positions-card.tooltip.status'),
               sortable: true,
-              width: '12rem',
+              // width: '12rem',
               className: 'col-apy',
             },
             {
@@ -394,7 +395,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
               header: t('components.positions-card.line'),
               description: t('components.positions-card.tooltip.line'),
               sortable: true,
-              width: '13rem',
+              // width: '13rem',
               className: 'col-apy',
             },
             {
@@ -402,7 +403,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
               header: t('components.positions-card.lender'),
               description: t('components.positions-card.tooltip.lender'),
               sortable: true,
-              width: '13rem',
+              // width: '13rem',
               className: 'col-available',
             },
             {
@@ -410,7 +411,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
               header: t('components.positions-card.token'),
               description: t('components.positions-card.tooltip.token'),
               sortable: true,
-              width: '12rem',
+              // width: '12rem',
               className: 'col-available',
             },
             {
@@ -418,7 +419,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
               header: t('components.positions-card.total-deposits'),
               description: t('components.positions-card.tooltip.total-deposits'),
               sortable: true,
-              width: '13rem',
+              // width: '13rem',
               className: 'col-assets',
             },
             {
@@ -434,7 +435,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
               header: t('components.positions-card.interest'),
               description: t('components.positions-card.tooltip.interest'),
               sortable: true,
-              width: '8rem',
+              // width: '8rem',
               className: 'col-assets',
             },
             {
@@ -442,7 +443,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
               header: t('components.positions-card.drate'),
               description: t('components.positions-card.tooltip.drate'),
               sortable: true,
-              width: '10rem',
+              // width: '10rem',
               className: 'col-assets',
             },
             {
@@ -450,7 +451,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
               header: t('components.positions-card.frate'),
               description: t('components.positions-card.tooltip.frate'),
               sortable: true,
-              width: '10rem',
+              // width: '10rem',
               className: 'col-assets',
             },
             {
@@ -482,7 +483,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
           onAction={() => console.log('action')}
           wrap
         />
-      </ViewContainer>
+      </>
       <br />
     </>
   );

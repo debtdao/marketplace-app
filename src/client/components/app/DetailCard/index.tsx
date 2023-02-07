@@ -17,19 +17,28 @@ import { PROPOSED_STATUS } from '@src/core/types';
 const StyledCardElement = styled(CardElement)<{ stripes?: boolean }>`
   display: flex;
   justify-content: center;
+  align-items: center;
   margin: 0;
+  width: 15rem;
   // NOTE Card element uses card padding and layout padding, also other card child components too, doing this
   // all the card components will work fine when modifying either of the paddings, since the paddings are
   // related between them
   padding: calc(${({ theme }) => theme.card.padding} / 4) calc(${({ theme }) => theme.layoutPadding} / 2);
   font-size: 1.4rem;
-  flex-shrink: 0;
+  flex-shrink: 2;
 
-  &:first-child {
-    padding-left: ${({ theme }) => theme.card.padding};
-  }
+  // &:first-child {
+  //   padding-left: ${({ theme }) => theme.card.padding};
+  // }
+  // &:last-child {
+  //   padding-right: ${({ theme }) => theme.card.padding};
+  // }
+
+  // &:first-child {
+  //   align-items: flex-start;
+  // }
   &:last-child {
-    padding-right: ${({ theme }) => theme.card.padding};
+    align-items: flex-end;
   }
 
   > * {
@@ -50,14 +59,17 @@ const StyledCardElement = styled(CardElement)<{ stripes?: boolean }>`
 const TitleCardElement = styled(CardElement)`
   margin: 0;
   padding: 0.6rem calc(${({ theme }) => theme.layoutPadding} / 2);
-  flex-shrink: 0;
+  flex-shrink: 2;
   user-select: none;
+  width: 15rem;
+  align-items: center;
 
-  &:first-child {
-    padding-left: ${({ theme }) => theme.card.padding};
-  }
-  &:last-child {
-    padding-right: ${({ theme }) => theme.card.padding};
+  // &:first-child {
+  //   padding-left: ${({ theme }) => theme.card.padding};
+  // }
+  // &:last-child {
+  //   padding-right: ${({ theme }) => theme.card.padding};
+  // }
   }
 `;
 
@@ -88,7 +100,8 @@ const StyledCardHeader = styled(CardHeader)`
   align-items: center;
   justify-content: space-between;
   margin-bottom: 2rem;
-  grid-gap: 1.2rem;
+  // grid-gap: 1.2rem;
+  grid-gap: 0.5rem;
 `;
 
 const StyledCard = styled(Card)`
@@ -99,7 +112,8 @@ const StyledCard = styled(Card)`
 const SectionContent = styled.div`
   display: flex;
   flex-wrap: wrap;
-  grid-gap: 1.2rem;
+  // grid-gap: 1.2rem;
+  grid-gap: 0.5rem;
   align-items: center;
 `;
 

@@ -74,8 +74,8 @@ const sharedTheme: SharedTheme = {
     desktopL: 2560,
   },
   globalFont: '"Roboto", sans-serif',
-  globalMaxWidth: '120rem',
-  // globalMaxWidth: '150rem',
+  // globalMaxWidth: '120rem',
+  globalMaxWidth: '90%',
   globalRadius: '0.8rem',
 
   sideBar: {

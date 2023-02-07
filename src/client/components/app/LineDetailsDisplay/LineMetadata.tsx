@@ -173,7 +173,8 @@ const StyledIcon = styled(Icon)`
 
 const AssetsListCard = styled(DetailCard)`
   // max-width: ${({ theme }) => theme.globalMaxWidth};
-  max-width: 90%;
+  max-width: 100%;
+  width: 100%;
   padding: ${({ theme }) => theme.card.padding};
   @media ${device.tablet} {
     .col-name {
@@ -527,7 +528,7 @@ export const LineMetadata = () => {
         {renderEscrowMetadata()}
       </ThreeColumnLayout>
       <SectionHeader>{t('lineDetails:metadata.escrow.assets-list.title')}</SectionHeader>
-      <ViewContainer>
+      <>
         <AssetsListCard
           header={' '}
           data-testid="line-assets-list"
@@ -541,7 +542,7 @@ export const LineMetadata = () => {
                   <Text>{type?.toUpperCase()}</Text>
                 </>
               ),
-              width: '10rem',
+              // width: '10rem',
               sortable: true,
               className: 'col-type',
             },
@@ -558,7 +559,7 @@ export const LineMetadata = () => {
                   </RouterLink>
                 </TokenIconContainer>
               ),
-              width: '15rem',
+              // width: '15rem',
               sortable: true,
               className: 'col-symbol',
             },
@@ -569,7 +570,7 @@ export const LineMetadata = () => {
               // transform: ({ token: { balance } }) => <Text ellipsis> {balance} </Text>,
               format: ({ amount }) => `${humanize('amount', amount, 18, 2)}`,
               sortable: true,
-              width: '20rem',
+              // width: '20rem',
               className: 'col-amount',
             },
             {
@@ -579,7 +580,7 @@ export const LineMetadata = () => {
               format: ({ value }) => `$ ${humanize('amount', value, 18, 2)}`,
               // format: ({ value }) => `$ ${humanize('value', value, 18, 2)}`,
               sortable: true,
-              width: '20rem',
+              // width: '20rem',
               className: 'col-value',
             },
             {
@@ -597,7 +598,7 @@ export const LineMetadata = () => {
           initialSortBy="value"
           wrap
         />
-      </ViewContainer>
+      </>
     </>
   );
 };

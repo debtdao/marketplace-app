@@ -166,6 +166,8 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
           setLoading(false);
         }
         if (res.meta.requestStatus === 'fulfilled') {
+          console.log('Deployed Line Response: ', res);
+          // dispatch changeRoute
           setTransactionCompleted(1);
           setLoading(false);
         }

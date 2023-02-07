@@ -678,9 +678,13 @@ export interface LineFactoryService {
 
   deploySecuredLine(props: DeploySecuredLineProps): Promise<TransactionResponse | PopulatedTransaction>;
 
+  // deploySecuredLineWtihConfig(
+  //   props: DeploySecuredLineWithConfigProps
+  // ): Promise<TransactionResponse | PopulatedTransaction>;
+
   deploySecuredLineWtihConfig(
     props: DeploySecuredLineWithConfigProps
-  ): Promise<TransactionResponse | PopulatedTransaction>;
+  ): Promise<[transaction: TransactionResponse | PopulatedTransaction, lineAddress: string]>;
 
   rolloverSecuredLine(props: RolloverSecuredLineProps): Promise<TransactionResponse | PopulatedTransaction>;
 }

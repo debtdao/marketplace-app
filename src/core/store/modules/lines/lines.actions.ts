@@ -279,18 +279,21 @@ const deploySecuredLine = createAsyncThunk<void, DeploySecuredLineProps, ThunkAP
   }
 );
 
-const deploySecuredLineWithConfig = createAsyncThunk<void, DeploySecuredLineWithConfigProps, ThunkAPI>(
-  'lines/deploySecuredLineWithConfigProps',
-  async (deployData, { getState, extra }) => {
-    const { lineFactoryService } = extra.services;
-    const deploySecuredLineWithConfigData = await lineFactoryService.deploySecuredLineWtihConfig({
-      ...deployData,
-    });
+const deploySecuredLineWithConfig = createAsyncThunk<
+  { lineAddress: string; deployData: DeploySecuredLineWithConfigProps },
+  DeploySecuredLineWithConfigProps,
+  ThunkAPI
+>('lines/deploySecuredLineWithConfigProps', async (deployData, { getState, extra }) => {
+  const { lineFactoryService } = extra.services;
+  const [deploySecuredLineWithConfigData, lineAddress] = await lineFactoryService.deploySecuredLineWtihConfig({
+    ...deployData,
+  });
 
-    console.log('new secured line with Config deployed. tx response', deploySecuredLineWithConfigData);
-    // await dispatch(getLine(deployedLineData.))
-  }
-);
+  console.log('new secured line with Config deployed. tx response', deploySecuredLineWithConfigData);
+  console.log('new secured line with Config deployed. line address: ', lineAddress);
+  // await dispatch(getLine(deployedLineData.))
+  return { lineAddress, deployData };
+});
 
 const approveDeposit = createAsyncThunk<
   void,

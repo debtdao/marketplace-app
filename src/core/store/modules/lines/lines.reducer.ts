@@ -19,6 +19,8 @@ import {
   EscrowDepositMap,
   ProposalMap,
   PROPOSED_STATUS,
+  LineOfCredit,
+  ACTIVE_STATUS,
 } from '@types';
 import { getNetworkId } from '@src/utils';
 
@@ -84,6 +86,7 @@ const {
   getLinePage,
   getLines,
   deploySecuredLine,
+  deploySecuredLineWithConfig,
   // initiateSaveLines,
   setSelectedLineAddress,
   setSelectedLinePosition,
@@ -360,72 +363,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
 
     /* ----------------------------- addCredit ----------------------------- */
-    // .addCase(addCredit.pending, (state) => {
-    //   state.statusMap.addCredit = { loading: true };
-    // })
-    // .addCase(
-    //   addCredit.fulfilled,
-    //   (state, { payload: { lineAddress, drate, frate, amount, token, lender, network } }) => {
-    //     const positionIds = state.linesMap[lineAddress].positionIds ?? [];
-    //     const positionId = '0x' + Math.random().toString(16).substr(2, 40);
-    //     positionIds.push(positionId);
-    //     const proposalId = '0x' + Math.random().toString(16).substr(2, 40);
-    //     const proposalsMap = {
-    //       id: proposalId,
-    //       proposedAt: null,
-    //       revokedAt: null,
-    //       acceptedAt: null,
-    //       endedAt: null,
-    //       maker,
-    //       taker: null,
-    //       mutualConsentFunc: '',
-    //       msgData: '',
-    //       args: [],
-    //     } as ProposalMap;
-    //     // id: string;
-    //     // proposedAt: number;
-    //     // revokedAt: number;
-    //     // acceptedAt: number;
-    //     // endedAt: number;
-    //     // maker: string;
-    //     // taker: string;
-    //     // mutualConsentFunc: string;
-    //     // msgData: string;
-    //     // args: string[];
-
-    //     const position = {
-    //       id: positionId,
-    //       line: lineAddress,
-    //       status: 'PROPOSED',
-    //       token,
-    //       lender,
-    //       proposalsMap,
-    //     } as CreditPosition;
-    //     // id: string;
-    //     // line: string;
-    //     // status: PositionStatusTypes;
-    //     // lender: string;
-    //     // token: TokenView;
-    //     // deposit: string;
-    //     // principal: string;
-    //     // interestAccrued: string;
-    //     // interestRepaid: string;
-    //     // totalInterestRepaid: string;
-    //     // dRate: string;
-    //     // fRate: string;
-    //     // proposalsMap: ProposalMap;
-
-    //     // save positonIds array in state.linesMap.positionIds
-    //     // save position object to state.positionsMap
-
-    //     // state.linesMap = { ...state.linesMap, ...lines };
-    //     // state.positionsMap = { ...state.positionsMap, ...positions };
-    //   }
-    // )
-    // .addCase(addCredit.rejected, (state, { error }) => {
-    //   state.statusMap.addCredit = { error: error.message };
-    // })
-
     /* ------------------------------ depositAndRepay ------------------------------ */
     .addCase(depositAndRepay.pending, (state, { meta }) => {
       //const lineAddress = meta.arg.lineAddress;
@@ -441,6 +378,36 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       //const lineAddress = meta.arg.lineAddress;
       console.log('error', error);
       //state.statusMap.user.linesActionsStatusMap[lineAddress].deposit = { error: error.message };
+    })
+
+    /* ------------------------------ deploySecuredLineWithConfig ------------------------------ */
+    .addCase(deploySecuredLineWithConfig.pending, (state, { meta }) => {
+      console.log('state', state);
+    })
+    .addCase(deploySecuredLineWithConfig.fulfilled, (state, { payload: { lineAddress, deployData } }) => {
+      const { borrower, revenueSplit, ttl, cratio } = deployData;
+
+      const lineObj = {
+        id: lineAddress,
+        borrower: borrower,
+        arbiter: '',
+        status: ACTIVE_STATUS,
+        start: 0,
+        end: 0,
+        principal: '0',
+        deposit: '0',
+        interest: '0',
+        defaultSplit: revenueSplit.toString(),
+        totalInterestRepaid: '0',
+        highestApy: ['', '', '0'],
+        spigotId: '',
+        escrowId: '',
+      } as LineOfCredit;
+      console.log('New Line of Credit: ', lineObj);
+      state.linesMap[lineAddress] = lineObj;
+    })
+    .addCase(deploySecuredLineWithConfig.rejected, (state, { error, meta }) => {
+      console.log('error', error);
     })
 
     /* ------------------------------ withdrawLine ----------------------------- */

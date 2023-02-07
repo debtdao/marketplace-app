@@ -377,10 +377,10 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
 
   return (
     <>
-      <TableHeader>{t('components.positions-card.positions')}</TableHeader>
-      <>
+      {/* <TableHeader>{t('components.positions-card.positions')}</TableHeader> */}
+      <div>
         <PositionsCard
-          header={' '}
+          header={'Positions'}
           data-testid="vaults-opportunities-list"
           metadata={[
             {
@@ -485,7 +485,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
           onAction={() => console.log('action')}
           wrap
         />
-      </>
+      </div>
       <br />
     </>
   );

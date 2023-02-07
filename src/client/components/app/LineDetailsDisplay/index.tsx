@@ -18,7 +18,7 @@ interface LineDetailsProps {
 
 export const Container = styled.div`
   margin: 0;
-  padding: 1em;
+  // padding: 1em;
   width: 100%;
 `;
 

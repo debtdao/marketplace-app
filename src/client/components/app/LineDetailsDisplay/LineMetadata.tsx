@@ -175,6 +175,7 @@ const AssetsListCard = styled(DetailCard)`
   // max-width: ${({ theme }) => theme.globalMaxWidth};
   max-width: 100%;
   width: 100%;
+  margin: 4rem 0;
   padding: ${({ theme }) => theme.card.padding};
   @media ${device.tablet} {
     .col-name {
@@ -527,10 +528,10 @@ export const LineMetadata = () => {
         {renderSpigotMetadata()}
         {renderEscrowMetadata()}
       </ThreeColumnLayout>
-      <SectionHeader>{t('lineDetails:metadata.escrow.assets-list.title')}</SectionHeader>
-      <>
+      {/* <SectionHeader>{t('lineDetails:metadata.escrow.assets-list.title')}</SectionHeader> */}
+      <div>
         <AssetsListCard
-          header={' '}
+          header={'Collateral'}
           data-testid="line-assets-list"
           metadata={[
             {
@@ -598,7 +599,7 @@ export const LineMetadata = () => {
           initialSortBy="value"
           wrap
         />
-      </>
+      </div>
     </>
   );
 };

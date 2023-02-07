@@ -76,7 +76,8 @@ const LinkSection = styled.div`
   column-gap: ${({ theme }) => theme.card.padding};
   row-gap: 1rem;
   flex: 1;
-  color: ${({ theme }) => theme.colors.icons.text};
+  // color: ${({ theme }) => theme.colors.icons.text};
+  color: ${({ theme }) => theme.colors.titles};
 `;
 
 const StyledLink = styled(Link)`
@@ -106,6 +107,7 @@ const StyledFooter = styled.footer`
   flex-wrap: wrap;
   gap: 1rem;
   row-gap: 1.5rem;
+  background-color: ${({ theme }) => theme.colors.surface};
   padding: ${({ theme }) => theme.card.padding};
   border-radius: ${({ theme }) => theme.globalRadius};
   max-width: ${({ theme }) => theme.globalMaxWidth};

@@ -1,4 +1,5 @@
 import { FC, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { BigNumber } from 'ethers';
 import styled from 'styled-components';
 
@@ -66,6 +67,7 @@ interface DeployLineProps {
 export const DeployLineTx: FC<DeployLineProps> = (props) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
+  const history = useHistory();
 
   // Deploy Line base data state
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
@@ -201,6 +203,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
           setLineAddress(lineAddress);
           setTransactionCompleted(1);
           setLoading(false);
+          history.push(`/${currentNetwork}/lines/${lineAddress}`);
         }
       });
     } catch (e) {
@@ -211,7 +214,6 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
   if (transactionCompleted === 1) {
     return (
       <StyledTransaction onClose={onClose} header={'Transaction complete'}>
-        <Link to={`/${currentNetwork}/lines/${lineAddress}`}>{t('Go to Line of Credit')}</Link>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.deploy-line.success-message')}

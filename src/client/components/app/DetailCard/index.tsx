@@ -170,6 +170,7 @@ export const DetailCard = <T,>({
   };
 
   useEffect(() => {
+    console.log('Sort Data: ', data);
     setSortedData(sortedBy ? sort(data, sortedBy, order) : data);
   }, [data]);
 

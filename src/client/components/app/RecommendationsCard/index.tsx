@@ -22,6 +22,7 @@ const ContainerCard = styled(Card)`
 const StyledCardContent = styled(CardContent)`
   align-items: stretch;
   justify-content: center;
+  // justify-content: start;
   flex-wrap: wrap;
   grid-gap: ${({ theme }) => theme.card.padding};
   margin-top: ${({ theme }) => theme.card.padding};
@@ -32,9 +33,11 @@ const StyledCardContent = styled(CardContent)`
 
 const ItemCard = styled(Card)<{ onClick: any }>`
   display: flex;
-  align-items: center;
+  align-items: start;
   min-height: 30rem;
   min-width: 33%;
+  // min-width: 30%;
+  // max-width: 33%;
   flex: 1;
   padding: ${({ theme }) => theme.layoutPadding};
   padding-right: calc(${({ theme }) => theme.card.padding} + ${TokenListIconSize} * 2.5);

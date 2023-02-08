@@ -35,6 +35,7 @@ import {
   formatGetLinesData,
   formatLinePageData,
   formatLineWithEvents,
+  formatOptimisticLineData,
   formatUserPortfolioData,
   // validateLineDeposit,
   // validateLineWithdraw,
@@ -282,26 +283,27 @@ const deploySecuredLine = createAsyncThunk<void, DeploySecuredLineProps, ThunkAP
 const deploySecuredLineWithConfig = createAsyncThunk<
   {
     lineAddress: string;
-    arbiterAddress: string;
-    escrowId: string;
-    spigotId: string;
+    lineObj: LineOfCredit;
     deployData: DeploySecuredLineWithConfigProps;
   },
   DeploySecuredLineWithConfigProps,
   ThunkAPI
 >('lines/deploySecuredLineWithConfigProps', async (deployData, { getState, extra }) => {
-  const { lineFactoryService } = extra.services;
+  const { lineFactoryService, creditLineService } = extra.services;
   const [deploySecuredLineWithConfigData, lineAddress] = await lineFactoryService.deploySecuredLineWtihConfig({
     ...deployData,
   });
-  const arbiterAddress = await lineFactoryService.arbiter(deployData.network);
-  console.log('Arbiter address: ', arbiterAddress);
-  const escrowId = '0x';
-  const spigotId = '0x';
+  const arbiterAddress = await creditLineService.arbiter(lineAddress);
   console.log('new secured line with Config deployed. tx response', deploySecuredLineWithConfigData);
   console.log('new secured line with Config deployed. line address: ', lineAddress);
-  // await dispatch(getLine(deployedLineData.))
-  return { lineAddress, arbiterAddress, escrowId, spigotId, deployData };
+  console.log('Arbiter address: ', arbiterAddress);
+  const lineObj: LineOfCredit = formatOptimisticLineData(lineAddress, arbiterAddress, deployData);
+
+  return {
+    lineAddress: lineAddress.toLowerCase(),
+    lineObj,
+    deployData,
+  };
 });
 
 const approveDeposit = createAsyncThunk<

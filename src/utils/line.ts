@@ -45,6 +45,9 @@ import {
   ProposalFragResponse,
   CreditProposal,
   ProposalMap,
+  LineOfCredit,
+  ACTIVE_STATUS,
+  DeploySecuredLineWithConfigProps,
 } from '@types';
 
 import { humanize, normalizeAmount, normalize, format, toUnit, toTargetDecimalUnits, BASE_DECIMALS } from './format';
@@ -708,4 +711,37 @@ export const _createTokenView = (tokenResponse: TokenFragRepsonse, amount?: BigN
     categories: [],
     description: '',
   };
+};
+
+export const formatOptimisticLineData = (
+  lineAddress: string,
+  arbiterAddress: string,
+  deployData: DeploySecuredLineWithConfigProps
+): LineOfCredit => {
+  const escrowId = '0x';
+  const spigotId = '0x';
+
+  // await dispatch(getLine(deployedLineData.))
+  const { borrower, revenueSplit, ttl, cratio } = deployData;
+
+  const lineObj = {
+    id: lineAddress,
+    borrower: borrower,
+    arbiter: arbiterAddress,
+    status: ACTIVE_STATUS,
+    start: Math.floor(Date.now() / 1000),
+    end: Math.floor(Date.now() / 1000) + Number(ttl.toString()),
+    principal: '0',
+    deposit: '0',
+    interest: '0',
+    defaultSplit: revenueSplit.toString(),
+    totalInterestRepaid: '0',
+    highestApy: ['', '', '0'],
+    spigotId: spigotId,
+    escrowId: escrowId,
+    escrow: {},
+    spigot: {},
+  } as LineOfCredit;
+
+  return lineObj;
 };

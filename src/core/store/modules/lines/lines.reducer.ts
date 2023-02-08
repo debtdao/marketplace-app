@@ -385,33 +385,10 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(deploySecuredLineWithConfig.pending, (state, { meta }) => {
       console.log('state', state);
     })
-    .addCase(
-      deploySecuredLineWithConfig.fulfilled,
-      (state, { payload: { lineAddress, arbiterAddress, escrowId, spigotId, deployData } }) => {
-        const { borrower, revenueSplit, ttl, cratio } = deployData;
-
-        const lineObj = {
-          id: lineAddress,
-          borrower: borrower,
-          arbiter: arbiterAddress,
-          status: ACTIVE_STATUS,
-          start: Math.floor(Date.now() / 1000),
-          end: Math.floor(Date.now() / 1000) + Number(ttl.toString()),
-          principal: '0',
-          deposit: '0',
-          interest: '0',
-          defaultSplit: revenueSplit.toString(),
-          totalInterestRepaid: '0',
-          highestApy: ['', '', '0'],
-          spigotId: spigotId,
-          escrowId: escrowId,
-          escrow: {},
-          spigot: {},
-        } as LineOfCredit;
-        console.log('New Line of Credit: ', lineObj);
-        state.linesMap[lineAddress] = lineObj;
-      }
-    )
+    .addCase(deploySecuredLineWithConfig.fulfilled, (state, { payload: { lineAddress, lineObj, deployData } }) => {
+      console.log('New Line of Credit: ', lineObj);
+      state.linesMap[lineAddress] = lineObj;
+    })
     .addCase(deploySecuredLineWithConfig.rejected, (state, { error, meta }) => {
       console.log('error', error);
     })

@@ -190,6 +190,7 @@ export interface CreditLineService {
   getCredit: (contractAddress: string, id: BytesLike) => Promise<CreditPosition>;
   getLenderByCreditID: (contractAddress: string, id: BytesLike) => Promise<Address>;
   getInterestRateContract: (contractAddress: string) => Promise<Address>;
+  arbiter: (contractAddress: string) => Promise<Address>;
   borrower: (contractAddress: string) => Promise<Address>;
   isActive: (contractAddress: string) => Promise<boolean>;
   isBorrowing: (contractAddress: string) => Promise<boolean>;

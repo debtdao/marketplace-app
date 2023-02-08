@@ -76,7 +76,6 @@ const LinkSection = styled.div`
   column-gap: ${({ theme }) => theme.card.padding};
   row-gap: 1rem;
   flex: 1;
-  // color: ${({ theme }) => theme.colors.icons.text};
   color: ${({ theme }) => theme.colors.titles};
 `;
 

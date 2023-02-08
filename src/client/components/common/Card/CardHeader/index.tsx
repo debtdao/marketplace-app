@@ -5,7 +5,6 @@ import { device } from '@themes/default';
 
 const Container = styled.div`
   width: 100%;
-  // padding: 0 ${({ theme }) => theme.card.padding};
 `;
 
 const BigHeader = styled.h2`

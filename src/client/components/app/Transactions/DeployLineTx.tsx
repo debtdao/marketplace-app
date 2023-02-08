@@ -190,12 +190,9 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
         })
       ).then((res) => {
         if (res.meta.requestStatus === 'rejected') {
-          // setTransactionCompleted(2);
           setLoading(false);
         }
         if (res.meta.requestStatus === 'fulfilled') {
-          console.log('Deployed Line Response: ', res);
-          // dispatch changeRoute
           const { lineAddress } = res.payload as {
             lineAddress: string;
             deployData: DeploySecuredLineWithConfigProps;

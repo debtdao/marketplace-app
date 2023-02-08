@@ -32,7 +32,6 @@ import { humanize, formatAddress, normalizeAmount, getENS } from '@src/utils';
 import { getEnv } from '@config/env';
 
 const PositionsCard = styled(DetailCard)`
-  // max-width: ${({ theme }) => theme.globalMaxWidth};
   max-width: 100%;
   width: 100%;
   padding: ${({ theme }) => theme.card.padding};
@@ -113,12 +112,6 @@ interface PositionsTableProps {
   displayLine?: boolean; // whether to add the positions line to the table
 }
 
-// interface ActionButtonProps {
-//   name: string;
-//   handler: (position?: string) => void;
-//   disabled: boolean;
-// }
-
 export const PositionsTable = ({ borrower, lender, positions, displayLine = false }: PositionsTableProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const dispatch = useAppDispatch();
@@ -132,7 +125,6 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
   const { NETWORK } = getEnv();
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
-  // const { borrower } = selectedLine!;
 
   // Initial set up for positions table
   useEffect(() => {

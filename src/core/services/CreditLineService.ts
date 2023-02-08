@@ -436,9 +436,6 @@ export class CreditLineServiceImpl implements CreditLineService {
   }
 
   public async isLender(contractAddress: string, id: BytesLike): Promise<boolean> {
-    console.log('IsLender = signer: ', await this.getSignerAddress());
-    console.log('IsLender - lender: ', await this.getLenderByCreditID(contractAddress, id));
-    console.log('IsLender - contractAddress, id: ', contractAddress, id);
     return (await this.getSignerAddress()) === (await this.getLenderByCreditID(contractAddress, id));
   }
 

@@ -7,7 +7,7 @@ import { getAddress } from 'ethers/lib/utils';
 import { device } from '@themes/default';
 import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
-import { prettyNumbers, unnullify } from '@src/utils';
+import { BASE_DECIMALS, prettyNumbers, unnullify } from '@src/utils';
 import {
   AggregatedEscrow,
   ARBITER_POSITION_ROLE,
@@ -268,7 +268,7 @@ export const LineMetadata = () => {
       <MetricDataDisplay
         title={t('lineDetails:metadata.escrow.total')}
         description={t('lineDetails:metadata.escrow.tooltip.total')}
-        data={`$ ${humanize('amount', collateralValue, 18, 2)}`}
+        data={`$ ${humanize('amount', collateralValue, BASE_DECIMALS, 2)}`}
       />
     );
   };
@@ -318,7 +318,7 @@ export const LineMetadata = () => {
         <MetricDataDisplay
           title={t('lineDetails:metadata.revenue.total')}
           description={t('lineDetails:metadata.revenue.tooltip')}
-          data={`$ ${humanize('amount', revenueValue, 18, 2)}`}
+          data={`$ ${humanize('amount', revenueValue, BASE_DECIMALS, 2)}`}
         />
       </>
     );
@@ -498,18 +498,18 @@ export const LineMetadata = () => {
               <StyledIcon Component={InfoIcon} size="1.5rem" />
             </Tooltip>
             <MetadataTitle>{t('lineDetails:metadata.total-interest-paid')}: </MetadataTitle> $
-            {humanize('amount', totalInterestRepaid, 18, 2)}
+            {humanize('amount', totalInterestRepaid, BASE_DECIMALS, 2)}
           </MetadataRow>
         </MetadataBox>
         <MetricDataDisplay
           title={t('lineDetails:metadata.principal')}
           description={t('lineDetails:metadata.tooltip.principal')}
-          data={`$ ${humanize('amount', principal, 18, 2)}`}
+          data={`$ ${humanize('amount', principal, BASE_DECIMALS, 2)}`}
         />
         <MetricDataDisplay
           title={t('lineDetails:metadata.deposit')}
           description={t('lineDetails:metadata.tooltip.deposit')}
-          data={`$ ${humanize('amount', deposit, 18, 2)}`}
+          data={`$ ${humanize('amount', deposit, BASE_DECIMALS, 2)}`}
         />
       </ThreeColumnLayout>
       <SectionHeader>
@@ -528,7 +528,6 @@ export const LineMetadata = () => {
         {renderSpigotMetadata()}
         {renderEscrowMetadata()}
       </ThreeColumnLayout>
-      {/* <SectionHeader>{t('lineDetails:metadata.escrow.assets-list.title')}</SectionHeader> */}
       <div>
         <AssetsListCard
           header={'Collateral'}
@@ -568,8 +567,7 @@ export const LineMetadata = () => {
               key: 'amount',
               header: t('lineDetails:metadata.escrow.assets-list.amount'),
               description: t('lineDetails:metadata.escrow.tooltip.amount'),
-              // transform: ({ token: { balance } }) => <Text ellipsis> {balance} </Text>,
-              format: ({ amount }) => `${humanize('amount', amount, 18, 2)}`,
+              format: ({ amount }) => `${humanize('amount', amount, BASE_DECIMALS, 2)}`,
               sortable: true,
               // width: '20rem',
               className: 'col-amount',
@@ -578,8 +576,7 @@ export const LineMetadata = () => {
               key: 'value',
               header: t('lineDetails:metadata.escrow.assets-list.value'),
               description: t('lineDetails:metadata.escrow.tooltip.value'),
-              format: ({ value }) => `$ ${humanize('amount', value, 18, 2)}`,
-              // format: ({ value }) => `$ ${humanize('value', value, 18, 2)}`,
+              format: ({ value }) => `$ ${humanize('amount', value, BASE_DECIMALS, 2)}`,
               sortable: true,
               // width: '20rem',
               className: 'col-value',

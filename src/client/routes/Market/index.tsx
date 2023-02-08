@@ -30,7 +30,6 @@ const StyledRecommendationsCard = styled(RecommendationsCard)``;
 
 const StyledSliderCard = styled(SliderCard)`
   width: 100%;
-  // min-height: 24rem;
 `;
 
 const BannerCtaButton = styled(Button)`

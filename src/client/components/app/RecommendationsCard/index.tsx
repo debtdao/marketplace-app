@@ -22,14 +22,10 @@ const ContainerCard = styled(Card)`
 
 const StyledCardContent = styled(CardContent)`
   align-items: stretch;
-  // justify-content: center;
   justify-content: start;
   flex-wrap: wrap;
   grid-gap: ${({ theme }) => theme.card.padding};
   margin-top: ${({ theme }) => theme.card.padding};
-  // margin-left: 0.5rem;
-  // margin-right: 0.5rem;
-  // padding: 0 ${({ theme }) => theme.card.padding};
 `;
 
 const ItemCard = styled(Card)<{ onClick: any }>`

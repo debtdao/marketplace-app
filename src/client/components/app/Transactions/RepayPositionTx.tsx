@@ -482,7 +482,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
           })
         );
         setTransactionCompleted(1);
-        // window.location.reload();
         setLoading(false);
       }
     });

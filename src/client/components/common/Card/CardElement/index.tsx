@@ -18,25 +18,20 @@ interface SortIconProps extends Omit<IconProps, 'ref'> {
   sortType?: SortType;
 }
 
-interface StyledIconProps extends Omit<IconProps, 'ref'> {
-  // fill: string;
-}
+interface StyledIconProps extends Omit<IconProps, 'ref'> {}
 
 interface StyledTooltipProps extends Omit<TooltipProps, 'ref'> {}
 
 const StyledIcon = styled(({ ...props }: StyledIconProps) => <Icon {...props} />)`
   height: 1.1rem;
-  // position: relative;
   margin-left: 0.4rem;
   flex-shrink: 0;
-  // fill: ${({ theme }) => theme.colors.texts};
   fill: ${({ theme, color, fill }) => fill ?? color ?? theme.colors.titles};
   transition: transform 200ms ease-in-out;
 `;
 
 const SortIcon = styled(({ activeSort, sortType, ...props }: SortIconProps) => <Icon {...props} />)`
   height: 1.1rem;
-  // position: relative;
   margin-left: 0.4rem;
   fill: ${({ theme }) => theme.colors.secondary};
   transition: transform 200ms ease-in-out;
@@ -61,7 +56,6 @@ const Header = styled.h3<{ onClick?: () => void }>`
   align-items: center;
   text-align: center;
   font-size: 1.6rem;
-  // font-size: 2rem;
   font-weight: 400;
   margin: 0;
   padding: 0;
@@ -117,15 +111,12 @@ export const CardElement: FC<CardElementProps> = ({
   className,
   ...props
 }) => {
-  // console.log('Card Element - props: ', props);
-  // console.log('Card Element - content: ', content);
-  // console.log('Card Element - description: ', description);
-  // const stuff = 'text';
   return (
     <Container width={width} align={align} grow={grow} fontWeight={fontWeight} className={className} {...props}>
       {header && (
         <Header onClick={onClick}>
           {header}
+          {/* TODO: Add tooltip back once css issues are fixed */}
           {/* <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
             <Icon Component={InfoIcon} size="1.5rem" />
           </Tooltip> */}

@@ -133,8 +133,6 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
       return;
     }
 
-    console.log('Selected Credit: ', selectedCredit);
-    console.log('Selected Position: ', selectedPosition);
     dispatch(
       LinesActions.withdrawLine({
         id: selectedPosition.id,
@@ -153,7 +151,6 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
         dispatch(
           LinesActions.setPosition({
             id: selectedPosition.id,
-            // position: selectedPosition,
             position: updatedPosition,
           })
         );

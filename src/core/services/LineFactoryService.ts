@@ -88,37 +88,6 @@ export class LineFactoryServiceImpl {
     )) as TransactionResponse;
   }
 
-  // public async deploySecuredLineWtihConfig(props: {
-  //   borrower: string;
-  //   ttl: BigNumber;
-  //   network: Network;
-  //   cratio: BigNumber;
-  //   revenueSplit: BigNumber;
-  // }): Promise<TransactionResponse | PopulatedTransaction> {
-  //   const { borrower, ttl, cratio, revenueSplit, network } = props;
-  //   const data = {
-  //     borrower,
-  //     ttl,
-  //     cratio,
-  //     revenueSplit,
-  //     network,
-  //     factoryAddress: getLineFactoryforNetwork(props.network),
-  //   };
-  //   const tx = await this.executeContractMethod(
-  //     data.factoryAddress!,
-  //     'deploySecuredLineWithConfig',
-  //     [{ borrower, ttl: ttl.toString(), cratio: cratio.toString(), revenueSplit: revenueSplit.toString() }],
-  //     network,
-  //     false
-  //   );
-  //   const rc = await tx.wait();
-  //   const [spigot, escrow, securedLine, x, y, z] = [...rc.logs];
-  //   const { address: lineAddress } = securedLine;
-  //   console.log('Tx Events: ', rc);
-  //   console.log('Secured Line: ', securedLine);
-  //   return tx;
-  // }
-
   public async deploySecuredLineWtihConfig(props: {
     borrower: string;
     ttl: BigNumber;

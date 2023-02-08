@@ -103,10 +103,6 @@ const getLine = createAsyncThunk<{ lineData: SecuredLine | undefined }, GetLineA
 const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine[] } }, UseCreditLinesParams, ThunkAPI>(
   'lines/getLines',
   async (categories, { getState, extra, dispatch }) => {
-    // const {
-    //   wallet,
-    //   tokens: { tokensMap },
-    // } = getState();
     const state: RootState = getState();
     const {
       wallet,
@@ -115,11 +111,6 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
     const { creditLineService, onchainMetaDataService } = extra.services;
     const network = getNetwork(wallet.networkVersion);
     const tokenPrices = TokensSelectors.selectTokenPrices(state);
-    console.log('Token Prices: ', tokenPrices);
-    // const tokenPrices = Object.entries(tokensMap).reduce(
-    //   (prices, [addy, { priceUsdc }]) => ({ ...prices, [addy]: BigNumber.from(priceUsdc) }),
-    //   {}
-    // );
 
     // ensure consistent ordering of categories
     const categoryKeys = Object.keys(categories);

@@ -126,7 +126,6 @@ export const Layout: FC = ({ children }) => {
   // TODO: Reset this before merging into develop.
   useEffect(() => {
     dispatch(AppActions.initApp());
-    // dispatch(TokensActions.getTokens());
 
     // NOTE Test zapper API
     //   fetch('https://api.zapper.fi/v2/prices', {

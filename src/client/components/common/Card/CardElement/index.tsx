@@ -27,6 +27,7 @@ const StyledIcon = styled(({ ...props }: StyledIconProps) => <Icon {...props} />
   // position: relative;
   margin-left: 0.4rem;
   flex-shrink: 0;
+  fill: ${({ theme }) => theme.colors.texts};
   transition: transform 200ms ease-in-out;
 `;
 
@@ -34,7 +35,7 @@ const SortIcon = styled(({ activeSort, sortType, ...props }: SortIconProps) => <
   height: 1.1rem;
   // position: relative;
   margin-left: 0.4rem;
-  // fill: currentColor;
+  fill: ${({ theme }) => theme.colors.secondary};
   transition: transform 200ms ease-in-out;
   flex-shrink: 0;
   transform: rotateZ(0);

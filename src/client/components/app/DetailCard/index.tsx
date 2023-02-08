@@ -17,16 +17,6 @@ const StyledCardElement = styled(CardElement)<{ stripes?: boolean }>`
   font-size: 1.4rem;
   flex-shrink: 2;
 
-  // &:first-child {
-  //   padding-left: ${({ theme }) => theme.card.padding};
-  // }
-  // &:last-child {
-  //   padding-right: ${({ theme }) => theme.card.padding};
-  // }
-
-  // &:first-child {
-  //   align-items: flex-start;
-  // }
   &:last-child {
     align-items: flex-end;
   }
@@ -53,14 +43,6 @@ const TitleCardElement = styled(CardElement)`
   user-select: none;
   width: 12rem;
   align-items: center;
-
-  // &:first-child {
-  //   padding-left: ${({ theme }) => theme.card.padding};
-  // }
-  // &:last-child {
-  //   padding-right: ${({ theme }) => theme.card.padding};
-  // }
-  }
 `;
 
 const StyledCardContent = styled(CardContent)<{ wrap?: boolean; pointer?: boolean }>`

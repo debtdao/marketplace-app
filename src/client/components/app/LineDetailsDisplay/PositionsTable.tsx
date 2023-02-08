@@ -106,7 +106,7 @@ const TokenIconContainer = styled.div`
   width: 100%;
 `;
 
-interface PositionsProps {
+interface PositionsTableProps {
   borrower?: string;
   lender?: string;
   positions: CreditPosition[];
@@ -119,7 +119,7 @@ interface PositionsProps {
 //   disabled: boolean;
 // }
 
-export const PositionsTable = ({ borrower, lender, positions, displayLine = false }: PositionsProps) => {
+export const PositionsTable = ({ borrower, lender, positions, displayLine = false }: PositionsTableProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const dispatch = useAppDispatch();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
@@ -324,7 +324,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
               .map((proposal) => {
                 const tokenIcon =
                   Object.keys(tokensMap).length > 0 ? tokensMap[getAddress(position.token.address)]?.icon ?? '' : '';
-                const [dRate, fRate, deposit, tokenAddress, lenderAddress] = [...proposal.args];
+                const [dRate, fRate, deposit, tokenAddress, lenderAddress] = proposal.args;
                 return {
                   deposit: humanize('amount', deposit, position.token.decimals, 2),
                   drate: `${normalizeAmount(dRate, 2)} %`,
@@ -377,7 +377,6 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
 
   return (
     <>
-      {/* <TableHeader>{t('components.positions-card.positions')}</TableHeader> */}
       <div>
         <PositionsCard
           header={'Positions'}

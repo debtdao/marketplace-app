@@ -34,7 +34,6 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionLoading, setLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>(['']);
-  // const selectedCredit = useAppSelector(LinesSelectors.selectSelectedLine);
   const linesMap = useAppSelector(LinesSelectors.selectLinesMap);
   const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
   const selectedProposal = useAppSelector(LinesSelectors.selectSelectedProposal);
@@ -44,11 +43,10 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
     return null;
   }
 
-  const [dRate, fRate, deposit, tokenAddress, lenderAddress] = [...selectedProposal!.args];
+  const [dRate, fRate, deposit, tokenAddress, lenderAddress] = selectedProposal!.args;
   const { msgData } = selectedProposal!;
   const targetTokenAmount = normalizeAmount(deposit, selectedPosition!.token.decimals);
-  const selectedCredit = linesMap[selectedPosition?.line];
-  // console.log('linesMap: ', linesMap);
+  const selectedLine = linesMap[selectedPosition?.line];
 
   const onTransactionCompletedDismissed = () => {
     if (onClose) {
@@ -60,7 +58,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
 
   const revokeConsent = () => {
     setLoading(true);
-    if (!selectedCredit?.id) {
+    if (!selectedLine?.id) {
       setErrors([...errors, 'no selected credit ID']);
       setLoading(false);
       return;
@@ -79,8 +77,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
     dispatch(
       LinesActions.revokeConsent({
         id: selectedPosition.id,
-        lineAddress: selectedCredit.id,
-        // lineAddress: selectedPosition.line,
+        lineAddress: selectedLine.id,
         network: walletNetwork,
         msgData: msgData,
       })
@@ -95,11 +92,9 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
         console.log('revoke consent fulfilled: ', '2');
         dispatch(
           LinesActions.revokeProposal({
-            lineAddress: selectedCredit.id,
-            // lineAddress: selectedPosition.line,
+            lineAddress: selectedLine.id,
             positionId: selectedPosition.id,
             proposalId: selectedProposal!.id,
-            // network: walletNetwork,
           })
         );
         console.log('revoke consent fulfilled: ', '3');
@@ -119,8 +114,8 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
     },
   ];
 
-  if (!selectedCredit) {
-    console.log('revoke consent modal selected credit is undefined: ', selectedCredit);
+  if (!selectedLine) {
+    console.log('revoke consent modal selected credit is undefined: ', selectedLine);
     return null;
   }
 
@@ -156,8 +151,7 @@ export const RevokeConsentTx: FC<RevokeConsentProps> = (props) => {
       <TxCreditLineInput
         key={'credit-input'}
         headerText={t('components.transaction.revoke-consent.select-credit')}
-        // onSelectedCreditLineChange={onSelectedCreditLineChange}
-        selectedCredit={selectedCredit}
+        selectedCredit={selectedLine}
         readOnly={true}
       />
       <TxTokenInput

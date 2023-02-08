@@ -182,7 +182,6 @@ export const Portfolio = () => {
       {selectedRole === LENDER_POSITION_ROLE && (
         <StyledBorrowerContainer>
           <PositionsTable
-            borrower={undefined}
             lender={portfolioAddress}
             positions={lenderPositions.map((id) => allPositions[id])}
             displayLine={true}

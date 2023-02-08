@@ -36,8 +36,8 @@ const ItemCard = styled(Card)<{ onClick: any }>`
   display: flex;
   align-items: start;
   min-height: 30rem;
-  min-width: 31%;
-  max-width: 33%;
+  min-width: 32%;
+  max-width: 32%;
   flex: 1;
   padding: ${({ theme }) => theme.layoutPadding};
   padding-right: calc(${({ theme }) => theme.card.padding} + ${TokenListIconSize} * 2.5);

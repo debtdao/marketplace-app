@@ -687,4 +687,7 @@ export interface LineFactoryService {
   ): Promise<[transaction: TransactionResponse | PopulatedTransaction, lineAddress: string]>;
 
   rolloverSecuredLine(props: RolloverSecuredLineProps): Promise<TransactionResponse | PopulatedTransaction>;
+
+  // view functions
+  arbiter(network: string): Promise<string>;
 }

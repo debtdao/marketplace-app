@@ -4,6 +4,7 @@ import { TransactionService, Web3Provider, Config, ExecuteTransactionProps, Addr
 import { getConfig } from '@config';
 import { getLineFactoryforNetwork } from '@src/utils';
 import { decodeErrorData } from '@src/utils/decodeError';
+import { getContract } from '@frameworks/ethers';
 
 import { TransactionResponse } from '../types';
 
@@ -33,6 +34,10 @@ export class LineFactoryServiceImpl {
     const { GRAPH_API_URL } = getConfig();
     this.graphUrl = GRAPH_API_URL || 'https://api.thegraph.com';
     this.abi = LineFactoryABI;
+  }
+
+  private _getLineFactoryContract(contractAddress: string) {
+    return getContract(contractAddress.toString(), this.abi, this.web3Provider.getSigner().provider);
   }
 
   public async deploySpigot(
@@ -217,5 +222,12 @@ export class LineFactoryServiceImpl {
       );
       return Promise.reject(e);
     }
+  }
+
+  /* ============================= Helpers =============================*/
+
+  public async arbiter(network: string): Promise<string> {
+    const factoryAddress = getLineFactoryforNetwork(network)!;
+    return (await this._getLineFactoryContract(factoryAddress)).arbiter();
   }
 }

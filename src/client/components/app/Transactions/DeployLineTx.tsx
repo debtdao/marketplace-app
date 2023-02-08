@@ -211,9 +211,6 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
   if (transactionCompleted === 1) {
     return (
       <StyledTransaction onClose={onClose} header={'Transaction complete'}>
-        {/* <RouterLink key={lineAddress} to={`${network}/lines/${address}`} selected={false}>
-          {'Go to your newly deployed line of credit'}
-        </RouterLink> */}
         <Link to={`/${currentNetwork}/lines/${lineAddress}`}>{t('Go to Line of Credit')}</Link>
         <TxStatus
           success={transactionCompleted}

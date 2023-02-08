@@ -387,16 +387,16 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
     .addCase(
       deploySecuredLineWithConfig.fulfilled,
-      (state, { payload: { lineAddress, escrowId, spigotId, deployData } }) => {
+      (state, { payload: { lineAddress, arbiterAddress, escrowId, spigotId, deployData } }) => {
         const { borrower, revenueSplit, ttl, cratio } = deployData;
 
         const lineObj = {
           id: lineAddress,
           borrower: borrower,
-          arbiter: '',
+          arbiter: arbiterAddress,
           status: ACTIVE_STATUS,
-          start: 0, // TODO
-          end: 0, // TODO
+          start: Math.floor(Date.now() / 1000),
+          end: Math.floor(Date.now() / 1000) + Number(ttl.toString()),
           principal: '0',
           deposit: '0',
           interest: '0',

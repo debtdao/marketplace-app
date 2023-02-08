@@ -251,9 +251,6 @@ export const LineMetadata = () => {
     defaultSplit,
   } = selectedLine!;
 
-  console.log('selectedLine: ', selectedLine);
-  console.log('escrow: ', escrow);
-  console.log('spigot: ', spigot);
   const { deposits, minCRatio, cratio, collateralValue } = escrow!;
   const { revenueValue, revenueSummary: revenue } = spigot!;
 

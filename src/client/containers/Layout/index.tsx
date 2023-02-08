@@ -145,13 +145,7 @@ export const Layout: FC = ({ children }) => {
 
   useEffect(() => {
     dispatch(RouteActions.changeRoute({ path: location.pathname }));
-    console.log('Route changed - location: ', location.pathname);
-    // dispatch(TokensActions.getTokens());
   }, [location]);
-
-  // useEffect(() => {
-  //   dispatch(TokensActions.getTokens());
-  // }, [userWalletAddress]);
 
   useEffect(() => {
     if (previousAddress) dispatch(AppActions.clearUserAppData());

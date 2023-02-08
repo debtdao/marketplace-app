@@ -388,7 +388,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
               header: t('components.positions-card.status'),
               description: t('components.positions-card.tooltip.status'),
               sortable: true,
-              // width: '12rem',
+              width: '8rem',
               className: 'col-apy',
             },
             {

@@ -718,8 +718,8 @@ export const formatOptimisticLineData = (
   arbiterAddress: string,
   deployData: DeploySecuredLineWithConfigProps
 ): LineOfCredit => {
-  const escrowId = '0x';
-  const spigotId = '0x';
+  const escrowId = '0xescrow';
+  const spigotId = '0xspigot';
 
   // await dispatch(getLine(deployedLineData.))
   const { borrower, revenueSplit, ttl, cratio } = deployData;

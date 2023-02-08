@@ -386,8 +386,10 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       console.log('state', state);
     })
     .addCase(deploySecuredLineWithConfig.fulfilled, (state, { payload: { lineAddress, lineObj, deployData } }) => {
-      console.log('New Line of Credit: ', lineObj);
+      const categories = state.categories;
+      const newestFeatured = [lineAddress].concat(categories['market:featured.newest']);
       state.linesMap[lineAddress] = lineObj;
+      state.categories['market:featured.newest'] = newestFeatured;
     })
     .addCase(deploySecuredLineWithConfig.rejected, (state, { error, meta }) => {
       console.log('error', error);

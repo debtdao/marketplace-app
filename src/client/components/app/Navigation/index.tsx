@@ -65,8 +65,7 @@ export const Navigation = ({ hideOptionalLinks }: NavigationProps) => {
   const displayLinks = navLinks.filter((link) => {
     if (link.text === 'navigation.portfolio' && userAddress) {
       link.to = `/${currentNetwork}/portfolio/${userAddress}`;
-      // TODO: fix portfolio undefined error
-    } else if (link.text === 'navigation.market' && !userAddress) {
+    } else if (link.text === 'navigation.portfolio' && !userAddress) {
       link.to = `/${currentNetwork}/portfolio/`;
     }
     return !(link.optional && hideOptionalLinks);

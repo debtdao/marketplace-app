@@ -9,7 +9,7 @@ const StyledCardElement = styled(CardElement)<{ stripes?: boolean }>`
   justify-content: center;
   align-items: center;
   margin: 0;
-  width: 14rem;
+  width: 12rem;
   // NOTE Card element uses card padding and layout padding, also other card child components too, doing this
   // all the card components will work fine when modifying either of the paddings, since the paddings are
   // related between them
@@ -51,7 +51,7 @@ const TitleCardElement = styled(CardElement)`
   padding: 0.6rem calc(${({ theme }) => theme.layoutPadding} / 2);
   flex-shrink: 2;
   user-select: none;
-  width: 14rem;
+  width: 12rem;
   align-items: center;
 
   // &:first-child {

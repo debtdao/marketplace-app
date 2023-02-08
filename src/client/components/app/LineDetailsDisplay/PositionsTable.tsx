@@ -445,7 +445,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
               header: t('components.positions-card.drate'),
               description: t('components.positions-card.tooltip.drate'),
               sortable: true,
-              // width: '10rem',
+              width: '8rem',
               className: 'col-assets',
             },
             {
@@ -453,7 +453,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
               header: t('components.positions-card.frate'),
               description: t('components.positions-card.tooltip.frate'),
               sortable: true,
-              // width: '10rem',
+              width: '8rem',
               className: 'col-assets',
             },
             {

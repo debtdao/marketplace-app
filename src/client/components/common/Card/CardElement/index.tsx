@@ -18,7 +18,9 @@ interface SortIconProps extends Omit<IconProps, 'ref'> {
   sortType?: SortType;
 }
 
-interface StyledIconProps extends Omit<IconProps, 'ref'> {}
+interface StyledIconProps extends Omit<IconProps, 'ref'> {
+  // fill: string;
+}
 
 interface StyledTooltipProps extends Omit<TooltipProps, 'ref'> {}
 
@@ -27,7 +29,8 @@ const StyledIcon = styled(({ ...props }: StyledIconProps) => <Icon {...props} />
   // position: relative;
   margin-left: 0.4rem;
   flex-shrink: 0;
-  fill: ${({ theme }) => theme.colors.texts};
+  // fill: ${({ theme }) => theme.colors.texts};
+  fill: ${({ theme, color, fill }) => fill ?? color ?? theme.colors.titles};
   transition: transform 200ms ease-in-out;
 `;
 
@@ -57,8 +60,8 @@ const Header = styled.h3<{ onClick?: () => void }>`
   position: relative;
   align-items: center;
   text-align: center;
-  // font-size: 1.6rem;
-  font-size: 2rem;
+  font-size: 1.6rem;
+  // font-size: 2rem;
   font-weight: 400;
   margin: 0;
   padding: 0;
@@ -126,9 +129,11 @@ export const CardElement: FC<CardElementProps> = ({
           {/* <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
             <Icon Component={InfoIcon} size="1.5rem" />
           </Tooltip> */}
-          <StyledTooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
+
+          {/* <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
             <StyledIcon Component={InfoIcon} size="1.5rem" />
-          </StyledTooltip>
+          </Tooltip>
+           */}
           {sortable && <SortIcon activeSort={activeSort} sortType={sortType} Component={ArrowDownIcon} />}
         </Header>
       )}

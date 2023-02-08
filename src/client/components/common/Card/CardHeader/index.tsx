@@ -1,6 +1,8 @@
 import { FC } from 'react';
 import styled from 'styled-components';
 
+import { device } from '@themes/default';
+
 const Container = styled.div`
   width: 100%;
   // padding: 0 ${({ theme }) => theme.card.padding};
@@ -10,8 +12,10 @@ const BigHeader = styled.h2`
   font-size: 2.4rem;
   font-weight: 700;
   margin: 0;
-  // padding: 0;
   padding: 0 ${({ theme }) => theme.card.padding};
+  @media ${device.mobile} {
+    text-align: center;
+  }
 `;
 
 const Header = styled.h2`
@@ -19,6 +23,9 @@ const Header = styled.h2`
   font-weight: 700;
   margin: 0;
   padding: 0;
+  @media ${device.mobile} {
+    text-align: center;
+  }
 `;
 
 const SubHeader = styled.h3`

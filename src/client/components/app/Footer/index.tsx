@@ -112,6 +112,10 @@ const StyledFooter = styled.footer`
   border-radius: ${({ theme }) => theme.globalRadius};
   max-width: ${({ theme }) => theme.globalMaxWidth};
 
+  @media ${device.mobile} {
+    max-width: 100%;
+  }
+
   @media ${device.desktopS} {
     grid-template-columns: 1fr;
     padding: 2rem;

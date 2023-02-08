@@ -8,6 +8,7 @@ import { useAppTranslation, useAppSelector } from '@hooks';
 import { OnchainMetaDataSelector } from '@src/core/store';
 import { SecuredLine, Item } from '@src/core/types';
 import { getENS } from '@utils';
+import { device } from '@themes/default';
 
 const TokenListIconSize = '1rem';
 
@@ -36,8 +37,6 @@ const ItemCard = styled(Card)<{ onClick: any }>`
   align-items: start;
   min-height: 30rem;
   min-width: 33%;
-  // min-width: 30%;
-  // max-width: 33%;
   flex: 1;
   padding: ${({ theme }) => theme.layoutPadding};
   padding-right: calc(${({ theme }) => theme.card.padding} + ${TokenListIconSize} * 2.5);
@@ -46,6 +45,10 @@ const ItemCard = styled(Card)<{ onClick: any }>`
   box-shadow: ${({ theme }) => `inset ${theme.colors.accents.purp} 0 0 ${theme.spacing.sm};`}
   position: relative;
   transition: filter 200ms ease-in-out;
+
+  @media ${device.mobile} {
+    min-width: 100%;
+  }
 
   ${({ onClick, theme }) =>
     onClick &&

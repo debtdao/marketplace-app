@@ -155,8 +155,6 @@ export const Market = () => {
             </div>
           </div>
         }
-        // TODO: decide if we want to remove Debt DAO banner from Market page
-        // background={<img src={DebtDAOBanner} alt={'Debt DAO Banner?'} />}
       />
 
       {getLinesStatus.loading ||

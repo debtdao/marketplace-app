@@ -192,7 +192,7 @@
           "login-cta": "Login as Arbiter",
           "enable-cta": "Enable token"
         },
-        "error-message": "could not add collateral"
+        "error-message": "Could not add collateral. "
       },
       "deposit-collateral": {
         "header": "Deposit Collateral",

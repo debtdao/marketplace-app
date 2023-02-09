@@ -61,8 +61,6 @@ const setSelectedLinePositionProposal = createAction<{ position?: string; propos
 );
 const setPosition = createAction<{ id: string; position: CreditPosition }>('lines/setPosition');
 
-const makeProposal = createAction<{ maker: string; position: AddCreditProps }>('lines/makeProposal');
-
 // TODO: update this to fetch the updated proposal from the subgraph to set revokedAt
 const revokeProposal = createAction<{ lineAddress: string; positionId: string; proposalId: string }>(
   'lines/revokeProposal'
@@ -342,33 +340,40 @@ const borrowCredit = createAsyncThunk<void, BorrowCreditProps, ThunkAPI>(
   }
 );
 
-const addCredit = createAsyncThunk<void, AddCreditProps, ThunkAPI>(
-  'lines/addCredit',
-  async ({ lineAddress, drate, frate, amount, token, lender, network }, { extra, getState }) => {
-    const { wallet } = getState();
-    const { services } = extra;
-    const userAddress = wallet.selectedAddress;
-    if (!userAddress) throw new Error('WALLET NOT CONNECTED');
+const addCredit = createAsyncThunk<
+  { maker: string; transactionType: string; position: AddCreditProps },
+  { transactionType: string; position: AddCreditProps },
+  ThunkAPI
+>('lines/addCredit', async ({ transactionType, position }, { extra, getState }) => {
+  const { wallet } = getState();
+  const { services } = extra;
+  const userAddress = wallet.selectedAddress;
+  if (!userAddress) throw new Error('WALLET NOT CONNECTED');
 
-    // TODO: fix BigNumber type difference issues
-    // const amountInWei = amount.multipliedBy(ONE_UNIT);
-    const { creditLineService } = services;
-    const tx = await creditLineService.addCredit({
-      lineAddress: lineAddress,
-      drate: drate,
-      frate: frate,
-      amount: amount,
-      token: token,
-      lender: lender,
-      dryRun: true,
-      network: network,
-    });
-    console.log('Add Credit Transaction: ', tx);
-    if (!tx) {
-      throw new Error('failed to add Credit');
-    }
+  // TODO: fix BigNumber type difference issues
+  // const amountInWei = amount.multipliedBy(ONE_UNIT);
+  const { creditLineService } = services;
+  const { lineAddress, drate, frate, amount, token, lender, network } = position;
+  const tx = await creditLineService.addCredit({
+    lineAddress: lineAddress,
+    drate: drate,
+    frate: frate,
+    amount: amount,
+    token: token,
+    lender: lender,
+    dryRun: true,
+    network: network,
+  });
+  console.log('Add Credit Transaction: ', tx);
+  if (!tx) {
+    throw new Error('failed to add Credit');
   }
-);
+  return {
+    maker: userAddress,
+    transactionType: transactionType,
+    position: position,
+  };
+});
 
 const depositAndRepay = createAsyncThunk<
   void,
@@ -925,7 +930,6 @@ export const LinesActions = {
   claimAndTrade,
   claimAndRepay,
   useAndRepay,
-  makeProposal,
   liquidate,
 
   getDepositAllowance,

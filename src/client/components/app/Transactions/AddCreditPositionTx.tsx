@@ -222,7 +222,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       dryRun: false,
     };
 
-    dispatch(LinesActions.addCredit(transactionObj)).then((res) => {
+    dispatch(LinesActions.addCredit({ transactionType, position: transactionObj })).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionApproved(transactionApproved);
         setLoading(false);
@@ -238,11 +238,8 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
             position: updatedPosition,
           })
         );
-        setTransactionCompleted(1);
-        setLoading(false);
       }
-      if (res.meta.requestStatus === 'fulfilled' && transactionType === 'propose') {
-        dispatch(LinesActions.makeProposal({ maker: walletAddress!, position: transactionObj }));
+      if (res.meta.requestStatus === 'fulfilled') {
         setTransactionCompleted(1);
         setLoading(false);
       }

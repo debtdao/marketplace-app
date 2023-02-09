@@ -68,9 +68,7 @@ export const LineDetail = () => {
     }
 
     dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineAddress }));
-    dispatch(TokensActions.getTokens())
-      .then((res) => dispatch(LinesActions.getLinePage({ id: lineAddress })))
-      .then((error) => dispatch(LinesActions.getLinePage({ id: lineAddress })));
+    dispatch(TokensActions.getTokens()).then(() => dispatch(LinesActions.getLinePage({ id: lineAddress })));
   }, []);
 
   const [firstTokensFetch, setFirstTokensFetch] = useState(true);

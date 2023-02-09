@@ -72,9 +72,7 @@ export const Spigot = () => {
     // TODO: implement getSpigot gql query and replace dispatch to getLinePage
     // dispatch(CollateralActions.getSpigotPage({ id: spigotAddress }));
     if (spigotAddress && !selectedSpigot) {
-      dispatch(TokensActions.getTokens())
-        .then((res) => dispatch(LinesActions.getLinePage({ id: lineAddress })))
-        .then((error) => dispatch(LinesActions.getLinePage({ id: lineAddress })));
+      dispatch(TokensActions.getTokens()).then(() => dispatch(LinesActions.getLinePage({ id: lineAddress })));
       dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
     }
 

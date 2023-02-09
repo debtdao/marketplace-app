@@ -69,15 +69,18 @@ const selectLiveLines = createSelector([selectLines], (lines): SecuredLine[] => 
   return lines.filter((line: SecuredLine) => line.end < Date.now() / 1000);
 });
 
-const selectSelectedLine = createSelector([selectLinesMap, selectSelectedLineAddress], (lines, selectedLineAddress) => {
-  if (!selectedLineAddress) return undefined;
-  return lines[selectedLineAddress];
-});
-
 const selectSelectedPosition = createSelector(
   [selectPositionsMap, selectSelectedPositionId],
   (positions, id = ''): CreditPosition | undefined => {
     return positions[id];
+  }
+);
+
+const selectSelectedLine = createSelector(
+  [selectLinesMap, selectSelectedLineAddress, selectSelectedPosition],
+  (lines, selectedLineAddress, position) => {
+    if (!selectedLineAddress && (!position || !position.line)) return undefined;
+    return lines[selectedLineAddress ?? position!.line];
   }
 );
 

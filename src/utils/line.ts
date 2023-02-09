@@ -48,6 +48,8 @@ import {
   LineOfCredit,
   ACTIVE_STATUS,
   DeploySecuredLineWithConfigProps,
+  AddCreditProps,
+  PROPOSED_STATUS,
 } from '@types';
 
 import { humanize, normalizeAmount, normalize, format, toUnit, toTargetDecimalUnits, BASE_DECIMALS } from './format';
@@ -744,4 +746,44 @@ export const formatOptimisticLineData = (
   } as LineOfCredit;
 
   return lineObj;
+};
+
+export const formatOptimisticProposal = (
+  maker: string,
+  position: AddCreditProps,
+  positionId: string
+): CreditPosition => {
+  const { lineAddress, drate, frate, amount, token, lender } = position;
+  const proposalId = '0x' + Math.random().toFixed(64).slice(2, 68);
+  const proposal = {
+    id: proposalId,
+    proposedAt: 1234,
+    acceptedAt: 1234,
+    revokedAt: 0,
+    maker: maker.toLowerCase(),
+    taker: String(null),
+    mutualConsentFunc: '',
+    msgData: '',
+    args: [drate.toString(), frate.toString(), amount.toString(), token.address, lender],
+  } as CreditProposal;
+  const proposalsMap: ProposalMap = {};
+  proposalsMap[proposalId] = proposal;
+
+  const proposedPosition = {
+    id: positionId,
+    line: lineAddress,
+    status: PROPOSED_STATUS,
+    token,
+    lender: lender.toLowerCase(),
+    deposit: '0',
+    principal: '0',
+    interestAccrued: '0',
+    interestRepaid: '0',
+    totalInterestRepaid: '0',
+    dRate: '0',
+    fRate: '0',
+    proposalsMap,
+  } as CreditPosition;
+
+  return proposedPosition;
 };

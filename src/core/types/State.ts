@@ -114,6 +114,7 @@ export interface CreditLineState {
     };
   };
   statusMap: {
+    addCredit: Status;
     getLines: Status;
     getLine: Status;
     // getLineEvents: Status;

@@ -106,7 +106,7 @@
       "borrow": "Borrow",
       "deposit-and-repay-header": "Deposit and Repay",
       "claim-and-repay-header": "Claim and Repay",
-      "claim-operator-revenue":"Claim Revenue",
+      "claim-operator-revenue": "Claim Revenue",
       "deposit-and-close-header": "Deposit and Close",
       "withdraw": "Withdraw",
       "borrow-limit": {
@@ -177,8 +177,8 @@
         "select-lender": "3. Lender:",
         "select-rates": "4. Set Interest Rates",
         "rates": {
-          "facility-rate":"Facility  Rate",
-          "drawn-rate":"Drawn Rate"
+          "facility-rate": "Facility  Rate",
+          "drawn-rate": "Drawn Rate"
         },
         "lender-address": "Ethereum Address",
         "back-to-market": "Head back to the Market",
@@ -296,7 +296,7 @@
       },
       "revoke-consent": {
         "header": "Cancel Proposed Deal",
-        "cta": "Cancel Proposal",
+        "cta": "Cancel",
         "select-credit": "1. Borrower:",
         "select-token": "2. Token:",
         "select-lender": "3. Lender:",
@@ -309,7 +309,7 @@
         "error-message": "could not cancel proposed deal"
       },
       "enable-spigot": {
-        "header":"Enable Spigot",
+        "header": "Enable Spigot",
         "select-function": "Select Function",
         "revenue-contract": "1. Revenue Contract",
         "revenue-token-to-claim": "2. Revenue Token to Claim",
@@ -328,8 +328,8 @@
         "claim-data-header": "Transaction data to call on revenue contract",
         "claim-data-input": "Hexcode (0xdebfda05....)",
         "cta": "Claim",
-        "claim-operator-tokens":{
-          "cta":"Claim Operator Tokens",
+        "claim-operator-tokens": {
+          "cta": "Claim Operator Tokens",
           "error-message": "could not claim operator tokens"
         },
         "error-message": "could not claim revenue"

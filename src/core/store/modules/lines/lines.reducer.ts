@@ -23,7 +23,7 @@ import {
   ACTIVE_STATUS,
   RevenueSummaryMap,
 } from '@types';
-import { getNetworkId } from '@src/utils';
+import { formatOptimisticProposal, getNetworkId } from '@src/utils';
 
 import { NetworkActions } from '../network/network.actions';
 import { WalletActions } from '../wallet/wallet.actions';
@@ -65,6 +65,7 @@ export const linesInitialState: CreditLineState = {
     },
   },
   statusMap: {
+    addCredit: initialStatus,
     getLines: initialStatus,
     getLine: initialStatus,
     getLinePage: initialStatus,
@@ -101,7 +102,6 @@ const {
   // getUserLinesMetadata,
   clearSelectedLine,
   clearLineStatus,
-  makeProposal,
 } = LinesActions;
 
 const linesReducer = createReducer(linesInitialState, (builder) => {
@@ -126,48 +126,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(setPosition, (state, { payload: { id, position } }) => {
       state.positionsMap[id] = position;
       console.log('Updated Positions Map: ', state.positionsMap[id]);
-    })
-
-    .addCase(makeProposal, (state, { payload: { maker, position } }) => {
-      const { lineAddress, drate, frate, amount, token, lender } = position;
-
-      const positionIds = state.linesMap[lineAddress].positionIds ?? [];
-      const positionId = '0x' + Math.random().toFixed(64).slice(2, 68);
-      positionIds.push(positionId);
-      const proposalId = '0x' + Math.random().toFixed(64).slice(2, 68);
-
-      const proposal = {
-        id: proposalId,
-        proposedAt: 1234,
-        acceptedAt: 1234,
-        revokedAt: 0,
-        maker: maker.toLowerCase(),
-        taker: String(null),
-        mutualConsentFunc: '',
-        msgData: '',
-        args: [drate.toString(), frate.toString(), amount.toString(), token.address, lender],
-      } as CreditProposal;
-      const proposalsMap: ProposalMap = {};
-      proposalsMap[proposalId] = proposal;
-
-      const proposedPosition = {
-        id: positionId,
-        line: lineAddress,
-        status: PROPOSED_STATUS,
-        token,
-        lender: lender.toLowerCase(),
-        deposit: '0',
-        principal: '0',
-        interestAccrued: '0',
-        interestRepaid: '0',
-        totalInterestRepaid: '0',
-        dRate: '0',
-        fRate: '0',
-        proposalsMap,
-      } as CreditPosition;
-
-      state.linesMap[lineAddress].positionIds = positionIds;
-      state.positionsMap[positionId] = proposedPosition;
     })
 
     .addCase(revokeProposal, (state, { payload: { lineAddress, positionId, proposalId } }) => {
@@ -361,6 +319,24 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
 
     /* ----------------------------- addCredit ----------------------------- */
+    .addCase(addCredit.pending, (state) => {
+      state.statusMap.addCredit = { loading: true };
+    })
+    .addCase(addCredit.fulfilled, (state, { payload: { maker, transactionType, position } }) => {
+      if (transactionType === 'propose') {
+        const { lineAddress } = position;
+        const positionId = '0x' + Math.random().toFixed(64).slice(2, 68);
+        const positionIds = state.linesMap[lineAddress].positionIds ?? [];
+        positionIds.push(positionId);
+        const proposedPosition = formatOptimisticProposal(maker, position, positionId);
+        state.linesMap[lineAddress].positionIds = positionIds;
+        state.positionsMap[positionId] = proposedPosition;
+      }
+    })
+    .addCase(addCredit.rejected, (state, { error }) => {
+      state.statusMap.addCredit = { error: error.message };
+    })
+
     /* ------------------------------ depositAndRepay ------------------------------ */
     .addCase(depositAndRepay.pending, (state, { meta }) => {
       //const lineAddress = meta.arg.lineAddress;

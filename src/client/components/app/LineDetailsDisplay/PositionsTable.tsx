@@ -266,8 +266,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
 
   const formattedPositionsAndProposals = _.flatten(
     positions?.map((position) => {
-      const tokenIcon =
-        Object.keys(tokensMap).length > 0 ? tokensMap[getAddress(position.token.address)]?.icon ?? '' : '';
+      const tokenIcon = tokensMap !== undefined ? tokensMap[getAddress(position.token.address)]?.icon ?? '' : '';
       const positionToDisplay = {
         deposit: humanize('amount', position.deposit, position.token.decimals, 2),
         drate: `${normalizeAmount(position.dRate, 2)} %`,
@@ -315,7 +314,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
               .filter((proposal) => proposal.revokedAt === null || proposal.revokedAt === 0)
               .map((proposal) => {
                 const tokenIcon =
-                  Object.keys(tokensMap).length > 0 ? tokensMap[getAddress(position.token.address)]?.icon ?? '' : '';
+                  tokensMap !== undefined ? tokensMap[getAddress(position.token.address)]?.icon ?? '' : '';
                 const [dRate, fRate, deposit, tokenAddress, lenderAddress] = proposal.args;
                 return {
                   deposit: humanize('amount', deposit, position.token.decimals, 2),

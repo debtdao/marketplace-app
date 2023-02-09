@@ -7,7 +7,6 @@ import { sort } from '@utils';
 const StyledCardElement = styled(CardElement)<{ stripes?: boolean }>`
   display: flex;
   justify-content: center;
-  // align-items: center;
   align-items: flex-start;
   margin: 0;
   // NOTE Card element uses card padding and layout padding, also other card child components too, doing this
@@ -16,9 +15,6 @@ const StyledCardElement = styled(CardElement)<{ stripes?: boolean }>`
   padding: calc(${({ theme }) => theme.card.padding} / 4) calc(${({ theme }) => theme.layoutPadding} / 2);
   font-size: 1.4rem;
   flex-shrink: 2;
-  // &:first-child {
-  //   align-items: flex-start;
-  // }
 
   &:last-child {
     align-items: center;
@@ -45,10 +41,6 @@ const TitleCardElement = styled(CardElement)`
   flex-shrink: 2;
   user-select: none;
   align-items: flex-start;
-  // align-items: center;
-  // &:first-child {
-  //   align-items: flex-start;
-  // }
   &:last-child {
     align-items: center;
   }

@@ -17,7 +17,7 @@ const StyledCardElement = styled(CardElement)<{ stripes?: boolean }>`
   flex-shrink: 2;
 
   &:last-child {
-    align-items: center;
+    align-items: flex-end;
   }
 
   > * {
@@ -42,7 +42,7 @@ const TitleCardElement = styled(CardElement)`
   user-select: none;
   align-items: flex-start;
   &:last-child {
-    align-items: center;
+    align-items: flex-end;
   }
 `;
 

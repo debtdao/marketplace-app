@@ -34,7 +34,8 @@
         "status": "Status of the position: proposed, open, or closed",
         "principal": "The total amount of the token borrowed",
         "interest": "The amount of interest accrued on the borrowed token",
-        "lender": "The lender address for the position"
+        "lender": "The lender address for the position",
+        "actions": "The actions available for the position. Users can deposit, borrow, withdraw, or close the position."
       }
     },
     "list-card": {

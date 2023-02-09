@@ -37,7 +37,7 @@ const ItemCard = styled(Card)<{ onClick: any }>`
   flex: 1;
   padding: ${({ theme }) => theme.layoutPadding};
   padding-right: calc(${({ theme }) => theme.card.padding} + ${TokenListIconSize} * 2.5);
-  background-color: ${({ theme }) => theme.colors.surfaceVariantA};
+  background-color: ${({ theme }) => (theme.name === 'light' ? theme.colors.surface : theme.colors.surfaceVariantA)};
   color: ${({ theme }) => theme.colors.primary};
   box-shadow: ${({ theme }) => `inset ${theme.colors.accents.purp} 0 0 ${theme.spacing.sm};`}
   position: relative;
@@ -79,7 +79,7 @@ const ItemInfoLabel = styled(Text)`
 `;
 
 const ItemName = styled(Text)`
-  font-size: ${({ theme }) => theme.fonts.sizes.md};
+  font-size: ${({ theme }) => theme.fonts.sizes.lg};
   width: 100%;
   white-space: nowrap;
   overflow: hidden;

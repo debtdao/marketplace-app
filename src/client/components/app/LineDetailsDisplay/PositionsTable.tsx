@@ -443,6 +443,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
             },
             {
               key: 'actions',
+              description: t('components.positions-card.tooltip.actions'),
               header: 'Actions',
               align: 'flex-end',
               grow: '1',

@@ -12,9 +12,6 @@ const BigHeader = styled.h2`
   font-weight: 700;
   margin: 0;
   padding: 0 ${({ theme }) => theme.card.padding};
-  @media ${device.mobile} {
-    text-align: center;
-  }
 `;
 
 const Header = styled.h2`

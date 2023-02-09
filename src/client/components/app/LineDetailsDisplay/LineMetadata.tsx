@@ -5,7 +5,6 @@ import { format } from 'date-fns';
 import { getAddress } from 'ethers/lib/utils';
 
 import { device } from '@themes/default';
-import { getTheme } from '@themes';
 import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
 import { BASE_DECIMALS, prettyNumbers, unnullify } from '@src/utils';
@@ -254,7 +253,6 @@ const MetricDataDisplay = ({ title, description, data, displaySubmetrics = false
 export const LineMetadata = (props: LineMetadataProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
-  const currentTheme = useAppSelector(({ theme }) => theme.current);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const dispatch = useAppDispatch();
@@ -263,8 +261,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const explorerUrl = useExplorerURL(network);
   const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
-  const theme = getTheme(currentTheme);
-  console.log('Thene: ', theme);
   const { borrowerID } = props;
   const {
     borrower,
@@ -624,6 +620,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
             {
               key: 'actions',
               header: 'Actions',
+              description: t('lineDetails:metadata.escrow.tooltip.actions'),
               transform: ({ token, type }) => renderButtons(token, type),
               align: 'flex-end',
               width: 'auto',

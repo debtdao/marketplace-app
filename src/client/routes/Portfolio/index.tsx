@@ -153,12 +153,7 @@ export const Portfolio = () => {
 
       {selectedRole === BORROWER_POSITION_ROLE && (
         <StyledBorrowerContainer>
-          <PositionsTable
-            borrower={portfolioAddress!}
-            lender={undefined}
-            positions={borrowerPositions}
-            displayLine={true}
-          />
+          <PositionsTable borrower={portfolioAddress!} positions={borrowerPositions} displayLine={true} />
         </StyledBorrowerContainer>
       )}
 

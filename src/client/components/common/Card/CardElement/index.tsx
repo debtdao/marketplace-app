@@ -18,6 +18,7 @@ interface SortIconProps extends Omit<IconProps, 'ref'> {
   sortType?: SortType;
 }
 
+// TODO: StyledIcon, StyledTooltipProps, and StyledTooltip do not work for some reason
 interface StyledIconProps extends Omit<IconProps, 'ref'> {}
 
 interface StyledTooltipProps extends Omit<TooltipProps, 'ref'> {}
@@ -28,6 +29,10 @@ const StyledIcon = styled(({ ...props }: StyledIconProps) => <Icon {...props} />
   flex-shrink: 0;
   fill: ${({ theme, color, fill }) => fill ?? color ?? theme.colors.titles};
   transition: transform 200ms ease-in-out;
+`;
+
+const StyledTooltip = styled(({ ...props }: StyledTooltipProps) => <Tooltip {...props} />)`
+  position: absolute;
 `;
 
 const SortIcon = styled(({ activeSort, sortType, ...props }: SortIconProps) => <Icon {...props} />)`
@@ -44,10 +49,6 @@ const SortIcon = styled(({ activeSort, sortType, ...props }: SortIconProps) => <
     color: ${theme.colors.texts};
     transform: ${sortType === 'asc' ? 'rotateZ(180deg)' : 'rotateZ(0deg)'};
   `}
-`;
-
-const StyledTooltip = styled(({ ...props }: StyledTooltipProps) => <Tooltip {...props} />)`
-  position: absolute;
 `;
 
 const Header = styled.h3<{ onClick?: () => void }>`
@@ -116,15 +117,15 @@ export const CardElement: FC<CardElementProps> = ({
       {header && (
         <Header onClick={onClick}>
           {header}
-          {/* TODO: Add tooltip back once css issues are fixed */}
-          {/* <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
+          <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
             <Icon Component={InfoIcon} size="1.5rem" />
-          </Tooltip> */}
+          </Tooltip>
 
+          {/* TODO: Add styled tooltip back once css issues are fixed */}
           {/* <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
             <StyledIcon Component={InfoIcon} size="1.5rem" />
-          </Tooltip>
-           */}
+          </Tooltip> */}
+
           {sortable && <SortIcon activeSort={activeSort} sortType={sortType} Component={ArrowDownIcon} />}
         </Header>
       )}

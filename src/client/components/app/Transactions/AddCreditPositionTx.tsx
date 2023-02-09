@@ -107,7 +107,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   useEffect(() => {
     if (selectedPosition?.status === PROPOSED_STATUS && selectedProposal) {
       // set values based on selectedProposal
-      const [dRate, fRate, deposit, tokenAddress, lenderAddress] = [...selectedProposal.args];
+      const [dRate, fRate, deposit, tokenAddress, lenderAddress] = selectedProposal.args;
       setTargetTokenAmount(normalizeAmount(deposit, selectedPosition.token.decimals));
       setSelectedTokenAddress(tokenAddress);
       setDrate(normalizeAmount(dRate, 0));

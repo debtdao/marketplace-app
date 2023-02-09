@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { getAddress } from 'ethers/lib/utils';
 
 import { device } from '@themes/default';
+import { getTheme } from '@themes';
 import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
 import { BASE_DECIMALS, prettyNumbers, unnullify } from '@src/utils';
@@ -26,7 +27,7 @@ import {
   REPAID_STATUS,
   INSOLVENT_STATUS,
 } from '@src/core/types';
-import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
+import { DetailCard, ActionButtons, TokenIcon, ViewContainer, BorrowerName } from '@components/app';
 import { Button, Text, RedirectIcon, Link, CardEmptyList, Tooltip, InfoIcon, Icon } from '@components/common';
 import {
   LinesSelectors,
@@ -79,6 +80,12 @@ const DataMetric = styled.h5`
   ${({ theme }) => `
     font-size: ${theme.fonts.sizes.md};
   `}
+`;
+
+export const MetadataContainer = styled.div`
+  background-color: ${({ theme }) => (theme.name === 'classic' ? theme.colors.backgroundVariant : '')};
+  padding: ${({ theme }) => theme.card.padding};
+  border-radius: ${({ theme }) => theme.globalRadius};
 `;
 
 const MetadataBox = styled.div`
@@ -134,15 +141,30 @@ const RedirectLinkIcon = styled(RedirectIcon)`
   padding-bottom: 0.2rem;
 `;
 
+const Header = styled.h1`
+  ${({ theme }) => `
+    margin-bottom: ${theme.spacing.xl};
+    font-size: ${theme.fonts.sizes.xl};
+    color: ${theme.colors.titles};
+  `};
+`;
+
+const Redirect = styled(RedirectIcon)`
+  display: inline-block;
+  fill: currentColor;
+  width: 1.2rem;
+  margin-left: 2rem;
+  padding-bottom: 0.2rem;
+`;
+
 const RouterLink = styled(Link)<{ selected: boolean }>`
   display: flex;
-  justify-content: center;
   flex-direction: row;
   align-items: center;
   color: inherit;
-  font-size: 1.2rem;
+  font-size: 3rem;
   flex: 1;
-  padding: 0.5rem;
+  width: 100%;
 
   &:hover span {
     filter: brightness(90%);
@@ -157,6 +179,30 @@ const RouterLink = styled(Link)<{ selected: boolean }>`
     color: ${props.theme.colors.titlesVariant};
   `}
 `;
+
+// const RouterLink = styled(Link)<{ selected: boolean }>`
+//   display: flex;
+//   justify-content: center;
+//   flex-direction: row;
+//   align-items: center;
+//   color: inherit;
+//   font-size: 1.2rem;
+//   flex: 1;
+//   padding: 0.5rem;
+
+//   &:hover span {
+//     filter: brightness(90%);
+//   }
+
+//   span {
+//     transition: filter 200ms ease-in-out;
+//   }
+//   ${(props) =>
+//     props.selected &&
+//     `
+//     color: ${props.theme.colors.titlesVariant};
+//   `}
+// `;
 
 const TokenIconContainer = styled.div`
   display: flex;
@@ -211,6 +257,10 @@ interface MetricDisplay extends Metric {
   children?: any;
 }
 
+interface LineMetadataProps {
+  borrowerID: string;
+}
+
 const MetricDataDisplay = ({ title, description, data, displaySubmetrics = false, children }: MetricDisplay) => {
   return (
     <MetricContainer>
@@ -226,9 +276,10 @@ const MetricDataDisplay = ({ title, description, data, displaySubmetrics = false
   );
 };
 
-export const LineMetadata = () => {
+export const LineMetadata = (props: LineMetadataProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
+  const currentTheme = useAppSelector(({ theme }) => theme.current);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const dispatch = useAppDispatch();
@@ -237,8 +288,11 @@ export const LineMetadata = () => {
   const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const explorerUrl = useExplorerURL(network);
   const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
-
+  const theme = getTheme(currentTheme);
+  console.log('Thene: ', theme);
+  const { borrowerID } = props;
   const {
+    borrower,
     start: startTime,
     end: endTime,
     status,
@@ -469,66 +523,76 @@ export const LineMetadata = () => {
 
   return (
     <>
-      <ThreeColumnLayout>
-        <MetadataBox>
-          <MetadataRow>
-            <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.status')}</>}>
-              <StyledIcon Component={InfoIcon} size="1.5rem" />
-            </Tooltip>
-            <MetadataTitle>{t('lineDetails:metadata.status')}: </MetadataTitle>{' '}
-            <StatusWithColor status={status}>{status[0].toUpperCase() + status.substring(1)}</StatusWithColor>{' '}
-          </MetadataRow>
-          <MetadataRow>
-            <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.start')}</>}>
-              <StyledIcon Component={InfoIcon} size="1.5rem" />
-            </Tooltip>
-            <MetadataTitle>{t('lineDetails:metadata.start')}: </MetadataTitle> {startDateHumanized}
-          </MetadataRow>
-          <MetadataRow>
-            <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.end')}</>}>
-              <StyledIcon Component={InfoIcon} size="1.5rem" />
-            </Tooltip>
-            <MetadataTitle>{t('lineDetails:metadata.end')}: </MetadataTitle> {endDateHumanized}
-          </MetadataRow>
-          <MetadataRow>
-            <Tooltip
-              placement="bottom-start"
-              tooltipComponent={<>{t('lineDetails:metadata.tooltip.total-interest-paid')}</>}
-            >
-              <StyledIcon Component={InfoIcon} size="1.5rem" />
-            </Tooltip>
-            <MetadataTitle>{t('lineDetails:metadata.total-interest-paid')}: </MetadataTitle> $
-            {humanize('amount', totalInterestRepaid, BASE_DECIMALS, 2)}
-          </MetadataRow>
-        </MetadataBox>
-        <MetricDataDisplay
-          title={t('lineDetails:metadata.principal')}
-          description={t('lineDetails:metadata.tooltip.principal')}
-          data={`$ ${humanize('amount', principal, BASE_DECIMALS, 2)}`}
-        />
-        <MetricDataDisplay
-          title={t('lineDetails:metadata.deposit')}
-          description={t('lineDetails:metadata.tooltip.deposit')}
-          data={`$ ${humanize('amount', deposit, BASE_DECIMALS, 2)}`}
-        />
-      </ThreeColumnLayout>
-      <SectionHeader>
-        {t('lineDetails:metadata.secured-by')}
-        <CollateralTypeName to={`/${network}/lines/${selectedLine?.id}/spigots/${selectedLine?.spigotId}`}>
-          {' '}
-          {t(`lineDetails:metadata.revenue.title`)}{' '}
-        </CollateralTypeName>
-        {' + '}
-        {t(`lineDetails:metadata.escrow.title`)}
-      </SectionHeader>
+      <MetadataContainer>
+        <Header>
+          <RouterLink to={`/${network}/portfolio/${borrower}`} key={borrower} selected={false}>
+            <BorrowerName>
+              {t('lineDetails:metadata.borrower')} {'  :  '} {borrowerID}
+              <Redirect />
+            </BorrowerName>
+          </RouterLink>
+        </Header>
+        <ThreeColumnLayout>
+          <MetadataBox>
+            <MetadataRow>
+              <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.status')}</>}>
+                <StyledIcon Component={InfoIcon} size="1.5rem" />
+              </Tooltip>
+              <MetadataTitle>{t('lineDetails:metadata.status')}: </MetadataTitle>{' '}
+              <StatusWithColor status={status}>{status[0].toUpperCase() + status.substring(1)}</StatusWithColor>{' '}
+            </MetadataRow>
+            <MetadataRow>
+              <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.start')}</>}>
+                <StyledIcon Component={InfoIcon} size="1.5rem" />
+              </Tooltip>
+              <MetadataTitle>{t('lineDetails:metadata.start')}: </MetadataTitle> {startDateHumanized}
+            </MetadataRow>
+            <MetadataRow>
+              <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.end')}</>}>
+                <StyledIcon Component={InfoIcon} size="1.5rem" />
+              </Tooltip>
+              <MetadataTitle>{t('lineDetails:metadata.end')}: </MetadataTitle> {endDateHumanized}
+            </MetadataRow>
+            <MetadataRow>
+              <Tooltip
+                placement="bottom-start"
+                tooltipComponent={<>{t('lineDetails:metadata.tooltip.total-interest-paid')}</>}
+              >
+                <StyledIcon Component={InfoIcon} size="1.5rem" />
+              </Tooltip>
+              <MetadataTitle>{t('lineDetails:metadata.total-interest-paid')}: </MetadataTitle> $
+              {humanize('amount', totalInterestRepaid, BASE_DECIMALS, 2)}
+            </MetadataRow>
+          </MetadataBox>
+          <MetricDataDisplay
+            title={t('lineDetails:metadata.principal')}
+            description={t('lineDetails:metadata.tooltip.principal')}
+            data={`$ ${humanize('amount', principal, BASE_DECIMALS, 2)}`}
+          />
+          <MetricDataDisplay
+            title={t('lineDetails:metadata.deposit')}
+            description={t('lineDetails:metadata.tooltip.deposit')}
+            data={`$ ${humanize('amount', deposit, BASE_DECIMALS, 2)}`}
+          />
+        </ThreeColumnLayout>
+        <SectionHeader>
+          {t('lineDetails:metadata.secured-by')}
+          <CollateralTypeName to={`/${network}/lines/${selectedLine?.id}/spigots/${selectedLine?.spigotId}`}>
+            {' '}
+            {t(`lineDetails:metadata.revenue.title`)}{' '}
+          </CollateralTypeName>
+          {' + '}
+          {t(`lineDetails:metadata.escrow.title`)}
+        </SectionHeader>
 
-      {!revenue && !deposits && <MetricName>{t('lineDetails:metadata.unsecured')}</MetricName>}
+        {!revenue && !deposits && <MetricName>{t('lineDetails:metadata.unsecured')}</MetricName>}
 
-      <ThreeColumnLayout>
-        {renderSpigotMetadata()}
-        {renderEscrowMetadata()}
-      </ThreeColumnLayout>
-      <div>
+        <ThreeColumnLayout>
+          {renderSpigotMetadata()}
+          {renderEscrowMetadata()}
+        </ThreeColumnLayout>
+      </MetadataContainer>
+      <>
         <AssetsListCard
           header={'Collateral'}
           data-testid="line-assets-list"
@@ -593,7 +657,7 @@ export const LineMetadata = () => {
           initialSortBy="value"
           wrap
         />
-      </div>
+      </>
     </>
   );
 };

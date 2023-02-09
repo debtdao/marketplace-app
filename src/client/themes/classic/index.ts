@@ -47,10 +47,11 @@ const classic = {
 
 const classicTheme: DefaultTheme = {
   ...sharedTheme,
+  name: classic.name,
   // TODO: Replace with a custom Debt DAO branded background
-  // background: {
-  //   image: ClassicBackground,
-  // },
+  background: {
+    image: ClassicBackground,
+  },
   colors: {
     logo: '#006AE3',
 

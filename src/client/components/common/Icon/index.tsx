@@ -58,6 +58,7 @@ export const Icon = styled(forwardRef(({ Component, ...props }: IconProps, ref) 
   justify-content: center;
   user-select: none;
   margin-left: 1rem;
+  fill: ${({ color }) => color ?? 'currentColor'};
   width: ${({ size }) => size ?? 'initial'};
   height: ${({ size }) => size ?? 'initial'};
   ${styledSystem};

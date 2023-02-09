@@ -32,7 +32,7 @@ export const depositAndRepayUpdate = (position: CreditPosition, amount: string) 
 };
 
 export const addCreditUpdate = (position: CreditPosition, proposal: CreditProposal): CreditPosition => {
-  const [dRate, fRate, deposit, tokenAddress, lender] = [...proposal.args];
+  const [dRate, fRate, deposit, tokenAddress, lender] = proposal.args;
   return {
     ...position,
     status: OPENED_STATUS,

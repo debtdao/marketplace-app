@@ -10,7 +10,7 @@ const StyledTokenIcon = styled.div`
   justify-content: center;
 `;
 
-type TokenIconSize = 'default' | 'xs' | 'small' | 'big' | 'xBig' | 'xxBig';
+type TokenIconSize = 'default' | 'small' | 'big' | 'xBig' | 'xxBig';
 
 interface TokenIconProps {
   icon?: string;
@@ -24,9 +24,6 @@ export const TokenIcon = ({ SVG, icon, symbol, size, margin }: TokenIconProps) =
   const src = icon === '' || !icon ? fallbackIcon : icon;
   let height;
   switch (size) {
-    case 'xs':
-      height = '2.2rem';
-      break;
     case 'small':
       height = '2.5rem';
       break;

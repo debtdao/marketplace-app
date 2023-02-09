@@ -181,6 +181,7 @@ export const ClaimOperatorTokensTx: FC<ClaimOperatorTokensTxProps> = (props) => 
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.claim-revenue.claim-operator-tokens.error-message')}
+          transactionFailedReason={t('components.transaction.claim-revenue.claim-operator-tokens.error-reason')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>

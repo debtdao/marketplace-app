@@ -215,7 +215,6 @@ export interface CreditLineService {
 
 export interface AddCreditProps {
   lineAddress: string;
-  // token: Address;
   token: TokenView;
   drate: BigNumber;
   frate: BigNumber;
@@ -678,10 +677,6 @@ export interface LineFactoryService {
   deployEscrow(props: DeployEscrowProps): Promise<TransactionResponse | PopulatedTransaction>;
 
   deploySecuredLine(props: DeploySecuredLineProps): Promise<TransactionResponse | PopulatedTransaction>;
-
-  // deploySecuredLineWtihConfig(
-  //   props: DeploySecuredLineWithConfigProps
-  // ): Promise<TransactionResponse | PopulatedTransaction>;
 
   deploySecuredLineWtihConfig(
     props: DeploySecuredLineWithConfigProps

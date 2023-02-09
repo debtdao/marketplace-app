@@ -208,7 +208,6 @@ const getUserPortfolio = createAsyncThunk<
   if (!userPortfolio) return { address: user, lines: {}, lenderPositions: {} };
 
   const { lines, positions: lenderPositions } = formatUserPortfolioData(userPortfolio, tokenPrices);
-  console.log('lines action: ', lines);
   return { address: user, lines, lenderPositions };
 });
 
@@ -368,19 +367,6 @@ const addCredit = createAsyncThunk<void, AddCreditProps, ThunkAPI>(
     if (!tx) {
       throw new Error('failed to add Credit');
     }
-
-    // return {
-    //   lineAddress,
-    //   drate,
-    //   frate,
-    //   amount,
-    //   token,
-    //   lender,
-    //   network,
-    // };
-    // return;
-    // const notifyEnabled = app.servicesEnabled.notify;
-    // await transactionService.handleTransaction({ tx, network: network.current, useExternalService: notifyEnabled });
   }
 );
 

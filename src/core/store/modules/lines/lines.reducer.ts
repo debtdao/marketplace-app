@@ -132,10 +132,8 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       const { lineAddress, drate, frate, amount, token, lender } = position;
 
       const positionIds = state.linesMap[lineAddress].positionIds ?? [];
-      // const positionId = '0x' + Math.random().toString(16).substr(2, 40);
       const positionId = '0x' + Math.random().toFixed(64).slice(2, 68);
       positionIds.push(positionId);
-      // const proposalId = '0x' + Math.random().toString(16).substr(2, 40);
       const proposalId = '0x' + Math.random().toFixed(64).slice(2, 68);
 
       const proposal = {
@@ -306,7 +304,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.linesMap = { ...state.linesMap, ...lines };
       let allPositions = {};
       let allEvents = {};
-      console.log('lines reducer: ', lines);
       const linesByRole: LinesByRole = _.entries<SecuredLine>(lines).reduce(
         ({ borrowing, arbiting }: LinesByRole, [addy, line]) => {
           // add borrower and arbiter positions to object for state.positionsMap

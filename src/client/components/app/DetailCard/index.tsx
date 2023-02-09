@@ -9,17 +9,12 @@ const StyledCardElement = styled(CardElement)<{ stripes?: boolean }>`
   justify-content: center;
   align-items: center;
   margin: 0;
-  width: 12rem;
   // NOTE Card element uses card padding and layout padding, also other card child components too, doing this
   // all the card components will work fine when modifying either of the paddings, since the paddings are
   // related between them
   padding: calc(${({ theme }) => theme.card.padding} / 4) calc(${({ theme }) => theme.layoutPadding} / 2);
   font-size: 1.4rem;
   flex-shrink: 2;
-
-  &:last-child {
-    align-items: flex-end;
-  }
 
   > * {
     margin-top: 0;
@@ -41,7 +36,6 @@ const TitleCardElement = styled(CardElement)`
   padding: 0.6rem calc(${({ theme }) => theme.layoutPadding} / 2);
   flex-shrink: 2;
   user-select: none;
-  width: 12rem;
   align-items: center;
 `;
 
@@ -49,7 +43,7 @@ const StyledCardContent = styled(CardContent)<{ wrap?: boolean; pointer?: boolea
   align-items: stretch;
   justify-content: stretch;
   ${({ pointer }) => pointer && `cursor: pointer;`};
-  ${({ wrap }) => wrap && `flex-wrap: wrap;`};
+  // ${({ wrap }) => wrap && `flex-wrap: wrap;`};
 
   &:hover {
     background-color: ${({ theme }) => theme.colors.selectionBar};
@@ -68,7 +62,7 @@ const StyledCardContent = styled(CardContent)<{ wrap?: boolean; pointer?: boolea
 
 const StyledCardHeader = styled(CardHeader)`
   display: flex;
-  flex-wrap: wrap;
+  // flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 2rem;
@@ -82,7 +76,7 @@ const StyledCard = styled(Card)`
 
 const SectionContent = styled.div`
   display: flex;
-  flex-wrap: wrap;
+  // flex-wrap: wrap;
   grid-gap: 0.5rem;
   align-items: center;
 `;

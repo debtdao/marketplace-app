@@ -45,29 +45,18 @@ const enableCollateral = createAsyncThunk<
   ThunkAPI
 >('collateral/enableCollateral', async (props, { extra, getState, dispatch }) => {
   const { wallet } = getState();
-  // const { supportedTokensMap } = tokens;
   const { services } = extra;
   const userAddress = wallet.selectedAddress;
   if (!userAddress) throw new Error('WALLET NOT CONNECTED');
 
   // TODO chekc that they are arbiter on line that owns Escrowbeforethey send tx
-  console.log('enable collatteral action props', props);
   const { collateralService } = services;
   const tx = await collateralService.enableCollateral(props);
-  // console.log('enable collatteral action', tx);
-  // console.log('supported tokens map: ', supportedTokensMap);
-  // console.log('props token: ', props.token);
-  // const tokenInfo: TokenFragRepsonse = supportedTokensMap[props.token];
-  // console.log('token info: ', tokenInfo);
   const escrowDeposit = formatEscrowDeposit(props.token);
-  // console.log('escrow deposit: ', escrowDeposit);
   if (!tx) {
     throw new Error('failed to enable collateral');
   }
-  // console.log('enable collateral props: ', props);
-  // console.log('enable collateral escrow deposit: ', escrowDeposit);
   return {
-    // lineAddress: props.lineAddress,
     ...props,
     escrowDeposit: escrowDeposit,
     contract: props.escrowAddress,

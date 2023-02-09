@@ -172,7 +172,6 @@ const StyledIcon = styled(Icon)`
 `;
 
 const AssetsListCard = styled(DetailCard)`
-  // max-width: ${({ theme }) => theme.globalMaxWidth};
   max-width: 100%;
   width: 100%;
   margin: 4rem 0;
@@ -449,6 +448,7 @@ export const LineMetadata = () => {
               disabled: !walletIsConnected,
             },
           ]}
+          direction="row"
         />
       );
     }
@@ -542,7 +542,6 @@ export const LineMetadata = () => {
                   <Text>{type?.toUpperCase()}</Text>
                 </>
               ),
-              // width: '10rem',
               sortable: true,
               className: 'col-type',
             },
@@ -559,7 +558,6 @@ export const LineMetadata = () => {
                   </RouterLink>
                 </TokenIconContainer>
               ),
-              // width: '15rem',
               sortable: true,
               className: 'col-symbol',
             },
@@ -569,7 +567,6 @@ export const LineMetadata = () => {
               description: t('lineDetails:metadata.escrow.tooltip.amount'),
               format: ({ amount }) => `${humanize('amount', amount, BASE_DECIMALS, 2)}`,
               sortable: true,
-              // width: '20rem',
               className: 'col-amount',
             },
             {
@@ -578,11 +575,11 @@ export const LineMetadata = () => {
               description: t('lineDetails:metadata.escrow.tooltip.value'),
               format: ({ value }) => `$ ${humanize('amount', value, BASE_DECIMALS, 2)}`,
               sortable: true,
-              // width: '20rem',
               className: 'col-value',
             },
             {
               key: 'actions',
+              header: 'Actions',
               transform: ({ token, type }) => renderButtons(token, type),
               align: 'flex-end',
               width: 'auto',

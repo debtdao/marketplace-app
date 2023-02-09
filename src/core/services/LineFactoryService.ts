@@ -114,8 +114,6 @@ export class LineFactoryServiceImpl {
     const rc = await tx.wait();
     const [spigot, escrow, securedLine, x, y, z] = [...rc.logs];
     const { address: lineAddress } = securedLine;
-    console.log('Tx Events: ', rc);
-    console.log('Secured Line: ', securedLine);
     return [tx, lineAddress];
   }
 
@@ -172,13 +170,7 @@ export class LineFactoryServiceImpl {
       };
 
       let tx;
-      // console.log('subgraph network props: ', props.network);
       tx = await this.transactionService.execute(props);
-      // const rc = await tx.wait();
-      // const [spigot, escrow, securedLine, x, y, z] = [...rc.logs];
-      // const { address: lineAddress } = securedLine;
-      // console.log('Tx Events: ', rc);
-      // console.log('Secured Line: ', securedLine);
       return tx;
     } catch (e) {
       const txnData = JSON.parse(JSON.stringify(e)).transaction.data;

@@ -83,6 +83,7 @@ const DataMetric = styled.h5`
 
 export const MetadataContainer = styled.div`
   background-color: ${({ theme }) => (theme.name === 'classic' ? theme.colors.surface : '')};
+  filter: brightness(1.2);
   padding: ${({ theme }) => theme.card.padding};
   border-radius: ${({ theme }) => theme.globalRadius};
 `;

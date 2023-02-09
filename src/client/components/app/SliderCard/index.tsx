@@ -58,9 +58,7 @@ const StyledCardContent = styled(CardContent)`
 
 const CardBackground = styled.div`
   display: flex;
-  border: 2px solid ${({ theme }) => theme.colors.primary};
   border-radius: ${({ theme }) => theme.globalRadius};
-  margin: -2px;
   overflow: hidden;
   position: relative;
   width: 100%;

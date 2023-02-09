@@ -2,7 +2,7 @@ import { FC } from 'react';
 import styled from 'styled-components';
 
 import { useAppTranslation } from '@hooks';
-import { CheckRoundIcon, Text, Icon, ErrorIcon } from '@components/common';
+import { CheckRoundIcon, Text, Icon, ErrorIcon, Link } from '@components/common';
 
 import { TxActionButton, TxActions } from './TxActions';
 
@@ -53,13 +53,14 @@ const StyledTxStatus = styled.div`
 
 export interface TxStatusProps {
   transactionCompletedLabel?: string;
+  link?: string;
   exit: () => void;
   success: number;
 }
 
 // Pass down 2 as props for failed transactions and 1 for successful transactions
 
-export const TxStatus: FC<TxStatusProps> = ({ transactionCompletedLabel, success, exit, children, ...props }) => {
+export const TxStatus: FC<TxStatusProps> = ({ transactionCompletedLabel, link, success, exit, children, ...props }) => {
   const { t } = useAppTranslation('common');
 
   const actionButtonLabel = transactionCompletedLabel ?? t('components.transaction.status.exit');
@@ -73,9 +74,15 @@ export const TxStatus: FC<TxStatusProps> = ({ transactionCompletedLabel, success
             <StyledIcon Component={CheckRoundIcon} />
           </TxStatusContent>
           <TxActions>
-            <TxActionButton onClick={exit} success>
-              {actionButtonLabel}
-            </TxActionButton>
+            {link !== undefined ? (
+              <TxActionButton onClick={exit} success>
+                <Link to={link}>{actionButtonLabel}</Link>
+              </TxActionButton>
+            ) : (
+              <TxActionButton onClick={exit} success>
+                {actionButtonLabel}
+              </TxActionButton>
+            )}
           </TxActions>
         </>
       ) : success === 2 ? (

@@ -10,7 +10,7 @@ import { LinesActions, LinesSelectors, NetworkSelectors, RouteActions, WalletSel
 import { getConstants } from '@src/config/constants';
 import { DeploySecuredLineWithConfigProps } from '@src/core/types';
 
-import { Link, ToggleButton } from '../../common';
+import { Button, Link, RedirectIcon, ToggleButton } from '../../common';
 
 import { TxContainer } from './components/TxContainer';
 import { TxAddressInput } from './components/TxAddressInput';
@@ -200,7 +200,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
           setLineAddress(lineAddress);
           setTransactionCompleted(1);
           setLoading(false);
-          history.push(`/${currentNetwork}/lines/${lineAddress}`);
+          // history.push(`/${currentNetwork}/lines/${lineAddress}`);
         }
       });
     } catch (e) {
@@ -213,6 +213,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       <StyledTransaction onClose={onClose} header={'Transaction complete'}>
         <TxStatus
           success={transactionCompleted}
+          link={`/${currentNetwork}/lines/${lineAddress}`}
           transactionCompletedLabel={t('components.transaction.deploy-line.success-message')}
           exit={onTransactionCompletedDismissed}
         />

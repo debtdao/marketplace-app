@@ -31,6 +31,8 @@ const StyledRecommendationsCard = styled(RecommendationsCard)``;
 
 const StyledSliderCard = styled(SliderCard)`
   width: 100%;
+  padding: ${({ theme }) => theme.card.padding};
+  box-shadow: none;
 `;
 
 const BannerCtaButton = styled(Button)`
@@ -140,6 +142,7 @@ export const Market = () => {
             </div>
           </div>
         }
+        background={<img src={DebtDAOBanner} alt={'Debt DAO Banner?'} />}
       />
 
       {getLinesStatus.loading ||

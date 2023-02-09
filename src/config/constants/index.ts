@@ -122,7 +122,7 @@ export const getConstants = memoize((): Constants => {
       TOKEN_ADDRESSES.USDT,
       TOKEN_ADDRESSES.WBTC,
     ],
-    DEFAULT_THEME: 'classic',
+    DEFAULT_THEME: 'system-prefs',
     AVAILABLE_THEMES: ['system-prefs', 'light', 'dark', 'cyberpunk', 'classic'],
     AVAILABLE_CUSTOM_THEMES: ['explorer'],
     DEFAULT_ALERT_TIMEOUT: 3000,

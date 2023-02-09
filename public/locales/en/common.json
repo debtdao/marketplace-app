@@ -233,7 +233,7 @@
         "revenue-split": "4. Select a Revenue Split",
         "revenue-split-input": "Revenue Split",
         "error-message": "could not deploy line",
-        "success-message": "deployed line successfully"
+        "success-message": "Go to Line of Credit"
       },
       "borrow-credit": {
         "header": "Borrow",

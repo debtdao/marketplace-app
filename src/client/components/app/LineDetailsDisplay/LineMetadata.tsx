@@ -277,8 +277,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
   } = selectedLine!;
   const { deposits, minCRatio, cratio, collateralValue } = escrow!;
   const { revenueValue, revenueSummary: revenue } = spigot!;
-  console.log('Escrow Deposts: ', deposits);
-  console.log('Spigot Revenue: ', revenue);
 
   const renderEscrowMetadata = () => {
     if (!deposits) return null;

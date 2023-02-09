@@ -50,7 +50,6 @@ const StyledCardContent = styled(CardContent)<{ wrap?: boolean; pointer?: boolea
   align-items: stretch;
   justify-content: stretch;
   ${({ pointer }) => pointer && `cursor: pointer;`};
-  // ${({ wrap }) => wrap && `flex-wrap: wrap;`};
 
   &:hover {
     background-color: ${({ theme }) => theme.colors.selectionBar};
@@ -64,7 +63,6 @@ const StyledCardContent = styled(CardContent)<{ wrap?: boolean; pointer?: boolea
 
 const StyledCardHeader = styled(CardHeader)`
   display: flex;
-  // flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 2rem;
@@ -78,7 +76,6 @@ const StyledCard = styled(Card)`
 
 const SectionContent = styled.div`
   display: flex;
-  // flex-wrap: wrap;
   grid-gap: 0.5rem;
   align-items: center;
 `;

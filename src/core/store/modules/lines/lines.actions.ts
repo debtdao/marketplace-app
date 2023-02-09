@@ -282,9 +282,6 @@ const deploySecuredLineWithConfig = createAsyncThunk<
     ...deployData,
   });
   const arbiterAddress = await creditLineService.arbiter(lineAddress);
-  console.log('new secured line with Config deployed. tx response', deploySecuredLineWithConfigData);
-  console.log('new secured line with Config deployed. line address: ', lineAddress);
-  console.log('Arbiter address: ', arbiterAddress);
   const lineObj: LineOfCredit = formatOptimisticLineData(lineAddress, arbiterAddress, deployData);
 
   return {

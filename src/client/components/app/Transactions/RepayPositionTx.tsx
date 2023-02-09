@@ -273,7 +273,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     }
 
     if (selectedPosition.principal < targetAmount) {
-      setAmountWarning('The amount entered exceeds the debt owed.')
+      setAmountWarning('The amount entered exceeds the debt owed.');
       return;
     }
 
@@ -828,19 +828,19 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         const isClosing = repayType.id !== 'deposit-and-repay';
         return (
           <>
-          <TxTokenInput
-            headerText={t('components.transaction.repay.select-amount')}
-            inputText={tokenHeaderText}
-            // TODO: add unit test for this
-            amount={targetAmount}
-            onAmountChange={(amnt) => setTargetAmount(amnt)}
-            // @cleanup TODO
-            maxAmount={getMaxRepay()}
-            selectedToken={selectedPosition.token}
-            onSelectedTokenChange={onSelectedSellTokenChange}
-            readOnly={isClosing ? true : false}
-          />
-          {inputAmountWarning !== '' ? <div style={{ color: '#C3272B' }}>{inputAmountWarning}</div> : ''}
+            <TxTokenInput
+              headerText={t('components.transaction.repay.select-amount')}
+              inputText={tokenHeaderText}
+              // TODO: add unit test for this
+              amount={targetAmount}
+              onAmountChange={(amnt) => setTargetAmount(amnt)}
+              // @cleanup TODO
+              maxAmount={getMaxRepay()}
+              selectedToken={selectedPosition.token}
+              onSelectedTokenChange={onSelectedSellTokenChange}
+              readOnly={isClosing ? true : false}
+            />
+            {inputAmountWarning !== '' ? <div style={{ color: '#C3272B' }}>{inputAmountWarning}</div> : ''}
           </>
         );
     }

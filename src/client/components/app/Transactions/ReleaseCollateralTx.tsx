@@ -103,6 +103,7 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
   const borrower = linesMap[selectedLineAddress!].borrower;
   const selectedEscrow = useAppSelector(CollateralSelectors.selectSelectedEscrow);
   const allCollateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
+  const [inputAmountWarning, setAmountWarning] = useState('');
 
   const { assetAddress: selectedCollateralAssetAddress } = useAppSelector(ModalSelectors.selectActiveModalProps);
   const collateralOptions = _.values(selectedEscrow?.deposits).map((d) => d.token);
@@ -196,6 +197,15 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
       network: walletNetwork,
     };
 
+    if (Number(amount) <= 0) {
+      setAmountWarning('Increase Amount, cannot be 0.');
+      return;
+    }
+
+    if (userMetadata.role !== BORROWER_POSITION_ROLE) {
+      return;
+    }
+
     dispatch(CollateralActions.releaseCollateral(transactionData)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionCompleted(2);
@@ -250,6 +260,7 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.release-collateral.error-message')}
+          transactionFailedReason={t('components.transaction.release-collateral.error-reason')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>
@@ -297,6 +308,7 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
         // inputError={!!sourceStatus.error}
         // displayGuidance={displaySourceGuidance}
       />
+      {inputAmountWarning !== '' ? <div style={{ color: '#C3272B' }}>{inputAmountWarning}</div> : ''}
       <TxActions>
         {txActions.map(({ label, onAction, status, disabled, contrast }) => (
           <TxActionButton

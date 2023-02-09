@@ -84,6 +84,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
+  const [inputAmountWarning, setAmountWarning] = useState('');
 
   //state for params
   const { header, onClose } = props;
@@ -221,6 +222,11 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
       network: walletNetwork,
     };
 
+    if (Number(amount) <= 0) {
+      setAmountWarning('Increase Amount, cannot be 0.');
+      return;
+    }
+
     dispatch(CollateralActions.addCollateral(transactionData)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionCompleted(2);
@@ -282,6 +288,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.add-collateral.error-message')}
+          transactionFailedReason={t('components.transaction.add-collateral.error-reason')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>
@@ -327,6 +334,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
         // inputError={!!sourceStatus.error}
         // displayGuidance={displaySourceGuidance}
       />
+      {inputAmountWarning !== '' ? <div style={{ color: '#C3272B' }}>{inputAmountWarning}</div> : ''}
       <TxActions>
         {txActions.map(({ label, onAction, status, disabled, contrast }) => (
           <TxActionButton

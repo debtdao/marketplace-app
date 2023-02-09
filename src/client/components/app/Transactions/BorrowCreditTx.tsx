@@ -152,6 +152,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.borrow-credit.error-message')}
+          transactionFailedReason={t('components.transaction.borrow-credit.error-reason')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>

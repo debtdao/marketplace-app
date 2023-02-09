@@ -114,6 +114,10 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
   const initialToken: string = selectedSellTokenAddress ?? selectedPosition?.token.address ?? DAI;
 
+  // WARNINGS
+
+  const [inputAmountWarning, setAmountWarning] = useState('');
+
   // @cleanup TODO only use sell token for claimAndRepay/Trade. use selectedPosition.token for everything else
   const { selectedSellToken, sourceAssetOptions } = useSelectedSellToken({
     selectedSellTokenAddress: initialToken,
@@ -265,6 +269,11 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     if (!positions) {
       setErrors([...errors, 'no positions available']);
       setLoading(false);
+      return;
+    }
+
+    if (selectedPosition.principal < targetAmount) {
+      setAmountWarning('The amount entered exceeds the debt owed.')
       return;
     }
 
@@ -818,6 +827,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       default:
         const isClosing = repayType.id !== 'deposit-and-repay';
         return (
+          <>
           <TxTokenInput
             headerText={t('components.transaction.repay.select-amount')}
             inputText={tokenHeaderText}
@@ -830,6 +840,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             onSelectedTokenChange={onSelectedSellTokenChange}
             readOnly={isClosing ? true : false}
           />
+          {inputAmountWarning !== '' ? <div style={{ color: '#C3272B' }}>{inputAmountWarning}</div> : ''}
+          </>
         );
     }
   };

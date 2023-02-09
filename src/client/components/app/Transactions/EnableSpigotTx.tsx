@@ -55,6 +55,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const [claimFunc, setClaimFunc] = useState<string>('');
   const [transferFunc, setTransferFunc] = useState<string>('');
   const [revenueContractAddy, setRevenueContractAdd] = useState<string>('');
+  const [inputWarning, setWarning] = useState('');
 
   const [didFetchAbi, setDidFetchABI] = useState<boolean>(false);
   const [claimFuncType, setClaimFuncType] = useState({ id: '', label: '', value: '' });
@@ -115,6 +116,22 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
 
     if (!walletNetwork) {
       setLoading(false);
+      return;
+    }
+
+    if (transferFunc === '0x00000000') {
+      setWarning('TransferFunc cannot be null selector');
+      return;
+    }
+
+    if (revenueSplit > selectedLine.defaultSplit) {
+      // Is this right?
+      setWarning('Revenue Contract split exceeds default split');
+      return;
+    }
+
+    if (revenueContractAddy === selectedSpigot.id) {
+      setWarning('Revenue Contract cannot be the same address as the Spigot');
       return;
     }
 
@@ -190,6 +207,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
         address={revenueContractAddy}
         onAddressChange={setRevenueContractAdd}
       />
+      {inputWarning !== '' ? <div style={{ color: '#C3272B' }}>{inputWarning}</div> : ''}
 
       {isVerifiedContract ? (
         <>

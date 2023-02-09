@@ -110,6 +110,7 @@
         "token-input-header": "Select an asset",
         "token-input-desc": "",
         "enable-failed": "Could not add token as collateral",
+        "enable-failed-reason":"There is no price oracle for this asset \n OR the token has an invalid decimal count",
         "cta": "Enable Asset"
       },
       "oracle-price": "Oracle Price",
@@ -192,7 +193,8 @@
           "login-cta": "Login as Arbiter",
           "enable-cta": "Enable token"
         },
-        "error-message": "Could not add collateral. "
+        "error-message": "Could not add collateral.",
+        "error-reason": "Token has not been enabled by Arbiter"
       },
       "deposit-collateral": {
         "header": "Deposit Collateral",
@@ -202,7 +204,8 @@
       "release-collateral": {
         "header": "Release Collateral",
         "select-token": "The Token Used As Collateral",
-        "error-message": "could not release collateral"
+        "error-message": "could not release collateral",
+        "error-reason": "Withdrawing this amount would bring the collateralization ratio too low."
       },
       "arbiter-liquidate": {
         "header": "Liquidate Borrowers",
@@ -228,7 +231,8 @@
         "select-line": "1. Select a Position:",
         "select-amount": "2. Amount to Borrow:",
         "your-rates": "3. Your Rates:",
-        "error-message": "could not borrow credit"
+        "error-message": "could not borrow credit",
+        "error-reason": "There is not enough liquidity, or this Line is not Active"
       },
       "repay": {
         "header": "Repay",
@@ -281,7 +285,8 @@
         "header": "Withdraw",
         "select-line": "1. Selected line to withdraw",
         "select-amount": "2. Select amount to withdraw",
-        "error-message": "could not withdraw credit"
+        "error-message": "could not withdraw credit",
+        "error-reason": "There is not enough liquidity in this position"
       },
       "revoke-consent": {
         "header": "Cancel Proposed Deal",
@@ -319,9 +324,11 @@
         "cta": "Claim",
         "claim-operator-tokens":{
           "cta":"Claim Operator Tokens",
-          "error-message": "could not claim operator tokens"
+          "error-message": "could not claim operator tokens",
+          "error-reaason": "There is nothing to claim OR you are not operator of this line"
         },
-        "error-message": "could not claim revenue"
+        "error-message": "could not claim revenue",
+        "error-reason" : "Transfer Owner Function is set to 0x0000000\n OR there is no revenue to claim \n OR an incorrect claim function is configured "
       },
       "success-message": "completed"
     }

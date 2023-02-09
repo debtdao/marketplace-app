@@ -69,6 +69,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedEscrow = useAppSelector(CollateralSelectors.selectSelectedEscrow);
+  const [inputRoleWarning, setRoleWarning] = useState('');
 
   // need to get call statusMap from state for tx error messages
   //const collateralStatusMap = useAppSelector(CollateralSelectors.selectStatusMap);
@@ -163,6 +164,11 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
   const enableCollateralAsset = () => {
     setLoading(true);
 
+    if (userMetadata.role !== ARBITER_POSITION_ROLE) {
+      setRoleWarning('Only the Arbiter can enable Collateral');
+      return;
+    }
+
     // TODO set error in state to display no line selected
 
     if (!selectedEscrow || !selectedCollateralAssetAddress) {
@@ -222,6 +228,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.enable-collateral-asset.enable-failed')}
+          transactionFailedReason={t('components.transaction.enable-collateral-asset.enable-failed-reason')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>
@@ -243,6 +250,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
         // inputError={!!sourceStatus.error}
         // displayGuidance={displaySourceGuidance}
       />
+      {inputRoleWarning !== '' ? <div style={{ color: '#C3272B' }}>{inputRoleWarning}</div> : ''}
       <TxActions>
         <TxActionButton
           key={t('components.transaction.enable-collateral-asset.cta') as string}

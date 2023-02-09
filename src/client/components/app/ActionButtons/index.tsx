@@ -42,6 +42,12 @@ const ActionButton = styled(Button)<{ hide?: boolean }>`
   &.disabled {
     opacity: 0.6;
   }
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.surfaceVariantB};
+    color: ${({ theme }) => theme.colors.vaultActionButton.selected.color};
+    border: 4px solid ${({ theme }) => theme.colors.vaultActionButton.selected.borderColor};
+  }
 `;
 
 interface ActionButtonsProps {

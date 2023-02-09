@@ -49,14 +49,9 @@ const StyledCardContent = styled(CardContent)<{ wrap?: boolean; pointer?: boolea
     background-color: ${({ theme }) => theme.colors.selectionBar};
 
     // NOTE If you want to change other elements on selection bar hover
-    // ${StyledCardElement} {
-    //   color: ${({ theme }) => theme.colors.titles};
-    // }
-    // .action-button {
-    //   background: ${({ theme }) => theme.colors.vaultActionButton.selected.background};
-    //   color: ${({ theme }) => theme.colors.vaultActionButton.selected.color};
-    //   border: 2px solid ${({ theme }) => theme.colors.vaultActionButton.selected.borderColor};
-    // }
+    ${StyledCardElement} {
+      color: ${({ theme }) => theme.colors.titles};
+    }
   }
 `;
 

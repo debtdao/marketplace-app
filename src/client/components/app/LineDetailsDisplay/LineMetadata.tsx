@@ -83,7 +83,7 @@ const DataMetric = styled.h5`
 `;
 
 export const MetadataContainer = styled.div`
-  background-color: ${({ theme }) => (theme.name === 'classic' ? theme.colors.backgroundVariant : '')};
+  background-color: ${({ theme }) => (theme.name === 'classic' ? theme.colors.surface : '')};
   padding: ${({ theme }) => theme.card.padding};
   border-radius: ${({ theme }) => theme.globalRadius};
 `;
@@ -157,15 +157,14 @@ const Redirect = styled(RedirectIcon)`
   padding-bottom: 0.2rem;
 `;
 
-const RouterLink = styled(Link)<{ selected: boolean }>`
+const RouterLink = styled(Link)<{ selected: boolean; fontSize: string }>`
   display: flex;
   flex-direction: row;
   align-items: center;
   color: inherit;
-  font-size: 3rem;
   flex: 1;
   width: 100%;
-
+  font-size: ${(props) => props.fontSize};
   &:hover span {
     filter: brightness(90%);
   }
@@ -179,30 +178,6 @@ const RouterLink = styled(Link)<{ selected: boolean }>`
     color: ${props.theme.colors.titlesVariant};
   `}
 `;
-
-// const RouterLink = styled(Link)<{ selected: boolean }>`
-//   display: flex;
-//   justify-content: center;
-//   flex-direction: row;
-//   align-items: center;
-//   color: inherit;
-//   font-size: 1.2rem;
-//   flex: 1;
-//   padding: 0.5rem;
-
-//   &:hover span {
-//     filter: brightness(90%);
-//   }
-
-//   span {
-//     transition: filter 200ms ease-in-out;
-//   }
-//   ${(props) =>
-//     props.selected &&
-//     `
-//     color: ${props.theme.colors.titlesVariant};
-//   `}
-// `;
 
 const TokenIconContainer = styled.div`
   display: flex;
@@ -525,7 +500,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
     <>
       <MetadataContainer>
         <Header>
-          <RouterLink to={`/${network}/portfolio/${borrower}`} key={borrower} selected={false}>
+          <RouterLink to={`/${network}/portfolio/${borrower}`} key={borrower} selected={false} fontSize={'3rem'}>
             <BorrowerName>
               {t('lineDetails:metadata.borrower')} {'  :  '} {borrowerID}
               <Redirect />
@@ -616,7 +591,12 @@ export const LineMetadata = (props: LineMetadataProps) => {
               transform: ({ token: { symbol, icon, address } }) => (
                 <TokenIconContainer>
                   <TokenIcon icon={icon} symbol={symbol} size="small" margin="0.5rem" />
-                  <RouterLink key={address} to={`${explorerUrl}/address/${address}`} selected={false}>
+                  <RouterLink
+                    key={address}
+                    to={`${explorerUrl}/address/${address}`}
+                    selected={false}
+                    fontSize={'1.2rem'}
+                  >
                     {symbol}
                     <RedirectLinkIcon />
                   </RouterLink>

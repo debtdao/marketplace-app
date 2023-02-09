@@ -15,13 +15,14 @@ import {
   OnchainMetaDataSelector,
   NetworkSelectors,
   TokensActions,
+  TokensSelectors,
 } from '@store';
 import { RecommendationsCard, SliderCard, ViewContainer } from '@components/app';
 import { SpinnerLoading, Text, Button } from '@components/common';
 import { SecuredLine, UseCreditLinesParams, Item } from '@src/core/types';
 import { DebtDAOBanner } from '@assets/images';
 import { getEnv } from '@config/env';
-import { getENS } from '@src/utils';
+import { getDefaultLineCategories, getENS } from '@src/utils';
 import { getConstants } from '@src/config/constants';
 
 const { SUPPORTED_NETWORKS } = getConstants();
@@ -54,32 +55,19 @@ export const Market = () => {
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
+  const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
 
   // TODO not neeed here
   const addCreditStatus = useAppSelector(LinesSelectors.selectLinesActionsStatusMap);
 
-  const defaultLineCategories: UseCreditLinesParams = {
-    // using i18m translation as keys for easy display
-    'market:featured.highest-credit': {
-      first: 3,
-      // NOTE: terrible proxy for total credit (oldest = most). Currently getLines only allows filtering by line metadata not modules'
-      orderBy: 'start',
-      orderDirection: 'asc',
-    },
-    'market:featured.highest-revenue': {
-      first: 16,
-      // NOTE: terrible proxy for total revenue earned (highest % = highest notional). Currently getLines only allows filtering by line metadata not modules'
-      orderBy: 'defaultSplit',
-      orderDirection: 'desc',
-    },
-    'market:featured.newest': {
-      first: 15,
-      orderBy: 'start', // NOTE: theoretically gets lines that start in the future, will have to refine query
-      orderDirection: 'desc',
-    },
+  const defaultLineCategories = getDefaultLineCategories();
+  const fetchMarketData = () => {
+    if (tokensMap === undefined) {
+      dispatch(TokensActions.getTokens()).then(() => dispatch(LinesActions.getLines(defaultLineCategories)));
+    } else {
+      dispatch(LinesActions.getLines(defaultLineCategories));
+    }
   };
-  const fetchMarketData = () =>
-    dispatch(TokensActions.getTokens()).then(() => dispatch(LinesActions.getLines(defaultLineCategories)));
   const lineCategoriesForDisplay = useAppSelector(LinesSelectors.selectLinesForCategories);
   const getLinesStatus = useAppSelector(LinesSelectors.selectLinesStatusMap).getLines;
 

@@ -4,9 +4,9 @@ import _ from 'lodash';
 import { useParams } from 'react-router-dom';
 
 import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
-import { WalletSelectors, LinesActions, LinesSelectors, AlertsActions, TokensActions } from '@store';
+import { WalletSelectors, LinesActions, LinesSelectors, AlertsActions, TokensActions, TokensSelectors } from '@store';
 import { SummaryCard, ViewContainer } from '@components/app';
-import { isValidAddress } from '@utils';
+import { getDefaultLineCategories, isValidAddress } from '@utils';
 import {
   LENDER_POSITION_ROLE,
   BORROWER_POSITION_ROLE,
@@ -95,30 +95,11 @@ export const Portfolio = () => {
   const allPositions = useAppSelector(LinesSelectors.selectPositionsMap);
   const [selectedRole, setRole] = useState<string>(BORROWER_POSITION_ROLE);
   const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
-
+  const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
   const availableRoles = [BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE];
 
   // TODO: Move this from market and portfolio pages into a shared location
-  const defaultLineCategories: UseCreditLinesParams = {
-    // using i18m translation as keys for easy display
-    'market:featured.highest-credit': {
-      first: 3,
-      // NOTE: terrible proxy for total credit (oldest = most). Currently getLines only allows filtering by line metadata not modules'
-      orderBy: 'start',
-      orderDirection: 'asc',
-    },
-    'market:featured.highest-revenue': {
-      first: 16,
-      // NOTE: terrible proxy for total revenue earned (highest % = highest notional). Currently getLines only allows filtering by line metadata not modules'
-      orderBy: 'defaultSplit',
-      orderDirection: 'desc',
-    },
-    'market:featured.newest': {
-      first: 15,
-      orderBy: 'start', // NOTE: theoretically gets lines that start in the future, will have to refine query
-      orderDirection: 'desc',
-    },
-  };
+  const defaultLineCategories = getDefaultLineCategories();
 
   useEffect(() => {
     if (!isValidAddress(portfolioAddress!)) {
@@ -126,7 +107,11 @@ export const Portfolio = () => {
     } else if (portfolioAddress && isValidAddress(portfolioAddress)) {
       dispatch(LinesActions.getUserPortfolio({ user: portfolioAddress.toLocaleLowerCase() }));
       // TODO: only dispatch if userPortfolio doesn't provide what we need to populate linesMap
-      dispatch(TokensActions.getTokens()).then(() => dispatch(LinesActions.getLines(defaultLineCategories)));
+      if (tokensMap === undefined) {
+        dispatch(TokensActions.getTokens()).then(() => dispatch(LinesActions.getLines(defaultLineCategories)));
+      } else {
+        dispatch(LinesActions.getLines(defaultLineCategories));
+      }
     }
   }, [portfolioAddress]);
 

@@ -59,6 +59,7 @@ export const LineDetail = () => {
   const getLinePageStatus = useAppSelector(LinesSelectors.selectGetLinePageStatus);
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const currentNetworkSettings = NETWORK_SETTINGS[currentNetwork];
+  const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
 
   useEffect(() => {
     if (!lineAddress || !isValidAddress(lineAddress)) {
@@ -68,7 +69,11 @@ export const LineDetail = () => {
     }
 
     dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineAddress }));
-    dispatch(TokensActions.getTokens()).then(() => dispatch(LinesActions.getLinePage({ id: lineAddress })));
+    if (tokensMap === undefined) {
+      dispatch(TokensActions.getTokens()).then(() => dispatch(LinesActions.getLinePage({ id: lineAddress })));
+    } else {
+      dispatch(LinesActions.getLinePage({ id: lineAddress }));
+    }
   }, []);
 
   const [firstTokensFetch, setFirstTokensFetch] = useState(true);

@@ -131,7 +131,11 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
     if (selectedLine && !lineAddress) {
       dispatch(LinesActions.setSelectedLineAddress({ lineAddress: selectedLine.id }));
     } else if (lineAddress && !selectedLine) {
-      dispatch(TokensActions.getTokens()).then((res) => dispatch(LinesActions.getLinePage({ id: lineAddress })));
+      if (tokensMap === undefined) {
+        dispatch(TokensActions.getTokens()).then((res) => dispatch(LinesActions.getLinePage({ id: lineAddress })));
+      } else {
+        dispatch(LinesActions.getLinePage({ id: lineAddress }));
+      }
     }
   }, [lineAddress, selectedLine]);
 

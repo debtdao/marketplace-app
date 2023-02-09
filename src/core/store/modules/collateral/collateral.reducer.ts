@@ -139,7 +139,6 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
     .addCase(deploySecuredLineWithConfig.fulfilled, (state, { payload: { lineAddress, lineObj, deployData } }) => {
       const { escrowId, spigotId } = lineObj;
       if (!lineAddress || !escrowId || !spigotId) return;
-      let map: CollateralMap = {};
       const { cratio } = deployData;
       const escrow = {
         id: escrowId,
@@ -157,9 +156,7 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
         type: COLLATERAL_TYPE_REVENUE,
         line: lineAddress,
       };
-      map[escrowId] = escrow;
-      map[spigotId] = spigot;
-      state.collateralMap = { ...state.collateralMap, ...map };
+      state.collateralMap = { ...state.collateralMap, [escrowId]: escrow, [spigotId]: spigot };
     })
 
     /* -------------------------------- getLines ------------------------------- */

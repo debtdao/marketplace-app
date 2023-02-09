@@ -45,6 +45,7 @@ const dark = {
 
 const darkTheme: DefaultTheme = {
   ...sharedTheme,
+  name: dark.name,
   colors: {
     logo: '#006AE3',
 

@@ -690,9 +690,7 @@ export const formatUserPortfolioData = (
     })
     .reduce((lines, line) => ({ ...lines, [line.id]: line }), {});
 
-  console.log('format user porfolio data - lines: ', lines);
   const positions = createPositionsMap(lenderPositions, tokenPrices);
-
   return { lines, positions };
 };
 

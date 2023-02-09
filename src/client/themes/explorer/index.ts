@@ -6,7 +6,7 @@ import ExplorerBackground from './background.jpg';
 
 const explorerTheme: DefaultTheme = {
   ...sharedTheme,
-
+  name: 'explorer',
   background: {
     image: ExplorerBackground,
     position: 'right center',

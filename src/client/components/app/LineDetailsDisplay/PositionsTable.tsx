@@ -270,7 +270,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
 
   const formattedPositionsAndProposals = _.flatten(
     positions?.map((position) => {
-      const tokenIcon = tokensMap !== undefined ? tokensMap[getAddress(position.token.address)]?.icon ?? '' : '';
+      const tokenIcon = tokensMap?.[getAddress(position.token.address)]?.icon ?? '';
       const positionToDisplay = {
         deposit: humanize('amount', position.deposit, position.token.decimals, 2),
         drate: `${normalizeAmount(position.dRate, 2)} %`,
@@ -293,6 +293,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
         token: (
           <TokenIconContainer>
             <TokenIcon icon={tokenIcon} symbol={position.token.symbol} size="small" margin="0.5rem" />
+            {/* <TokenIcon symbol={position.token.symbol} size="small" margin="0.5rem" /> */}
             <RouterLink
               key={position.token.address}
               to={`${explorerUrl}/address/${position.token.address}`}
@@ -317,8 +318,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
           ? Object.values(position.proposalsMap)
               .filter((proposal) => proposal.revokedAt === null || proposal.revokedAt === 0)
               .map((proposal) => {
-                const tokenIcon =
-                  tokensMap !== undefined ? tokensMap[getAddress(position.token.address)]?.icon ?? '' : '';
+                const tokenIcon = tokensMap?.[getAddress(position.token.address)]?.icon ?? '';
                 const [dRate, fRate, deposit, tokenAddress, lenderAddress] = proposal.args;
                 return {
                   deposit: humanize('amount', deposit, position.token.decimals, 2),

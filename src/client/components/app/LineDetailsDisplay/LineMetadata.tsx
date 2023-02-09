@@ -275,9 +275,10 @@ export const LineMetadata = (props: LineMetadataProps) => {
     spigot,
     defaultSplit,
   } = selectedLine!;
-
   const { deposits, minCRatio, cratio, collateralValue } = escrow!;
   const { revenueValue, revenueSummary: revenue } = spigot!;
+  console.log('Escrow Deposts: ', deposits);
+  console.log('Spigot Revenue: ', revenue);
 
   const renderEscrowMetadata = () => {
     if (!deposits) return null;
@@ -399,7 +400,10 @@ export const LineMetadata = (props: LineMetadataProps) => {
   };
 
   const formattedCollateralData = allCollateral.map((c) => {
-    const tokenIcon = tokensMap !== undefined ? tokensMap[getAddress(c.token.address)]?.icon ?? '' : '';
+    console.log('Tokens Map: ', tokensMap);
+    console.log('Tokens Map undefined?: ', c.token.address);
+    console.log('Tokens Map c: ', c);
+    const tokenIcon = tokensMap?.[getAddress(c.token.address)]?.icon ?? '';
     const tokenInfo = { icon: tokenIcon, ...c.token };
     const collateral = { ...c, token: tokenInfo };
     return {

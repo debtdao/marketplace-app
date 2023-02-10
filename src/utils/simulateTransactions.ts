@@ -1,4 +1,4 @@
-import { CreditPosition, OPENED_STATUS } from '@src/core/types';
+import { CLOSED_STATUS, CreditPosition, CreditProposal, OPENED_STATUS } from '@src/core/types';
 
 import { toWei } from './format';
 
@@ -31,9 +31,21 @@ export const depositAndRepayUpdate = (position: CreditPosition, amount: string) 
   };
 };
 
-export const addCreditUpdate = (position: CreditPosition) => {
+export const addCreditUpdate = (position: CreditPosition, proposal: CreditProposal): CreditPosition => {
+  const [dRate, fRate, deposit, tokenAddress, lender] = proposal.args;
   return {
     ...position,
     status: OPENED_STATUS,
+    dRate,
+    fRate,
+    deposit,
+    lender,
+  };
+};
+
+export const repayCreditUpdate = (position: CreditPosition): CreditPosition => {
+  return {
+    ...position,
+    status: CLOSED_STATUS,
   };
 };

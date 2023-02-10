@@ -24,6 +24,6 @@ export const getTheme = (theme?: Theme): DefaultTheme => {
       const { matches: prefersColorSchemeDark } = window?.matchMedia('(prefers-color-scheme: dark)');
       return prefersColorSchemeDark ? darkTheme : lightTheme;
     default:
-      return lightTheme;
+      return classicTheme;
   }
 };

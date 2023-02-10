@@ -17,9 +17,10 @@ interface TokenIconProps {
   SVG?: React.FC;
   symbol?: string;
   size?: TokenIconSize;
+  margin?: string;
 }
 
-export const TokenIcon = ({ SVG, icon, symbol, size }: TokenIconProps) => {
+export const TokenIcon = ({ SVG, icon, symbol, size, margin }: TokenIconProps) => {
   const src = icon === '' || !icon ? fallbackIcon : icon;
   let height;
   switch (size) {
@@ -45,6 +46,7 @@ export const TokenIcon = ({ SVG, icon, symbol, size }: TokenIconProps) => {
     minHeight: height,
     width: width,
     height: height,
+    marginRight: margin,
   };
 
   return (

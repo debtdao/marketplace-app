@@ -15,11 +15,19 @@ import {
   PositionMap,
   CreditEvent,
   CreditProposal,
+  EscrowDeposit,
+  EscrowDepositMap,
+  ProposalMap,
+  PROPOSED_STATUS,
+  LineOfCredit,
+  ACTIVE_STATUS,
+  RevenueSummaryMap,
 } from '@types';
-import { getNetworkId } from '@src/utils';
+import { formatOptimisticProposal, getNetworkId } from '@src/utils';
 
 import { NetworkActions } from '../network/network.actions';
 import { WalletActions } from '../wallet/wallet.actions';
+import { CollateralActions } from '../collateral/collateral.actions';
 
 import { LinesActions } from './lines.actions';
 
@@ -57,6 +65,7 @@ export const linesInitialState: CreditLineState = {
     },
   },
   statusMap: {
+    addCredit: initialStatus,
     getLines: initialStatus,
     getLine: initialStatus,
     getLinePage: initialStatus,
@@ -79,12 +88,13 @@ const {
   getLinePage,
   getLines,
   deploySecuredLine,
+  deploySecuredLineWithConfig,
   // initiateSaveLines,
   setSelectedLineAddress,
   setSelectedLinePosition,
   setSelectedLinePositionProposal,
   setPosition,
-  setProposal,
+  revokeProposal,
   getUserLinePositions,
   getUserPortfolio,
   clearLinesData,
@@ -115,9 +125,10 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 
     .addCase(setPosition, (state, { payload: { id, position } }) => {
       state.positionsMap[id] = position;
+      console.log('Updated Positions Map: ', state.positionsMap[id]);
     })
 
-    .addCase(setProposal, (state, { payload: { lineAddress, positionId, proposalId } }) => {
+    .addCase(revokeProposal, (state, { payload: { lineAddress, positionId, proposalId } }) => {
       const { revokedAt, ...rest } = state.positionsMap[positionId]?.proposalsMap[proposalId];
       const updatedProposal = { ...rest, revokedAt: 1234 }; // TODO: replace with actual time the proposal was revoked
       state.positionsMap[positionId].proposalsMap[proposalId] = updatedProposal;
@@ -265,7 +276,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       );
       // add lender positions to object for state.positionsMap and update state.positionsMap
       allPositions = { ...allPositions, ...lenderPositions };
-      console.log('User Portfolio 5: ', allPositions);
       state.positionsMap = { ...state.positionsMap, ...allPositions };
 
       state.user.portfolio = {
@@ -308,15 +318,23 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.getAllowances = { error: error.message };
     })
 
+    /* ----------------------------- addCredit ----------------------------- */
     .addCase(addCredit.pending, (state) => {
-      state.statusMap.getAllowances = { loading: true };
+      state.statusMap.addCredit = { loading: true };
     })
-    .addCase(addCredit.fulfilled, (state) => {
-      // deployLine action emits a getLine action if tx is successful
-      state.statusMap.getAllowances = {};
+    .addCase(addCredit.fulfilled, (state, { payload: { maker, transactionType, position } }) => {
+      if (transactionType === 'propose') {
+        const { lineAddress } = position;
+        const positionId = '0x' + Math.random().toFixed(64).slice(2, 68);
+        const positionIds = state.linesMap[lineAddress].positionIds ?? [];
+        positionIds.push(positionId);
+        const proposedPosition = formatOptimisticProposal(maker, position, positionId);
+        state.linesMap[lineAddress].positionIds = positionIds;
+        state.positionsMap[positionId] = proposedPosition;
+      }
     })
     .addCase(addCredit.rejected, (state, { error }) => {
-      state.statusMap.getAllowances = { error: error.message };
+      state.statusMap.addCredit = { error: error.message };
     })
 
     /* ------------------------------ depositAndRepay ------------------------------ */
@@ -334,6 +352,20 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       //const lineAddress = meta.arg.lineAddress;
       console.log('error', error);
       //state.statusMap.user.linesActionsStatusMap[lineAddress].deposit = { error: error.message };
+    })
+
+    /* ------------------------------ deploySecuredLineWithConfig ------------------------------ */
+    .addCase(deploySecuredLineWithConfig.pending, (state, { meta }) => {
+      console.log('state', state);
+    })
+    .addCase(deploySecuredLineWithConfig.fulfilled, (state, { payload: { lineAddress, lineObj, deployData } }) => {
+      const categories = state.categories;
+      const newestFeatured = [lineAddress].concat(categories['market:featured.newest']);
+      state.linesMap[lineAddress] = lineObj;
+      state.categories['market:featured.newest'] = newestFeatured;
+    })
+    .addCase(deploySecuredLineWithConfig.rejected, (state, { error, meta }) => {
+      console.log('error', error);
     })
 
     /* ------------------------------ withdrawLine ----------------------------- */

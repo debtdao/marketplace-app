@@ -46,9 +46,3 @@ export const getProviderType = (network: Network): ProviderType => {
       throw Error('Unknown Network');
   }
 };
-
-export const getEtherscanUrlStub = (network: string) => {
-  if (network === 'mainnet') return 'https://etherscan.io/address/';
-  if (network === 'goerli') return 'https://goerli.etherscan.io/address/';
-  else return '';
-};

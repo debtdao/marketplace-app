@@ -97,9 +97,12 @@ export class CreditLineServiceImpl implements CreditLineService {
         throw new Error('Cannot withdraw. Signer is not lender');
       }
 
-      return <TransactionResponse>(
-        await this.executeContractMethod(props.lineAddress, 'withdraw', [props.id, props.amount], props.network)
-      );
+      return (await this.executeContractMethod(
+        props.lineAddress,
+        'withdraw',
+        [props.id, props.amount],
+        props.network
+      )) as TransactionResponse;
     } catch (e) {
       console.log(`An error occured while withdrawing credit, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
@@ -320,15 +323,13 @@ export class CreditLineServiceImpl implements CreditLineService {
         network: props.network,
       };
 
-      return <TransactionResponse>(
-        await this.executeContractMethod(
-          line,
-          'addCredit',
-          [data.drate, data.frate, data.amount, data.token, data.lender],
-          props.network,
-          true
-        )
-      );
+      return (await this.executeContractMethod(
+        line,
+        'addCredit',
+        [data.drate, data.frate, data.amount, data.token.address, data.lender],
+        props.network,
+        true
+      )) as TransactionResponse;
     } catch (e) {
       console.log(`An error occured while adding credit, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);

@@ -12,10 +12,12 @@ import {
   WalletActions,
   OnchainMetaDataSelector,
   NetworkSelectors,
+  TokensSelectors,
+  TokensActions,
 } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL } from '@hooks';
 import { device } from '@themes/default';
-import { DetailCard, ActionButtons, ViewContainer } from '@components/app';
+import { DetailCard, ActionButtons, ViewContainer, TokenIcon } from '@components/app';
 import { Input, SearchIcon, Button, RedirectIcon, Link } from '@components/common';
 import {
   ARBITER_POSITION_ROLE,
@@ -30,7 +32,8 @@ import { humanize, formatAddress, normalizeAmount, getENS } from '@src/utils';
 import { getEnv } from '@config/env';
 
 const PositionsCard = styled(DetailCard)`
-  max-width: ${({ theme }) => theme.globalMaxWidth};
+  max-width: 100%;
+  width: 100%;
   padding: ${({ theme }) => theme.card.padding};
   @media ${device.tablet} {
     .col-name {
@@ -95,18 +98,21 @@ const RedirectLinkIcon = styled(RedirectIcon)`
   padding-bottom: 0.2rem;
 `;
 
-interface PositionsProps {
+const TokenIconContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+`;
+
+interface PositionsTableProps {
+  borrower?: string;
+  lender?: string;
   positions: CreditPosition[];
   displayLine?: boolean; // whether to add the positions line to the table
 }
 
-interface ActionButtonProps {
-  name: string;
-  handler: (position?: string) => void;
-  disabled: boolean;
-}
-
-export const PositionsTable = ({ positions, displayLine = false }: PositionsProps) => {
+export const PositionsTable = ({ borrower, lender, positions, displayLine = false }: PositionsTableProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const dispatch = useAppDispatch();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
@@ -118,15 +124,18 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
   const explorerUrl = useExplorerURL(currentNetwork);
   const { NETWORK } = getEnv();
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
-
-  const { borrower } = selectedLine!;
+  const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
 
   // Initial set up for positions table
   useEffect(() => {
     if (selectedLine && !lineAddress) {
       dispatch(LinesActions.setSelectedLineAddress({ lineAddress: selectedLine.id }));
     } else if (lineAddress && !selectedLine) {
-      dispatch(LinesActions.getLinePage({ id: lineAddress }));
+      if (tokensMap === undefined) {
+        dispatch(TokensActions.getTokens()).then((res) => dispatch(LinesActions.getLinePage({ id: lineAddress })));
+      } else {
+        dispatch(LinesActions.getLinePage({ id: lineAddress }));
+      }
     }
   }, [lineAddress, selectedLine]);
 
@@ -242,12 +251,12 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
     };
 
     // Display button to approve proposal for the taker/borrower of the proposal
-    if (getAddress(borrower) === userWallet && getAddress(proposal.maker) === userWallet) {
+    if (borrower && getAddress(borrower) === userWallet && getAddress(proposal.maker) === userWallet) {
       return [approveMutualConsent, revokeMutualConsent];
     }
 
     // Display button to approve proposal for the taker/borrower of the proposal
-    if (getAddress(borrower) === userWallet) {
+    if (borrower && getAddress(borrower) === userWallet) {
       return [approveMutualConsent];
     }
 
@@ -261,7 +270,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
 
   const formattedPositionsAndProposals = _.flatten(
     positions?.map((position) => {
-      // get position (not in PROPOSED_STATUS)
+      const tokenIcon = tokensMap?.[getAddress(position.token.address)]?.icon ?? '';
       const positionToDisplay = {
         deposit: humanize('amount', position.deposit, position.token.decimals, 2),
         drate: `${normalizeAmount(position.dRate, 2)} %`,
@@ -282,13 +291,18 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
           </RouterLink>
         ),
         token: (
-          <RouterLink
-            key={position.token.address}
-            to={`${explorerUrl}/address/${position.token.address}`}
-            selected={false}
-          >
-            {position.token.symbol}
-          </RouterLink>
+          <TokenIconContainer>
+            <TokenIcon icon={tokenIcon} symbol={position.token.symbol} size="small" margin="0.5rem" />
+            {/* <TokenIcon symbol={position.token.symbol} size="small" margin="0.5rem" /> */}
+            <RouterLink
+              key={position.token.address}
+              to={`${explorerUrl}/address/${position.token.address}`}
+              selected={false}
+            >
+              {position.token.symbol}
+              <RedirectLinkIcon />
+            </RouterLink>
+          </TokenIconContainer>
         ),
         actions: (
           <ActionButtons
@@ -302,9 +316,10 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
       const proposalsToDisplay =
         position.status === PROPOSED_STATUS
           ? Object.values(position.proposalsMap)
-              .filter((proposal) => proposal.revokedAt === null)
+              .filter((proposal) => proposal.revokedAt === null || proposal.revokedAt === 0)
               .map((proposal) => {
-                const [dRate, fRate, deposit, tokenAddress, lenderAddress] = [...proposal.args];
+                const tokenIcon = tokensMap?.[getAddress(position.token.address)]?.icon ?? '';
+                const [dRate, fRate, deposit, tokenAddress, lenderAddress] = proposal.args;
                 return {
                   deposit: humanize('amount', deposit, position.token.decimals, 2),
                   drate: `${normalizeAmount(dRate, 2)} %`,
@@ -325,9 +340,17 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
                     </RouterLink>
                   ),
                   token: (
-                    <RouterLink key={tokenAddress} to={`${explorerUrl}/address/${tokenAddress}`} selected={false}>
-                      {position.token.symbol}
-                    </RouterLink>
+                    <TokenIconContainer>
+                      <TokenIcon icon={tokenIcon} symbol={position.token.symbol} size="small" margin="0.5rem" />
+                      <RouterLink
+                        key={position.token.address}
+                        to={`${explorerUrl}/address/${position.token.address}`}
+                        selected={false}
+                      >
+                        {position.token.symbol}
+                        <RedirectLinkIcon />
+                      </RouterLink>
+                    </TokenIconContainer>
                   ),
                   actions: (
                     <ActionButtons
@@ -349,80 +372,80 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
 
   return (
     <>
-      <TableHeader>{t('components.positions-card.positions')}</TableHeader>
-      <ViewContainer>
+      <div>
         <PositionsCard
-          header={' '}
+          header={'Positions'}
           data-testid="vaults-opportunities-list"
           metadata={[
             {
               key: 'status',
               header: t('components.positions-card.status'),
+              description: t('components.positions-card.tooltip.status'),
               sortable: true,
-              width: '12rem',
               className: 'col-apy',
             },
             {
               key: 'line',
               hide: !displayLine,
               header: t('components.positions-card.line'),
+              description: t('components.positions-card.tooltip.line'),
               sortable: true,
-              width: '13rem',
               className: 'col-apy',
             },
             {
               key: 'lender',
               header: t('components.positions-card.lender'),
+              description: t('components.positions-card.tooltip.lender'),
               sortable: true,
-              width: '13rem',
               className: 'col-available',
             },
             {
               key: 'token',
               header: t('components.positions-card.token'),
+              description: t('components.positions-card.tooltip.token'),
               sortable: true,
-              width: '8rem',
               className: 'col-available',
             },
             {
               key: 'deposit',
               header: t('components.positions-card.total-deposits'),
+              description: t('components.positions-card.tooltip.total-deposits'),
               sortable: true,
-              width: '13rem',
               className: 'col-assets',
             },
             {
               key: 'principal',
               header: t('components.positions-card.principal'),
+              description: t('components.positions-card.tooltip.principal'),
               sortable: true,
-              width: '13rem',
               className: 'col-assets',
             },
             {
               key: 'interest',
               header: t('components.positions-card.interest'),
+              description: t('components.positions-card.tooltip.interest'),
               sortable: true,
-              width: '8rem',
               className: 'col-assets',
             },
             {
               key: 'drate',
               header: t('components.positions-card.drate'),
+              description: t('components.positions-card.tooltip.drate'),
               sortable: true,
-              width: '10rem',
               className: 'col-assets',
             },
             {
               key: 'frate',
               header: t('components.positions-card.frate'),
+              description: t('components.positions-card.tooltip.frate'),
               sortable: true,
-              width: '10rem',
               className: 'col-assets',
             },
             {
               key: 'actions',
+              description: t('components.positions-card.tooltip.actions'),
+              header: 'Actions',
               align: 'flex-end',
-              width: 'auto',
               grow: '1',
             },
           ]}
@@ -448,7 +471,7 @@ export const PositionsTable = ({ positions, displayLine = false }: PositionsProp
           onAction={() => console.log('action')}
           wrap
         />
-      </ViewContainer>
+      </div>
       <br />
     </>
   );

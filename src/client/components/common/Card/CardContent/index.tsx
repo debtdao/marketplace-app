@@ -4,7 +4,6 @@ import styled from 'styled-components';
 const Container = styled.article<{ wrap?: string }>`
   display: flex;
   flex-direction: row;
-  flex-wrap: ${({ wrap }) => wrap};
   align-items: center;
 `;
 

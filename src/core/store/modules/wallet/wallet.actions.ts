@@ -100,7 +100,7 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
               read: web3Provider.getInstanceOf(providerType),
               write: web3Provider.getInstanceOf('wallet'),
             });
-            console.log('subgraph - wallet select change network', network);
+            // console.log('subgraph - wallet select change network', network);
             dispatch(NetworkActions.changeNetwork({ network }));
           }
         },
@@ -169,8 +169,8 @@ const changeWalletNetwork = createAsyncThunk<ChangeWalletNetworkResult, { networ
     // if (wallet.isCreated && wallet.changeNetwork) {
     //   networkChanged = await wallet.changeNetwork(network);
     // }
-    console.log('subgraph change wallet network: ', networkChanged);
-    console.log('subgraph network: ', network);
+    // console.log('subgraph change wallet network: ', networkChanged);
+    // console.log('subgraph network: ', network);
     return { networkChanged, network };
   }
 );

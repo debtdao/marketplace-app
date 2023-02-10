@@ -8,6 +8,7 @@ import { useAppTranslation, useAppSelector } from '@hooks';
 import { OnchainMetaDataSelector } from '@src/core/store';
 import { SecuredLine, Item } from '@src/core/types';
 import { getENS } from '@utils';
+import { device } from '@themes/default';
 
 const TokenListIconSize = '1rem';
 
@@ -21,26 +22,30 @@ const ContainerCard = styled(Card)`
 
 const StyledCardContent = styled(CardContent)`
   align-items: stretch;
-  justify-content: center;
+  justify-content: start;
   flex-wrap: wrap;
   grid-gap: ${({ theme }) => theme.card.padding};
   margin-top: ${({ theme }) => theme.card.padding};
-  padding: 0 ${({ theme }) => theme.card.padding};
 `;
 
 const ItemCard = styled(Card)<{ onClick: any }>`
   display: flex;
-  align-items: center;
+  align-items: start;
   min-height: 30rem;
-  min-width: 33%;
+  min-width: 32%;
+  max-width: 32%;
   flex: 1;
   padding: ${({ theme }) => theme.layoutPadding};
   padding-right: calc(${({ theme }) => theme.card.padding} + ${TokenListIconSize} * 2.5);
-  background-color: ${({ theme }) => theme.colors.surfaceVariantB};
+  background-color: ${({ theme }) => (theme.name === 'light' ? theme.colors.surface : theme.colors.surfaceVariantA)};
   color: ${({ theme }) => theme.colors.primary};
-  box-shadow: ${({ theme }) => `${theme.colors.accents.purp} 0 0 ${theme.spacing.sm};`}
+  box-shadow: ${({ theme }) => `inset ${theme.colors.accents.purp} 0 0 ${theme.spacing.sm};`}
   position: relative;
   transition: filter 200ms ease-in-out;
+
+  @media ${device.mobile} {
+    min-width: 100%;
+  }
 
   ${({ onClick, theme }) =>
     onClick &&
@@ -74,7 +79,7 @@ const ItemInfoLabel = styled(Text)`
 `;
 
 const ItemName = styled(Text)`
-  font-size: ${({ theme }) => theme.fonts.sizes.md};
+  font-size: ${({ theme }) => theme.fonts.sizes.lg};
   width: 100%;
   white-space: nowrap;
   overflow: hidden;

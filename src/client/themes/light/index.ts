@@ -53,6 +53,7 @@ const light = {
 
 const lightTheme: DefaultTheme = {
   ...sharedTheme,
+  name: light.name,
   colors: {
     logo: light.colors.primary,
 

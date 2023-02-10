@@ -4,10 +4,16 @@ import _ from 'lodash';
 import { useParams } from 'react-router-dom';
 
 import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
-import { WalletSelectors, LinesActions, LinesSelectors, AlertsActions } from '@store';
+import { WalletSelectors, LinesActions, LinesSelectors, AlertsActions, TokensActions, TokensSelectors } from '@store';
 import { SummaryCard, ViewContainer } from '@components/app';
-import { isValidAddress } from '@utils';
-import { LENDER_POSITION_ROLE, BORROWER_POSITION_ROLE, CreditPosition, SecuredLine } from '@src/core/types';
+import { getDefaultLineCategories, isValidAddress } from '@utils';
+import {
+  LENDER_POSITION_ROLE,
+  BORROWER_POSITION_ROLE,
+  CreditPosition,
+  SecuredLine,
+  UseCreditLinesParams,
+} from '@src/core/types';
 import { PositionsTable } from '@src/client/components/app/LineDetailsDisplay/PositionsTable';
 import { device } from '@themes/default';
 
@@ -89,14 +95,23 @@ export const Portfolio = () => {
   const allPositions = useAppSelector(LinesSelectors.selectPositionsMap);
   const [selectedRole, setRole] = useState<string>(BORROWER_POSITION_ROLE);
   const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
-
+  const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
   const availableRoles = [BORROWER_POSITION_ROLE, LENDER_POSITION_ROLE];
+
+  // TODO: Move this from market and portfolio pages into a shared location
+  const defaultLineCategories = getDefaultLineCategories();
 
   useEffect(() => {
     if (!isValidAddress(portfolioAddress!)) {
       dispatch(AlertsActions.openAlert({ message: 'Please connect wallet.', type: 'error' }));
     } else if (portfolioAddress && isValidAddress(portfolioAddress)) {
       dispatch(LinesActions.getUserPortfolio({ user: portfolioAddress.toLocaleLowerCase() }));
+      // TODO: only dispatch if userPortfolio doesn't provide what we need to populate linesMap
+      if (tokensMap === undefined) {
+        dispatch(TokensActions.getTokens()).then(() => dispatch(LinesActions.getLines(defaultLineCategories)));
+      } else {
+        dispatch(LinesActions.getLines(defaultLineCategories));
+      }
     }
   }, [portfolioAddress]);
 
@@ -138,80 +153,19 @@ export const Portfolio = () => {
 
       {selectedRole === BORROWER_POSITION_ROLE && (
         <StyledBorrowerContainer>
-          <PositionsTable positions={borrowerPositions} displayLine={true} />
+          <PositionsTable borrower={portfolioAddress!} positions={borrowerPositions} displayLine={true} />
         </StyledBorrowerContainer>
       )}
 
       {selectedRole === LENDER_POSITION_ROLE && (
         <StyledBorrowerContainer>
-          <PositionsTable positions={lenderPositions.map((id) => allPositions[id])} displayLine={true} />
+          <PositionsTable
+            lender={portfolioAddress}
+            positions={lenderPositions.map((id) => allPositions[id])}
+            displayLine={true}
+          />
         </StyledBorrowerContainer>
       )}
-
-      {/* {!portfolioLoaded && <StyledNoWalletCard />} */}
-      {/* {!userTokensLoading && (
-        <TokensCard
-          header={t('components.list-card.wallet')}
-          metadata={[
-            {
-              key: 'balanceUsdc',
-              header: t('components.list-card.value'),
-              format: ({ balanceUsdc }) => humanize('usd', balanceUsdc),
-              sortable: true,
-              width: '11rem',
-              className: 'col-value',
-            },
-            {
-              key: 'displayName',
-              header: t('components.list-card.asset'),
-              transform: ({ displayIcon, displayName, symbol }) => (
-                <>
-                  <TokenIcon icon={displayIcon} symbol={symbol} />
-                  <Text ellipsis>{displayName}</Text>
-                </>
-              ),
-              width: '23rem',
-              sortable: true,
-              className: 'col-name',
-            },
-            {
-              key: 'tokenBalance',
-              header: t('components.list-card.balance'),
-              format: ({ balance, decimals }) => humanize('amount', balance, decimals, 2),
-              sortable: true,
-              width: '13rem',
-              className: 'col-balance',
-            },
-            {
-              key: 'priceUsdc',
-              header: t('components.list-card.price'),
-              format: ({ priceUsdc }) => humanize('usd', priceUsdc),
-              sortable: true,
-              width: '11rem',
-              className: 'col-price',
-            },
-
-            {
-              key: 'invest',
-              transform: ({ address }) => <ActionButtons actions={[...investButton(address, false)]} />,
-              align: 'flex-end',
-              width: 'auto',
-              grow: '1',
-            },
-          ]}
-          data={userTokens.map((token) => ({
-            ...token,
-            displayName: token.symbol,
-            displayIcon: token.icon ?? '',
-            tokenBalance: normalizeAmount(token.balance, token.decimals),
-            invest: null,
-          }))}
-          initialSortBy="balanceUsdc"
-          wrap
-          filterBy={filterDustTokens}
-          filterLabel="Show dust"
-        />
-      // )} */}
     </StyledViewContainer>
   );
 };

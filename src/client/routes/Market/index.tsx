@@ -14,13 +14,15 @@ import {
   OnchainMetaDataActions,
   OnchainMetaDataSelector,
   NetworkSelectors,
+  TokensActions,
+  TokensSelectors,
 } from '@store';
 import { RecommendationsCard, SliderCard, ViewContainer } from '@components/app';
 import { SpinnerLoading, Text, Button } from '@components/common';
 import { SecuredLine, UseCreditLinesParams, Item } from '@src/core/types';
 import { DebtDAOBanner } from '@assets/images';
 import { getEnv } from '@config/env';
-import { getENS } from '@src/utils';
+import { getDefaultLineCategories, getENS } from '@src/utils';
 import { getConstants } from '@src/config/constants';
 
 const { SUPPORTED_NETWORKS } = getConstants();
@@ -29,7 +31,8 @@ const StyledRecommendationsCard = styled(RecommendationsCard)``;
 
 const StyledSliderCard = styled(SliderCard)`
   width: 100%;
-  min-height: 24rem;
+  padding: ${({ theme }) => theme.card.padding};
+  box-shadow: none;
 `;
 
 const BannerCtaButton = styled(Button)`
@@ -54,31 +57,19 @@ export const Market = () => {
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
+  const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
 
   // TODO not neeed here
   const addCreditStatus = useAppSelector(LinesSelectors.selectLinesActionsStatusMap);
 
-  const defaultLineCategories: UseCreditLinesParams = {
-    // using i18m translation as keys for easy display
-    'market:featured.highest-credit': {
-      first: 3,
-      // NOTE: terrible proxy for total credit (oldest = most). Currently getLines only allows filtering by line metadata not modules'
-      orderBy: 'start',
-      orderDirection: 'asc',
-    },
-    'market:featured.highest-revenue': {
-      first: 16,
-      // NOTE: terrible proxy for total revenue earned (highest % = highest notional). Currently getLines only allows filtering by line metadata not modules'
-      orderBy: 'defaultSplit',
-      orderDirection: 'desc',
-    },
-    'market:featured.newest': {
-      first: 15,
-      orderBy: 'start', // NOTE: theoretically gets lines that start in the future, will have to refine query
-      orderDirection: 'desc',
-    },
+  const defaultLineCategories = getDefaultLineCategories();
+  const fetchMarketData = () => {
+    if (tokensMap === undefined) {
+      dispatch(TokensActions.getTokens()).then(() => dispatch(LinesActions.getLines(defaultLineCategories)));
+    } else {
+      dispatch(LinesActions.getLines(defaultLineCategories));
+    }
   };
-  const fetchMarketData = () => dispatch(LinesActions.getLines(defaultLineCategories));
   const lineCategoriesForDisplay = useAppSelector(LinesSelectors.selectLinesForCategories);
   const getLinesStatus = useAppSelector(LinesSelectors.selectLinesStatusMap).getLines;
 
@@ -135,12 +126,20 @@ export const Market = () => {
             <Text>
               <p>{t('market:banner.body')}</p>
             </Text>
-            <BannerCtaButton styling="primary" onClick={onBorrowerCtaClick}>
-              {ctaButtonText}
-            </BannerCtaButton>
-            <BannerCtaButton styling="secondary" outline onClick={onLenderCtaClick}>
-              {t('market:banner.cta-lender')}
-            </BannerCtaButton>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                gap: '2.4rem', // match grid-gap in Market Page
+              }}
+            >
+              <BannerCtaButton styling="primary" onClick={onBorrowerCtaClick}>
+                {ctaButtonText}
+              </BannerCtaButton>
+              <BannerCtaButton styling="secondary" outline onClick={onLenderCtaClick}>
+                {t('market:banner.cta-lender')}
+              </BannerCtaButton>
+            </div>
           </div>
         }
         background={<img src={DebtDAOBanner} alt={'Debt DAO Banner?'} />}

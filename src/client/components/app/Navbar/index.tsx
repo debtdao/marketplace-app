@@ -86,12 +86,16 @@ const StyledNavbar = styled.header<{ warning?: boolean }>`
   border-radius: ${({ theme }) => theme.globalRadius};
 
   @media ${device.mobile} {
+    max-width: 100%;
     ${StyledText} {
       font-size: 1.9rem;
+      text-align: center;
+      margin-bottom: 2.4rem;
     }
     ${StyledOptionList} {
       width: auto;
     }
+    flex-direction: column;
   }
 `;
 

@@ -1,6 +1,8 @@
 import { BigNumber, ethers } from 'ethers';
 import { keyBy, merge, values, orderBy, toNumber, isString, get } from 'lodash';
 
+import { UseCreditLinesParams } from '@src/core/types';
+
 export const bn = (value: string | number) => {
   if (value.toString().includes('.')) {
     // BN cant handle decimals
@@ -69,3 +71,27 @@ export const orderApy = (apyData: string, apyType: string) => {
 export const isCustomApyType = (apyType: string) => apyType === 'new' || apyType === 'n/a' || apyType === 'override';
 
 export const getRandomId = (): string => new Date().getTime().toString(36) + Math.random().toString(36).slice(2);
+
+export const getDefaultLineCategories = () => {
+  const defaultLineCategories: UseCreditLinesParams = {
+    // using i18m translation as keys for easy display
+    'market:featured.highest-credit': {
+      first: 3,
+      // NOTE: terrible proxy for total credit (oldest = most). Currently getLines only allows filtering by line metadata not modules'
+      orderBy: 'start',
+      orderDirection: 'asc',
+    },
+    'market:featured.highest-revenue': {
+      first: 16,
+      // NOTE: terrible proxy for total revenue earned (highest % = highest notional). Currently getLines only allows filtering by line metadata not modules'
+      orderBy: 'defaultSplit',
+      orderDirection: 'desc',
+    },
+    'market:featured.newest': {
+      first: 15,
+      orderBy: 'start', // NOTE: theoretically gets lines that start in the future, will have to refine query
+      orderDirection: 'desc',
+    },
+  };
+  return defaultLineCategories;
+};

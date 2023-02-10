@@ -97,7 +97,7 @@ export class CollateralServiceImpl implements CollateralService {
       escrowAddress,
       this.escrowAbi,
       'enableCollateral',
-      [token],
+      [token.address],
       network,
       dryRun
     );

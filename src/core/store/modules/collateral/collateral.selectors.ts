@@ -23,6 +23,7 @@ const selectSelectedCollateralAsset = (state: RootState) => {
     ? state.tokens.tokensMap[getAddress(state.collateral.selectedCollateralAsset)]
     : undefined;
 };
+
 const selectSelectedRevenueContractAddress = (state: RootState) => state.collateral.selectedRevenueContract;
 
 const selectSelectedEscrow = createSelector([selectCollateralMap, selectSelectedEscrowAddress], (cMap, addy) => {

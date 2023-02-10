@@ -1,7 +1,7 @@
 import { FC, ReactNode } from 'react';
 import styled from 'styled-components';
 
-import { Icon, ArrowDownIcon, IconProps } from '@components/common';
+import { Icon, ArrowDownIcon, IconProps, InfoIcon, Tooltip, TooltipProps } from '@components/common';
 
 const Container = styled.div<{ width?: string; align?: string; grow?: string; fontWeight?: number }>`
   display: flex;
@@ -18,10 +18,27 @@ interface SortIconProps extends Omit<IconProps, 'ref'> {
   sortType?: SortType;
 }
 
+// TODO: StyledIcon, StyledTooltipProps, and StyledTooltip do not work for some reason
+interface StyledIconProps extends Omit<IconProps, 'ref'> {}
+
+interface StyledTooltipProps extends Omit<TooltipProps, 'ref'> {}
+
+const StyledIcon = styled(({ ...props }: StyledIconProps) => <Icon {...props} />)`
+  height: 1.1rem;
+  margin-left: 0.4rem;
+  flex-shrink: 0;
+  fill: ${({ theme, color, fill }) => fill ?? color ?? theme.colors.titles};
+  transition: transform 200ms ease-in-out;
+`;
+
+const StyledTooltip = styled(({ ...props }: StyledTooltipProps) => <Tooltip {...props} />)`
+  position: absolute;
+`;
+
 const SortIcon = styled(({ activeSort, sortType, ...props }: SortIconProps) => <Icon {...props} />)`
   height: 1.1rem;
   margin-left: 0.4rem;
-  fill: currentColor;
+  fill: ${({ theme }) => theme.colors.secondary};
   transition: transform 200ms ease-in-out;
   flex-shrink: 0;
   transform: rotateZ(0);
@@ -29,16 +46,18 @@ const SortIcon = styled(({ activeSort, sortType, ...props }: SortIconProps) => <
   ${({ activeSort, sortType, theme }) =>
     activeSort &&
     `
-    color: ${theme.colors.titles};
+    color: ${theme.colors.texts};
     transform: ${sortType === 'asc' ? 'rotateZ(180deg)' : 'rotateZ(0deg)'};
   `}
 `;
 
 const Header = styled.h3<{ onClick?: () => void }>`
   display: flex;
+  position: relative;
   align-items: center;
+  text-align: center;
   font-size: 1.6rem;
-  font-weight: 400;
+  font-weight: 700;
   margin: 0;
   padding: 0;
   color: ${({ theme }) => theme.colors.texts};
@@ -64,6 +83,7 @@ const Content = styled.div`
 type SortType = 'asc' | 'desc';
 interface CardElementProps {
   header?: string;
+  description?: string;
   sortable?: boolean;
   activeSort?: boolean;
   sortType?: SortType;
@@ -79,6 +99,7 @@ interface CardElementProps {
 export const CardElement: FC<CardElementProps> = ({
   children,
   header,
+  description,
   sortable,
   activeSort,
   sortType,
@@ -96,6 +117,15 @@ export const CardElement: FC<CardElementProps> = ({
       {header && (
         <Header onClick={onClick}>
           {header}
+          <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
+            <Icon Component={InfoIcon} size="1.5rem" />
+          </Tooltip>
+
+          {/* TODO: Add styled tooltip back once css issues are fixed */}
+          {/* <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
+            <StyledIcon Component={InfoIcon} size="1.5rem" />
+          </Tooltip> */}
+
           {sortable && <SortIcon activeSort={activeSort} sortType={sortType} Component={ArrowDownIcon} />}
         </Header>
       )}

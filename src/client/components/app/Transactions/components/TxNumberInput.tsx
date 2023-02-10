@@ -13,7 +13,7 @@ const InterestRateInputContainer = styled.div`
   flex-direction: row;
 `;
 
-const StyledAmountInput = styled.input<{ readOnly?: boolean; error?: boolean }>`
+const StyledAmountInput = styled.input<{ textAlign: string; readOnly?: boolean; error?: boolean }>`
   font-size: 2.4rem;
   font-weight: 700;
   background: transparent;
@@ -23,7 +23,8 @@ const StyledAmountInput = styled.input<{ readOnly?: boolean; error?: boolean }>`
   padding: 0;
   font-family: inherit;
   appearance: textfield;
-  width: 80%;
+  width: 50%;
+  text-align: ${({ textAlign }) => textAlign};
 
   &::placeholder {
     color: ${({ theme }) => theme.colors.txModalColors.textContrast};
@@ -120,6 +121,7 @@ export interface TxNumberInputProps {
   headerText?: string;
   inputLabel?: string;
   width?: 'sm' | 'md';
+  inputAlign?: 'left' | 'right';
   placeholder?: string;
   amount: string;
   maxAmount?: string;
@@ -141,6 +143,7 @@ export const TxNumberInput: FC<TxNumberInputProps> = ({
   readOnly,
   hideAmount,
   children,
+  inputAlign = 'left',
   ...props
 }) => {
   return (
@@ -162,6 +165,7 @@ export const TxNumberInput: FC<TxNumberInputProps> = ({
                     error={inputError}
                     type="number"
                     aria-label={inputLabel || ''}
+                    textAlign={inputAlign}
                   />
                   <InputPercent>%</InputPercent>
                 </InterestRateInputContainer>

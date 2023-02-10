@@ -23,7 +23,7 @@ const StyledTooltipArrow = styled.div`
 `;
 
 const StyledTooltip = styled.div`
-  background: ${({ theme }) => theme.colors.background};
+  background: ${({ theme }) => theme.colors.backgroundVariant};
   color: ${({ theme }) => theme.colors.titles};
   fill: currentColor;
   stroke: currentColor;
@@ -33,6 +33,8 @@ const StyledTooltip = styled.div`
   font-size: 1.6rem;
   padding: 0.8rem;
   width: max-content;
+  max-height: 20rem;
+  max-width: 40rem;
   min-width: 11rem;
   z-index: ${({ theme }) => theme.zindex.tooltips};
 

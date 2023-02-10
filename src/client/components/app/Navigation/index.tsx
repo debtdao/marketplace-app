@@ -63,8 +63,10 @@ export const Navigation = ({ hideOptionalLinks }: NavigationProps) => {
   const userAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
 
   const displayLinks = navLinks.filter((link) => {
-    if (link.text === 'navigation.portfolio') {
+    if (link.text === 'navigation.portfolio' && userAddress) {
       link.to = `/${currentNetwork}/portfolio/${userAddress}`;
+    } else if (link.text === 'navigation.portfolio' && !userAddress) {
+      link.to = `/${currentNetwork}/portfolio/`;
     }
     return !(link.optional && hideOptionalLinks);
   });

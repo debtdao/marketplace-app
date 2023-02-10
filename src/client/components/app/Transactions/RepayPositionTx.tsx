@@ -13,6 +13,7 @@ import {
   bn,
   getTradeQuote,
   isGoerli,
+  repayCreditUpdate,
 } from '@utils';
 import { useAppTranslation, useAppDispatch, useAppSelector, useSelectedSellToken } from '@hooks';
 import {
@@ -314,6 +315,13 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         setLoading(false);
       }
       if (res.meta.requestStatus === 'fulfilled') {
+        const updatedPosition = repayCreditUpdate(selectedPosition);
+        dispatch(
+          LinesActions.setPosition({
+            id: selectedPosition.id,
+            position: updatedPosition,
+          })
+        );
         setTransactionCompleted(1);
         setLoading(false);
       }
@@ -466,8 +474,14 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         setLoading(false);
       }
       if (res.meta.requestStatus === 'fulfilled') {
+        const updatedPosition = repayCreditUpdate(selectedPosition);
+        dispatch(
+          LinesActions.setPosition({
+            id: selectedPosition.id,
+            position: updatedPosition,
+          })
+        );
         setTransactionCompleted(1);
-        window.location.reload();
         setLoading(false);
       }
     });

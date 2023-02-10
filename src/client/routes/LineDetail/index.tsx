@@ -2,7 +2,15 @@ import { useEffect, useState } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { LinesActions, AlertsActions, AppSelectors, TokensSelectors, LinesSelectors, NetworkSelectors } from '@store';
+import {
+  LinesActions,
+  AlertsActions,
+  AppSelectors,
+  TokensSelectors,
+  LinesSelectors,
+  NetworkSelectors,
+  TokensActions,
+} from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation, useIsMounting } from '@hooks';
 import { LineDetailsDisplay, ViewContainer, SliderCard } from '@components/app';
 import { SpinnerLoading, Text } from '@components/common';
@@ -51,6 +59,7 @@ export const LineDetail = () => {
   const getLinePageStatus = useAppSelector(LinesSelectors.selectGetLinePageStatus);
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const currentNetworkSettings = NETWORK_SETTINGS[currentNetwork];
+  const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
 
   useEffect(() => {
     if (!lineAddress || !isValidAddress(lineAddress)) {
@@ -60,11 +69,11 @@ export const LineDetail = () => {
     }
 
     dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineAddress }));
-    dispatch(LinesActions.getLinePage({ id: lineAddress }));
-    // TODO: Why is this here? It makes it so you cannot grab the selectedLine when you switch to a new page.
-    // return () => {
-    //   dispatch(LinesActions.clearSelectedLine());
-    // };
+    if (tokensMap === undefined) {
+      dispatch(TokensActions.getTokens()).then(() => dispatch(LinesActions.getLinePage({ id: lineAddress })));
+    } else {
+      dispatch(LinesActions.getLinePage({ id: lineAddress }));
+    }
   }, []);
 
   const [firstTokensFetch, setFirstTokensFetch] = useState(true);

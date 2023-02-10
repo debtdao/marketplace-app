@@ -45,6 +45,11 @@ import {
   ProposalFragResponse,
   CreditProposal,
   ProposalMap,
+  LineOfCredit,
+  ACTIVE_STATUS,
+  DeploySecuredLineWithConfigProps,
+  AddCreditProps,
+  PROPOSED_STATUS,
 } from '@types';
 
 import { humanize, normalizeAmount, normalize, format, toUnit, toTargetDecimalUnits, BASE_DECIMALS } from './format';
@@ -646,6 +651,7 @@ export const formatUserPortfolioData = (
   // add token Prices as arg
   // const { spigot, escrow, positions, borrower, status, ...metadata } = lineData;
   const { borrowerLineOfCredits, lenderPositions, arbiterLineOfCredits } = portfolioData;
+  console.log('format borrowerLineOfCredits - lines: ', borrowerLineOfCredits, arbiterLineOfCredits);
   const lines = [...borrowerLineOfCredits, ...arbiterLineOfCredits]
     .map(({ borrower, arbiter, status, positions = [], events = [], escrow, spigot, ...rest }) => {
       const {
@@ -685,11 +691,10 @@ export const formatUserPortfolioData = (
     .reduce((lines, line) => ({ ...lines, [line.id]: line }), {});
 
   const positions = createPositionsMap(lenderPositions, tokenPrices);
-
   return { lines, positions };
 };
 
-const _createTokenView = (tokenResponse: TokenFragRepsonse, amount?: BigNumber, price?: BigNumber) => {
+export const _createTokenView = (tokenResponse: TokenFragRepsonse, amount?: BigNumber, price?: BigNumber) => {
   // might already have for token in state but we only pass in prices to these util functions
   // will need to merge and prefer state vs this jank
   return {
@@ -706,4 +711,77 @@ const _createTokenView = (tokenResponse: TokenFragRepsonse, amount?: BigNumber, 
     categories: [],
     description: '',
   };
+};
+
+export const formatOptimisticLineData = (
+  lineAddress: string,
+  arbiterAddress: string,
+  deployData: DeploySecuredLineWithConfigProps
+): LineOfCredit => {
+  const escrowId = '0xescrow';
+  const spigotId = '0xspigot';
+
+  // await dispatch(getLine(deployedLineData.))
+  const { borrower, revenueSplit, ttl, cratio } = deployData;
+
+  const lineObj = {
+    id: lineAddress,
+    borrower: borrower,
+    arbiter: arbiterAddress,
+    status: ACTIVE_STATUS,
+    start: Math.floor(Date.now() / 1000),
+    end: Math.floor(Date.now() / 1000) + Number(ttl.toString()),
+    principal: '0',
+    deposit: '0',
+    interest: '0',
+    defaultSplit: revenueSplit.toString(),
+    totalInterestRepaid: '0',
+    highestApy: ['', '', '0'],
+    spigotId: spigotId,
+    escrowId: escrowId,
+    escrow: {},
+    spigot: {},
+  } as LineOfCredit;
+
+  return lineObj;
+};
+
+export const formatOptimisticProposal = (
+  maker: string,
+  position: AddCreditProps,
+  positionId: string
+): CreditPosition => {
+  const { lineAddress, drate, frate, amount, token, lender } = position;
+  const proposalId = '0x' + Math.random().toFixed(64).slice(2, 68);
+  const proposal = {
+    id: proposalId,
+    proposedAt: 1234,
+    acceptedAt: 1234,
+    revokedAt: 0,
+    maker: maker.toLowerCase(),
+    taker: String(null),
+    mutualConsentFunc: '',
+    msgData: '',
+    args: [drate.toString(), frate.toString(), amount.toString(), token.address, lender],
+  } as CreditProposal;
+  const proposalsMap: ProposalMap = {};
+  proposalsMap[proposalId] = proposal;
+
+  const proposedPosition = {
+    id: positionId,
+    line: lineAddress,
+    status: PROPOSED_STATUS,
+    token,
+    lender: lender.toLowerCase(),
+    deposit: '0',
+    principal: '0',
+    interestAccrued: '0',
+    interestRepaid: '0',
+    totalInterestRepaid: '0',
+    dRate: '0',
+    fRate: '0',
+    proposalsMap,
+  } as CreditPosition;
+
+  return proposedPosition;
 };

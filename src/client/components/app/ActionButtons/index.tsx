@@ -2,11 +2,15 @@ import styled from 'styled-components';
 
 import { Button, Icon, WarningFilledIcon } from '@components/common';
 
-const ActionButtonsContainer = styled.div<{ actions: number }>`
+const ActionButtonsContainer = styled.div<{ actions: number; direction?: string }>`
   display: flex;
   align-items: center;
   // grid-template-columns: repeat(${({ actions }) => actions}, 1fr);
   gap: ${({ theme }) => theme.layoutPadding};
+
+  @media (max-width: 1800px) {
+    flex-direction: ${({ direction }) => direction ?? 'column'};
+  }
 `;
 
 const AlertIcon = styled(Icon)`
@@ -30,13 +34,19 @@ const ActionButton = styled(Button)<{ hide?: boolean }>`
   color: ${({ theme }) => theme.colors.vaultActionButton.color};
   border: 2px solid ${({ theme }) => theme.colors.vaultActionButton.borderColor};
   padding: 0 1.6rem;
-  // width: 9.6rem;
+  width: 9.6rem;
 
   ${({ hide }) => hide && `visibility: hidden;`}
 
   &[disabled],
   &.disabled {
     opacity: 0.6;
+  }
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.surfaceVariantB};
+    color: ${({ theme }) => theme.colors.vaultActionButton.selected.color};
+    border: 4px solid ${({ theme }) => theme.colors.vaultActionButton.selected.borderColor};
   }
 `;
 
@@ -47,13 +57,14 @@ interface ActionButtonsProps {
     disabled?: boolean;
     hide?: boolean;
   }>;
+  direction?: 'row' | 'column';
   value1?: string;
   value2?: string;
   alert?: string;
 }
 
-export const ActionButtons = ({ actions, alert, value1, value2 }: ActionButtonsProps) => (
-  <ActionButtonsContainer actions={actions.length}>
+export const ActionButtons = ({ actions, alert, direction, value1, value2 }: ActionButtonsProps) => (
+  <ActionButtonsContainer actions={actions.length} direction={direction}>
     {alert && (
       <AlertButton
         title={alert}

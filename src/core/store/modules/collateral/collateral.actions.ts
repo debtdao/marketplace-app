@@ -1,5 +1,6 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { getAddress } from 'ethers/lib/utils';
+import { BigNumber } from 'ethers';
 
 import { ThunkAPI } from '@frameworks/redux';
 import {
@@ -13,8 +14,12 @@ import {
   ReleaseCollateraltProps,
   TradeableProps,
   ClaimOperatorTokensProps,
+  TokenFragRepsonse,
+  EscrowDeposit,
+  TokenView,
 } from '@src/core/types';
 import { TxActionButton } from '@src/client/components/app';
+import { formatEscrowDeposit } from '@src/utils/collateral';
 
 const setSelectedEscrow = createAction<{ escrowAddress?: string }>('collateral/setSelectedEscrow');
 const setSelectedSpigot = createAction<{ spigotAddress?: string }>('collateral/setSelectedSpigot');
@@ -35,7 +40,7 @@ const saveEventsToMap = createAsyncThunk<
 >('collateral/saveEventsToMap', async (props) => props);
 
 const enableCollateral = createAsyncThunk<
-  { contract: string; token: string; success: boolean },
+  { escrowDeposit: EscrowDeposit; lineAddress: string; contract: string; token: TokenView; success: boolean },
   EnableCollateralAssetProps,
   ThunkAPI
 >('collateral/enableCollateral', async (props, { extra, getState, dispatch }) => {
@@ -45,24 +50,22 @@ const enableCollateral = createAsyncThunk<
   if (!userAddress) throw new Error('WALLET NOT CONNECTED');
 
   // TODO chekc that they are arbiter on line that owns Escrowbeforethey send tx
-
   const { collateralService } = services;
   const tx = await collateralService.enableCollateral(props);
-  console.log('enable collatteral action', tx);
-
+  const escrowDeposit = formatEscrowDeposit(props.token);
   if (!tx) {
     throw new Error('failed to enable collateral');
   }
-
   return {
     ...props,
+    escrowDeposit: escrowDeposit,
     contract: props.escrowAddress,
     success: !!tx,
   };
 });
 
 const addCollateral = createAsyncThunk<
-  { contract: string; token: string; success: boolean },
+  { contract: string; token: string; amount: BigNumber; success: boolean },
   AddCollateralProps,
   ThunkAPI
 >('collateral/addCollateral', async (props, { extra, getState, dispatch }) => {
@@ -70,6 +73,7 @@ const addCollateral = createAsyncThunk<
   const { services } = extra;
   const userAddress = wallet.selectedAddress;
   if (!userAddress) throw new Error('WALLET NOT CONNECTED');
+  const { token, amount, escrowAddress } = props;
 
   console.log('addCollateral action props', props);
   // TODO chekc that they are arbiter on line that owns Escrowbeforethey send tx
@@ -82,14 +86,15 @@ const addCollateral = createAsyncThunk<
   }
 
   return {
-    ...props,
-    contract: props.escrowAddress,
+    contract: escrowAddress,
+    token: token,
+    amount: amount,
     success: !!tx,
   };
 });
 
 const releaseCollateral = createAsyncThunk<
-  { contract: string; token: string; success: boolean },
+  { contract: string; token: string; amount: BigNumber; success: boolean },
   ReleaseCollateraltProps,
   ThunkAPI
 >('collateral/releaseCollateral', async (props, { extra, getState, dispatch }) => {
@@ -97,6 +102,7 @@ const releaseCollateral = createAsyncThunk<
   const { services } = extra;
   const userAddress = wallet.selectedAddress;
   if (!userAddress) throw new Error('WALLET NOT CONNECTED');
+  const { token, amount, escrowAddress } = props;
 
   console.log('addCollateral action props', props);
   // TODO chekc that they are arbiter on line that owns Escrowbeforethey send tx
@@ -109,8 +115,9 @@ const releaseCollateral = createAsyncThunk<
   }
 
   return {
-    ...props,
-    contract: props.escrowAddress,
+    contract: escrowAddress,
+    token: token,
+    amount: amount,
     success: !!tx,
   };
 });

@@ -2,11 +2,12 @@ import { isEmpty } from 'lodash';
 import { BigNumber, ethers } from 'ethers';
 import styled from 'styled-components';
 import { format } from 'date-fns';
+import { getAddress } from 'ethers/lib/utils';
 
 import { device } from '@themes/default';
-import { useAppDispatch, useAppSelector, useAppTranslation } from '@hooks';
+import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
-import { prettyNumbers, getEtherscanUrlStub, unnullify } from '@src/utils';
+import { BASE_DECIMALS, prettyNumbers, unnullify } from '@src/utils';
 import {
   AggregatedEscrow,
   ARBITER_POSITION_ROLE,
@@ -19,9 +20,14 @@ import {
   RevenueSummary,
   SpigotRevenueContractMap,
   TokenView,
+  UNINITIALIZED_STATUS,
+  ACTIVE_STATUS,
+  LIQUIDATABLE_STATUS,
+  REPAID_STATUS,
+  INSOLVENT_STATUS,
 } from '@src/core/types';
-import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
-import { Button, Text, RedirectIcon, Link, CardEmptyList } from '@components/common';
+import { DetailCard, ActionButtons, TokenIcon, ViewContainer, BorrowerName } from '@components/app';
+import { Button, Text, RedirectIcon, Link, CardEmptyList, Tooltip, InfoIcon, Icon } from '@components/common';
 import {
   LinesSelectors,
   ModalsActions,
@@ -29,6 +35,7 @@ import {
   WalletActions,
   CollateralActions,
   NetworkSelectors,
+  TokensSelectors,
 } from '@src/core/store';
 import { humanize } from '@src/utils';
 import { getEnv } from '@config/env';
@@ -59,6 +66,7 @@ const MetricContainer = styled.div`
 `;
 
 const MetricName = styled.h3`
+  display: flex;
   ${({ theme }) => `
     font-size: ${theme.fonts.sizes.lg};
     font-weight: 600;
@@ -73,6 +81,54 @@ const DataMetric = styled.h5`
   `}
 `;
 
+export const MetadataContainer = styled.div`
+  background-color: ${({ theme }) => (theme.name === 'classic' ? theme.colors.surface : '')};
+  filter: brightness(1.2);
+  padding: ${({ theme }) => theme.card.padding};
+  border-radius: ${({ theme }) => theme.globalRadius};
+`;
+
+const MetadataBox = styled.div`
+  ${({ theme }) => `
+    font-size: ${theme.fonts.sizes.md};
+  `}
+`;
+
+const MetadataTitle = styled.span`
+  ${({ theme }) => `color: ${theme.colors.primary}; `}
+  font-weight: 800;
+`;
+
+const MetadataRow = styled.p`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-left: 0rem;
+`;
+
+const StatusWithColor = styled.span<{ status: string }>`
+  color: ${({ status }) => {
+    switch (status) {
+      case UNINITIALIZED_STATUS:
+        return '#E6E600'; // darkish yellow
+      case ACTIVE_STATUS:
+      case REPAID_STATUS:
+        return '#6AFF4D'; // light green
+      case INSOLVENT_STATUS:
+      case LIQUIDATABLE_STATUS:
+        return '#FF1919'; // bright red
+    }
+  }};
+`;
+
+const CratioWithColor = styled.span<{ diff: number }>`
+  color: ${({ diff }) => {
+    if (diff >= 15) return '#6AFF4D'; // decent margin - light green
+    else if (diff < 0) return '#FF1919'; // liquidatable - bright red
+    else return '#E6E600'; // close to liquidatable - darkish yellow
+  }};
+`;
+
 const DataSubMetricsContainer = styled.div``;
 
 const DataSubMetric = styled.p``;
@@ -85,8 +141,61 @@ const RedirectLinkIcon = styled(RedirectIcon)`
   padding-bottom: 0.2rem;
 `;
 
+const Header = styled.h1`
+  ${({ theme }) => `
+    margin-bottom: ${theme.spacing.xl};
+    font-size: ${theme.fonts.sizes.xl};
+    color: ${theme.colors.titles};
+  `};
+`;
+
+const Redirect = styled(RedirectIcon)`
+  display: inline-block;
+  fill: currentColor;
+  width: 1.2rem;
+  margin-left: 2rem;
+  padding-bottom: 0.2rem;
+`;
+
+const RouterLink = styled(Link)<{ selected: boolean; fontSize: string }>`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  color: inherit;
+  flex: 1;
+  width: 100%;
+  font-size: ${(props) => props.fontSize};
+  &:hover span {
+    filter: brightness(90%);
+  }
+
+  span {
+    transition: filter 200ms ease-in-out;
+  }
+  ${(props) =>
+    props.selected &&
+    `
+    color: ${props.theme.colors.titlesVariant};
+  `}
+`;
+
+const TokenIconContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+`;
+
+const StyledIcon = styled(Icon)`
+  margin-left: 1rem;
+  flex-shrink: 0;
+  fill: ${({ theme, color, fill }) => fill ?? color ?? theme.colors.titles};
+`;
+
 const AssetsListCard = styled(DetailCard)`
-  max-width: ${({ theme }) => theme.globalMaxWidth};
+  max-width: 100%;
+  width: 100%;
+  margin: 4rem 0;
   padding: ${({ theme }) => theme.card.padding};
   @media ${device.tablet} {
     .col-name {
@@ -117,30 +226,32 @@ interface Metric {
 
 interface MetricDisplay extends Metric {
   title: string;
+  description: string;
   data: string;
   displaySubmetrics?: boolean;
-  submetrics?: Metric[];
+  children?: any;
 }
 
-const MetricDataDisplay = ({ title, data, displaySubmetrics = false, submetrics }: MetricDisplay) => {
+interface LineMetadataProps {
+  borrowerID: string;
+}
+
+const MetricDataDisplay = ({ title, description, data, displaySubmetrics = false, children }: MetricDisplay) => {
   return (
     <MetricContainer>
-      <MetricName>{title}</MetricName>
+      <MetricName>
+        {title}
+        <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
+          <StyledIcon Component={InfoIcon} size="1.5rem" />
+        </Tooltip>
+      </MetricName>
       <DataMetric>{data}</DataMetric>
-      {displaySubmetrics && (
-        <DataSubMetricsContainer>
-          {submetrics?.map(({ title, data }, index) => (
-            <DataSubMetric key={index}>
-              {title} : {data}
-            </DataSubMetric>
-          ))}
-        </DataSubMetricsContainer>
-      )}
+      {displaySubmetrics && <DataSubMetricsContainer>{children}</DataSubMetricsContainer>}
     </MetricContainer>
   );
 };
 
-export const LineMetadata = () => {
+export const LineMetadata = (props: LineMetadataProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
@@ -149,8 +260,11 @@ export const LineMetadata = () => {
   const { NETWORK } = getEnv();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
-
+  const explorerUrl = useExplorerURL(network);
+  const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
+  const { borrowerID } = props;
   const {
+    borrower,
     start: startTime,
     end: endTime,
     status,
@@ -161,7 +275,6 @@ export const LineMetadata = () => {
     spigot,
     defaultSplit,
   } = selectedLine!;
-
   const { deposits, minCRatio, cratio, collateralValue } = escrow!;
   const { revenueValue, revenueSummary: revenue } = spigot!;
 
@@ -171,28 +284,71 @@ export const LineMetadata = () => {
       return (
         <MetricDataDisplay
           title={t('lineDetails:metadata.escrow.no-collateral')}
+          description={t('lineDetails:metadata.escrow.no-collateral')}
           data={`$ ${prettyNumbers(collateralValue)}`}
         />
       );
     return (
       <MetricDataDisplay
         title={t('lineDetails:metadata.escrow.total')}
-        data={`$ ${humanize('amount', collateralValue, 18, 2)}`}
+        description={t('lineDetails:metadata.escrow.tooltip.total')}
+        data={`$ ${humanize('amount', collateralValue, BASE_DECIMALS, 2)}`}
       />
     );
   };
   const renderSpigotMetadata = () => {
     if (!revenue) return null;
     return (
-      <MetricDataDisplay
-        title={t('lineDetails:metadata.revenue.total')}
-        data={`$ ${humanize('amount', revenueValue, 18, 2)}`}
-      />
+      <>
+        <MetadataBox>
+          <MetadataRow>
+            <Tooltip
+              placement="bottom-start"
+              tooltipComponent={<>{t('lineDetails:metadata.tooltip.lender-revenue-split')}</>}
+            >
+              <StyledIcon Component={InfoIcon} size="1.5rem" />
+            </Tooltip>
+            <MetadataTitle>
+              {`${t('lineDetails:metadata.lender')}  ${t('lineDetails:metadata.revenue-split')}`}:
+            </MetadataTitle>{' '}
+            {defaultSplit}%
+          </MetadataRow>
+          <MetadataRow>
+            <Tooltip
+              placement="bottom-start"
+              tooltipComponent={<>{t('lineDetails:metadata.tooltip.borrower-revenue-split')}</>}
+            >
+              <StyledIcon Component={InfoIcon} size="1.5rem" />
+            </Tooltip>
+            <MetadataTitle>
+              {`${t('lineDetails:metadata.borrower')}  ${t('lineDetails:metadata.revenue-split')}`}:
+            </MetadataTitle>{' '}
+            {100 - Number(defaultSplit)}%
+          </MetadataRow>
+          <MetadataRow>
+            <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.cratio')}</>}>
+              <StyledIcon Component={InfoIcon} size="1.5rem" />
+            </Tooltip>
+            <MetadataTitle>{t('lineDetails:metadata.cratio')}: </MetadataTitle>{' '}
+            <CratioWithColor diff={Number(cratio) - Number(minCRatio)}>{cratio}%</CratioWithColor>
+          </MetadataRow>
+          <MetadataRow>
+            <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.min-cratio')}</>}>
+              <StyledIcon Component={InfoIcon} size="1.5rem" />
+            </Tooltip>
+            <MetadataTitle>{t('lineDetails:metadata.min-cratio')}: </MetadataTitle> {minCRatio}%
+          </MetadataRow>
+        </MetadataBox>
+        <MetricDataDisplay
+          title={t('lineDetails:metadata.revenue.total')}
+          description={t('lineDetails:metadata.revenue.tooltip')}
+          data={`$ ${humanize('amount', revenueValue, BASE_DECIMALS, 2)}`}
+        />
+      </>
     );
   };
 
-  // TODO: rename to addCollateralHandler
-  const depositHandler = (token: TokenView) => {
+  const addCollateralHandler = (token: TokenView) => {
     if (!walletIsConnected) {
       connectWallet();
     } else {
@@ -201,8 +357,7 @@ export const LineMetadata = () => {
     }
   };
 
-  // TODO: rename to releaseCollateralhandler
-  const withdrawHandler = (token: TokenView) => {
+  const releaseCollateralhandler = (token: TokenView) => {
     if (!walletIsConnected) {
       connectWallet();
     } else {
@@ -242,24 +397,33 @@ export const LineMetadata = () => {
     }
   };
 
-  const formattedCollateralData = allCollateral.map((c) => ({
-    ...c,
-    key: c.type + c.token.toString(),
-    align: 'flex-start',
-    actions: getCollateralRowActionForRole(userPositionMetadata.role),
-  }));
+  const formattedCollateralData = allCollateral.map((c) => {
+    console.log('Tokens Map: ', tokensMap);
+    console.log('Tokens Map undefined?: ', c.token.address);
+    console.log('Tokens Map c: ', c);
+    const tokenIcon = tokensMap?.[getAddress(c.token.address)]?.icon ?? '';
+    const tokenInfo = { icon: tokenIcon, ...c.token };
+    const collateral = { ...c, token: tokenInfo };
+    return {
+      ...collateral,
+      key: c.type + c.token.toString(),
+      align: 'flex-start',
+      actions: getCollateralRowActionForRole(userPositionMetadata.role),
+    };
+  });
 
+  const connectWalletText = t('components.connect-button.connect');
   const enableCollateralText = walletIsConnected
-    ? `${t('lineDetails:metadata.collateral-table.enable-asset')}`
-    : `${t('components.connect-button.connect')}`;
+    ? t('lineDetails:metadata.collateral-table.enable-asset')
+    : connectWalletText;
 
   const enableSpigotText = walletIsConnected
-    ? `${t('lineDetails:metadata.collateral-table.enable-spigot')}`
-    : `${t('components.connect-button.connect')}`;
+    ? t('lineDetails:metadata.collateral-table.enable-spigot')
+    : connectWalletText;
 
   const depositCollateralText = walletIsConnected
-    ? `${t('lineDetails:metadata.collateral-table.add-collateral')}`
-    : `${t('components.connect-button.connect')}`;
+    ? t('lineDetails:metadata.collateral-table.add-collateral')
+    : connectWalletText;
 
   const getCollateralTableActions = () => {
     switch (userPositionMetadata.role) {
@@ -282,12 +446,13 @@ export const LineMetadata = () => {
 
   const startDateHumanized = format(new Date(startTime * 1000), 'MMMM dd, yyyy');
   const endDateHumanized = format(new Date(endTime * 1000), 'MMMM dd, yyyy');
-  const revenueSplitFormatted: Metric[] = [];
-  revenueSplitFormatted.push({
-    title: `${t('lineDetails:metadata.borrower')}`,
-    data: 100 - Number(defaultSplit) + '%',
-  });
-  revenueSplitFormatted.push({ title: `${t('lineDetails:metadata.lender')}`, data: defaultSplit + '%' });
+  const revenueSplitFormatted: Metric[] = [
+    { title: `${t('lineDetails:metadata.lender')}`, data: defaultSplit + '%' },
+    {
+      title: `${t('lineDetails:metadata.borrower')}`,
+      data: 100 - Number(defaultSplit) + '%',
+    },
+  ];
 
   // TODO: fix types on args
   // TODO: What is the action button for revenue?
@@ -302,15 +467,16 @@ export const LineMetadata = () => {
           actions={[
             {
               name: t('components.transaction.deposit'),
-              handler: () => depositHandler(token),
+              handler: () => addCollateralHandler(token),
               disabled: !walletIsConnected,
             },
             {
               name: t('components.transaction.release'),
-              handler: () => withdrawHandler(token),
+              handler: () => releaseCollateralhandler(token),
               disabled: !walletIsConnected,
             },
           ]}
+          direction="row"
         />
       );
     }
@@ -328,99 +494,136 @@ export const LineMetadata = () => {
     // );
     return;
   };
+
   return (
     <>
-      <ThreeColumnLayout>
-        <MetricDataDisplay
-          title={t('lineDetails:metadata.principal')}
-          data={`$ ${humanize('amount', principal, 18, 2)}`}
-        />
-        <MetricDataDisplay title={t('lineDetails:metadata.deposit')} data={`$ ${humanize('amount', deposit, 18, 2)}`} />
-        <MetricDataDisplay
-          title={t('lineDetails:metadata.total-interest-paid')}
-          data={`$ ${humanize('amount', totalInterestRepaid, 18, 2)}`}
-        />
-        <MetricDataDisplay
-          title={t('lineDetails:metadata.revenue-split')}
-          data={''}
-          displaySubmetrics={true}
-          submetrics={revenueSplitFormatted}
-        />
-        <MetricDataDisplay title={t('lineDetails:metadata.min-cratio')} data={minCRatio + '%'} />
-        <MetricDataDisplay title={t('lineDetails:metadata.cratio')} data={cratio + '%'} />
-        <MetricDataDisplay
-          title={t('lineDetails:metadata.status')}
-          data={status[0].toUpperCase() + status.substring(1)}
-        />
-        <MetricDataDisplay title={t('lineDetails:metadata.start')} data={startDateHumanized} />
-        <MetricDataDisplay title={t('lineDetails:metadata.end')} data={endDateHumanized} />
-      </ThreeColumnLayout>
-      <SectionHeader>
-        {t('lineDetails:metadata.secured-by')}
-        <CollateralTypeName to={`/${network}/lines/${selectedLine?.id}/spigots/${selectedLine?.spigotId}`}>
-          {' '}
-          {t(`lineDetails:metadata.revenue.title`)}{' '}
-        </CollateralTypeName>
-        {' + '}
-        {t(`lineDetails:metadata.escrow.title`)}
-      </SectionHeader>
+      <MetadataContainer>
+        <Header>
+          <RouterLink to={`/${network}/portfolio/${borrower}`} key={borrower} selected={false} fontSize={'3rem'}>
+            <BorrowerName>
+              {t('lineDetails:metadata.borrower')} {'  :  '} {borrowerID}
+              <Redirect />
+            </BorrowerName>
+          </RouterLink>
+        </Header>
+        <ThreeColumnLayout>
+          <MetadataBox>
+            <MetadataRow>
+              <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.status')}</>}>
+                <StyledIcon Component={InfoIcon} size="1.5rem" />
+              </Tooltip>
+              <MetadataTitle>{t('lineDetails:metadata.status')}: </MetadataTitle>{' '}
+              <StatusWithColor status={status}>{status[0].toUpperCase() + status.substring(1)}</StatusWithColor>{' '}
+            </MetadataRow>
+            <MetadataRow>
+              <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.start')}</>}>
+                <StyledIcon Component={InfoIcon} size="1.5rem" />
+              </Tooltip>
+              <MetadataTitle>{t('lineDetails:metadata.start')}: </MetadataTitle> {startDateHumanized}
+            </MetadataRow>
+            <MetadataRow>
+              <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.end')}</>}>
+                <StyledIcon Component={InfoIcon} size="1.5rem" />
+              </Tooltip>
+              <MetadataTitle>{t('lineDetails:metadata.end')}: </MetadataTitle> {endDateHumanized}
+            </MetadataRow>
+            <MetadataRow>
+              <Tooltip
+                placement="bottom-start"
+                tooltipComponent={<>{t('lineDetails:metadata.tooltip.total-interest-paid')}</>}
+              >
+                <StyledIcon Component={InfoIcon} size="1.5rem" />
+              </Tooltip>
+              <MetadataTitle>{t('lineDetails:metadata.total-interest-paid')}: </MetadataTitle> $
+              {humanize('amount', totalInterestRepaid, BASE_DECIMALS, 2)}
+            </MetadataRow>
+          </MetadataBox>
+          <MetricDataDisplay
+            title={t('lineDetails:metadata.principal')}
+            description={t('lineDetails:metadata.tooltip.principal')}
+            data={`$ ${humanize('amount', principal, BASE_DECIMALS, 2)}`}
+          />
+          <MetricDataDisplay
+            title={t('lineDetails:metadata.deposit')}
+            description={t('lineDetails:metadata.tooltip.deposit')}
+            data={`$ ${humanize('amount', deposit, BASE_DECIMALS, 2)}`}
+          />
+        </ThreeColumnLayout>
+        <SectionHeader>
+          {t('lineDetails:metadata.secured-by')}
+          <CollateralTypeName to={`/${network}/lines/${selectedLine?.id}/spigots/${selectedLine?.spigotId}`}>
+            {' '}
+            {t(`lineDetails:metadata.revenue.title`)}{' '}
+          </CollateralTypeName>
+          {' + '}
+          {t(`lineDetails:metadata.escrow.title`)}
+        </SectionHeader>
 
-      {!revenue && !deposits && <MetricName>{t('lineDetails:metadata.unsecured')}</MetricName>}
+        {!revenue && !deposits && <MetricName>{t('lineDetails:metadata.unsecured')}</MetricName>}
 
-      <ThreeColumnLayout>
-        {renderSpigotMetadata()}
-        {renderEscrowMetadata()}
-      </ThreeColumnLayout>
-      <SectionHeader>{t('lineDetails:metadata.escrow.assets-list.title')}</SectionHeader>
-      <ViewContainer>
+        <ThreeColumnLayout>
+          {renderSpigotMetadata()}
+          {renderEscrowMetadata()}
+        </ThreeColumnLayout>
+      </MetadataContainer>
+      <>
         <AssetsListCard
-          header={' '}
+          header={'Collateral'}
           data-testid="line-assets-list"
           metadata={[
             {
               key: 'type',
               header: t('lineDetails:metadata.escrow.assets-list.type'),
+              description: t('lineDetails:metadata.escrow.tooltip.type'),
               transform: ({ type }) => (
                 <>
                   <Text>{type?.toUpperCase()}</Text>
                 </>
               ),
-              width: '10rem',
               sortable: true,
               className: 'col-type',
             },
             {
               key: 'token',
               header: t('lineDetails:metadata.escrow.assets-list.symbol'),
+              description: t('lineDetails:metadata.escrow.tooltip.symbol'),
               transform: ({ token: { symbol, icon, address } }) => (
-                <Link to={getEtherscanUrlStub(network) + `${address}`}>
-                  {icon && <TokenIcon icon={icon} symbol={symbol} />}
-                  <Text>{symbol}</Text>
-                  <RedirectLinkIcon />
-                </Link>
+                <TokenIconContainer>
+                  <TokenIcon icon={icon} symbol={symbol} size="small" margin="0.5rem" />
+                  <RouterLink
+                    key={address}
+                    to={`${explorerUrl}/address/${address}`}
+                    selected={false}
+                    fontSize={'1.2rem'}
+                  >
+                    {symbol}
+                    <RedirectLinkIcon />
+                  </RouterLink>
+                </TokenIconContainer>
               ),
-              width: '15rem',
               sortable: true,
               className: 'col-symbol',
             },
             {
               key: 'amount',
               header: t('lineDetails:metadata.escrow.assets-list.amount'),
-              transform: ({ token: { balance } }) => <Text ellipsis> {balance} </Text>,
+              description: t('lineDetails:metadata.escrow.tooltip.amount'),
+              format: ({ amount }) => `${humanize('amount', amount, BASE_DECIMALS, 2)}`,
               sortable: true,
-              width: '20rem',
               className: 'col-amount',
             },
             {
               key: 'value',
               header: t('lineDetails:metadata.escrow.assets-list.value'),
-              format: ({ value }) => `$ ${humanize('amount', value, 18, 2)}`,
+              description: t('lineDetails:metadata.escrow.tooltip.value'),
+              format: ({ value }) => `$ ${humanize('amount', value, BASE_DECIMALS, 2)}`,
               sortable: true,
-              width: '20rem',
               className: 'col-value',
             },
             {
               key: 'actions',
+              header: 'Actions',
+              description: t('lineDetails:metadata.escrow.tooltip.actions'),
               transform: ({ token, type }) => renderButtons(token, type),
               align: 'flex-end',
               width: 'auto',
@@ -434,7 +637,7 @@ export const LineMetadata = () => {
           initialSortBy="value"
           wrap
         />
-      </ViewContainer>
+      </>
     </>
   );
 };

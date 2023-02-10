@@ -6,7 +6,7 @@ import ExplorerBackground from './background.jpg';
 
 const explorerTheme: DefaultTheme = {
   ...sharedTheme,
-
+  name: 'explorer',
   background: {
     image: ExplorerBackground,
     position: 'right center',
@@ -72,6 +72,10 @@ const explorerTheme: DefaultTheme = {
         borderColor: '#F59E3D',
         color: '#F59E3D',
       },
+    },
+    accents: {
+      purp: '#8658DA',
+      gnar: '#20B10D',
     },
 
     txModalColors: {

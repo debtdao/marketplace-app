@@ -36,7 +36,7 @@ const onchainMetaDataReducer = createReducer(initialOnchainMetaDataState, (build
     })
 
     .addCase(getENS.rejected, (state, { error }) => {
-      console.log('error in getENS reducer: ', error);
+      // console.log('error in getENS reducer: ', error);
     })
 
     .addCase(getENS.pending, (state) => {

@@ -114,6 +114,7 @@ export interface CreditLineState {
     };
   };
   statusMap: {
+    addCredit: Status;
     getLines: Status;
     getLine: Status;
     // getLineEvents: Status;
@@ -155,7 +156,7 @@ export interface CollateralActionsStatusMap {
   getLineCollateralData: Status;
   approve: TokenCollateralMap;
   addCollateral: TokenCollateralMap;
-  enableCollateral: TokenCollateralMap;
+  enableCollateral: Status;
 
   addSpigot: Status;
   releaseSpigot: Status;

@@ -69,7 +69,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedEscrow = useAppSelector(CollateralSelectors.selectSelectedEscrow);
-
+  const collateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
   // need to get call statusMap from state for tx error messages
   //const collateralStatusMap = useAppSelector(CollateralSelectors.selectStatusMap);
 
@@ -78,17 +78,13 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionApproved, setTransactionApproved] = useState(true);
   const [transactionLoading, setLoading] = useState(false);
-  const [selectedCollateralAssetAddress, setSelectedCollateralAssetAddress] = useState('');
+  const [selectedCollateralAssetAddress, setSelectedCollateralAssetAddress] = useState(collateralOptions[0].address);
 
   // @cleanup CollateralSelectors.selectedCollateralAsset
   const selectedAssetAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress) || TOKEN_ADDRESSES.DAI;
 
-  // @cleanup TODO pull colalteralOptions from subgraph instread of default yearn tokens
-  const collateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
   const selectedAsset =
     _.find(collateralOptions, (t) => t.address === selectedCollateralAssetAddress) || collateralOptions[0];
-  console.log('Selected Collateral Asset: ', selectedAsset);
-  console.log('collateralOption', collateralOptions, selectedAsset);
 
   useEffect(() => {
     // if escrow not set yet then correct state
@@ -177,8 +173,9 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
     }
 
     const transactionData: EnableCollateralAssetProps = {
+      lineAddress: selectedLine!.id,
       escrowAddress: selectedEscrow.id,
-      token: selectedCollateralAssetAddress,
+      token: selectedAsset,
       network: walletNetwork,
       dryRun: false,
     };

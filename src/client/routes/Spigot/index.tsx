@@ -11,6 +11,7 @@ import {
   NetworkSelectors,
   CollateralSelectors,
   CollateralActions,
+  TokensActions,
 } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation, useIsMounting } from '@hooks';
 import { ViewContainer, SliderCard, SpigotDisplay } from '@components/app';
@@ -60,6 +61,7 @@ export const Spigot = () => {
   const { NETWORK_SETTINGS } = getConfig();
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const currentNetworkSettings = NETWORK_SETTINGS[currentNetwork];
+  const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
 
   useEffect(() => {
     if (!spigotAddress || !isValidAddress(spigotAddress)) {
@@ -71,7 +73,11 @@ export const Spigot = () => {
     // TODO: implement getSpigot gql query and replace dispatch to getLinePage
     // dispatch(CollateralActions.getSpigotPage({ id: spigotAddress }));
     if (spigotAddress && !selectedSpigot) {
-      dispatch(LinesActions.getLinePage({ id: lineAddress }));
+      if (tokensMap === undefined) {
+        dispatch(TokensActions.getTokens()).then(() => dispatch(LinesActions.getLinePage({ id: lineAddress })));
+      } else {
+        dispatch(LinesActions.getLinePage({ id: lineAddress }));
+      }
       dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
     }
 

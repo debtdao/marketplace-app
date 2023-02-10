@@ -4,6 +4,7 @@ import { sharedTheme } from '../default';
 
 const cyberpunkTheme: DefaultTheme = {
   ...sharedTheme,
+  name: 'cyberpunk',
   colors: {
     logo: '#0CA7C9',
 
@@ -65,7 +66,10 @@ const cyberpunkTheme: DefaultTheme = {
         color: '#3D305F',
       },
     },
-
+    accents: {
+      purp: '#8658DA',
+      gnar: '#20B10D',
+    },
     txModalColors: {
       background: '#523C6E',
       backgroundVariant: '#392850',

@@ -24,6 +24,10 @@ const light = {
       variant: '#475570',
       text: '#475570',
     },
+    accents: {
+      purp: '#8658DA',
+      gnar: '#20B10D',
+    },
     button: {
       filled: {
         primary: '#0657F9',
@@ -49,6 +53,7 @@ const light = {
 
 const lightTheme: DefaultTheme = {
   ...sharedTheme,
+  name: light.name,
   colors: {
     logo: light.colors.primary,
 
@@ -96,7 +101,10 @@ const lightTheme: DefaultTheme = {
         color: 'white',
       },
     },
-
+    accents: {
+      purp: '#8658DA',
+      gnar: '#20B10D',
+    },
     vaultActionButton: {
       background: light.colors.secondary,
       borderColor: light.colors.secondary,

@@ -35,6 +35,7 @@ import {
   GetUserPortfolioResponse,
   GetLineEventsResponse,
   LineEventFragResponse,
+  TokenView,
 } from '@types';
 
 // *************** USER ***************
@@ -189,6 +190,7 @@ export interface CreditLineService {
   getCredit: (contractAddress: string, id: BytesLike) => Promise<CreditPosition>;
   getLenderByCreditID: (contractAddress: string, id: BytesLike) => Promise<Address>;
   getInterestRateContract: (contractAddress: string) => Promise<Address>;
+  arbiter: (contractAddress: string) => Promise<Address>;
   borrower: (contractAddress: string) => Promise<Address>;
   isActive: (contractAddress: string) => Promise<boolean>;
   isBorrowing: (contractAddress: string) => Promise<boolean>;
@@ -213,7 +215,7 @@ export interface CreditLineService {
 
 export interface AddCreditProps {
   lineAddress: string;
-  token: Address;
+  token: TokenView;
   drate: BigNumber;
   frate: BigNumber;
   amount: BigNumber;
@@ -359,8 +361,9 @@ export interface GetUserPortfolioProps {
 // Colalteral Service Function Props
 export interface EnableCollateralAssetProps {
   // userPositionMetadata: UserPositionMetadata;
+  lineAddress: Address;
   escrowAddress: Address;
-  token: Address;
+  token: TokenView;
   network: Network;
   dryRun?: boolean;
 }
@@ -677,7 +680,10 @@ export interface LineFactoryService {
 
   deploySecuredLineWtihConfig(
     props: DeploySecuredLineWithConfigProps
-  ): Promise<TransactionResponse | PopulatedTransaction>;
+  ): Promise<[transaction: TransactionResponse | PopulatedTransaction, lineAddress: string]>;
 
   rolloverSecuredLine(props: RolloverSecuredLineProps): Promise<TransactionResponse | PopulatedTransaction>;
+
+  // view functions
+  arbiter(network: string): Promise<string>;
 }

@@ -88,7 +88,6 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
     allowTokenSelect: true,
   });
   const positionToken = selectedPosition?.token ?? selectedSellToken;
-
   const acceptingOffer = props.acceptingOffer || (userMetadata.role === BORROWER_POSITION_ROLE && !!selectedPosition);
 
   //state for params
@@ -97,19 +96,18 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const [transactionApproved, setTransactionApproved] = useState(true);
   const [transactionLoading, setLoading] = useState(false);
   const [targetTokenAmount, setTargetTokenAmount] = useState('0');
-  const [drate, setDrate] = useState('');
-  const [frate, setFrate] = useState('');
+  const [drate, setDrate] = useState('0');
+  const [frate, setFrate] = useState('0');
   const [lenderAddress, setLenderAddress] = useState(walletAddress ? walletAddress : '');
   const [selectedTokenAddress, setSelectedTokenAddress] = useState('');
   const [transactionType, setTransactionType] = useState('propose');
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
 
-  console.log('selectedPosition', selectedPosition, selectedCredit);
   useEffect(() => {
     if (selectedPosition?.status === PROPOSED_STATUS && selectedProposal) {
       // set values based on selectedProposal
-      const [dRate, fRate, deposit, tokenAddress, lenderAddress] = [...selectedProposal.args];
+      const [dRate, fRate, deposit, tokenAddress, lenderAddress] = selectedProposal.args;
       setTargetTokenAmount(normalizeAmount(deposit, selectedPosition.token.decimals));
       setSelectedTokenAddress(tokenAddress);
       setDrate(normalizeAmount(dRate, 0));
@@ -118,14 +116,6 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       setTransactionType('accept');
     }
   }, [selectedPosition]);
-
-  // if(1selectedSellToken || selectedSellToken?.address !== selectedPosition?.token.address) {
-  //   setSelectedTokenAddress(selectedPosition?.token.address);
-  //   dispatch(
-  //     TokensActions.setSelectedTokenAddress({
-  //       tokenAddress: selectedPosition?.token.address,
-  //     });
-  // }
 
   useEffect(() => {
     if (!selectedSellToken) {
@@ -226,13 +216,13 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       drate: BigNumber.from(drate),
       frate: BigNumber.from(frate),
       amount: BigNumber.from(amountInWei),
-      token: positionToken.address,
+      token: positionToken,
       lender: lenderAddress,
       network: walletNetwork!,
       dryRun: false,
     };
 
-    dispatch(LinesActions.addCredit(transactionObj)).then((res) => {
+    dispatch(LinesActions.addCredit({ transactionType, position: transactionObj })).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
         setTransactionApproved(transactionApproved);
         setLoading(false);
@@ -241,17 +231,15 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         if (!selectedPosition) {
           return;
         }
-        const updatedPosition = addCreditUpdate(selectedPosition);
+        const updatedPosition = addCreditUpdate(selectedPosition, selectedProposal!);
         dispatch(
           LinesActions.setPosition({
             id: selectedPosition.id,
             position: updatedPosition,
           })
         );
-        setTransactionCompleted(1);
-        setLoading(false);
       }
-      if (res.meta.requestStatus === 'fulfilled' && transactionType === 'propose') {
+      if (res.meta.requestStatus === 'fulfilled') {
         setTransactionCompleted(1);
         setLoading(false);
       }

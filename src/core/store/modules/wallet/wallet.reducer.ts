@@ -41,7 +41,7 @@ const walletReducer = createReducer(walletInitialState, (builder) => {
       state.selectedAddress = address ? getAddress(address) : undefined;
     })
     .addCase(networkChange, (state, { payload: { network } }) => {
-      console.log('subgraph wallet networkChange reducer: ', network);
+      // console.log('subgraph wallet networkChange reducer: ', network);
       state.networkVersion = network;
     })
     // Use networkId to set the state

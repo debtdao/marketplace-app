@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { BigNumber } from 'ethers';
 
 import {
+  initialStatus,
   CollateralState,
   CollateralActionsStatusMap,
   CollateralModule,
@@ -11,6 +12,11 @@ import {
   CollateralEvent,
   BaseEscrowDepositFragResponse,
   ReservesMap,
+  AggregatedEscrow,
+  EscrowDepositMap,
+  RevenueSummaryMap,
+  COLLATERAL_TYPE_ASSET,
+  COLLATERAL_TYPE_REVENUE,
 } from '@types';
 import { formatCollateralEvents, formatSpigotCollateralEvents } from '@src/utils';
 
@@ -21,7 +27,7 @@ import { CollateralActions } from './collateral.actions';
 export const initialCollateralActionsStatusMap: CollateralActionsStatusMap = {
   approve: {},
   addCollateral: {},
-  enableCollateral: {},
+  enableCollateral: initialStatus,
   addSpigot: {},
   releaseSpigot: {},
   updateOwnerSplit: {},
@@ -42,7 +48,7 @@ export const collateralInitialState: CollateralState = {
   statusMap: initialCollateralActionsStatusMap,
 };
 
-const { getLines, getLinePage, getUserPortfolio } = LinesActions;
+const { deploySecuredLineWithConfig, getLines, getLinePage, getUserPortfolio } = LinesActions;
 
 const {
   setSelectedEscrow,
@@ -53,6 +59,7 @@ const {
   enableCollateral,
   addSpigot,
   tradeable,
+  releaseCollateral,
 } = CollateralActions;
 
 const collateralReducer = createReducer(collateralInitialState, (builder) => {
@@ -73,24 +80,47 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
       state.selectedCollateralAsset = assetAddress;
     })
     /* -------------------------------- enableCollateral ------------------------------- */
-    .addCase(enableCollateral.pending, (state, payload) => {
-      // state.statusMap.enableCollateral = { loading: true };
+    .addCase(enableCollateral.pending, (state) => {
+      state.statusMap.enableCollateral = { loading: true };
     })
-    .addCase(enableCollateral.fulfilled, (state, payload) => {
-      // state.statusMap.enableCollateral = {};
-    })
+    .addCase(
+      enableCollateral.fulfilled,
+      (state, { payload: { escrowDeposit, lineAddress, contract, token, success } }) => {
+        const escrow = state.collateralMap[contract] as AggregatedEscrow;
+        const escrowDeposits = escrow.deposits ?? ({} as EscrowDepositMap);
+        escrowDeposits[token.address] = escrowDeposit;
+        state.collateralMap[contract] = { ...escrow, deposits: escrowDeposits };
+      }
+    )
     .addCase(enableCollateral.rejected, (state, { error }) => {
-      // state.statusMap.enableCollateral = { error: error.message };
+      state.statusMap.enableCollateral = { error: error.message };
     })
     /* -------------------------------- addCollateral ------------------------------- */
     .addCase(addCollateral.pending, (state, payload) => {
-      // state.statusMap.addCollateral = { loading: true };
+      state.statusMap.enableCollateral = { loading: true };
     })
-    .addCase(addCollateral.fulfilled, (state, payload) => {
-      // state.statusMap.addCollateral = {};
+    .addCase(addCollateral.fulfilled, (state, { payload: { contract, token, amount, success } }) => {
+      const escrow = state.collateralMap[contract] as AggregatedEscrow;
+      const escrowDeposits = escrow.deposits ?? ({} as EscrowDepositMap);
+      escrowDeposits[token].amount = BigNumber.from(escrowDeposits[token].amount).add(amount).toString();
+      state.collateralMap[contract] = { ...escrow, deposits: escrowDeposits };
     })
     .addCase(addCollateral.rejected, (state, { error }) => {
-      // _.assignIn(state.statusMap.addCollateral, { [contract]: { [token]: { error: error.message } } });
+      state.statusMap.enableCollateral = { error: error.message };
+    })
+
+    /* -------------------------------- releaseCollateral ------------------------------- */
+    .addCase(releaseCollateral.pending, (state, payload) => {
+      state.statusMap.enableCollateral = { loading: true };
+    })
+    .addCase(releaseCollateral.fulfilled, (state, { payload: { contract, token, amount, success } }) => {
+      const escrow = state.collateralMap[contract] as AggregatedEscrow;
+      const escrowDeposits = escrow.deposits ?? ({} as EscrowDepositMap);
+      escrowDeposits[token].amount = BigNumber.from(escrowDeposits[token].amount).sub(amount).toString();
+      state.collateralMap[contract] = { ...escrow, deposits: escrowDeposits };
+    })
+    .addCase(releaseCollateral.rejected, (state, { error }) => {
+      state.statusMap.enableCollateral = { error: error.message };
     })
 
     /* ---------------------------------- addSpigot ----------------------------------------*/
@@ -104,6 +134,30 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
     })
 
     // State changes from non collateral actions
+
+    /* -------------------------------- deploySecuredLineWithConfig ------------------------------- */
+    .addCase(deploySecuredLineWithConfig.fulfilled, (state, { payload: { lineAddress, lineObj, deployData } }) => {
+      const { escrowId, spigotId } = lineObj;
+      if (!lineAddress || !escrowId || !spigotId) return;
+      const { cratio } = deployData;
+      const escrow = {
+        id: escrowId,
+        cratio: '0',
+        collateralValue: '0',
+        minCRatio: Math.round(Number(cratio.toString())) / 100,
+        deposits: {} as EscrowDepositMap,
+        type: COLLATERAL_TYPE_ASSET,
+        line: lineAddress,
+      };
+      const spigot = {
+        id: spigotId,
+        revenueValue: '0',
+        revenueSummary: {} as RevenueSummaryMap,
+        type: COLLATERAL_TYPE_REVENUE,
+        line: lineAddress,
+      };
+      state.collateralMap = { ...state.collateralMap, [escrowId]: escrow, [spigotId]: spigot };
+    })
 
     /* -------------------------------- getLines ------------------------------- */
     .addCase(getLines.fulfilled, (state, { payload: { linesData: lines } }) => {

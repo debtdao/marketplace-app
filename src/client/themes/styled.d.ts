@@ -106,6 +106,7 @@ declare module 'styled-components' {
 
   // TODO Restructure theme and generic vars shared between themes
   export interface DefaultTheme extends SharedTheme {
+    name: string;
     colors: {
       logo: string;
 
@@ -154,6 +155,11 @@ declare module 'styled-components' {
           background: string;
           color: string;
         };
+      };
+
+      accents: {
+        purp: string;
+        gnar: string;
       };
 
       vaultActionButton: {

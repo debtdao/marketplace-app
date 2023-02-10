@@ -220,16 +220,16 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
     },
   ];
   const txActions = userMetadata.role === BORROWER_POSITION_ROLE ? escrowCollateralSettings : [];
-  console.log('escrow collateral settings: ', escrowCollateralSettings);
 
-  console.log('selected collat', selectedCollateralAsset);
   if (!selectedCollateralAsset) return null;
   const tokenView = _.find(allCollateralOptions, (t) => t.address === getAddress(selectedCollateralAsset.address));
-  console.log('add collat', tokenView);
   if (!tokenView) return null;
   if (!selectedLine) return null;
 
-  const targetBalance = normalizeAmount(tokenView.balance, tokenView.decimals);
+  const targetBalance = normalizeAmount(
+    selectedEscrow!.deposits![selectedCollateralAssetAddress].amount,
+    selectedEscrow!.deposits![selectedCollateralAssetAddress].token.decimals
+  );
   const tokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(targetBalance, 4)}`;
 
   if (transactionCompleted === 1) {

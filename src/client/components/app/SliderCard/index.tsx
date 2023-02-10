@@ -58,9 +58,7 @@ const StyledCardContent = styled(CardContent)`
 
 const CardBackground = styled.div`
   display: flex;
-  border: 2px solid ${({ theme }) => theme.colors.primary};
   border-radius: ${({ theme }) => theme.globalRadius};
-  margin: -2px;
   overflow: hidden;
   position: relative;
   width: 100%;
@@ -87,7 +85,7 @@ const StyledCard = styled(Card)`
   display: flex;
   padding: 0;
   background: ${({ theme }) => theme.colors.backgroundVariant};
-  border: 2px solid ${({ theme }) => theme.colors.primary};
+  box-shadow: ${({ theme }) => `inset ${theme.colors.accents.purp} 0 0 ${theme.spacing.sm};`}
   color: ${({ theme }) => theme.colors.primary};
   min-width: 28rem;
   position: relative;

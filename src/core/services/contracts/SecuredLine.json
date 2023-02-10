@@ -380,8 +380,27 @@
       {
         "indexed": false,
         "internalType": "bytes32",
-        "name": "_consentHash",
+        "name": "proposalId",
         "type": "bytes32"
+      }
+    ],
+    "name": "MutualConsentAccepted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "proposalId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "taker",
+        "type": "address"
       }
     ],
     "name": "MutualConsentRegistered",
@@ -391,15 +410,9 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
         "indexed": false,
         "internalType": "bytes32",
-        "name": "_toRevoke",
+        "name": "proposalId",
         "type": "bytes32"
       }
     ],
@@ -629,13 +642,7 @@
   {
     "inputs": [],
     "name": "accrueInterest",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -770,13 +777,7 @@
       }
     ],
     "name": "borrow",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -850,13 +851,7 @@
       }
     ],
     "name": "close",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "payable",
     "type": "function"
   },
@@ -948,13 +943,7 @@
   {
     "inputs": [],
     "name": "declareInsolvent",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -974,13 +963,7 @@
   {
     "inputs": [],
     "name": "depositAndClose",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "payable",
     "type": "function"
   },
@@ -993,13 +976,7 @@
       }
     ],
     "name": "depositAndRepay",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "payable",
     "type": "function"
   },
@@ -1062,26 +1039,14 @@
       }
     ],
     "name": "increaseCredit",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "payable",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "init",
-    "outputs": [
-      {
-        "internalType": "enum LineLib.STATUS",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -1149,7 +1114,7 @@
         "type": "bytes32"
       }
     ],
-    "name": "mutualConsents",
+    "name": "mutualConsentProposals",
     "outputs": [
       {
         "internalType": "address",
@@ -1188,6 +1153,21 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint128",
+        "name": "",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "",
+        "type": "uint128"
       }
     ],
     "stateMutability": "view",
@@ -1247,13 +1227,7 @@
       }
     ],
     "name": "rollover",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -1276,13 +1250,7 @@
       }
     ],
     "name": "setRates",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -1315,13 +1283,7 @@
   {
     "inputs": [],
     "name": "stepQ",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -1499,13 +1461,7 @@
       }
     ],
     "name": "withdraw",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },

@@ -7,7 +7,7 @@ import { getAddress } from 'ethers/lib/utils';
 import { device } from '@themes/default';
 import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
-import { BASE_DECIMALS, prettyNumbers, unnullify } from '@src/utils';
+import { BASE_DECIMALS, prettyNumbers, unnullify, normalizeAmount } from '@src/utils';
 import {
   AggregatedEscrow,
   ARBITER_POSITION_ROLE,
@@ -336,7 +336,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
             <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.min-cratio')}</>}>
               <StyledIcon Component={InfoIcon} size="1.5rem" />
             </Tooltip>
-            <MetadataTitle>{t('lineDetails:metadata.min-cratio')}: </MetadataTitle> {minCRatio}%
+            <MetadataTitle>{t('lineDetails:metadata.min-cratio')}: </MetadataTitle>{' '}
+            {normalizeAmount(minCRatio.toString(), 2)}%
           </MetadataRow>
         </MetadataBox>
         <MetricDataDisplay

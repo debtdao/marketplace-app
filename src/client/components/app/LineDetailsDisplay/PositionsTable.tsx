@@ -125,6 +125,8 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
   const { NETWORK } = getEnv();
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
+  const { escrow } = selectedLine!;
+  const { minCRatio, cratio } = escrow!;
 
   // Initial set up for positions table
   useEffect(() => {
@@ -211,7 +213,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
       const borrowAction = {
         name: t('components.transaction.borrow'),
         handler: borrowHandler,
-        disabled: false,
+        disabled: Number(cratio) <= minCRatio ? true : false,
       };
 
       if (position.deposit === position.principal) return [repayAction];

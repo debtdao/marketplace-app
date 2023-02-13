@@ -332,7 +332,10 @@ export const LineMetadata = (props: LineMetadataProps) => {
               <StyledIcon Component={InfoIcon} size="1.5rem" />
             </Tooltip>
             <MetadataTitle>{t('lineDetails:metadata.cratio')}: </MetadataTitle>{' '}
-            <CratioWithColor diff={Number(cratio) - Number(minCRatio)}>{normalizeAmount(cratio, 2)}%</CratioWithColor>
+            <CratioWithColor diff={Number(cratio) - Number(minCRatio)}>
+              {' '}
+              {Number(principal) === 0 ? '∞' : normalizeAmount(cratio, 2)} %
+            </CratioWithColor>
           </MetadataRow>
           <MetadataRow>
             <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.min-cratio')}</>}>

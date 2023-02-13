@@ -385,7 +385,7 @@ export const formatSecuredLineData = (
     collateralValue: formatUnits(unnullify(collateralValue), 6).toString(),
     cratio: parseUnits(credit.principal.toString(), 'ether').eq(0)
       ? '0'
-      : String(Number(BigNumber.from(10000).mul(collateralValue).div(credit.principal).toString()) / 100),
+      : String(Number(BigNumber.from(10000).mul(collateralValue).div(credit.principal).toString())),
     minCRatio: escrow.minCRatio,
     events: escrowCollateralEvents,
     deposits,
@@ -434,7 +434,7 @@ export const formatSecuredLineData = (
   };
 
   const positions = createPositionsMap(positionFrags, tokenPrices);
-
+  console.log('CRATIO', aggregatedEscrow.cratio);
   return {
     credit: {
       highestApy,

@@ -18,7 +18,7 @@ import { getENS } from '@src/utils';
 import { useExplorerURL } from '@src/client/hooks/useExplorerURL';
 
 import { ActionButtons } from '../ActionButtons';
-import { BorrowerName } from '../LineDetailsDisplay';
+// import { BorrowerName } from '../LineDetailsDisplay';
 
 import { SpigotMetadata } from './SpigotMetadata';
 
@@ -44,6 +44,10 @@ const Header = styled.h1`
     font-size: ${theme.fonts.sizes.xl};
     color: ${theme.colors.titles};
   `};
+`;
+
+const BorrowerName = styled(Text)`
+  max-width: 100%;
 `;
 
 const RouterLink = styled(Link)<{ selected: boolean }>`

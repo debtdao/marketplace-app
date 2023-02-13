@@ -5,9 +5,9 @@ import { format } from 'date-fns';
 import { getAddress } from 'ethers/lib/utils';
 
 import { device } from '@themes/default';
-import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL } from '@hooks';
+import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL, useWindowDimensions } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
-import { BASE_DECIMALS, prettyNumbers, unnullify, normalizeAmount } from '@src/utils';
+import { BASE_DECIMALS, prettyNumbers, unnullify, normalizeAmount, formatAddress } from '@src/utils';
 import {
   AggregatedEscrow,
   ARBITER_POSITION_ROLE,
@@ -26,7 +26,7 @@ import {
   REPAID_STATUS,
   INSOLVENT_STATUS,
 } from '@src/core/types';
-import { DetailCard, ActionButtons, TokenIcon, ViewContainer, BorrowerName } from '@components/app';
+import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
 import { Button, Text, RedirectIcon, Link, CardEmptyList, Tooltip, InfoIcon, Icon } from '@components/common';
 import {
   LinesSelectors,
@@ -48,6 +48,11 @@ const SectionHeader = styled.h3`
     margin: ${theme.spacing.xl} 0;
     color: ${theme.colors.primary};
   `}
+  @media ${device.mobile} {
+    flex-wrap: wrap;
+    font-size: ${({ theme }) => theme.fonts.sizes.lg};
+    margin: ${({ theme }) => `${theme.spacing.lg} 0`};
+  }
 `;
 
 const CollateralTypeName = styled(Link)`
@@ -57,6 +62,12 @@ const CollateralTypeName = styled(Link)`
     margin: 0 ${theme.fonts.sizes.sm};
     color: ${theme.colors.primary};
   `}
+  @media ${device.mobile} {
+    ${({ theme }) => `
+    font-size: ${theme.fonts.sizes.lg};
+    margin: 0 ${theme.fonts.sizes.xs};
+  `}
+  }
 `;
 
 const MetricContainer = styled.div`
@@ -142,11 +153,25 @@ const RedirectLinkIcon = styled(RedirectIcon)`
 `;
 
 const Header = styled.h1`
+  display: flex;
   ${({ theme }) => `
     margin-bottom: ${theme.spacing.xl};
     font-size: ${theme.fonts.sizes.xl};
     color: ${theme.colors.titles};
-  `};
+  `}
+`;
+
+const BorrowerName = styled(Text)`
+  display: flex;
+  max-width: 100%;
+  margin-left: 1rem;
+  align-items: center;
+  @media ${device.mobile} {
+    ${({ theme }) => `
+      font-size: ${theme.fonts.sizes.md};
+      margin-left: 0.5rem;
+   `}
+  }
 `;
 
 const Redirect = styled(RedirectIcon)`
@@ -155,12 +180,16 @@ const Redirect = styled(RedirectIcon)`
   width: 1.2rem;
   margin-left: 2rem;
   padding-bottom: 0.2rem;
+  @media ${device.mobile} {
+    ${({ theme }) => `
+      margin-left: 1.0rem;
+   `}
+  }
 `;
 
 const RouterLink = styled(Link)<{ selected: boolean; fontSize: string }>`
   display: flex;
   flex-direction: row;
-  align-items: center;
   color: inherit;
   flex: 1;
   width: 100%;
@@ -177,6 +206,9 @@ const RouterLink = styled(Link)<{ selected: boolean; fontSize: string }>`
     `
     color: ${props.theme.colors.titlesVariant};
   `}
+  @media ${device.mobile} {
+    align-items: flex-start;
+  }
 `;
 
 const TokenIconContainer = styled.div`
@@ -255,6 +287,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
+  const { isMobile } = useWindowDimensions();
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const dispatch = useAppDispatch();
   const { NETWORK } = getEnv();
@@ -501,8 +534,9 @@ export const LineMetadata = (props: LineMetadataProps) => {
       <MetadataContainer>
         <Header>
           <RouterLink to={`/${network}/portfolio/${borrower}`} key={borrower} selected={false} fontSize={'3rem'}>
+            {t('lineDetails:metadata.borrower')} {'  :  '}
             <BorrowerName>
-              {t('lineDetails:metadata.borrower')} {'  :  '} {borrowerID}
+              {isMobile ? formatAddress(borrowerID) : borrowerID}
               <Redirect />
             </BorrowerName>
           </RouterLink>

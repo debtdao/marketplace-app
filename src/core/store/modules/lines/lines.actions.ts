@@ -251,6 +251,22 @@ const getExpectedTransactionOutcome = createAsyncThunk<
   }
 );
 
+export interface GetInterestAccruedProps {
+  contractAddress: string;
+  id: BytesLike;
+}
+
+const getInterestAccrued = createAsyncThunk<{ amount: BigNumber }, GetInterestAccruedProps, ThunkAPI>(
+  'lines/getInterestAccrued',
+  async (props, { getState, extra }) => {
+    const { services } = extra;
+    const { creditLineService } = services;
+    const { contractAddress, id } = props;
+    const interestAccrued = await creditLineService.getInterestAccrued(contractAddress, id);
+    return { amount: interestAccrued };
+  }
+);
+
 /* -------------------------------------------------------------------------- */
 /*                             Transaction Methods                            */
 /* -------------------------------------------------------------------------- */
@@ -911,6 +927,7 @@ export const LinesActions = {
   getLinePage,
   getUserLinePositions,
   getUserPortfolio,
+  getInterestAccrued,
 
   approveDeposit,
   addCredit,

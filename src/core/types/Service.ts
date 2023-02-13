@@ -187,6 +187,7 @@ export interface CreditLineService {
 
   // helpers
   getFirstID: (contractAddress: string) => Promise<BytesLike>;
+  getInterestAccrued: (contractAddress: string, id: BytesLike) => Promise<BigNumber>;
   getCredit: (contractAddress: string, id: BytesLike) => Promise<CreditPosition>;
   getLenderByCreditID: (contractAddress: string, id: BytesLike) => Promise<Address>;
   getInterestRateContract: (contractAddress: string) => Promise<Address>;

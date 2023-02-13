@@ -1,4 +1,4 @@
-import { ContractFunction, ethers, PopulatedTransaction } from 'ethers';
+import { ContractFunction, ethers, PopulatedTransaction, BigNumber } from 'ethers';
 import { BytesLike } from '@ethersproject/bytes/src.ts';
 import { keccak256 } from 'ethers/lib/utils';
 
@@ -397,6 +397,10 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   public async getLenderByCreditID(contractAddress: string, id: BytesLike): Promise<Address> {
     return (await this._getContract(contractAddress).credits(id)).lender;
+  }
+
+  public async getInterestAccrued(contractAddress: string, id: BytesLike): Promise<BigNumber> {
+    return await this._getContract(contractAddress).interestAccrued(id);
   }
 
   public async getInterestRateContract(contractAddress: string): Promise<Address> {

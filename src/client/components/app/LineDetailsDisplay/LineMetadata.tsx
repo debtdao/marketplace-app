@@ -97,6 +97,10 @@ export const MetadataContainer = styled.div`
   filter: brightness(1.2);
   padding: ${({ theme }) => theme.card.padding};
   border-radius: ${({ theme }) => theme.globalRadius};
+  // @media ${device.mobile} {
+  //   padding-left: 1rem;
+  //   padding-right: 1rem;
+  // }
 `;
 
 const MetadataBox = styled.div`
@@ -206,9 +210,6 @@ const RouterLink = styled(Link)<{ selected: boolean; fontSize: string }>`
     `
     color: ${props.theme.colors.titlesVariant};
   `}
-  @media ${device.mobile} {
-    align-items: flex-start;
-  }
 `;
 
 const TokenIconContainer = styled.div`
@@ -510,7 +511,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
               disabled: !walletIsConnected,
             },
           ]}
-          direction="row"
         />
       );
     }
@@ -645,7 +645,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
               description: t('lineDetails:metadata.escrow.tooltip.amount'),
               format: ({ amount }) => `${humanize('amount', amount, BASE_DECIMALS, 2)}`,
               sortable: true,
-              className: 'col-amount',
+              className: 'col-assets',
             },
             {
               key: 'value',
@@ -653,7 +653,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
               description: t('lineDetails:metadata.escrow.tooltip.value'),
               format: ({ value }) => `$ ${humanize('amount', value, BASE_DECIMALS, 2)}`,
               sortable: true,
-              className: 'col-value',
+              className: 'col-assets',
             },
             {
               key: 'actions',
@@ -661,7 +661,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
               description: t('lineDetails:metadata.escrow.tooltip.actions'),
               transform: ({ token, type }) => renderButtons(token, type),
               align: 'flex-end',
-              width: 'auto',
               grow: '1',
             },
           ]}

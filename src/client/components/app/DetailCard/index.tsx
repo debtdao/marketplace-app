@@ -3,6 +3,8 @@ import styled from 'styled-components';
 
 import { Card, CardHeader, CardContent, CardElement, CardEmptyList, ToggleButton } from '@components/common';
 import { sort } from '@utils';
+import { device } from '@themes/default';
+import { useWindowDimensions } from '@hooks';
 
 const StyledCardElement = styled(CardElement)<{ stripes?: boolean }>`
   display: flex;
@@ -33,6 +35,11 @@ const StyledCardElement = styled(CardElement)<{ stripes?: boolean }>`
       background-color: ${theme.colors.surfaceVariantA};
     }
   `}
+
+  @media ${device.mobile} {
+    padding-left: 0rem;
+    padding-right: 0rem;
+  }
 `;
 
 const TitleCardElement = styled(CardElement)`
@@ -43,6 +50,9 @@ const TitleCardElement = styled(CardElement)`
   align-items: flex-start;
   &:last-child {
     align-items: flex-end;
+  }
+  @media ${device.mobile} {
+    padding: 0rem;
   }
 `;
 
@@ -78,6 +88,9 @@ const SectionContent = styled.div`
   display: flex;
   grid-gap: 0.5rem;
   align-items: center;
+  @media ${device.mobile} {
+    margin-bottom: 2rem;
+  }
 `;
 
 interface Metadata<T> {
@@ -124,6 +137,7 @@ export const DetailCard = <T,>({
   filterLabel,
   ...props
 }: DetailCardProps<T>) => {
+  const { isMobile } = useWindowDimensions();
   const [sortedData, setSortedData] = useState(initialSortBy ? sort(data, initialSortBy) : data);
   const [sortedBy, setSortedBy] = useState(initialSortBy);
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
@@ -152,23 +166,44 @@ export const DetailCard = <T,>({
 
   return (
     <StyledCard {...props}>
-      <StyledCardHeader header={header}>
-        <SectionContent>
-          {!!filterBy && (
-            <>
-              {filterLabel}
-              <ToggleButton
-                ariaLabel={filterLabel}
-                selected={filterToggle}
-                setSelected={setFilterToggle}
-                data-testid="filter-toggle"
-                data-active={filterToggle}
-              />
-            </>
-          )}
-          {SearchBar}
-        </SectionContent>
-      </StyledCardHeader>
+      {!isMobile ? (
+        <StyledCardHeader header={header}>
+          <SectionContent>
+            {!!filterBy && (
+              <>
+                {filterLabel}
+                <ToggleButton
+                  ariaLabel={filterLabel}
+                  selected={filterToggle}
+                  setSelected={setFilterToggle}
+                  data-testid="filter-toggle"
+                  data-active={filterToggle}
+                />
+              </>
+            )}
+            {SearchBar}
+          </SectionContent>
+        </StyledCardHeader>
+      ) : (
+        <>
+          <StyledCardHeader header={header}></StyledCardHeader>
+          <SectionContent>
+            {!!filterBy && (
+              <>
+                {filterLabel}
+                <ToggleButton
+                  ariaLabel={filterLabel}
+                  selected={filterToggle}
+                  setSelected={setFilterToggle}
+                  data-testid="filter-toggle"
+                  data-active={filterToggle}
+                />
+              </>
+            )}
+            {SearchBar}
+          </SectionContent>
+        </>
+      )}
 
       {!!displayData.length && (
         <CardContent>

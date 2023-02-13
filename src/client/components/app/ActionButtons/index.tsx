@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 import { Button, Icon, WarningFilledIcon } from '@components/common';
+import { device } from '@themes/default';
 
 const ActionButtonsContainer = styled.div<{ actions: number; direction?: string }>`
   display: flex;
@@ -35,6 +36,11 @@ const ActionButton = styled(Button)<{ hide?: boolean }>`
   border: 2px solid ${({ theme }) => theme.colors.vaultActionButton.borderColor};
   padding: 0 1.6rem;
   width: 9.6rem;
+
+  // @media ${device.mobile} {
+  //   width: 7.5rem;
+  //   padding: 0 1rem;
+  // }
 
   ${({ hide }) => hide && `visibility: hidden;`}
 

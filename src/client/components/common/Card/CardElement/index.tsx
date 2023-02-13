@@ -2,6 +2,7 @@ import { FC, ReactNode } from 'react';
 import styled from 'styled-components';
 
 import { Icon, ArrowDownIcon, IconProps, InfoIcon, Tooltip, TooltipProps } from '@components/common';
+import { useWindowDimensions } from '@hooks';
 
 const Container = styled.div<{ width?: string; align?: string; grow?: string; fontWeight?: number }>`
   display: flex;
@@ -112,14 +113,17 @@ export const CardElement: FC<CardElementProps> = ({
   className,
   ...props
 }) => {
+  const { isMobile } = useWindowDimensions();
   return (
     <Container width={width} align={align} grow={grow} fontWeight={fontWeight} className={className} {...props}>
       {header && (
         <Header onClick={onClick}>
           {header}
-          <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
-            <Icon Component={InfoIcon} size="1.5rem" />
-          </Tooltip>
+          {!isMobile && (
+            <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
+              <Icon Component={InfoIcon} size="1.5rem" />
+            </Tooltip>
+          )}
 
           {/* TODO: Add styled tooltip back once css issues are fixed */}
           {/* <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>

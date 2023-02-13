@@ -74,7 +74,6 @@ const RouterLink = styled(Link)<{ selected: boolean }>`
   color: inherit;
   font-size: 1.2rem;
   flex: 1;
-  padding: 0.5rem;
 
   &:hover span {
     filter: brightness(90%);
@@ -390,21 +389,21 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
               header: t('components.positions-card.line'),
               description: t('components.positions-card.tooltip.line'),
               sortable: true,
-              className: 'col-apy',
+              className: 'col-assets',
             },
             {
               key: 'lender',
               header: t('components.positions-card.lender'),
               description: t('components.positions-card.tooltip.lender'),
               sortable: true,
-              className: 'col-available',
+              className: 'col-assets',
             },
             {
               key: 'token',
               header: t('components.positions-card.token'),
               description: t('components.positions-card.tooltip.token'),
               sortable: true,
-              className: 'col-available',
+              className: 'col-token',
             },
             {
               key: 'deposit',

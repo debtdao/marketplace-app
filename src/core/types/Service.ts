@@ -182,7 +182,7 @@ export interface CreditLineService {
   borrow: (props: BorrowCreditProps) => Promise<TransactionResponse | PopulatedTransaction>;
   withdraw: (props: WithdrawLineProps) => Promise<TransactionResponse | PopulatedTransaction>;
   revokeConsent: (props: RevokeConsentProps) => Promise<TransactionResponse | PopulatedTransaction>;
-  // setRates: (props: SetRatesProps) => Promise<TransactionResponse | PopulatedTransaction>;
+  setRates: (props: SetRatesProps) => Promise<TransactionResponse | PopulatedTransaction>;
   // increaseCredit: (props: IncreaseCreditProps) => Promise<TransactionResponse | PopulatedTransaction>;
 
   // helpers
@@ -327,6 +327,8 @@ export interface InterestRateAccrueInterestProps {
   drawnBalance: BigNumber;
   facilityBalance: BigNumber;
 }
+
+
 
 export interface GetLineProps extends GetLineArgs {
   id: string;

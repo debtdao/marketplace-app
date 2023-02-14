@@ -139,6 +139,12 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   // TODO: replace usage in useFundsForClosing with appropriate value
 
   useEffect(() => {
+    if (selectedPosition && selectedLine?.id) {
+      dispatch(LinesActions.getInterestAccrued({ contractAddress: selectedLine.id, id: selectedPosition.id }));
+    }
+  }, []);
+
+  useEffect(() => {
     if (!selectedSellToken && !_.isEmpty(sourceAssetOptions)) {
       dispatch(
         TokensActions.setSelectedTokenAddress({

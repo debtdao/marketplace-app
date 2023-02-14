@@ -263,6 +263,7 @@ const getInterestAccrued = createAsyncThunk<{ amount: BigNumber }, GetInterestAc
     const { creditLineService } = services;
     const { contractAddress, id } = props;
     const interestAccrued = await creditLineService.getInterestAccrued(contractAddress, id);
+    console.log(interestAccrued.toString());
     return { amount: interestAccrued };
   }
 );

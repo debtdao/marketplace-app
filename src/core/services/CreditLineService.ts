@@ -127,7 +127,7 @@ export class CreditLineServiceImpl implements CreditLineService {
     }
   }
 
-  public async setRates(props: SetRatesProps): Promise<string> {
+  public async setRates(props: SetRatesProps): Promise<TransactionResponse | PopulatedTransaction> {
     try {
       const { lineAddress: line, id } = props;
       // check mutualConsentById
@@ -137,7 +137,7 @@ export class CreditLineServiceImpl implements CreditLineService {
         [props.id, props.drate, props.frate],
         props.network,
         true
-      );
+      ) as TransactionResponse;
       const borrower = await this.borrower(line);
       const lender = await this.getLenderByCreditID(line, id);
       if (!(await this.isMutualConsent(line, populatedTrx.data, borrower, lender))) {
@@ -145,15 +145,7 @@ export class CreditLineServiceImpl implements CreditLineService {
           `Setting rate is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.lineAddress}]`
         );
       }
-
-      return (<TransactionResponse>(
-        await this.executeContractMethod(
-          props.lineAddress,
-          'setRates',
-          [props.id, props.drate, props.frate],
-          props.network
-        )
-      )).hash;
+      return populatedTrx;
     } catch (e) {
       console.log(`An error occured while setting rate, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
@@ -392,6 +384,8 @@ export class CreditLineServiceImpl implements CreditLineService {
       return Promise.reject(e);
     }
   }
+
+
 
   /* ============================= Helpers =============================*/
 

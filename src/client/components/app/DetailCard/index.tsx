@@ -88,9 +88,6 @@ const SectionContent = styled.div`
   display: flex;
   grid-gap: 0.5rem;
   align-items: center;
-  @media ${device.mobile} {
-    margin-bottom: 2rem;
-  }
 `;
 
 interface Metadata<T> {
@@ -166,44 +163,23 @@ export const DetailCard = <T,>({
 
   return (
     <StyledCard {...props}>
-      {!isMobile ? (
-        <StyledCardHeader header={header}>
-          <SectionContent>
-            {!!filterBy && (
-              <>
-                {filterLabel}
-                <ToggleButton
-                  ariaLabel={filterLabel}
-                  selected={filterToggle}
-                  setSelected={setFilterToggle}
-                  data-testid="filter-toggle"
-                  data-active={filterToggle}
-                />
-              </>
-            )}
-            {SearchBar}
-          </SectionContent>
-        </StyledCardHeader>
-      ) : (
-        <>
-          <StyledCardHeader header={header}></StyledCardHeader>
-          <SectionContent>
-            {!!filterBy && (
-              <>
-                {filterLabel}
-                <ToggleButton
-                  ariaLabel={filterLabel}
-                  selected={filterToggle}
-                  setSelected={setFilterToggle}
-                  data-testid="filter-toggle"
-                  data-active={filterToggle}
-                />
-              </>
-            )}
-            {SearchBar}
-          </SectionContent>
-        </>
-      )}
+      <StyledCardHeader header={header}>
+        <SectionContent>
+          {!!filterBy && (
+            <>
+              {filterLabel}
+              <ToggleButton
+                ariaLabel={filterLabel}
+                selected={filterToggle}
+                setSelected={setFilterToggle}
+                data-testid="filter-toggle"
+                data-active={filterToggle}
+              />
+            </>
+          )}
+          {SearchBar}
+        </SectionContent>
+      </StyledCardHeader>
 
       {!!displayData.length && (
         <CardContent>

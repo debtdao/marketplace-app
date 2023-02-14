@@ -15,8 +15,8 @@ import {
   TokensSelectors,
   TokensActions,
 } from '@store';
-import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL } from '@hooks';
-import { device } from '@themes/default';
+import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL, useWindowDimensions } from '@hooks';
+import { device, sharedTheme } from '@themes/default';
 import { DetailCard, ActionButtons, ViewContainer, TokenIcon } from '@components/app';
 import { Input, SearchIcon, Button, RedirectIcon, Link } from '@components/common';
 import {
@@ -40,17 +40,15 @@ const PositionsCard = styled(DetailCard)`
       width: 100%;
     }
   }
-  @media (max-width: 750px) {
+  @media ${device.tabletL} {
     .col-assets {
       display: none;
     }
   }
   @media ${device.mobile} {
-    .col-available {
-      width: 10rem;
+    .col-assets {
+      display: none;
     }
-  }
-  @media (max-width: 450px) {
     .col-available {
       display: none;
     }
@@ -114,6 +112,7 @@ interface PositionsTableProps {
 export const PositionsTable = ({ borrower, lender, positions, displayLine = false }: PositionsTableProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const dispatch = useAppDispatch();
+  const { isMobile, width } = useWindowDimensions();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const userRoleMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
@@ -381,7 +380,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
               header: t('components.positions-card.status'),
               description: t('components.positions-card.tooltip.status'),
               sortable: true,
-              className: 'col-apy',
+              className: 'col-status',
             },
             {
               key: 'line',
@@ -396,7 +395,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
               header: t('components.positions-card.lender'),
               description: t('components.positions-card.tooltip.lender'),
               sortable: true,
-              className: 'col-assets',
+              className: 'col-available',
             },
             {
               key: 'token',
@@ -410,7 +409,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
               header: t('components.positions-card.total-deposits'),
               description: t('components.positions-card.tooltip.total-deposits'),
               sortable: true,
-              className: 'col-assets',
+              className: 'col-available',
             },
             {
               key: 'principal',

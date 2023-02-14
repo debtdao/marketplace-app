@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { format } from 'date-fns';
 import { getAddress } from 'ethers/lib/utils';
 
-import { device } from '@themes/default';
+import { device, sharedTheme } from '@themes/default';
 import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL, useWindowDimensions } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
 import { BASE_DECIMALS, prettyNumbers, unnullify, normalizeAmount, formatAddress } from '@src/utils';
@@ -97,10 +97,6 @@ export const MetadataContainer = styled.div`
   filter: brightness(1.2);
   padding: ${({ theme }) => theme.card.padding};
   border-radius: ${({ theme }) => theme.globalRadius};
-  // @media ${device.mobile} {
-  //   padding-left: 1rem;
-  //   padding-right: 1rem;
-  // }
 `;
 
 const MetadataBox = styled.div`
@@ -288,7 +284,9 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
-  const { isMobile } = useWindowDimensions();
+  const { isMobile, width } = useWindowDimensions();
+  const { devices } = sharedTheme;
+  console.log('Screen Width: ', width);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const dispatch = useAppDispatch();
   const { NETWORK } = getEnv();
@@ -536,7 +534,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
           <RouterLink to={`/${network}/portfolio/${borrower}`} key={borrower} selected={false} fontSize={'3rem'}>
             {t('lineDetails:metadata.borrower')} {'  :  '}
             <BorrowerName>
-              {isMobile ? formatAddress(borrowerID) : borrowerID}
+              {width < devices.desktopS ? formatAddress(borrowerID) : borrowerID}
               <Redirect />
             </BorrowerName>
           </RouterLink>

@@ -6,10 +6,9 @@ import { device } from '@themes/default';
 const ActionButtonsContainer = styled.div<{ actions: number; direction?: string }>`
   display: flex;
   align-items: center;
-  // grid-template-columns: repeat(${({ actions }) => actions}, 1fr);
   gap: ${({ theme }) => theme.layoutPadding};
 
-  @media (max-width: 1800px) {
+  @media (max-width: 2100px) {
     flex-direction: ${({ direction }) => direction ?? 'column'};
   }
 `;
@@ -36,11 +35,6 @@ const ActionButton = styled(Button)<{ hide?: boolean }>`
   border: 2px solid ${({ theme }) => theme.colors.vaultActionButton.borderColor};
   padding: 0 1.6rem;
   width: 9.6rem;
-
-  // @media ${device.mobile} {
-  //   width: 7.5rem;
-  //   padding: 0 1rem;
-  // }
 
   ${({ hide }) => hide && `visibility: hidden;`}
 

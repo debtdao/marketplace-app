@@ -229,13 +229,11 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
           .slice(0, 3),
         'id'
       );
-      console.log('Highest Revenue Lines: ', highestRevenueLines);
 
       const highestRevenueLinesCategory = { 'market:featured.highest-revenue': highestRevenueLines };
 
       const updatedCategories = { ...categories, ...highestCreditLinesCategory, ...highestRevenueLinesCategory };
-      console.log('Categories: ', categories);
-      console.log('Updated Categories: ', updatedCategories);
+
       // Remove spigot and escrow objects from lines
       const formattedLines = _.mapValues(lines, (line) => {
         const { spigot, escrow, ...rest } = line;
@@ -256,7 +254,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(getLinePage.fulfilled, (state, { payload: { linePageData } }) => {
       if (linePageData) {
         // overwrite actual positions with referential ids
-        const { positions, creditEvents, ...metadata } = linePageData;
+        const { positions, creditEvents, escrow, spigot, ...metadata } = linePageData;
         state.linesMap = { ...state.linesMap, [linePageData.id]: { ...metadata } };
         state.positionsMap = { ...state.positionsMap, ...positions };
         state.eventsMap = { ...state.eventsMap, [metadata.id]: creditEvents };

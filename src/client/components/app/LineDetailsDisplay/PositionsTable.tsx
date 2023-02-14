@@ -165,6 +165,11 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
     dispatch(ModalsActions.openModal({ modalName: 'withdraw' }));
   };
 
+  const setRatesHandler = (position?: string) => {
+    dispatch(LinesActions.setSelectedLinePosition({ position }));
+    dispatch(ModalsActions.openModal({ modalName: 'setRates' }));
+  };
+
   const revokeConsentHandler = (position?: string, proposal?: string) => {
     if (!position) return;
     dispatch(LinesActions.setSelectedLinePosition({ position }));
@@ -225,13 +230,18 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
       getAddress(position.lender) === userWallet &&
       BigNumber.from(position.deposit).gt(BigNumber.from(position.principal))
     ) {
-      return [
-        {
-          name: t('components.transaction.withdraw'),
-          handler: withdrawHandler,
-          disabled: false,
-        },
-      ];
+      const withdrawAction = {
+        name: t('components.transaction.withdraw'),
+        handler: withdrawHandler,
+        disabled: false,
+      };
+
+      const setRatesAction = {
+        name: t('components.transaction.set-rates'),
+        handler: setRatesHandler,
+        disabled: false,
+      };
+      return [setRatesAction, withdrawAction];
     }
 
     // not party to line. no actions;

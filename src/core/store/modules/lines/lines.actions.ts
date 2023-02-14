@@ -30,6 +30,7 @@ import {
   GetLinesResponse,
   MarketPageData,
   GetLineEventsResponse,
+  SetRatesProps,
 } from '@types';
 import {
   formatGetLinesData,
@@ -388,6 +389,16 @@ const addCredit = createAsyncThunk<
     position: position,
   };
 });
+
+const setRates = createAsyncThunk<void, SetRatesProps, ThunkAPI>(
+  'lines/setRates',
+
+  async (props, { extra, getState }) => {
+    const { services } = extra;
+    const { creditLineService } = services;
+    const tx = await creditLineService.setRates(props);
+  }
+);
 
 const depositAndRepay = createAsyncThunk<
   void,
@@ -932,6 +943,7 @@ export const LinesActions = {
 
   approveDeposit,
   addCredit,
+  setRates,
   borrowCredit,
   deploySecuredLine,
   deploySecuredLineWithConfig,

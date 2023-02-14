@@ -131,13 +131,13 @@ export class CreditLineServiceImpl implements CreditLineService {
     try {
       const { lineAddress: line, id } = props;
       // check mutualConsentById
-      const populatedTrx = await this.executeContractMethod(
+      const populatedTrx = (await this.executeContractMethod(
         props.lineAddress,
         'setRates',
         [props.id, props.drate, props.frate],
         props.network,
         true
-      ) as TransactionResponse;
+      )) as TransactionResponse;
       const borrower = await this.borrower(line);
       const lender = await this.getLenderByCreditID(line, id);
       if (!(await this.isMutualConsent(line, populatedTrx.data, borrower, lender))) {
@@ -384,8 +384,6 @@ export class CreditLineServiceImpl implements CreditLineService {
       return Promise.reject(e);
     }
   }
-
-
 
   /* ============================= Helpers =============================*/
 

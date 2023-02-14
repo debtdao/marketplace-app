@@ -328,8 +328,6 @@ export interface InterestRateAccrueInterestProps {
   facilityBalance: BigNumber;
 }
 
-
-
 export interface GetLineProps extends GetLineArgs {
   id: string;
   network: Network;

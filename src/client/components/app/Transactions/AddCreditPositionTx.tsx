@@ -38,7 +38,7 @@ const {
 } = getConstants();
 const StyledTransaction = styled(TxContainer)``;
 
-interface AddCreditPositionProps {
+export interface AddCreditPositionProps {
   header: string;
   onClose: () => void;
   acceptingOffer?: boolean;

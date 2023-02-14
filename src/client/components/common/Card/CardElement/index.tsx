@@ -54,8 +54,10 @@ const SortIcon = styled(({ activeSort, sortType, ...props }: SortIconProps) => <
 
 const Header = styled.h3<{ onClick?: () => void }>`
   display: flex;
+  flex-direction: row;
   position: relative;
   align-items: center;
+  text-align: center;
   font-size: 1.6rem;
   font-weight: 700;
   margin: 0;
@@ -78,6 +80,11 @@ const Content = styled.div`
   :first-child img {
     margin-right: ${({ theme }) => theme.layoutPadding};
   }
+`;
+
+const IconContainer = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
 type SortType = 'asc' | 'desc';
@@ -126,9 +133,8 @@ export const CardElement: FC<CardElementProps> = ({
 
           {/* TODO: Add styled tooltip back once css issues are fixed */}
           {/* <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
-            <StyledIcon Component={InfoIcon} size="1.5rem" />
-          </Tooltip> */}
-
+                <StyledIcon Component={InfoIcon} size="1.5rem" />
+              </Tooltip> */}
           {sortable && <SortIcon activeSort={activeSort} sortType={sortType} Component={ArrowDownIcon} />}
         </Header>
       )}

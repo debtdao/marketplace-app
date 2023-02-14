@@ -32,8 +32,9 @@ const ItemCard = styled(Card)<{ onClick: any }>`
   display: flex;
   align-items: start;
   min-height: 30rem;
-  min-width: 32%;
-  max-width: 32%;
+  // display three columns on larger screens
+  min-width: 31%;
+  max-width: 31%;
   flex: 1;
   padding: ${({ theme }) => theme.layoutPadding};
   padding-right: calc(${({ theme }) => theme.card.padding} + ${TokenListIconSize} * 2.5);
@@ -43,6 +44,12 @@ const ItemCard = styled(Card)<{ onClick: any }>`
   position: relative;
   transition: filter 200ms ease-in-out;
 
+  // display two columns on small screens
+  @media ${device.desktopS} {
+    min-width: 48%;
+  }
+
+  // display a single column on mobile
   @media ${device.mobile} {
     min-width: 100%;
   }

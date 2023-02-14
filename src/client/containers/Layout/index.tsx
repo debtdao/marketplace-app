@@ -171,7 +171,6 @@ export const Layout: FC = ({ children }) => {
     // dispatch(LinesActions.getLines(defaultLineCategories));
     // dispatch(LinesActions.getLinePage({ id: selectedLineAddress! }));
     // dispatch(LinesActions.getUserPortfolio({ user: userWalletAddress! }));
-
     dispatch(TokensActions.getTokens());
     dispatch(TokensActions.getSupportedOracleTokens());
   }, [currentNetwork]);

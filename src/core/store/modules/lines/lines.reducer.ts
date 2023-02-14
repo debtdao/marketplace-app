@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { createReducer } from '@reduxjs/toolkit';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 
 import {
   initialStatus,
@@ -23,7 +23,7 @@ import {
   ACTIVE_STATUS,
   RevenueSummaryMap,
 } from '@types';
-import { formatOptimisticProposal, getNetworkId } from '@src/utils';
+import { BASE_DECIMALS, formatOptimisticProposal, getNetworkId } from '@src/utils';
 
 import { NetworkActions } from '../network/network.actions';
 import { WalletActions } from '../wallet/wallet.actions';
@@ -215,9 +215,36 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
           categories[category] = [...(categories[category] || []), line.id];
         })
       );
-      state.linesMap = { ...state.linesMap, ...lines };
+      const highestCreditLines = _.map(
+        _.sortBy(lines, (line) => Number(BigNumber.from(line.deposit).div(BASE_DECIMALS)))
+          .reverse()
+          .slice(0, 3),
+        'id'
+      );
+      const highestCreditLinesCategory = { 'market:featured.highest-credit': highestCreditLines };
+
+      const highestRevenueLines = _.map(
+        _.sortBy(lines, (line) => Number(BigNumber.from(line!.spigot!.revenueValue).div(BASE_DECIMALS)))
+          .reverse()
+          .slice(0, 3),
+        'id'
+      );
+      console.log('Highest Revenue Lines: ', highestRevenueLines);
+
+      const highestRevenueLinesCategory = { 'market:featured.highest-revenue': highestRevenueLines };
+
+      const updatedCategories = { ...categories, ...highestCreditLinesCategory, ...highestRevenueLinesCategory };
+      console.log('Categories: ', categories);
+      console.log('Updated Categories: ', updatedCategories);
+      // Remove spigot and escrow objects from lines
+      const formattedLines = _.mapValues(lines, (line) => {
+        const { spigot, escrow, ...rest } = line;
+        return rest;
+      });
+
+      state.linesMap = { ...state.linesMap, ...formattedLines };
       state.positionsMap = { ...state.positionsMap, ...positions };
-      state.categories = { ...state.categories, ...categories };
+      state.categories = { ...state.categories, ...updatedCategories };
     })
     .addCase(getLines.rejected, (state, { error }) => {
       state.statusMap.getLines = { error: error.message };

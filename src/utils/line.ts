@@ -427,7 +427,7 @@ export const formatSecuredLineData = (
     id: spigotId,
     type: COLLATERAL_TYPE_REVENUE,
     line,
-    revenueValue: formatUnits(unnullify(revenueValue), 6).toString(),
+    revenueValue: formatUnits(unnullify(revenueValue), 6).toString().split('.')[0],
     revenueSummary,
     events: spigotEvents,
     spigots: spigotRevenueContracts,
@@ -435,13 +435,14 @@ export const formatSecuredLineData = (
 
   const positions = createPositionsMap(positionFrags, tokenPrices);
 
+  console.log('Credit - Deposit: ', formatUnits(unnullify(credit.deposit), 6).toString().split('.')[0]);
   return {
     credit: {
       highestApy,
-      principal: formatUnits(unnullify(credit.principal), 6).toString(),
-      deposit: formatUnits(unnullify(credit.deposit), 6).toString(),
+      principal: formatUnits(unnullify(credit.principal), 6).toString().split('.')[0],
+      deposit: formatUnits(unnullify(credit.deposit), 6).toString().split('.')[0],
       interest: '0', // TODO
-      totalInterestRepaid: formatUnits(unnullify(credit.totalInterestRepaid), 6).toString(),
+      totalInterestRepaid: formatUnits(unnullify(credit.totalInterestRepaid), 6).toString().split('.')[0],
       positionIds: Object.keys(positions),
       positions,
     },
@@ -560,7 +561,7 @@ export const formatLineWithEvents = (
     id: escrow!.id,
     type: COLLATERAL_TYPE_ASSET,
     line: escrow!.line,
-    collateralValue: formatUnits(unnullify(collateralValue), 6).toString(),
+    collateralValue: formatUnits(unnullify(collateralValue), 6).toString().split('.')[0],
     cratio: escrow!.cratio,
     minCRatio: escrow!.minCRatio,
     events: escrowCollateralEvents,
@@ -572,7 +573,7 @@ export const formatLineWithEvents = (
     id: spigot!.id,
     type: COLLATERAL_TYPE_REVENUE,
     line: spigot!.line,
-    revenueValue: formatUnits(revenueValue, 6).toString(),
+    revenueValue: formatUnits(revenueValue, 6).toString().split('.')[0],
     revenueSummary: revenueSummary,
     events: spigotEvents,
     spigots: spigotRevenueContracts,

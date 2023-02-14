@@ -431,6 +431,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
   };
 
   const formattedCollateralData = allCollateral.map((c) => {
+    // TODO: remove this after fixing the bug
     console.log('Tokens Map: ', tokensMap);
     console.log('Tokens Map undefined?: ', c.token.address);
     console.log('Tokens Map c: ', c);

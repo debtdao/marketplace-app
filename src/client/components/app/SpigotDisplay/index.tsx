@@ -18,7 +18,6 @@ import { getENS } from '@src/utils';
 import { useExplorerURL } from '@src/client/hooks/useExplorerURL';
 
 import { ActionButtons } from '../ActionButtons';
-// import { BorrowerName } from '../LineDetailsDisplay';
 
 import { SpigotMetadata } from './SpigotMetadata';
 

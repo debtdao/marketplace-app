@@ -435,7 +435,6 @@ export const formatSecuredLineData = (
 
   const positions = createPositionsMap(positionFrags, tokenPrices);
 
-  console.log('Credit - Deposit: ', formatUnits(unnullify(credit.deposit), 6).toString().split('.')[0]);
   return {
     credit: {
       highestApy,
@@ -649,10 +648,7 @@ export const formatUserPortfolioData = (
   portfolioData: GetUserPortfolioResponse,
   tokenPrices: { [token: string]: BigNumber }
 ): { lines: { [address: string]: SecuredLineWithEvents }; positions: PositionMap } => {
-  // add token Prices as arg
-  // const { spigot, escrow, positions, borrower, status, ...metadata } = lineData;
   const { borrowerLineOfCredits, lenderPositions, arbiterLineOfCredits } = portfolioData;
-  console.log('format borrowerLineOfCredits - lines: ', borrowerLineOfCredits, arbiterLineOfCredits);
   const lines = [...borrowerLineOfCredits, ...arbiterLineOfCredits]
     .map(({ borrower, arbiter, status, positions = [], events = [], escrow, spigot, ...rest }) => {
       const {
@@ -679,14 +675,8 @@ export const formatUserPortfolioData = (
 
         spigotId: spigot?.id ?? '',
         escrowId: escrow?.id ?? '',
-        spigot: {
-          ...(spigotData ?? {}),
-          ...spigot,
-        },
-        escrow: {
-          ...(escrowData ?? {}),
-          ...escrow,
-        },
+        spigot: spigotData,
+        escrow: escrowData,
       };
     })
     .reduce((lines, line) => ({ ...lines, [line.id]: line }), {});

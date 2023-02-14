@@ -133,8 +133,8 @@ export const CardElement: FC<CardElementProps> = ({
 
           {/* TODO: Add styled tooltip back once css issues are fixed */}
           {/* <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
-                <StyledIcon Component={InfoIcon} size="1.5rem" />
-              </Tooltip> */}
+            <StyledIcon Component={InfoIcon} size="1.5rem" />
+          </Tooltip> */}
           {sortable && <SortIcon activeSort={activeSort} sortType={sortType} Component={ArrowDownIcon} />}
         </Header>
       )}

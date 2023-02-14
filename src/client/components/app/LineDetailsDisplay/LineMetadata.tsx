@@ -182,7 +182,7 @@ const Redirect = styled(RedirectIcon)`
   padding-bottom: 0.2rem;
   @media ${device.mobile} {
     ${({ theme }) => `
-      margin-left: 1.0rem;
+      margin-left: 1rem;
    `}
   }
 `;
@@ -286,7 +286,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const { isMobile, width } = useWindowDimensions();
   const { devices } = sharedTheme;
-  console.log('Screen Width: ', width);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const dispatch = useAppDispatch();
   const { NETWORK } = getEnv();
@@ -431,10 +430,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
   };
 
   const formattedCollateralData = allCollateral.map((c) => {
-    // TODO: remove this after fixing the bug
-    console.log('Tokens Map: ', tokensMap);
-    console.log('Tokens Map undefined?: ', c.token.address);
-    console.log('Tokens Map c: ', c);
     const tokenIcon = tokensMap?.[getAddress(c.token.address)]?.icon ?? '';
     const tokenInfo = { icon: tokenIcon, ...c.token };
     const collateral = { ...c, token: tokenInfo };

@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import styled from 'styled-components';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import _ from 'lodash';
 
 import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
@@ -53,6 +53,12 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
     setTargetAmount(amount);
     _updatePosition();
   };
+
+  const getMax = (pos:CreditPosition): string => {
+    const maxBorrow = Number(pos.deposit) - Number(pos.principal);
+
+    return maxBorrow.toString();
+  }
 
   const onSelectedPositionChange = (arg: CreditPosition): void => {
     dispatch(LinesActions.setSelectedLinePosition({ position: arg.id }));
@@ -178,7 +184,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
         inputError={false}
         amount={targetAmount}
         onAmountChange={onAmountChange}
-        maxAmount={normalizeAmount(selectedPosition['deposit'], 18)}
+        maxAmount={getMax(selectedPosition)}
         maxLabel={'Max'}
         readOnly={false}
         hideAmount={false}

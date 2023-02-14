@@ -144,7 +144,7 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
         id: escrowId,
         cratio: '0',
         collateralValue: '0',
-        minCRatio: Math.round(Number(cratio.toString())) / 100,
+        minCRatio: Math.round(100 * Number(cratio.toString())) / 100,
         deposits: {} as EscrowDepositMap,
         type: COLLATERAL_TYPE_ASSET,
         line: lineAddress,

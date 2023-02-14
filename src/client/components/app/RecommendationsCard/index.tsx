@@ -34,7 +34,7 @@ const ItemCard = styled(Card)<{ onClick: any }>`
   min-height: 30rem;
   // display three columns on larger screens
   min-width: 31%;
-  max-width: 31%;
+  max-width: 32%;
   flex: 1;
   padding: ${({ theme }) => theme.layoutPadding};
   padding-right: calc(${({ theme }) => theme.card.padding} + ${TokenListIconSize} * 2.5);

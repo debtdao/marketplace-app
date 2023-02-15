@@ -5,8 +5,8 @@ import { prettyNumbers, formatAddress, unnullify, humanize } from '@utils';
 import { Card, CardHeader, CardContent, Text, Icon, ChevronRightIcon } from '@components/common';
 import { TokenIcon } from '@components/app';
 import { useAppTranslation, useAppSelector } from '@hooks';
-import { OnchainMetaDataSelector } from '@src/core/store';
-import { SecuredLine, Item } from '@src/core/types';
+import { CollateralSelectors, OnchainMetaDataSelector } from '@src/core/store';
+import { SecuredLine, Item, AggregatedEscrow, AggregatedSpigot } from '@src/core/types';
 import { getENS } from '@utils';
 import { device } from '@themes/default';
 
@@ -135,6 +135,7 @@ interface RecommendationsProps {
 export const RecommendationsCard = ({ header, subHeader, items, ...props }: RecommendationsProps) => {
   const { t } = useAppTranslation(['common']);
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
+  const collateralMap = useAppSelector(CollateralSelectors.selectCollateralMap);
   if (items.length === 0) {
     return null;
   }
@@ -146,6 +147,8 @@ export const RecommendationsCard = ({ header, subHeader, items, ...props }: Reco
       <StyledCardContent>
         {items.map((item, i) => {
           const endDateHumanized = format(new Date(item.end * 1000), 'MMMM dd, yyyy');
+          const spigot = collateralMap[item.spigotId] as AggregatedSpigot;
+          const escrow = collateralMap[item.escrowId] as AggregatedEscrow;
           return (
             <ItemCard
               key={`${i}-${item.borrower}`}
@@ -178,8 +181,8 @@ export const RecommendationsCard = ({ header, subHeader, items, ...props }: Reco
 
                 <ItemInfoLabel>{t('components.line-card.secured-by')}:</ItemInfoLabel>
                 <Metric>
-                  ${humanize('amount', item.escrow?.collateralValue, 18, 2)} / ${' '}
-                  {humanize('amount', item.spigot?.revenueValue, 18, 2)}
+                  ${humanize('amount', escrow?.collateralValue, 18, 2)} / ${' '}
+                  {humanize('amount', spigot?.revenueValue, 18, 2)}
                 </Metric>
                 <MetricsTextContainer>
                   <MetricsText>

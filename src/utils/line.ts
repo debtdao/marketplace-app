@@ -776,3 +776,7 @@ export const formatOptimisticProposal = (
 
   return proposedPosition;
 };
+
+// TODO: Move code from getLines to create state.categories into this function
+// export const formatLineCategories = (lines: SecuredLine[]): string[] => {
+// }

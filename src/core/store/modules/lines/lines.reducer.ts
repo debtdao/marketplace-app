@@ -215,10 +215,8 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
           categories[category] = [...(categories[category] || []), line.id];
         })
       );
-      const validLines = _.filter(
-        lines,
-        (line) => line.status === 'active' && Number(line.defaultSplit) > 0 && line.end * 1000 > Date.now()
-      );
+
+      const validLines = _.filter(lines, (line) => line.status === 'active' && line.end * 1000 > Date.now());
 
       const highestCreditLines = _.map(
         _.sortBy(validLines, (line) => Number(BigNumber.from(line.deposit).div(BASE_DECIMALS)))
@@ -226,8 +224,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
           .slice(0, 3),
         'id'
       );
-
-      const newCreditLines = categories['market:featured.newest'];
 
       const highestCreditLinesCategory = { 'market:featured.highest-credit': highestCreditLines };
 
@@ -240,7 +236,19 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 
       const highestRevenueLinesCategory = { 'market:featured.highest-revenue': highestRevenueLines };
 
-      const updatedCategories = { ...categories, ...highestCreditLinesCategory, ...highestRevenueLinesCategory };
+      const newCreditLines = _.map(
+        _.sortBy(validLines, (line) => line.start),
+        'id'
+      );
+
+      const newCreditLinesCategory = { 'market:featured.newest': newCreditLines };
+
+      const updatedCategories = {
+        ...categories,
+        ...highestCreditLinesCategory,
+        ...highestRevenueLinesCategory,
+        ...newCreditLinesCategory,
+      };
 
       // Remove spigot and escrow objects from lines
       const formattedLines = _.mapValues(lines, (line) => {

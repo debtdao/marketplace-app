@@ -510,7 +510,8 @@ export const formatLineWithEvents = (
   const [revenueValue, revenueSummary]: [BigNumber, RevenueSummaryMap] = revenues.reduce<any>(
     (agg, { token, totalVolume, totalVolumeUsd, ...summary }) => {
       const checkSumAddress = ethers.utils.getAddress(token.id);
-      const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
+      // const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
+      const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(1000000);
       const totalRevenueVolume = toTargetDecimalUnits(totalVolume, token.decimals, BASE_DECIMALS);
       return [
         agg[0].add(unnullify(totalRevenueVolume).toString()).mul(usdcPrice),

@@ -8,9 +8,11 @@ const ActionButtonsContainer = styled.div<{ actions: number; direction?: string 
   align-items: center;
   gap: ${({ theme }) => theme.layoutPadding};
 
-  @media (max-width: 2100px) {
+  @media ${device.tabletL} {
     flex-direction: ${({ direction }) => direction ?? 'column'};
+    // wrap: nowrap:
   }
+  // wrap: wrap;
 `;
 
 const AlertIcon = styled(Icon)`

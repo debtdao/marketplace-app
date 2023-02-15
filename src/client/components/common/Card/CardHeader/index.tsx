@@ -20,7 +20,7 @@ const Header = styled.h2`
   margin: 0;
   padding: 0;
   @media ${device.mobile} {
-    text-align: center;
+    text-align: left;
   }
 `;
 

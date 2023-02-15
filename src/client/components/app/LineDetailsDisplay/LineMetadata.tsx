@@ -40,6 +40,12 @@ import {
 import { humanize } from '@src/utils';
 import { getEnv } from '@config/env';
 
+const StyledButton = styled(Button)`
+  @media ${device.mobile} {
+    padding: ${({ theme }) => theme.spacing.lg} 0;
+  }
+`;
+
 const SectionHeader = styled.h3`
   ${({ theme }) => `
     display: flex;
@@ -461,8 +467,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
       case ARBITER_POSITION_ROLE:
         return (
           <>
-            <Button onClick={addSpigotHandler}>{enableSpigotText}</Button>
-            <Button onClick={enableAssetHandler}>{enableCollateralText}</Button>
+            <StyledButton onClick={addSpigotHandler}>{enableSpigotText}</StyledButton>
+            <StyledButton onClick={enableAssetHandler}>{enableCollateralText}</StyledButton>
           </>
         );
       case LENDER_POSITION_ROLE: // for testing

@@ -31,6 +31,12 @@ import {
 } from '@src/core/store';
 import { getEnv } from '@config/env';
 
+const StyledButton = styled(Button)`
+  @media ${device.mobile} {
+    padding: ${({ theme }) => theme.spacing.xl} 0;
+  }
+`;
+
 const SectionHeader = styled.h3`
   ${({ theme }) => `
     font-size: ${theme.fonts.sizes.xl};
@@ -191,18 +197,18 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
   const getCollateralTableActions = () => {
     switch (userPositionMetadata.role) {
       case BORROWER_POSITION_ROLE:
-        return <Button onClick={claimOperatorTokensHandler}>{ClaimOperatorTokensText}</Button>; // TODO: What role does this go under? Do we need an Operator Role?
+        return <StyledButton onClick={claimOperatorTokensHandler}>{ClaimOperatorTokensText}</StyledButton>;
       case ARBITER_POSITION_ROLE:
         return (
           <>
-            <Button onClick={addSpigotHandler}>{enableSpigotText}</Button>
+            <StyledButton onClick={addSpigotHandler}>{enableSpigotText}</StyledButton>
           </>
         );
       case LENDER_POSITION_ROLE:
       default:
         return (
           <>
-            <Button onClick={claimOperatorTokensHandler}>{ClaimOperatorTokensText}</Button>
+            <StyledButton onClick={claimOperatorTokensHandler}>{ClaimOperatorTokensText}</StyledButton>
           </>
         );
     }

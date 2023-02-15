@@ -778,5 +778,43 @@ export const formatOptimisticProposal = (
 };
 
 // TODO: Move code from getLines to create state.categories into this function
-// export const formatLineCategories = (lines: SecuredLine[]): string[] => {
-// }
+export const formatLineCategories = (
+  lines: { [key: string]: SecuredLine },
+  categories: { [key: string]: string[] }
+): { [key: string]: string[] } => {
+  const validLines = _.filter(lines, (line) => line.status === 'active' && line.end * 1000 > Date.now());
+
+  const highestCreditLines = _.map(
+    _.sortBy(validLines, (line) => Number(BigNumber.from(line.deposit).div(BASE_DECIMALS)))
+      .reverse()
+      .slice(0, 3),
+    'id'
+  );
+
+  const highestCreditLinesCategory = { 'market:featured.highest-credit': highestCreditLines };
+
+  const highestRevenueLines = _.map(
+    _.sortBy(validLines, (line) => Number(BigNumber.from(line!.spigot!.revenueValue).div(BASE_DECIMALS)))
+      .reverse()
+      .slice(0, 3),
+    'id'
+  );
+
+  const highestRevenueLinesCategory = { 'market:featured.highest-revenue': highestRevenueLines };
+
+  const newCreditLines = _.map(
+    _.sortBy(validLines, (line) => line.start),
+    'id'
+  );
+
+  const newCreditLinesCategory = { 'market:featured.newest': newCreditLines };
+
+  const updatedCategories = {
+    ...categories,
+    ...highestCreditLinesCategory,
+    ...highestRevenueLinesCategory,
+    ...newCreditLinesCategory,
+  };
+
+  return updatedCategories;
+};

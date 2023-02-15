@@ -23,7 +23,7 @@ import {
   ACTIVE_STATUS,
   RevenueSummaryMap,
 } from '@types';
-import { BASE_DECIMALS, formatOptimisticProposal, getNetworkId } from '@src/utils';
+import { BASE_DECIMALS, formatLineCategories, formatOptimisticProposal, getNetworkId } from '@src/utils';
 
 import { NetworkActions } from '../network/network.actions';
 import { WalletActions } from '../wallet/wallet.actions';
@@ -216,39 +216,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
         })
       );
 
-      const validLines = _.filter(lines, (line) => line.status === 'active' && line.end * 1000 > Date.now());
-
-      const highestCreditLines = _.map(
-        _.sortBy(validLines, (line) => Number(BigNumber.from(line.deposit).div(BASE_DECIMALS)))
-          .reverse()
-          .slice(0, 3),
-        'id'
-      );
-
-      const highestCreditLinesCategory = { 'market:featured.highest-credit': highestCreditLines };
-
-      const highestRevenueLines = _.map(
-        _.sortBy(validLines, (line) => Number(BigNumber.from(line!.spigot!.revenueValue).div(BASE_DECIMALS)))
-          .reverse()
-          .slice(0, 3),
-        'id'
-      );
-
-      const highestRevenueLinesCategory = { 'market:featured.highest-revenue': highestRevenueLines };
-
-      const newCreditLines = _.map(
-        _.sortBy(validLines, (line) => line.start),
-        'id'
-      );
-
-      const newCreditLinesCategory = { 'market:featured.newest': newCreditLines };
-
-      const updatedCategories = {
-        ...categories,
-        ...highestCreditLinesCategory,
-        ...highestRevenueLinesCategory,
-        ...newCreditLinesCategory,
-      };
+      const updatedCategories = formatLineCategories(lines, categories);
 
       // Remove spigot and escrow objects from lines
       const formattedLines = _.mapValues(lines, (line) => {

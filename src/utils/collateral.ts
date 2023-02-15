@@ -127,7 +127,7 @@ export const formatCollateralRevenue = (
   );
   console.log('Values: ', newRevenueValue.toString(), newRevenueSummary);
   const updatedSpigot = {
-    revenueValue: formatUnits(unnullify(newRevenueValue), 6).toString(),
+    revenueValue: formatUnits(unnullify(newRevenueValue), 6).toString().split('.')[0],
     revenueSummary: newRevenueSummary,
     ...rest,
   };

@@ -161,7 +161,7 @@ const Header = styled.h1`
   `}
 `;
 
-const BorrowerName = styled(Text)`
+export const BorrowerName = styled(Text)`
   display: flex;
   max-width: 100%;
   margin-left: 1rem;

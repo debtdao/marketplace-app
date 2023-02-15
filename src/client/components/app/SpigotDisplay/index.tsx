@@ -1,9 +1,11 @@
 import styled from 'styled-components';
 import _ from 'lodash';
 import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
-import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
-import { RedirectIcon, Text, Link } from '@components/common';
+import { device, sharedTheme } from '@themes/default';
+import { useAppSelector, useAppTranslation, useAppDispatch, useWindowDimensions } from '@hooks';
+import { RedirectIcon, Text, Link, Button } from '@components/common';
 import {
   OnchainMetaDataActions,
   OnchainMetaDataSelector,
@@ -14,14 +16,19 @@ import {
   ModalsActions,
   LinesActions,
 } from '@store';
-import { getENS } from '@src/utils';
+import { formatAddress, getENS } from '@src/utils';
 import { useExplorerURL } from '@src/client/hooks/useExplorerURL';
 
 import { ActionButtons } from '../ActionButtons';
+import { BorrowerName } from '../LineDetailsDisplay/LineMetadata';
 
 import { SpigotMetadata } from './SpigotMetadata';
 
 interface SpigotDisplayProps {}
+
+const StyledButton = styled(Button)`
+  margin: ${({ theme }) => theme.spacing.lg} 0;
+`;
 
 const Container = styled.div`
   margin: 0;
@@ -45,9 +52,9 @@ const Header = styled.h1`
   `};
 `;
 
-const BorrowerName = styled(Text)`
-  max-width: 100%;
-`;
+// const BorrowerName = styled(Text)`
+//   max-width: 100%;
+// `;
 
 const RouterLink = styled(Link)<{ selected: boolean }>`
   display: flex;
@@ -76,9 +83,18 @@ const SpigotAddy = styled(Text)`
   max-width: 100%;
 `;
 
+export interface SpigotRouteParams {
+  lineAddress: string;
+  spigotAddress: string;
+  network: string;
+}
+
 export const SpigotDisplay = () => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
+  const { isMobile, width } = useWindowDimensions();
+  const { devices } = sharedTheme;
+  const { network, spigotAddress, lineAddress } = useParams<SpigotRouteParams>();
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
@@ -102,14 +118,19 @@ export const SpigotDisplay = () => {
     <Container>
       <Header>
         <RouterLink to={`${explorerUrl}/address/${borrowerID}`} key={borrowerID} selected={false}>
+          {t('spigot:metadata.borrower')} {'  :  '}
           <BorrowerName>
-            {t('spigot:metadata.borrower')} {'  :  '} {borrowerID}
+            {width < devices.desktopS ? formatAddress(borrowerID) : borrowerID}
             <Redirect />
           </BorrowerName>
         </RouterLink>
       </Header>
-      <Header>Revenue Contracts</Header>
       <SpigotMetadata />
+      {lineAddress ? (
+        <StyledButton>
+          <Link to={`/${network}/lines/${lineAddress}`}>{t('Back to Line of Credit')}</Link>
+        </StyledButton>
+      ) : null}
     </Container>
   );
 };

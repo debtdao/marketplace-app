@@ -238,7 +238,7 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
     <>
       <ViewContainer>
         <AssetsListCard
-          header={' '} //{t('lineDetails:metadata.escrow.assets-list.title')}
+          header={t('spigot:metadata.title')}
           data-testid="line-assets-list"
           metadata={[
             {
@@ -251,9 +251,9 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
                   <RedirectLinkIcon />
                 </Link>
               ),
-              width: '16rem',
+              // width: '16rem',
               sortable: true,
-              className: 'col-type',
+              className: 'col-address',
             },
             {
               key: 'token',
@@ -264,9 +264,9 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
                   <Text>{tokensMap[formatAddress(contract)] ? tokensMap[formatAddress(contract)].symbol : 'N/A'}</Text>
                 </Link>
               ),
-              width: '15rem',
+              // width: '15rem',
               sortable: true,
-              className: 'col-symbol',
+              className: 'col-available',
             },
             {
               key: 'ownerSplit',
@@ -278,12 +278,14 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
                 const ownerSplitFormatted = `Borrower: ${borrowerSplit}  |  Lender: ${lenderSplit}`;
                 return <Text>{ownerSplitFormatted}</Text>;
               },
-              width: '25rem',
+              width: 'auto',
               sortable: true,
-              className: 'col-symbol',
+              className: 'col-available',
             },
             {
               key: 'actions',
+              header: t('spigot:metadata.actions'),
+              description: t('spigot:metadata.tooltips.actions'),
               transform: ({ contract }) => <ActionButtons actions={[claimRev(contract)]} />,
               align: 'flex-end',
               width: 'auto',

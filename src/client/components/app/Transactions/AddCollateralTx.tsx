@@ -161,8 +161,10 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
       setLoading(false);
       return;
     }
-    const amount = BigNumber.from(targetTokenAmount)
-      .mul(BigNumber.from(10).pow(selectedCollateralAsset.decimals))
+    console.log(targetTokenAmount);
+    console.log(selectedCollateralAsset.decimals);
+    const amount = BigNumber.from(toWei(targetTokenAmount, selectedCollateralAsset.decimals))
+      // .mul(BigNumber.from(10).pow(selectedCollateralAsset.decimals))
       .toString();
     console.log(
       'appr collateral',
@@ -206,7 +208,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
       setLoading(false);
       return;
     }
-    const amount = BigNumber.from(targetTokenAmount).mul(BigNumber.from(10).pow(selectedCollateralAsset.decimals));
+    const amount = BigNumber.from(toWei(targetTokenAmount, selectedCollateralAsset.decimals));
     console.log(
       'add collateral',
       targetTokenAmount,

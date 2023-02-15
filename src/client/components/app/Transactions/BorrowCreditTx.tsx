@@ -54,11 +54,11 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
     _updatePosition();
   };
 
-  const getMax = (pos:CreditPosition): string => {
+  const getMax = (pos: CreditPosition): string => {
     const maxBorrow = Number(pos.deposit) - Number(pos.principal);
 
     return maxBorrow.toString();
-  }
+  };
 
   const onSelectedPositionChange = (arg: CreditPosition): void => {
     dispatch(LinesActions.setSelectedLinePosition({ position: arg.id }));

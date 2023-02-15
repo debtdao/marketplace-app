@@ -76,6 +76,13 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
 
   // Event Handlers
 
+  useEffect(() => {
+    if (selectedSpigot.spigots) {
+      console.log(selectedSpigot);
+      setClaimFunc(selectedSpigot.spigots[selectedRevenueContract].claimFunc);
+    }
+  }, []);
+
   const onTransactionCompletedDismissed = () => {
     if (onClose) {
       onClose();

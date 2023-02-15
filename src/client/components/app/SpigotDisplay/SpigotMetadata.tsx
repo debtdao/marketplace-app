@@ -139,7 +139,6 @@ const MetricDataDisplay = ({ title, data, displaySubmetrics = false, submetrics 
 };
 
 export const SpigotMetadata = (props: SpigotMetadataProps) => {
-  console.log('render line metadata', props);
   const { t } = useAppTranslation(['common', 'spigot']);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);

@@ -16,6 +16,7 @@ import {
 } from '@hooks';
 import { getConstants } from '@src/config/constants';
 import { generateClaimFuncInputs } from '@src/utils/generateFuncInputs';
+import { bytesToName } from '@src/utils/bytesToName';
 import {
   TokensActions,
   TokensSelectors,
@@ -78,8 +79,22 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
 
   useEffect(() => {
     if (selectedSpigot.spigots) {
-      console.log(selectedSpigot);
+      console.log(selectedSpigot.spigots[selectedRevenueContract].claimFunc);
       setClaimFunc(selectedSpigot.spigots[selectedRevenueContract].claimFunc);
+    }
+    if (selectedRevenueContract) {
+      console.log(getAddress(selectedRevenueContract));
+      dispatch(OnchainMetaDataActions.getABI(getAddress(selectedRevenueContract)));
+    }
+
+    if (contractABI[selectedRevenueContract] !== undefined && selectedSpigot.spigots) {
+      const funcName = bytesToName(
+        selectedSpigot.spigots[selectedRevenueContract].claimFunc,
+        contractABI[selectedRevenueContract]
+      );
+      setClaimFuncType({ id: '', label: funcName, value: '' });
+      const funcInputs = generateClaimFuncInputs(funcName, contractABI[selectedRevenueContract]!);
+      setFuncInputs(funcInputs);
     }
   }, []);
 
@@ -279,8 +294,8 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
         <>
           <TxFuncSelector
             headerText={t('components.transaction.enable-spigot.function-revenue')}
-            typeOptions={funcOptions}
             selectedType={claimFuncType}
+            readOnly={true}
             onSelectedTypeChange={onClaimFuncSelection}
           />
           {generateInputFields()}

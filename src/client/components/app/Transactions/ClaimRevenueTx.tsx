@@ -109,6 +109,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
   if (!selectedSpigot) return null;
 
   const claimRevenue = () => {
+    setLoading(true);
     if (!selectedSpigot.id) {
       console.log('claim rev modal: claimRevenue() - no spigot selected');
       return;
@@ -136,9 +137,13 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
       })
     )
       .then((res) => {
+        setTransactionCompleted(1);
+        setLoading(false);
         console.log('claim rev success', res);
       })
       .catch((err) => {
+        setTransactionCompleted(2);
+        setLoading(false);
         console.log('claim rev fail', err);
       });
   };

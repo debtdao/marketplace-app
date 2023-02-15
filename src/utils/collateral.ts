@@ -98,9 +98,7 @@ export const formatCollateralRevenue = (
     (agg, { token, amount, ...summary }) => {
       const checkSumAddress = ethers.utils.getAddress(token.address);
       console.log(token.address);
-      // TODO: put this back!
-      // const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
-      const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(2000000);
+      const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
       const amountLessOperatorTokens = BigNumber.from(amount).sub(
         BigNumber.from(reserves[checkSumAddress]?.operatorTokens ?? 0)
       );

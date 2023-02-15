@@ -215,16 +215,24 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
           categories[category] = [...(categories[category] || []), line.id];
         })
       );
+      const validLines = _.filter(
+        lines,
+        (line) => line.status === 'active' && Number(line.defaultSplit) > 0 && line.end * 1000 > Date.now()
+      );
+
       const highestCreditLines = _.map(
-        _.sortBy(lines, (line) => Number(BigNumber.from(line.deposit).div(BASE_DECIMALS)))
+        _.sortBy(validLines, (line) => Number(BigNumber.from(line.deposit).div(BASE_DECIMALS)))
           .reverse()
           .slice(0, 3),
         'id'
       );
+
+      const newCreditLines = categories['market:featured.newest'];
+
       const highestCreditLinesCategory = { 'market:featured.highest-credit': highestCreditLines };
 
       const highestRevenueLines = _.map(
-        _.sortBy(lines, (line) => Number(BigNumber.from(line!.spigot!.revenueValue).div(BASE_DECIMALS)))
+        _.sortBy(validLines, (line) => Number(BigNumber.from(line!.spigot!.revenueValue).div(BASE_DECIMALS)))
           .reverse()
           .slice(0, 3),
         'id'

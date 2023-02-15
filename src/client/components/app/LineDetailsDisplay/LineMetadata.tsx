@@ -433,9 +433,9 @@ export const LineMetadata = (props: LineMetadataProps) => {
   };
   console.log(allCollateral);
   const formattedCollateralData = allCollateral.map((c) => {
-    console.log('Tokens Map: ', tokensMap);
-    console.log('Tokens Map undefined?: ', c.token.address);
-    console.log('Tokens Map c: ', c);
+    // console.log('Tokens Map: ', tokensMap);
+    // console.log('Tokens Map undefined?: ', c.token.address);
+    // console.log('Tokens Map c: ', c);
     const tokenIcon = tokensMap?.[getAddress(c.token.address)]?.icon ?? '';
     const tokenInfo = { icon: tokenIcon, ...c.token };
     const collateral = { ...c, token: tokenInfo };

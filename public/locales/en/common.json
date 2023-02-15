@@ -334,7 +334,8 @@
           "cta": "Claim Operator Tokens",
           "error-message": "could not claim operator tokens"
         },
-        "error-message": "could not claim revenue"
+        "error-message": "could not claim revenue",
+        "error-reason": "Ownership has not been transferred"
       },
       "success-message": "completed"
     }

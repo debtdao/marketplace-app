@@ -16,3 +16,4 @@ export * from './hashSig';
 export * from './getENS';
 export * from './lineFactoryforNetwork';
 export * from './isGoerli';
+export * from './collateral';

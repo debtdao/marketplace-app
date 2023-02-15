@@ -137,9 +137,14 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
       })
     )
       .then((res) => {
-        setTransactionCompleted(1);
-        setLoading(false);
-        console.log('claim rev success', res);
+        if (res.meta.requestStatus === 'rejected') {
+          setTransactionCompleted(2);
+          setLoading(false);
+        }
+        if (res.meta.requestStatus === 'fulfilled') {
+          setTransactionCompleted(1);
+          setLoading(false);
+        }
       })
       .catch((err) => {
         setTransactionCompleted(2);
@@ -166,6 +171,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.claim-revenue.error-message')}
+          transactionFailedReason={t('components.transaction.claim-revenue.error-reason')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>

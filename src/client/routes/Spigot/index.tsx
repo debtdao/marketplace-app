@@ -92,11 +92,6 @@ export const Spigot = () => {
   return (
     <SpigotView>
       <SpigotDisplay />
-      {lineAddress ? (
-        <Button>
-          <Link to={`/${network}/lines/${lineAddress}`}>{t('Back to Line of Credit')}</Link>
-        </Button>
-      ) : null}
       {generalLoading && <SpinnerLoading flex="1" width="100%" height="20%" />}
       {!generalLoading && !selectedSpigot && (
         <StyledSliderCard

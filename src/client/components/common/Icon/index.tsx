@@ -57,7 +57,9 @@ export const Icon = styled(forwardRef(({ Component, ...props }: IconProps, ref) 
   align-items: center;
   justify-content: center;
   user-select: none;
-  margin-left: 1rem;
+  margin-left: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-shrink: 0;
   fill: ${({ color }) => color ?? 'currentColor'};
   width: ${({ size }) => size ?? 'initial'};
   height: ${({ size }) => size ?? 'initial'};

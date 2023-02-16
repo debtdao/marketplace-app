@@ -776,42 +776,26 @@ export const formatOptimisticProposal = (
 };
 
 // TODO: Move code from getLines to create state.categories into this function
-export const formatLineCategories = (
-  lines: { [key: string]: SecuredLine },
-  categories: { [key: string]: string[] }
-): { [key: string]: string[] } => {
-  const validLines = _.filter(lines, (line) => line.status === 'active' && line.end * 1000 > Date.now());
-
+export const formatLineCategories = (lines: { [key: string]: SecuredLine }): { [key: string]: string[] } => {
   const highestCreditLines = _.map(
-    _.sortBy(validLines, (line) => Number(BigNumber.from(line.deposit).div(BASE_DECIMALS)))
-      .reverse()
-      .slice(0, 3),
+    _.sortBy(lines, (line) => -Number(BigNumber.from(line.deposit).div(BASE_DECIMALS))).slice(0, 3),
     'id'
   );
-
-  const highestCreditLinesCategory = { 'market:featured.highest-credit': highestCreditLines };
 
   const highestRevenueLines = _.map(
-    _.sortBy(validLines, (line) => Number(BigNumber.from(line!.spigot!.revenueValue).div(BASE_DECIMALS)))
-      .reverse()
-      .slice(0, 3),
+    _.sortBy(lines, (line) => -Number(BigNumber.from(line!.spigot!.revenueValue).div(BASE_DECIMALS))).slice(0, 3),
     'id'
   );
-
-  const highestRevenueLinesCategory = { 'market:featured.highest-revenue': highestRevenueLines };
 
   const newCreditLines = _.map(
-    _.sortBy(validLines, (line) => line.start),
+    _.sortBy(lines, (line) => line.start),
     'id'
   );
 
-  const newCreditLinesCategory = { 'market:featured.newest': newCreditLines };
-
   const updatedCategories = {
-    ...categories,
-    ...highestCreditLinesCategory,
-    ...highestRevenueLinesCategory,
-    ...newCreditLinesCategory,
+    'market:featured.highest-credit': highestCreditLines,
+    'market:featured.highest-revenue': highestRevenueLines,
+    'market:featured.newest': newCreditLines,
   };
 
   return updatedCategories;

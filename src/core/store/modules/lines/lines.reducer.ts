@@ -216,7 +216,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
         })
       );
 
-      const updatedCategories = formatLineCategories(lines, categories);
+      const updatedCategories = formatLineCategories(lines);
 
       // Remove spigot and escrow objects from lines
       const formattedLines = _.mapValues(lines, (line) => {

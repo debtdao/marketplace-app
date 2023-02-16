@@ -60,6 +60,7 @@ const StyledCardContent = styled(CardContent)<{ wrap?: boolean; pointer?: boolea
   align-items: stretch;
   justify-content: stretch;
   ${({ pointer }) => pointer && `cursor: pointer;`};
+  // ${({ wrap }) => wrap && `flex-wrap: wrap;`};
 
   &:hover {
     background-color: ${({ theme }) => theme.colors.selectionBar};

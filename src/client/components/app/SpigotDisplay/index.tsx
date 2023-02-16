@@ -52,10 +52,6 @@ const Header = styled.h1`
   `};
 `;
 
-// const BorrowerName = styled(Text)`
-//   max-width: 100%;
-// `;
-
 const RouterLink = styled(Link)<{ selected: boolean }>`
   display: flex;
   flex-direction: row;

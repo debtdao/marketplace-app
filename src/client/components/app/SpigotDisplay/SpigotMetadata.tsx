@@ -256,7 +256,6 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
                   <RedirectLinkIcon />
                 </Link>
               ),
-              // width: '16rem',
               sortable: true,
               className: 'col-address',
             },
@@ -269,7 +268,6 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
                   <Text>{tokensMap[formatAddress(contract)] ? tokensMap[formatAddress(contract)].symbol : 'N/A'}</Text>
                 </Link>
               ),
-              // width: '15rem',
               sortable: true,
               className: 'col-available',
             },

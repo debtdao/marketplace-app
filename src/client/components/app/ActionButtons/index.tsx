@@ -10,9 +10,7 @@ const ActionButtonsContainer = styled.div<{ actions: number; direction?: string 
 
   @media ${device.tabletL} {
     flex-direction: ${({ direction }) => direction ?? 'column'};
-    // wrap: nowrap:
   }
-  // wrap: wrap;
 `;
 
 const AlertIcon = styled(Icon)`

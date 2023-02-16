@@ -57,7 +57,6 @@ const Header = styled.h3<{ onClick?: () => void }>`
   flex-direction: row;
   position: relative;
   align-items: center;
-  // text-align: center;
   font-size: 1.6rem;
   font-weight: 700;
   margin: 0;

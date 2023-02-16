@@ -107,12 +107,18 @@ interface PositionsTableProps {
   lender?: string;
   positions: CreditPosition[];
   displayLine?: boolean; // whether to add the positions line to the table
+  hideActions?: boolean;
 }
 
-export const PositionsTable = ({ borrower, lender, positions, displayLine = false }: PositionsTableProps) => {
+export const PositionsTable = ({
+  borrower,
+  lender,
+  positions,
+  displayLine = false,
+  hideActions = false,
+}: PositionsTableProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const dispatch = useAppDispatch();
-  const { isMobile, width } = useWindowDimensions();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const userRoleMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
@@ -467,6 +473,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
           filterLabel="Show 0% APY"
           initialSortBy="deposit"
           onAction={() => console.log('action')}
+          hideActions={hideActions}
           wrap
         />
       </div>

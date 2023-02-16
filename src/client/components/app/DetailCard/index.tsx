@@ -118,6 +118,7 @@ interface DetailCardProps<T> {
   onAction?: (item: T) => void;
   filterBy?: (item: T) => boolean;
   filterLabel?: string;
+  hideActions?: boolean;
 }
 
 export const DetailCard = <T,>({
@@ -132,6 +133,7 @@ export const DetailCard = <T,>({
   onAction,
   filterBy,
   filterLabel,
+  hideActions,
   ...props
 }: DetailCardProps<T>) => {
   const { isMobile } = useWindowDimensions();
@@ -160,25 +162,28 @@ export const DetailCard = <T,>({
   if (data.length === 0 && !SearchBar) {
     return null;
   }
-
   return (
     <StyledCard {...props}>
       <StyledCardHeader header={header}>
-        <SectionContent>
-          {!!filterBy && (
-            <>
-              {filterLabel}
-              <ToggleButton
-                ariaLabel={filterLabel}
-                selected={filterToggle}
-                setSelected={setFilterToggle}
-                data-testid="filter-toggle"
-                data-active={filterToggle}
-              />
-            </>
-          )}
-          {SearchBar}
-        </SectionContent>
+        {!hideActions ? (
+          <SectionContent>
+            {!!filterBy && (
+              <>
+                {filterLabel}
+                <ToggleButton
+                  ariaLabel={filterLabel}
+                  selected={filterToggle}
+                  setSelected={setFilterToggle}
+                  data-testid="filter-toggle"
+                  data-active={filterToggle}
+                />
+              </>
+            )}
+            {SearchBar}
+          </SectionContent>
+        ) : (
+          <></>
+        )}
       </StyledCardHeader>
 
       {!!displayData.length && (

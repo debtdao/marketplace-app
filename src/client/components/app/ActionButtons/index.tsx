@@ -7,10 +7,7 @@ const ActionButtonsContainer = styled.div<{ actions: number; direction?: string 
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.layoutPadding};
-
-  @media ${device.desktop} {
-    flex-direction: ${({ direction }) => direction ?? 'column'};
-  }
+  flex-direction: column;
 `;
 
 const AlertIcon = styled(Icon)`

@@ -8,7 +8,7 @@ const ActionButtonsContainer = styled.div<{ actions: number; direction?: string 
   align-items: center;
   gap: ${({ theme }) => theme.layoutPadding};
 
-  @media ${device.tabletL} {
+  @media ${device.desktop} {
     flex-direction: ${({ direction }) => direction ?? 'column'};
   }
 `;

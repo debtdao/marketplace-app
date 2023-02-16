@@ -31,6 +31,12 @@ import {
 } from '@src/core/store';
 import { getEnv } from '@config/env';
 
+const StyledButton = styled(Button)`
+  @media ${device.mobile} {
+    padding: ${({ theme }) => theme.spacing.xl} 0;
+  }
+`;
+
 const SectionHeader = styled.h3`
   ${({ theme }) => `
     font-size: ${theme.fonts.sizes.xl};
@@ -133,7 +139,6 @@ const MetricDataDisplay = ({ title, data, displaySubmetrics = false, submetrics 
 };
 
 export const SpigotMetadata = (props: SpigotMetadataProps) => {
-  console.log('render line metadata', props);
   const { t } = useAppTranslation(['common', 'spigot']);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
@@ -191,18 +196,18 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
   const getCollateralTableActions = () => {
     switch (userPositionMetadata.role) {
       case BORROWER_POSITION_ROLE:
-        return <Button onClick={claimOperatorTokensHandler}>{ClaimOperatorTokensText}</Button>; // TODO: What role does this go under? Do we need an Operator Role?
+        return <StyledButton onClick={claimOperatorTokensHandler}>{ClaimOperatorTokensText}</StyledButton>;
       case ARBITER_POSITION_ROLE:
         return (
           <>
-            <Button onClick={addSpigotHandler}>{enableSpigotText}</Button>
+            <StyledButton onClick={addSpigotHandler}>{enableSpigotText}</StyledButton>
           </>
         );
       case LENDER_POSITION_ROLE:
       default:
         return (
           <>
-            <Button onClick={claimOperatorTokensHandler}>{ClaimOperatorTokensText}</Button>
+            <StyledButton onClick={claimOperatorTokensHandler}>{ClaimOperatorTokensText}</StyledButton>
           </>
         );
     }
@@ -238,7 +243,7 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
     <>
       <ViewContainer>
         <AssetsListCard
-          header={' '} //{t('lineDetails:metadata.escrow.assets-list.title')}
+          header={t('spigot:metadata.title')}
           data-testid="line-assets-list"
           metadata={[
             {
@@ -251,9 +256,8 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
                   <RedirectLinkIcon />
                 </Link>
               ),
-              width: '16rem',
               sortable: true,
-              className: 'col-type',
+              className: 'col-address',
             },
             {
               key: 'token',
@@ -264,9 +268,8 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
                   <Text>{tokensMap[formatAddress(contract)] ? tokensMap[formatAddress(contract)].symbol : 'N/A'}</Text>
                 </Link>
               ),
-              width: '15rem',
               sortable: true,
-              className: 'col-symbol',
+              className: 'col-available',
             },
             {
               key: 'ownerSplit',
@@ -278,12 +281,14 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
                 const ownerSplitFormatted = `Borrower: ${borrowerSplit}  |  Lender: ${lenderSplit}`;
                 return <Text>{ownerSplitFormatted}</Text>;
               },
-              width: '25rem',
+              width: 'auto',
               sortable: true,
-              className: 'col-symbol',
+              className: 'col-available',
             },
             {
               key: 'actions',
+              header: t('spigot:metadata.actions'),
+              description: t('spigot:metadata.tooltips.actions'),
               transform: ({ contract }) => <ActionButtons actions={[claimRev(contract)]} />,
               align: 'flex-end',
               width: 'auto',

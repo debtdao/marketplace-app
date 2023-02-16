@@ -23,7 +23,7 @@ const StyledButton = styled.button<{ styling?: string; outline?: boolean }>`
   font-family: inherit;
   cursor: pointer;
   user-select: none;
-  font-size: 1.6rem;
+  font-size: ${({ theme }) => theme.fonts.sizes.md};
   transition: filter 200ms ease-in-out;
 
   a,

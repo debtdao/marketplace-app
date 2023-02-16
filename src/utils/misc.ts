@@ -73,6 +73,7 @@ export const isCustomApyType = (apyType: string) => apyType === 'new' || apyType
 export const getRandomId = (): string => new Date().getTime().toString(36) + Math.random().toString(36).slice(2);
 
 export const getDefaultLineCategories = () => {
+  const currentTime = Math.floor(Date.now() / 1000);
   const defaultLineCategories: UseCreditLinesParams = {
     // using i18m translation as keys for easy display
     'market:featured.highest-credit': {
@@ -80,17 +81,20 @@ export const getDefaultLineCategories = () => {
       // NOTE: terrible proxy for total credit (oldest = most). Currently getLines only allows filtering by line metadata not modules'
       orderBy: 'start',
       orderDirection: 'asc',
+      currentTime: currentTime,
     },
     'market:featured.highest-revenue': {
       first: 16,
       // NOTE: terrible proxy for total revenue earned (highest % = highest notional). Currently getLines only allows filtering by line metadata not modules'
       orderBy: 'defaultSplit',
       orderDirection: 'desc',
+      currentTime: currentTime,
     },
     'market:featured.newest': {
       first: 15,
       orderBy: 'start', // NOTE: theoretically gets lines that start in the future, will have to refine query
       orderDirection: 'desc',
+      currentTime: currentTime,
     },
   };
   return defaultLineCategories;

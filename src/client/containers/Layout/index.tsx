@@ -23,7 +23,7 @@ import { Modals, Alerts } from '@containers';
 import { getConfig } from '@config';
 import { Network, Route, UseCreditLinesParams } from '@types';
 import { device } from '@themes/default';
-import { isInIframe, isCoinbaseApp, getNetworkId } from '@utils';
+import { isInIframe, isCoinbaseApp, getNetworkId, getDefaultLineCategories } from '@utils';
 import { getPageName } from '@src/utils/getPageName';
 
 const contentSeparation = '1.6rem';
@@ -104,6 +104,7 @@ export const Layout: FC = ({ children }) => {
   const previousAddress = usePrevious(selectedAddress);
   const previousNetwork = usePrevious(currentNetwork);
   const userWalletAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
+  const defaultLineCategories = getDefaultLineCategories();
 
   // TODO: update how we get page name for a path to be more dynamic
   // const path = useAppSelector(({ route }) => route.path);
@@ -123,7 +124,6 @@ export const Layout: FC = ({ children }) => {
   // Used to check zapper api
   // const { ZAPPER_AUTH_TOKEN } = getConfig();
 
-  // TODO: Reset this before merging into develop.
   useEffect(() => {
     dispatch(AppActions.initApp());
 
@@ -156,7 +156,6 @@ export const Layout: FC = ({ children }) => {
     if (activeModal) dispatch(ModalsActions.closeModal());
 
     // Clear Redux state when switching networks
-    // TODO: Switch networks without requiring a page refresh.
     if (previousNetwork) {
       window.location.reload();
       // dispatch(AppActions.clearAppData());
@@ -171,8 +170,8 @@ export const Layout: FC = ({ children }) => {
     // dispatch(LinesActions.getLines(defaultLineCategories));
     // dispatch(LinesActions.getLinePage({ id: selectedLineAddress! }));
     // dispatch(LinesActions.getUserPortfolio({ user: userWalletAddress! }));
-
-    dispatch(TokensActions.getTokens());
+    // dispatch(TokensActions.getTokens());
+    dispatch(TokensActions.getTokens()).then(() => dispatch(LinesActions.getLines(defaultLineCategories)));
     dispatch(TokensActions.getSupportedOracleTokens());
   }, [currentNetwork]);
 

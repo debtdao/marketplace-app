@@ -40,6 +40,7 @@ const selectSelectedSpigot = createSelector(
 
 export const CollateralSelectors = {
   selectStatusMap,
+  selectCollateralMap,
   selectSelectedEscrow,
   selectSelectedSpigot,
   selectSelectedEscrowAddress,

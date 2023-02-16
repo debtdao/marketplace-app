@@ -310,12 +310,12 @@ export const GET_LINES_QUERY = gql`
   ${SPIGOT_SUMMARY_FRAGMENT}
   ${TOKEN_FRAGMENT}
 
-  query getLines($first: Int, $orderBy: String, $orderDirection: String, $blacklist: [ID]) {
+  query getLines($first: Int, $orderBy: String, $orderDirection: String, $blacklist: [ID], $currentTime: Int) {
     lineOfCredits(
       first: $first
       orderBy: $orderBy
       orderDirection: $orderDirection
-      where: { id_not_in: $blacklist } #TODO: , status: "ACTIVE" }
+      where: { id_not_in: $blacklist, status: "ACTIVE", end_gte: $currentTime }
     ) {
       ...BaseLineFrag
 

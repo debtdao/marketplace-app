@@ -92,11 +92,13 @@ export interface GetLinePageAuxArgs {
  * @property {number} GetLinesArgs.first - how many lines to get
  * @property {string} GetLinesArgs.orderBy - which property to sort on
  * @property {string} GetLinesArgs.orderDirection - if order is ascending or descending
+ * @property {number} GetLinesArgs.currentTime - lines must end after this time
  */
 export interface GetLinesArgs {
   first: number;
   orderBy: string;
   orderDirection: 'asc' | 'desc';
+  currentTime: number;
 }
 
 /**

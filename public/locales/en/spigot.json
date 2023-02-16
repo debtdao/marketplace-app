@@ -2,6 +2,7 @@
   "claim-revenue": "Claim Revenue",
   "metadata": {
     "borrower": "Borrower",
+    "actions": "Actions",
     "revenue": {
       "no-revenue": "",
       "per-month": "",
@@ -14,10 +15,12 @@
     "contract-address": "Contract Address",
     "symbol": "Contract Symbol",
     "revenue-split": "Revenue Split",
+    "title": "Revenue Contracts",
     "tooltips": {
       "contract-address": "The address of the revenue contract.",
       "symbol": "The ticker symbol of the revenue contract.",
-      "revenue-split": "The percentage of revenue split between the borrower and lender."
+      "revenue-split": "The percentage of revenue split between the borrower and lender.",
+      "actions": "The actions available for this revenue contract. Users can claim revenue."
     }
   },
   "no-spigot-supported-card": {

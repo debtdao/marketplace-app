@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useAppSelector, useAppTranslation, useAppDispatch } from '@hooks';
 import { RedirectIcon, Text, Link } from '@components/common';
 import { OnchainMetaDataActions, OnchainMetaDataSelector, LinesSelectors, NetworkSelectors } from '@store';
+import { device } from '@src/client/themes/default';
 import { Collateral, Network } from '@src/core/types';
 import { getENS } from '@src/utils';
 
@@ -19,10 +20,6 @@ interface LineDetailsProps {
 export const Container = styled.div`
   margin: 0;
   width: 100%;
-`;
-
-export const BorrowerName = styled(Text)`
-  max-width: 100%;
 `;
 
 export const LineDetailsDisplay = (props: LineDetailsProps) => {

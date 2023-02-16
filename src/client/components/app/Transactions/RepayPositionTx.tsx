@@ -108,12 +108,15 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const [repayType, setRepayType] = useState(allRepaymentOptions[0]);
   const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
+  const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
   const reservesMap = useAppSelector(CollateralSelectors.selectReservesMap);
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
   const initialToken: string = selectedSellTokenAddress ?? selectedPosition?.token.address ?? DAI;
+
+  console.log('Selected Spigot: ', selectedSpigot);
 
   // @cleanup TODO only use sell token for claimAndRepay/Trade. use selectedPosition.token for everything else
   const { selectedSellToken, sourceAssetOptions } = useSelectedSellToken({
@@ -155,7 +158,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     // populate collateral reservesmap in redux state
     if (Object.keys(reservesMap).length === 0) {
       // get all collateral tokens of type revenue
-      const lineRevenueSummary = selectedLine!.spigot!.revenueSummary;
+      const lineRevenueSummary = selectedSpigot!.revenueSummary;
       const revenueCollateralTokens: RevenueSummary[] = Object.values(lineRevenueSummary).filter(
         (token) => token.type === 'revenue'
       );
@@ -654,7 +657,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
   if (transactionCompleted === 1) {
     return (
-      <StyledTransaction onClose={onClose} header={'transaction'}>
+      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.success-message')}
@@ -666,7 +669,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
   if (transactionCompleted === 2) {
     return (
-      <StyledTransaction onClose={onClose} header={'transaction'}>
+      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.repay.deposit-and-repay.error-message')}

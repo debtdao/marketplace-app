@@ -100,6 +100,7 @@
       "weekly-apy": "Weekly APY"
     },
     "transaction": {
+      "header": "Transaction",
       "max-input": "Max",
       "approve": "Approve",
       "accept": "Accept",

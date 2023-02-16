@@ -283,7 +283,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
 
   if (transactionCompleted === 1) {
     return (
-      <StyledTransaction onClose={onClose} header={'transaction'}>
+      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.success-message')}
@@ -295,7 +295,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
 
   if (transactionCompleted === 2) {
     return (
-      <StyledTransaction onClose={onClose} header={'transaction'}>
+      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.add-credit.error-message')}

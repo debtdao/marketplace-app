@@ -9,7 +9,7 @@ import {
   useAppSelector,
 } from '@hooks';
 import { LinesSelectors, LinesActions, WalletSelectors } from '@store';
-import { withdrawUpdate, normalize, toWei } from '@src/utils';
+import { withdrawUpdate, normalize, toWei, formatAmount } from '@src/utils';
 
 import { TxContainer } from './components/TxContainer';
 import { TxCreditLineInput } from './components/TxCreditLineInput';
@@ -76,6 +76,11 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
 
     return amountToWithdraw > maxWithdrawAmount;
   };
+
+  const withdrawHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(
+    getMaxWithdraw(),
+    4
+  )} ${selectedPosition.token.symbol}`;
 
   const _updatePosition = () =>
     onPositionChange({
@@ -210,7 +215,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
       />
       <StyledAmountInput
         headerText={t('components.transaction.withdraw-credit.select-amount')}
-        inputText={t('')}
+        inputText={withdrawHeaderText}
         inputError={false}
         amount={targetAmount}
         onAmountChange={onAmountChange}

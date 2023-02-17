@@ -136,11 +136,16 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const [haveFetched0x, setHaveFetched0x] = useState<boolean>(false);
   // const [zeroExWarning, setZeroExWarning] = useState<boolean>(false);
   const [isTrade, setIsTrade] = useState<boolean>(false);
+  const [costToClose, setCostToClose] = useState('0');
   // TODO: replace usage in useFundsForClosing with appropriate value
 
   useEffect(() => {
     if (selectedPosition && selectedLine?.id) {
-      dispatch(LinesActions.getInterestAccrued({ contractAddress: selectedLine.id, id: selectedPosition.id }));
+      dispatch(LinesActions.getInterestAccrued({ contractAddress: selectedLine.id, id: selectedPosition.id })).then(
+        (res) => {
+          console.log(res);
+        }
+      );
     }
   }, []);
 
@@ -630,6 +635,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     if (!selectedPosition) {
       return '0';
     }
+    dispatch;
     const interestAccrued: string = `${Number(selectedPosition.interestAccrued)}`;
     return normalizeAmount(interestAccrued, selectedPosition.token.decimals);
   };

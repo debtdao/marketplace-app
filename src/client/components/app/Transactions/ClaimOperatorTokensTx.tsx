@@ -62,6 +62,7 @@ export const ClaimOperatorTokensTx: FC<ClaimOperatorTokensTxProps> = (props) => 
 
   const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
+  const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
   const reservesMap = useAppSelector(CollateralSelectors.selectReservesMap);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
@@ -101,7 +102,7 @@ export const ClaimOperatorTokensTx: FC<ClaimOperatorTokensTxProps> = (props) => 
     // populate collateral reservesmap in redux state
     if (Object.keys(reservesMap).length === 0) {
       // get all collateral tokens of type revenue
-      const lineRevenueSummary = selectedLine!.spigot!.revenueSummary;
+      const lineRevenueSummary = selectedSpigot!.revenueSummary;
       const revenueCollateralTokens: RevenueSummary[] = Object.values(lineRevenueSummary).filter(
         (token) => token.type === 'revenue'
       );

@@ -1,16 +1,13 @@
 import styled from 'styled-components';
 
 import { Button, Icon, WarningFilledIcon } from '@components/common';
+import { device } from '@themes/default';
 
 const ActionButtonsContainer = styled.div<{ actions: number; direction?: string }>`
   display: flex;
   align-items: center;
-  // grid-template-columns: repeat(${({ actions }) => actions}, 1fr);
   gap: ${({ theme }) => theme.layoutPadding};
-
-  @media (max-width: 1800px) {
-    flex-direction: ${({ direction }) => direction ?? 'column'};
-  }
+  flex-direction: column;
 `;
 
 const AlertIcon = styled(Icon)`
@@ -34,7 +31,8 @@ const ActionButton = styled(Button)<{ hide?: boolean }>`
   color: ${({ theme }) => theme.colors.vaultActionButton.color};
   border: 2px solid ${({ theme }) => theme.colors.vaultActionButton.borderColor};
   padding: 0 1.6rem;
-  width: 9.6rem;
+  max-width: 11rem;
+  min-width: 9.6rem;
 
   ${({ hide }) => hide && `visibility: hidden;`}
 

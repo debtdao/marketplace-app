@@ -3,6 +3,8 @@ import styled from 'styled-components';
 
 import { Card, CardHeader, CardContent, CardElement, CardEmptyList, ToggleButton } from '@components/common';
 import { sort } from '@utils';
+import { device } from '@themes/default';
+import { useWindowDimensions } from '@hooks';
 
 const StyledCardElement = styled(CardElement)<{ stripes?: boolean }>`
   display: flex;
@@ -33,6 +35,11 @@ const StyledCardElement = styled(CardElement)<{ stripes?: boolean }>`
       background-color: ${theme.colors.surfaceVariantA};
     }
   `}
+
+  @media ${device.mobile} {
+    padding-left: 0rem;
+    padding-right: 0rem;
+  }
 `;
 
 const TitleCardElement = styled(CardElement)`
@@ -44,12 +51,16 @@ const TitleCardElement = styled(CardElement)`
   &:last-child {
     align-items: flex-end;
   }
+  @media ${device.mobile} {
+    padding: 0rem;
+  }
 `;
 
 const StyledCardContent = styled(CardContent)<{ wrap?: boolean; pointer?: boolean }>`
   align-items: stretch;
   justify-content: stretch;
   ${({ pointer }) => pointer && `cursor: pointer;`};
+  // ${({ wrap }) => wrap && `flex-wrap: wrap;`};
 
   &:hover {
     background-color: ${({ theme }) => theme.colors.selectionBar};
@@ -124,6 +135,7 @@ export const DetailCard = <T,>({
   filterLabel,
   ...props
 }: DetailCardProps<T>) => {
+  const { isMobile } = useWindowDimensions();
   const [sortedData, setSortedData] = useState(initialSortBy ? sort(data, initialSortBy) : data);
   const [sortedBy, setSortedBy] = useState(initialSortBy);
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');

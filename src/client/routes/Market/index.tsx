@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import { utils } from 'ethers';
 
+import { device, sharedTheme } from '@themes/default';
 import { useAppSelector, useAppDispatch, useAppTranslation, useQueryParams } from '@hooks';
 import {
   ModalsActions,
@@ -38,7 +39,10 @@ const StyledSliderCard = styled(SliderCard)`
 const BannerCtaButton = styled(Button)`
   width: 80%;
   max-width: 20rem;
-  margin-top: 1em;
+  margin-top: 2rem;
+  @media ${device.mobile} {
+    padding: ${({ theme }) => theme.card.padding};
+  }
 `;
 
 interface VaultsQueryParams {

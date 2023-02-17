@@ -5,10 +5,10 @@ import styled from 'styled-components';
 import { format } from 'date-fns';
 import { getAddress } from 'ethers/lib/utils';
 
-import { device } from '@themes/default';
-import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL } from '@hooks';
+import { device, sharedTheme } from '@themes/default';
+import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL, useWindowDimensions } from '@hooks';
 import { ThreeColumnLayout } from '@src/client/containers/Columns';
-import { BASE_DECIMALS, prettyNumbers, unnullify, normalizeAmount } from '@src/utils';
+import { BASE_DECIMALS, prettyNumbers, unnullify, normalizeAmount, formatAddress } from '@src/utils';
 import {
   AggregatedEscrow,
   ARBITER_POSITION_ROLE,
@@ -27,7 +27,7 @@ import {
   REPAID_STATUS,
   INSOLVENT_STATUS,
 } from '@src/core/types';
-import { DetailCard, ActionButtons, TokenIcon, ViewContainer, BorrowerName } from '@components/app';
+import { DetailCard, ActionButtons, TokenIcon, ViewContainer } from '@components/app';
 import { Button, Text, RedirectIcon, Link, CardEmptyList, Tooltip, InfoIcon, Icon } from '@components/common';
 import {
   LinesSelectors,
@@ -42,6 +42,12 @@ import {
 import { humanize } from '@src/utils';
 import { getEnv } from '@config/env';
 
+const StyledButton = styled(Button)`
+  @media ${device.mobile} {
+    padding: ${({ theme }) => theme.spacing.lg} 0;
+  }
+`;
+
 const SectionHeader = styled.h3`
   ${({ theme }) => `
     display: flex;
@@ -50,6 +56,11 @@ const SectionHeader = styled.h3`
     margin: ${theme.spacing.xl} 0;
     color: ${theme.colors.primary};
   `}
+  @media ${device.mobile} {
+    flex-wrap: wrap;
+    font-size: ${({ theme }) => theme.fonts.sizes.lg};
+    margin: ${({ theme }) => `${theme.spacing.lg} 0`};
+  }
 `;
 
 const CollateralTypeName = styled(Link)`
@@ -59,6 +70,12 @@ const CollateralTypeName = styled(Link)`
     margin: 0 ${theme.fonts.sizes.sm};
     color: ${theme.colors.primary};
   `}
+  @media ${device.mobile} {
+    ${({ theme }) => `
+    font-size: ${theme.fonts.sizes.lg};
+    margin: 0 ${theme.fonts.sizes.xs};
+  `}
+  }
 `;
 
 const MetricContainer = styled.div`
@@ -145,11 +162,25 @@ const RedirectLinkIcon = styled(RedirectIcon)`
 `;
 
 const Header = styled.h1`
+  display: flex;
   ${({ theme }) => `
     margin-bottom: ${theme.spacing.xl};
     font-size: ${theme.fonts.sizes.xl};
     color: ${theme.colors.titles};
-  `};
+  `}
+`;
+
+export const BorrowerName = styled(Text)`
+  display: flex;
+  max-width: 100%;
+  margin-left: 1rem;
+  align-items: center;
+  @media ${device.mobile} {
+    ${({ theme }) => `
+      font-size: ${theme.fonts.sizes.md};
+      margin-left: 0.5rem;
+   `}
+  }
 `;
 
 const Redirect = styled(RedirectIcon)`
@@ -158,12 +189,16 @@ const Redirect = styled(RedirectIcon)`
   width: 1.2rem;
   margin-left: 2rem;
   padding-bottom: 0.2rem;
+  @media ${device.mobile} {
+    ${({ theme }) => `
+      margin-left: 1rem;
+   `}
+  }
 `;
 
 const RouterLink = styled(Link)<{ selected: boolean; fontSize: string }>`
   display: flex;
   flex-direction: row;
-  align-items: center;
   color: inherit;
   flex: 1;
   width: 100%;
@@ -259,6 +294,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const reservesMap = useAppSelector(CollateralSelectors.selectReservesMap);
+  const { isMobile, width } = useWindowDimensions();
+  const { devices } = sharedTheme;
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const dispatch = useAppDispatch();
   const { NETWORK } = getEnv();
@@ -467,8 +504,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
       case ARBITER_POSITION_ROLE:
         return (
           <>
-            <Button onClick={addSpigotHandler}>{enableSpigotText}</Button>
-            <Button onClick={enableAssetHandler}>{enableCollateralText}</Button>
+            <StyledButton onClick={addSpigotHandler}>{enableSpigotText}</StyledButton>
+            <StyledButton onClick={enableAssetHandler}>{enableCollateralText}</StyledButton>
           </>
         );
       case LENDER_POSITION_ROLE: // for testing
@@ -511,7 +548,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
               disabled: !walletIsConnected,
             },
           ]}
-          direction="row"
         />
       );
     }
@@ -535,8 +571,9 @@ export const LineMetadata = (props: LineMetadataProps) => {
       <MetadataContainer>
         <Header>
           <RouterLink to={`/${network}/portfolio/${borrower}`} key={borrower} selected={false} fontSize={'3rem'}>
+            {t('lineDetails:metadata.borrower')} {'  :  '}
             <BorrowerName>
-              {t('lineDetails:metadata.borrower')} {'  :  '} {borrowerID}
+              {width < devices.desktopS ? formatAddress(borrowerID) : borrowerID}
               <Redirect />
             </BorrowerName>
           </RouterLink>
@@ -645,7 +682,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
               description: t('lineDetails:metadata.escrow.tooltip.amount'),
               format: ({ amount }) => `${humanize('amount', amount, BASE_DECIMALS, 2)}`,
               sortable: true,
-              className: 'col-amount',
+              className: 'col-assets',
             },
             {
               key: 'value',
@@ -653,7 +690,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
               description: t('lineDetails:metadata.escrow.tooltip.value'),
               format: ({ value }) => `$ ${humanize('amount', value, BASE_DECIMALS, 2)}`,
               sortable: true,
-              className: 'col-value',
+              className: 'col-assets',
             },
             {
               key: 'actions',
@@ -661,7 +698,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
               description: t('lineDetails:metadata.escrow.tooltip.actions'),
               transform: ({ token, type }) => renderButtons(token, type),
               align: 'flex-end',
-              width: 'auto',
               grow: '1',
             },
           ]}

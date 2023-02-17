@@ -48,7 +48,6 @@ const BannerWarningText = styled.h2<{ toneDown?: boolean }>`
   display: inline-flex;
   font-size: 2.4rem;
   font-weight: 700;
-  // text-align: center;
   color: ${({ theme }) => theme.colors.titles};
   margin: 0;
   padding: 0;

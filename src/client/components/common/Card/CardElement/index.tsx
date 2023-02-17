@@ -2,6 +2,7 @@ import { FC, ReactNode } from 'react';
 import styled from 'styled-components';
 
 import { Icon, ArrowDownIcon, IconProps, InfoIcon, Tooltip, TooltipProps } from '@components/common';
+import { useWindowDimensions } from '@hooks';
 
 const Container = styled.div<{ width?: string; align?: string; grow?: string; fontWeight?: number }>`
   display: flex;
@@ -53,9 +54,9 @@ const SortIcon = styled(({ activeSort, sortType, ...props }: SortIconProps) => <
 
 const Header = styled.h3<{ onClick?: () => void }>`
   display: flex;
+  flex-direction: row;
   position: relative;
   align-items: center;
-  text-align: center;
   font-size: 1.6rem;
   font-weight: 700;
   margin: 0;
@@ -78,6 +79,11 @@ const Content = styled.div`
   :first-child img {
     margin-right: ${({ theme }) => theme.layoutPadding};
   }
+`;
+
+const IconContainer = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
 type SortType = 'asc' | 'desc';
@@ -112,20 +118,22 @@ export const CardElement: FC<CardElementProps> = ({
   className,
   ...props
 }) => {
+  const { isMobile } = useWindowDimensions();
   return (
     <Container width={width} align={align} grow={grow} fontWeight={fontWeight} className={className} {...props}>
       {header && (
         <Header onClick={onClick}>
           {header}
-          <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
-            <Icon Component={InfoIcon} size="1.5rem" />
-          </Tooltip>
+          {!isMobile && (
+            <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
+              <Icon Component={InfoIcon} size="1.5rem" />
+            </Tooltip>
+          )}
 
           {/* TODO: Add styled tooltip back once css issues are fixed */}
           {/* <Tooltip placement="bottom-start" tooltipComponent={<>{description}</>}>
             <StyledIcon Component={InfoIcon} size="1.5rem" />
           </Tooltip> */}
-
           {sortable && <SortIcon activeSort={activeSort} sortType={sortType} Component={ArrowDownIcon} />}
         </Header>
       )}

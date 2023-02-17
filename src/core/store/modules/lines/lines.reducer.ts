@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { createReducer } from '@reduxjs/toolkit';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 
 import {
   initialStatus,
@@ -23,7 +23,7 @@ import {
   ACTIVE_STATUS,
   RevenueSummaryMap,
 } from '@types';
-import { formatOptimisticProposal, getNetworkId } from '@src/utils';
+import { BASE_DECIMALS, formatLineCategories, formatOptimisticProposal, getNetworkId } from '@src/utils';
 
 import { NetworkActions } from '../network/network.actions';
 import { WalletActions } from '../wallet/wallet.actions';
@@ -215,9 +215,18 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
           categories[category] = [...(categories[category] || []), line.id];
         })
       );
-      state.linesMap = { ...state.linesMap, ...lines };
+
+      const updatedCategories = formatLineCategories(lines);
+
+      // Remove spigot and escrow objects from lines
+      const formattedLines = _.mapValues(lines, (line) => {
+        const { spigot, escrow, ...rest } = line;
+        return rest;
+      });
+
+      state.linesMap = { ...state.linesMap, ...formattedLines };
       state.positionsMap = { ...state.positionsMap, ...positions };
-      state.categories = { ...state.categories, ...categories };
+      state.categories = { ...state.categories, ...updatedCategories };
     })
     .addCase(getLines.rejected, (state, { error }) => {
       state.statusMap.getLines = { error: error.message };
@@ -229,7 +238,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(getLinePage.fulfilled, (state, { payload: { linePageData } }) => {
       if (linePageData) {
         // overwrite actual positions with referential ids
-        const { positions, creditEvents, ...metadata } = linePageData;
+        const { positions, creditEvents, escrow, spigot, ...metadata } = linePageData;
         state.linesMap = { ...state.linesMap, [linePageData.id]: { ...metadata } };
         state.positionsMap = { ...state.positionsMap, ...positions };
         state.eventsMap = { ...state.eventsMap, [metadata.id]: creditEvents };

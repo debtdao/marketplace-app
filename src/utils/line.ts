@@ -434,7 +434,7 @@ export const formatSecuredLineData = (
   };
 
   const positions = createPositionsMap(positionFrags, tokenPrices);
-  console.log('CRATIO', aggregatedEscrow.cratio);
+
   return {
     credit: {
       highestApy,

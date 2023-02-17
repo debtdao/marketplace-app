@@ -82,7 +82,6 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
   const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
   const initialToken: string = selectedSellTokenAddress || DAI;
-  console.log('add credit init tok', selectedPosition?.token.address, selectedSellTokenAddress, DAI);
   const { selectedSellToken, sourceAssetOptions } = useSelectedSellToken({
     selectedSellTokenAddress: initialToken,
     allowTokenSelect: true,
@@ -274,7 +273,6 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
           },
         ];
 
-  console.log('add cred sellToken', selectedPosition, positionToken, selectedSellToken);
   if (!positionToken) return null;
   if (!selectedCredit) return null;
 

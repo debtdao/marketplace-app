@@ -633,10 +633,13 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
   // generate token header text for deposit-and-repay and repay-and-close
   const targetBalance = normalizeAmount(selectedPosition.token.balance, selectedPosition.token.decimals);
+  console.log('Repay Token Header Text: ', targetBalance);
+  console.log('Repay Token: ', selectedPosition.token);
 
   const tokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(targetBalance, 4)} ${
     selectedPosition.token.symbol
   }`;
+  console.log('Repay Token Header Text: ', tokenHeaderText);
 
   // generate token header text for use-and-repay
   const creditTokenExistsInReserves =

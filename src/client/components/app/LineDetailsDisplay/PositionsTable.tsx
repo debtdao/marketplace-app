@@ -145,43 +145,54 @@ export const PositionsTable = ({
 
   // Action Handlers for positions table
 
-  const depositHandler = (position?: string, proposal?: string) => {
+  const depositHandler = (line?: string, position?: string, proposal?: string) => {
     if (!userWallet) {
       connectWallet();
     } else {
+      console.log('Propose Line: ', line);
+      console.log('Propose Position: ', position);
+      dispatch(LinesActions.setSelectedLineAddress({ lineAddress: line }));
       dispatch(LinesActions.setSelectedLinePosition({ position }));
       dispatch(LinesActions.setSelectedLinePositionProposal({ proposal }));
       dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
+      console.log('Done');
     }
   };
 
-  const liquidateHandler = (position?: string) => {
+  const liquidateHandler = (line?: string, position?: string) => {
     if (!position) return;
+    dispatch(LinesActions.setSelectedLineAddress({ lineAddress: line }));
     dispatch(LinesActions.setSelectedLinePosition({ position }));
     dispatch(ModalsActions.openModal({ modalName: 'liquidateBorrower' }));
   };
 
-  const withdrawHandler = (position?: string) => {
+  const withdrawHandler = (line?: string, position?: string) => {
     if (!position) return;
+    dispatch(LinesActions.setSelectedLineAddress({ lineAddress: line }));
     dispatch(LinesActions.setSelectedLinePosition({ position }));
     dispatch(ModalsActions.openModal({ modalName: 'withdraw' }));
   };
 
-  const revokeConsentHandler = (position?: string, proposal?: string) => {
+  const revokeConsentHandler = (line?: string, position?: string, proposal?: string) => {
     if (!position) return;
+    console.log('Propose Line: ', line);
+    console.log('Propose Position: ', position);
+    dispatch(LinesActions.setSelectedLineAddress({ lineAddress: line }));
     dispatch(LinesActions.setSelectedLinePosition({ position }));
     dispatch(LinesActions.setSelectedLinePositionProposal({ proposal }));
     dispatch(ModalsActions.openModal({ modalName: 'revokeConsent' }));
   };
 
-  const borrowHandler = (position?: string) => {
+  const borrowHandler = (line?: string, position?: string) => {
     if (!position) return;
+    dispatch(LinesActions.setSelectedLineAddress({ lineAddress: line }));
     dispatch(LinesActions.setSelectedLinePosition({ position }));
     dispatch(ModalsActions.openModal({ modalName: 'borrow' }));
   };
 
-  const depositAndRepayHandler = (position?: string) => {
+  const depositAndRepayHandler = (line?: string, position?: string) => {
     if (!position) return;
+    dispatch(LinesActions.setSelectedLineAddress({ lineAddress: line }));
     dispatch(LinesActions.setSelectedLinePosition({ position }));
     dispatch(ModalsActions.openModal({ modalName: 'depositAndRepay' }));
   };
@@ -241,7 +252,7 @@ export const PositionsTable = ({
   };
 
   // Returns a list of transactions to display on positions table for proposals
-  const getUserProposalActions = (proposal: CreditProposal) => {
+  const getUserProposalActions = (position: CreditPosition, proposal: CreditProposal) => {
     const approveMutualConsent = {
       name: t('components.transaction.add-credit.accept-terms'),
       handler: depositHandler,
@@ -310,7 +321,9 @@ export const PositionsTable = ({
         ),
         actions: (
           <ActionButtons
-            value1={position.id}
+            value1={position.line}
+            value2={position.id}
+            value3={''}
             // Note: if position is in PROPOSED_STATUS, then we want to display the proposal actions instead
             actions={position.status !== PROPOSED_STATUS ? getUserPositionActions(position) : []}
           />
@@ -358,9 +371,10 @@ export const PositionsTable = ({
                   ),
                   actions: (
                     <ActionButtons
-                      value1={position.id}
-                      value2={proposal.id}
-                      actions={getUserProposalActions(proposal)}
+                      value1={position.line}
+                      value2={position.id}
+                      value3={proposal.id}
+                      actions={getUserProposalActions(position, proposal)}
                     />
                   ),
                 };

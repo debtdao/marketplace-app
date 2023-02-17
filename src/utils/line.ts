@@ -788,7 +788,7 @@ export const formatLineCategories = (lines: { [key: string]: SecuredLine }): { [
   );
 
   const newCreditLines = _.map(
-    _.sortBy(lines, (line) => line.start),
+    _.sortBy(lines, (line) => -line.start),
     'id'
   );
 

@@ -51,17 +51,18 @@ const ActionButton = styled(Button)<{ hide?: boolean }>`
 interface ActionButtonsProps {
   actions: Array<{
     name: string;
-    handler: (value1?: string, value2?: string) => void;
+    handler: (value1?: string, value2?: string, value3?: string) => void;
     disabled?: boolean;
     hide?: boolean;
   }>;
   direction?: 'row' | 'column';
   value1?: string;
   value2?: string;
+  value3?: string;
   alert?: string;
 }
 
-export const ActionButtons = ({ actions, alert, direction, value1, value2 }: ActionButtonsProps) => (
+export const ActionButtons = ({ actions, alert, direction, value1, value2, value3 }: ActionButtonsProps) => (
   <ActionButtonsContainer actions={actions.length} direction={direction}>
     {alert && (
       <AlertButton
@@ -81,7 +82,7 @@ export const ActionButtons = ({ actions, alert, direction, value1, value2 }: Act
         key={`action-${name}`}
         onClick={(e: Event) => {
           e.stopPropagation();
-          handler(value1, value2);
+          handler(value1, value2, value3);
         }}
         // value={value}
         disabled={disabled}

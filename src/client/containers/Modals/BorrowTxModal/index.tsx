@@ -11,7 +11,6 @@ export interface BorrowTxModalProps {
 }
 
 export const BorrowTxModal: FC<BorrowTxModalProps> = ({ onClose, ...props }) => {
-  console.log('borrow modal', props);
   const { t } = useAppTranslation('common');
   // if (!creditLine) return; // TODO error or creditLine selector input
 

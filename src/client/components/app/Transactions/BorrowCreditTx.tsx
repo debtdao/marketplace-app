@@ -1,11 +1,11 @@
 import { FC, useState } from 'react';
 import styled from 'styled-components';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import _ from 'lodash';
 
 import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
 import { LinesSelectors, LinesActions, WalletSelectors } from '@store';
-import { normalizeAmount, borrowUpdate } from '@src/utils';
+import { normalizeAmount, borrowUpdate, formatAmount, BASE_DECIMALS } from '@src/utils';
 import { CreditPosition } from '@src/core/types';
 
 import { TxContainer } from './components/TxContainer';
@@ -158,6 +158,16 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
     );
   }
 
+  const amountAvailableToBorrow = normalizeAmount(
+    BigNumber.from(selectedPosition.deposit).sub(BigNumber.from(selectedPosition.principal)).toString(),
+    BASE_DECIMALS
+  );
+  console.log('Amount Available to Borrow: ', amountAvailableToBorrow);
+  const borrowHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(
+    amountAvailableToBorrow,
+    4
+  )} ${selectedPosition.token.symbol}`;
+
   return (
     <StyledTransaction onClose={onClose} header={header || t('components.transaction.borrow')}>
       <TxPositionInput
@@ -174,11 +184,11 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
       />
       <StyledAmountInput
         headerText={t('components.transaction.borrow-credit.select-amount')}
-        inputText={t('')}
+        inputText={borrowHeaderText}
         inputError={false}
         amount={targetAmount}
         onAmountChange={onAmountChange}
-        maxAmount={normalizeAmount(selectedPosition['deposit'], 18)}
+        maxAmount={amountAvailableToBorrow}
         maxLabel={'Max'}
         readOnly={false}
         hideAmount={false}

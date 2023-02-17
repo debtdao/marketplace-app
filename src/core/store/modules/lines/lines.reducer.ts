@@ -115,7 +115,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
 
     .addCase(setSelectedLinePosition, (state, { payload: { position } }) => {
-      console.log('set position', position, state.positionsMap[position ?? ''], state.positionsMap);
       state.selectedPosition = position;
     })
 
@@ -125,7 +124,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 
     .addCase(setPosition, (state, { payload: { id, position } }) => {
       state.positionsMap[id] = position;
-      console.log('Updated Positions Map: ', state.positionsMap[id]);
     })
 
     .addCase(revokeProposal, (state, { payload: { lineAddress, positionId, proposalId } }) => {

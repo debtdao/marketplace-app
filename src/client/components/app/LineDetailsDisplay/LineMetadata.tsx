@@ -140,7 +140,6 @@ const StatusWithColor = styled.span<{ status: string }>`
 
 const CratioWithColor = styled.span<{ diff: number }>`
   color: ${({ diff }) => {
-    console.log('CRATIO', diff);
     if (diff >= 15) return '#6AFF4D'; // decent margin - light green
     else if (diff < 0) return '#FF1919'; // liquidatable - bright red
     else return '#E6E600'; // close to liquidatable - darkish yellow
@@ -317,7 +316,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const { revenueValue, revenueSummary: revenue } = spigot!;
 
   const renderEscrowMetadata = () => {
-    console.log(cratio);
     if (!deposits) return null;
     if (!collateralValue)
       return (

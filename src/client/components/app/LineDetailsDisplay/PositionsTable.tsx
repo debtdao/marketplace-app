@@ -149,9 +149,6 @@ export const PositionsTable = ({
     if (!userWallet) {
       connectWallet();
     } else {
-      console.log('Propose Line: ', line);
-      console.log('Propose Position: ', position);
-      console.log('Propose Proposal: ', proposal);
       dispatch(LinesActions.setSelectedLineAddress({ lineAddress: line }));
       dispatch(LinesActions.setSelectedLinePosition({ position }));
       dispatch(LinesActions.setSelectedLinePositionProposal({ proposal }));
@@ -176,9 +173,6 @@ export const PositionsTable = ({
 
   const revokeConsentHandler = (line?: string, position?: string, proposal?: string) => {
     if (!position) return;
-    console.log('Propose Line: ', line);
-    console.log('Propose Position: ', position);
-    console.log('Propose Proposal: ', proposal);
     dispatch(LinesActions.setSelectedLineAddress({ lineAddress: line }));
     dispatch(LinesActions.setSelectedLinePosition({ position }));
     dispatch(LinesActions.setSelectedLinePositionProposal({ proposal }));

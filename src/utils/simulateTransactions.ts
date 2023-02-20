@@ -1,33 +1,37 @@
+import { BigNumber } from 'ethers';
+
 import { CLOSED_STATUS, CreditPosition, CreditProposal, OPENED_STATUS } from '@src/core/types';
 
 import { toWei } from './format';
 
-// TODO: replace all instances of Number with BigNumber
 export const borrowUpdate = (position: CreditPosition, amount: string) => {
-  const borrowedAmount = toWei(amount, Number(+position['token'].decimals));
-  const updatedPrincipal = Number(position['principal']) + Number(borrowedAmount);
+  const borrowedAmount = toWei(amount, Number(+position.token.decimals));
+  const updatedPrincipal = BigNumber.from(position.principal).add(BigNumber.from(borrowedAmount)).toString();
   return { ...position, principal: `${updatedPrincipal}` };
 };
 
-// TODO: replace all instances of Number with BigNumber
 export const withdrawUpdate = (position: CreditPosition, amount: string) => {
-  const withdrawnAmount = toWei(amount, Number(position['token'].decimals));
-  const updatedDeposit = Number(position['deposit']) - Number(withdrawnAmount);
+  const withdrawnAmount = toWei(amount, Number(position.token.decimals));
+  const updatedDeposit = BigNumber.from(position.deposit).sub(BigNumber.from(withdrawnAmount)).toString();
   return { ...position, deposit: `${updatedDeposit}` };
 };
 
-// TODO: replace all instances of Number with BigNumber
 export const depositAndRepayUpdate = (position: CreditPosition, amount: string) => {
-  const repayAmount = toWei(amount, Number(position['token'].decimals));
-  const interestPaid =
-    Number(repayAmount) > Number(position['interestAccrued']) ? position['interestAccrued'] : repayAmount;
-  const prinicipalToRepay = Number(position['principal']) - Number(repayAmount) + Number(interestPaid);
-  const remainingInterest = Number(position['interestAccrued']) - Number(interestPaid);
+  const repayAmount = toWei(amount, Number(position.token.decimals));
+  const interestPaid = BigNumber.from(repayAmount).gt(BigNumber.from(position.interestAccrued))
+    ? position.interestAccrued
+    : repayAmount;
+  const prinicipalToRepay = BigNumber.from(position.principal)
+    .sub(BigNumber.from(repayAmount))
+    .add(BigNumber.from(interestPaid))
+    .toString();
+  const remainingInterest = BigNumber.from(position.interestAccrued).sub(BigNumber.from(interestPaid)).toString();
+  const updatedInterestPaid = BigNumber.from(position.interestRepaid).add(BigNumber.from(remainingInterest)).toString();
   return {
     ...position,
     principal: `${prinicipalToRepay}`,
     interestAccrued: `${remainingInterest}`,
-    interestPaid: `${Number(position['interestRepaid']) + remainingInterest}`,
+    interestPaid: `${updatedInterestPaid}`,
   };
 };
 

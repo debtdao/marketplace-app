@@ -194,7 +194,7 @@ export const SetRatesTx: FC<SetRateProps> = (props) => {
   ];
 
   if (!selectedCredit) {
-    console.log('withdraw modal selected credit is undefined: ', selectedCredit);
+    console.log('Change Rates Modal undefined ', selectedCredit);
     return null;
   }
 

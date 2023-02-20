@@ -5,7 +5,7 @@ import _ from 'lodash';
 
 import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
 import { LinesSelectors, LinesActions, WalletSelectors } from '@store';
-import { normalizeAmount, borrowUpdate } from '@src/utils';
+import { normalizeAmount, borrowUpdate, BASE_DECIMALS } from '@src/utils';
 import { CreditPosition } from '@src/core/types';
 
 import { TxContainer } from './components/TxContainer';
@@ -55,7 +55,10 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
   };
 
   const getMax = (pos: CreditPosition): string => {
-    const maxBorrow = Number(pos.deposit) - Number(pos.principal);
+    const maxBorrow = normalizeAmount(
+      BigNumber.from(pos.deposit).sub(BigNumber.from(pos.principal)).toString(),
+      BASE_DECIMALS
+    );
 
     return maxBorrow.toString();
   };

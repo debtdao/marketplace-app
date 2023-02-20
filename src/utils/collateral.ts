@@ -80,18 +80,8 @@ export const formatCollateralRevenue = (
     [address: string]: BigNumber;
   }
 ): AggregatedSpigot => {
-  // TODO: update collateralMap to remove operatorTokens from amount and usdValue of type === REVENUE
-  // update revenueValue
-  // update revenueSummary
   console.log(spigot);
   const { revenueValue, revenueSummary, ...rest } = spigot;
-  // for each revenue token, update the amount and value
-  // const [newRevenueValue, newRevenueSummary]: [BigNumber, RevenueSummaryMap] = revenueSummary.reduce<any>()
-  // get the usdcPrice for each revenue token
-  // subtract the operatorTokens from the amount
-  // recalculate the value field with the usdcPrice and amount
-
-  // aggregated revenue in USD by token across all spigots
   const [newRevenueValue, newRevenueSummary]: [BigNumber, RevenueSummaryMap] = Object.values(
     revenueSummary
   ).reduce<any>(

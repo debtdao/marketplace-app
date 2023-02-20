@@ -192,10 +192,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.getLine = { error: error.message };
     })
 
-    .addCase(getInterestAccrued.fulfilled, (state, { payload: { amount, lineAddress, id } }) => {
-
-
-    })
+    .addCase(getInterestAccrued.fulfilled, (state, { payload: { amount, lineAddress, id } }) => {})
     /* -------------------------------- getLines ------------------------------- */
     .addCase(getLines.pending, (state) => {
       // either need to make linesData in .fullfilled be a map like request

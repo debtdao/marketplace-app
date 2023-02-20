@@ -258,7 +258,7 @@ export interface GetInterestAccruedProps {
 }
 
 const getInterestAccrued = createAsyncThunk<
-  { amount: BigNumber; lineAddress: string, id: BytesLike },
+  { amount: BigNumber; lineAddress: string; id: BytesLike },
   GetInterestAccruedProps,
   ThunkAPI
 >('lines/getInterestAccrued', async (props, { getState, extra }) => {
@@ -270,7 +270,7 @@ const getInterestAccrued = createAsyncThunk<
   return {
     amount: interestAccrued,
     lineAddress: contractAddress,
-    id:id,
+    id: id,
   };
 });
 

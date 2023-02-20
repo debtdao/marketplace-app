@@ -159,18 +159,15 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
     );
   }
 
-  console.log('Amount Available to Borrow - Deposit: ', selectedPosition.deposit);
-  console.log('Amount Available to Borrow - Principal: ', selectedPosition.principal);
   const amountAvailableToBorrow = normalizeAmount(
     BigNumber.from(selectedPosition.deposit).sub(BigNumber.from(selectedPosition.principal)).toString(),
     selectedPosition.token.decimals
   );
-  console.log('Amount Available to Borrow: ', amountAvailableToBorrow);
+
   const borrowHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(
     amountAvailableToBorrow,
     4
   )} ${selectedPosition.token.symbol}`;
-  console.log('Amount Available to Borrow Header: ', borrowHeaderText);
 
   return (
     <StyledTransaction onClose={onClose} header={header || t('components.transaction.borrow')}>

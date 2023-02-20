@@ -149,11 +149,10 @@ export const PositionsTable = ({
     if (!userWallet) {
       connectWallet();
     } else {
-      dispatch(LinesActions.setSelectedLineAddress({ lineAddress: line }));
+      dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineAddress }));
       dispatch(LinesActions.setSelectedLinePosition({ position }));
       dispatch(LinesActions.setSelectedLinePositionProposal({ proposal }));
       dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
-      console.log('Done');
     }
   };
 

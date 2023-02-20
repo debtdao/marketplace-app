@@ -110,6 +110,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
   const reservesMap = useAppSelector(CollateralSelectors.selectReservesMap);
+  const userTokensMap = useAppSelector(LinesSelectors.selectUserTokensMap);
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
@@ -632,7 +633,12 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   };
 
   // generate token header text for deposit-and-repay and repay-and-close
-  const tokenHeaderText = `${t('components.transaction.token-input.you-have')} ${selectedPosition.token.balance} ${
+  // TODO: test that this generates correct token amount from user's wallet on mainnet
+  const tokenTargetBalance = normalizeAmount(
+    userTokensMap?.[selectedPosition.token.address]?.balance ?? '0',
+    selectedPosition.token.decimals
+  );
+  const tokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(tokenTargetBalance, 4)} ${
     selectedPosition.token.symbol
   }`;
 

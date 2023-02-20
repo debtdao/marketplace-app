@@ -17,3 +17,4 @@ export * from './getENS';
 export * from './lineFactoryforNetwork';
 export * from './isGoerli';
 export * from './collateral';
+export * from './bytesToName';

@@ -102,6 +102,7 @@ const {
   // getUserLinesMetadata,
   clearSelectedLine,
   clearLineStatus,
+  getInterestAccrued,
 } = LinesActions;
 
 const linesReducer = createReducer(linesInitialState, (builder) => {
@@ -189,6 +190,11 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
     .addCase(getLine.rejected, (state, { error }) => {
       state.statusMap.getLine = { error: error.message };
+    })
+
+    .addCase(getInterestAccrued.fulfilled, (state, { payload: { amount, lineAddress, id } }) => {
+
+
     })
     /* -------------------------------- getLines ------------------------------- */
     .addCase(getLines.pending, (state) => {

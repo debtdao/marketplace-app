@@ -5,7 +5,7 @@ import { getAddress } from '@ethersproject/address';
 import { BytesLike, ethers } from 'ethers';
 import { ParamType } from '@ethersproject/abi';
 
-import { formatAmount, generateSig, isValidAddress, normalizeAmount } from '@utils';
+import { formatAmount, generateSig, isValidAddress, normalizeAmount, bytesToName } from '@utils';
 import {
   useAppTranslation,
   useAppDispatch,
@@ -16,7 +16,6 @@ import {
 } from '@hooks';
 import { getConstants } from '@src/config/constants';
 import { generateClaimFuncInputs } from '@src/utils/generateFuncInputs';
-import { bytesToName } from '@src/utils/bytesToName';
 import {
   TokensActions,
   TokensSelectors,

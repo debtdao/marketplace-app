@@ -28,7 +28,15 @@ import {
   CollateralSelectors,
 } from '@store';
 import { getConstants, testTokens } from '@src/config/constants';
-import { Balance, CreditPosition, RevenueSummary, TokenView, ZeroExAPIQuoteResponse } from '@src/core/types';
+import {
+  AggregatedSpigot,
+  Balance,
+  Collateral,
+  CreditPosition,
+  RevenueSummary,
+  TokenView,
+  ZeroExAPIQuoteResponse,
+} from '@src/core/types';
 
 import { TxContainer } from './components/TxContainer';
 import { TxTokenInput } from './components/TxTokenInput';
@@ -109,6 +117,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const reservesMap = useAppSelector(CollateralSelectors.selectReservesMap);
+  const collaterlMap = useAppSelector(CollateralSelectors.selectCollateralMap);
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
@@ -141,11 +150,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
   useEffect(() => {
     if (selectedPosition && selectedLine?.id) {
-      dispatch(LinesActions.getInterestAccrued({ contractAddress: selectedLine.id, id: selectedPosition.id })).then(
-        (res) => {
-          console.log(res);
-        }
-      );
+      dispatch(LinesActions.getInterestAccrued({ contractAddress: selectedLine.id, id: selectedPosition.id }));
     }
   }, []);
 
@@ -166,7 +171,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     // populate collateral reservesmap in redux state
     if (Object.keys(reservesMap).length === 0) {
       // get all collateral tokens of type revenue
-      const lineRevenueSummary = selectedLine!.spigot!.revenueSummary;
+      const spigot = collaterlMap[selectedLine!.spigotId] as AggregatedSpigot;
+      const lineRevenueSummary = spigot.revenueSummary;
       const revenueCollateralTokens: RevenueSummary[] = Object.values(lineRevenueSummary).filter(
         (token) => token.type === 'revenue'
       );
@@ -635,7 +641,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     if (!selectedPosition) {
       return '0';
     }
-    dispatch;
     const interestAccrued: string = `${Number(selectedPosition.interestAccrued)}`;
     return normalizeAmount(interestAccrued, selectedPosition.token.decimals);
   };

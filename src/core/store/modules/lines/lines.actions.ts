@@ -257,17 +257,22 @@ export interface GetInterestAccruedProps {
   id: BytesLike;
 }
 
-const getInterestAccrued = createAsyncThunk<{ amount: BigNumber }, GetInterestAccruedProps, ThunkAPI>(
-  'lines/getInterestAccrued',
-  async (props, { getState, extra }) => {
-    const { services } = extra;
-    const { creditLineService } = services;
-    const { contractAddress, id } = props;
-    const interestAccrued = await creditLineService.getInterestAccrued(contractAddress, id);
-    console.log(interestAccrued.toString());
-    return { amount: interestAccrued };
-  }
-);
+const getInterestAccrued = createAsyncThunk<
+  { amount: BigNumber; lineAddress: string, id: BytesLike },
+  GetInterestAccruedProps,
+  ThunkAPI
+>('lines/getInterestAccrued', async (props, { getState, extra }) => {
+  const { services } = extra;
+  const { creditLineService } = services;
+  const { contractAddress, id } = props;
+  const interestAccrued = await creditLineService.getInterestAccrued(contractAddress, id);
+  console.log(interestAccrued.toString());
+  return {
+    amount: interestAccrued,
+    lineAddress: contractAddress,
+    id:id,
+  };
+});
 
 /* -------------------------------------------------------------------------- */
 /*                             Transaction Methods                            */

@@ -44,6 +44,7 @@ export interface LineOfCredit {
   principal: string;
   deposit: string;
   interest: string;
+
   // lifetime stats
   defaultSplit: string;
   totalInterestRepaid: string;

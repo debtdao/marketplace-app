@@ -14,6 +14,8 @@ import {
   NetworkSelectors,
   TokensSelectors,
   TokensActions,
+  CollateralActions,
+  CollateralSelectors,
 } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL, useWindowDimensions } from '@hooks';
 import { device, sharedTheme } from '@themes/default';
@@ -27,6 +29,7 @@ import {
   CreditProposal,
   PROPOSED_STATUS,
   CLOSED_STATUS,
+  AggregatedEscrow,
 } from '@src/core/types';
 import { humanize, formatAddress, normalizeAmount, getENS } from '@src/utils';
 import { getEnv } from '@config/env';
@@ -119,12 +122,13 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
   const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
+  const collateralMap = useAppSelector(CollateralSelectors.selectCollateralMap);
+
   const explorerUrl = useExplorerURL(currentNetwork);
   const { NETWORK } = getEnv();
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
-  const { escrow } = selectedLine!;
-  const { minCRatio, cratio } = escrow!;
+  const { minCRatio, cratio } = collateralMap[selectedLine!.escrowId] as AggregatedEscrow;
 
   // Initial set up for positions table
   useEffect(() => {

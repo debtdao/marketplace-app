@@ -178,6 +178,21 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     // .addCase(initiateSaveLines.rejected, (state, { error }) => {
     //   state.statusMap.initiateSaveLines = { error: error.message };
     // })
+    /* --------------------------- getInterestAccrued ------------------------- */
+    // .addCase(getInterestAccrued.pending, (state) => {
+    //   state.statusMap.getInterestAccrued = { loading: true };
+    // })
+    .addCase(getInterestAccrued.fulfilled, (state, { payload: { amount, lineAddress, id } }) => {
+      // if (lineData) {
+      //   state.linesMap = { ...state.linesMap, [lineData.id]: lineData };
+      // }
+      // state.statusMap.getLine = {};
+      state.positionsMap[id].interestAccrued = amount;
+    })
+    // .addCase(getInterestAccrued.rejected, (state, { error }) => {
+    //   state.statusMap.getInterestAccrued = { error: error.message };
+    // })
+
     /* -------------------------------- getLine ------------------------------- */
     .addCase(getLine.pending, (state) => {
       state.statusMap.getLine = { loading: true };
@@ -191,8 +206,6 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     .addCase(getLine.rejected, (state, { error }) => {
       state.statusMap.getLine = { error: error.message };
     })
-
-    .addCase(getInterestAccrued.fulfilled, (state, { payload: { amount, lineAddress, id } }) => {})
     /* -------------------------------- getLines ------------------------------- */
     .addCase(getLines.pending, (state) => {
       // either need to make linesData in .fullfilled be a map like request

@@ -30,6 +30,7 @@ import {
 } from '@src/core/types';
 import { humanize, formatAddress, normalizeAmount, getENS } from '@src/utils';
 import { getEnv } from '@config/env';
+import { getConstants } from '@config/constants';
 
 const PositionsCard = styled(DetailCard)`
   max-width: 100%;
@@ -129,6 +130,7 @@ export const PositionsTable = ({
   const { NETWORK } = getEnv();
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
+  const { OPTIMISTIC_UPDATE_TIMESTAMP } = getConstants();
 
   // Initial set up for positions table
   useEffect(() => {
@@ -257,7 +259,7 @@ export const PositionsTable = ({
     const revokeMutualConsent = {
       name: t('components.transaction.revoke-consent.cta'),
       handler: revokeConsentHandler,
-      disabled: false,
+      disabled: proposal.acceptedAt === OPTIMISTIC_UPDATE_TIMESTAMP,
     };
 
     // Display button to approve proposal for the taker/borrower of the proposal

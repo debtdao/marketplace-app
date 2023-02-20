@@ -51,6 +51,7 @@ import {
   AddCreditProps,
   PROPOSED_STATUS,
 } from '@types';
+import { getConstants } from '@config/constants';
 
 import { humanize, normalizeAmount, normalize, format, toUnit, toTargetDecimalUnits, BASE_DECIMALS } from './format';
 
@@ -740,12 +741,13 @@ export const formatOptimisticProposal = (
   position: AddCreditProps,
   positionId: string
 ): CreditPosition => {
+  const { OPTIMISTIC_UPDATE_TIMESTAMP } = getConstants();
   const { lineAddress, drate, frate, amount, token, lender } = position;
   const proposalId = '0x' + Math.random().toFixed(64).slice(2, 68);
   const proposal = {
     id: proposalId,
-    proposedAt: 1234,
-    acceptedAt: 1234,
+    proposedAt: OPTIMISTIC_UPDATE_TIMESTAMP,
+    acceptedAt: OPTIMISTIC_UPDATE_TIMESTAMP,
     revokedAt: 0,
     maker: maker.toLowerCase(),
     taker: String(null),

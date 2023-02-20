@@ -126,6 +126,7 @@ export const getConstants = memoize((): Constants => {
     AVAILABLE_THEMES: ['system-prefs', 'light', 'dark', 'cyberpunk', 'classic'],
     AVAILABLE_CUSTOM_THEMES: ['explorer'],
     DEFAULT_ALERT_TIMEOUT: 3000,
+    OPTIMISTIC_UPDATE_TIMESTAMP: 1234,
     DEFAULT_LANG: 'en',
     SUPPORTED_LANGS: ['en', 'es', 'ja', 'zh'],
     DUST_AMOUNT_USD: '10000000',

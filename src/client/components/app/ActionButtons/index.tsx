@@ -82,10 +82,8 @@ export const ActionButtons = ({ actions, alert, direction, value1, value2, value
         key={`action-${name}`}
         onClick={(e: Event) => {
           e.stopPropagation();
-          console.log('Values: ', value1, value2, value3);
           handler(value1, value2, value3);
         }}
-        // value={value}
         disabled={disabled}
         hide={hide}
         {...props}

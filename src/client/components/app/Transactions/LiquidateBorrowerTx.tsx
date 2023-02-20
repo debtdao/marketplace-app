@@ -206,7 +206,7 @@ export const LiquidateBorrowerTx: FC<LiquidateBorrowerProps> = (props) => {
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
         onAmountChange={onAmountChange}
-        amountValue={String(10000000 * Number(targetTokenAmount))}
+        // amountValue={String(10000000 * Number(targetTokenAmount))}
         maxAmount={targetBalance}
         selectedToken={selectedSellToken}
         onSelectedTokenChange={onSelectedSellTokenChange}

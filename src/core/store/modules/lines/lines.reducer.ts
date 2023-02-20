@@ -23,6 +23,7 @@ import {
   ACTIVE_STATUS,
   RevenueSummaryMap,
 } from '@types';
+import { getConstants } from '@config/constants';
 import { BASE_DECIMALS, formatLineCategories, formatOptimisticProposal, getNetworkId } from '@src/utils';
 
 import { NetworkActions } from '../network/network.actions';
@@ -102,7 +103,9 @@ const {
   // getUserLinesMetadata,
   clearSelectedLine,
   clearLineStatus,
+  // getInterestAccrued,
 } = LinesActions;
+const { OPTIMISTIC_UPDATE_TIMESTAMP } = getConstants();
 
 const linesReducer = createReducer(linesInitialState, (builder) => {
   builder
@@ -115,6 +118,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
 
     .addCase(setSelectedLinePosition, (state, { payload: { position } }) => {
+      console.log('set position', position, state.positionsMap[position ?? ''], state.positionsMap);
       state.selectedPosition = position;
     })
 
@@ -124,11 +128,12 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 
     .addCase(setPosition, (state, { payload: { id, position } }) => {
       state.positionsMap[id] = position;
+      console.log('Updated Positions Map: ', state.positionsMap[id]);
     })
 
     .addCase(revokeProposal, (state, { payload: { lineAddress, positionId, proposalId } }) => {
       const { revokedAt, ...rest } = state.positionsMap[positionId]?.proposalsMap[proposalId];
-      const updatedProposal = { ...rest, revokedAt: 1234 }; // TODO: replace with actual time the proposal was revoked
+      const updatedProposal = { ...rest, revokedAt: OPTIMISTIC_UPDATE_TIMESTAMP }; // TODO: replace with actual time the proposal was revoked
       state.positionsMap[positionId].proposalsMap[proposalId] = updatedProposal;
     })
     /* -------------------------------------------------------------------------- */
@@ -174,6 +179,10 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     // })
     // .addCase(initiateSaveLines.rejected, (state, { error }) => {
     //   state.statusMap.initiateSaveLines = { error: error.message };
+    // })
+    /* --------------------------- getInterestAccrued ------------------------- */
+    // .addCase(getInterestAccrued.fulfilled, (state, { payload: { amount, lineAddress, id } }) => {
+    //   state.positionsMap[id].interestAccrued = amount;
     // })
     /* -------------------------------- getLine ------------------------------- */
     .addCase(getLine.pending, (state) => {

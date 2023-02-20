@@ -318,7 +318,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
         headerText={t('components.transaction.deposit-collateral.select-token')}
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
-        amountValue={String(10000000 * Number(targetTokenAmount))}
+        // amountValue={String(10000000 * Number(targetTokenAmount))}
         maxAmount={targetBalance}
         onAmountChange={setTargetTokenAmount}
         selectedToken={selectedCollateralAsset}

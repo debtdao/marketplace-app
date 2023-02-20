@@ -117,8 +117,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
   const initialToken: string = selectedSellTokenAddress ?? selectedPosition?.token.address ?? DAI;
 
-  console.log('Selected Spigot: ', selectedSpigot);
-
   // @cleanup TODO only use sell token for claimAndRepay/Trade. use selectedPosition.token for everything else
   const { selectedSellToken, sourceAssetOptions } = useSelectedSellToken({
     selectedSellTokenAddress: initialToken,
@@ -611,14 +609,16 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     dispatch(TokensActions.setSelectedTokenAddress({ tokenAddress }));
   };
 
-  //Calculate maximum repay amount, then humanize for readability
+  // Calculate maximum repay amount, then humanize for readability
   const getMaxRepay = (): string => {
     if (!selectedPosition) {
       return '0';
     }
 
     // TODO: replace interestAccrued with view function from contract. subgraph is always stale.
-    const maxRepay: string = `${Number(selectedPosition.principal) + Number(selectedPosition.interestAccrued)}`;
+    const maxRepay: string = `${BigNumber.from(selectedPosition.principal)
+      .add(BigNumber.from(selectedPosition.interestAccrued))
+      .toString()}`;
 
     return normalizeAmount(maxRepay, selectedPosition.token.decimals);
   };
@@ -628,7 +628,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     if (!selectedPosition) {
       return '0';
     }
-    const interestAccrued: string = `${Number(selectedPosition.interestAccrued)}`;
+    const interestAccrued: string = `${BigNumber.from(selectedPosition.interestAccrued).toString()}`;
     return normalizeAmount(interestAccrued, selectedPosition.token.decimals);
   };
 

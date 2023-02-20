@@ -289,7 +289,7 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
         headerText={t('components.transaction.release-collateral.select-token')}
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
-        amountValue={String(10000000 * Number(targetTokenAmount))}
+        // amountValue={String(10000000 * Number(targetTokenAmount))}
         maxAmount={targetBalance}
         onAmountChange={setTargetTokenAmount}
         selectedToken={selectedCollateralAsset}

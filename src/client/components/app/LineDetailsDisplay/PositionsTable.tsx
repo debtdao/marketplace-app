@@ -30,6 +30,7 @@ import {
   PROPOSED_STATUS,
   CLOSED_STATUS,
   AggregatedEscrow,
+  SecuredLine,
 } from '@src/core/types';
 import { humanize, formatAddress, normalizeAmount, getENS } from '@src/utils';
 import { getEnv } from '@config/env';
@@ -129,6 +130,7 @@ export const PositionsTable = ({
   const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
+  const selectLineFunc = useAppSelector(LinesSelectors.selectLine);
   const collateralMap = useAppSelector(CollateralSelectors.selectCollateralMap);
 
   const explorerUrl = useExplorerURL(currentNetwork);
@@ -136,7 +138,6 @@ export const PositionsTable = ({
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
   const { OPTIMISTIC_UPDATE_TIMESTAMP } = getConstants();
-  const { minCRatio, cratio } = collateralMap[selectedLine!.escrowId] as AggregatedEscrow;
 
   // Initial set up for positions table
   useEffect(() => {
@@ -232,6 +233,9 @@ export const PositionsTable = ({
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
       if (position.status === CLOSED_STATUS) return [];
 
+      const currentLine = selectLineFunc(position.line);
+      const { minCRatio, cratio } = collateralMap[currentLine?.escrowId] as AggregatedEscrow;
+      console.log('Current Line: ', currentLine);
       const borrowAction = {
         name: t('components.transaction.borrow'),
         handler: borrowHandler,

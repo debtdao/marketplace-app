@@ -1,5 +1,6 @@
 import { isEmpty } from 'lodash';
 import { BigNumber, ethers } from 'ethers';
+import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { format } from 'date-fns';
 import { getAddress } from 'ethers/lib/utils';
@@ -36,6 +37,7 @@ import {
   CollateralActions,
   NetworkSelectors,
   TokensSelectors,
+  CollateralSelectors,
 } from '@src/core/store';
 import { humanize } from '@src/utils';
 import { getEnv } from '@config/env';
@@ -290,11 +292,13 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
+  const reservesMap = useAppSelector(CollateralSelectors.selectReservesMap);
   const { isMobile, width } = useWindowDimensions();
   const { devices } = sharedTheme;
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const dispatch = useAppDispatch();
   const { NETWORK } = getEnv();
+  const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const explorerUrl = useExplorerURL(network);
@@ -314,6 +318,30 @@ export const LineMetadata = (props: LineMetadataProps) => {
   } = selectedLine!;
   const { deposits, minCRatio, cratio, collateralValue } = escrow!;
   const { revenueValue, revenueSummary: revenue } = spigot!;
+
+  useEffect(() => {
+    // populate collateral reservesmap in redux state
+    if (Object.keys(reservesMap).length === 0 && selectedLine) {
+      // get all collateral tokens of type revenue
+      const lineRevenueSummary = selectedLine!.spigot!.revenueSummary;
+      const revenueCollateralTokens: RevenueSummary[] = Object.values(lineRevenueSummary).filter(
+        (token) => token.type === 'revenue'
+      );
+
+      // populate reserves map with each revenue collateral token
+      for (const token of revenueCollateralTokens as RevenueSummary[]) {
+        console.log('revenue token: ', token);
+        dispatch(
+          CollateralActions.tradeable({
+            lineAddress: getAddress(selectedLine?.id),
+            spigotAddress: getAddress(selectedLine!.spigotId),
+            tokenAddress: getAddress(token.token.address),
+            network: walletNetwork!,
+          })
+        );
+      }
+    }
+  }, []);
 
   const renderEscrowMetadata = () => {
     if (!deposits) return null;
@@ -367,7 +395,10 @@ export const LineMetadata = (props: LineMetadataProps) => {
               <StyledIcon Component={InfoIcon} size="1.5rem" />
             </Tooltip>
             <MetadataTitle>{t('lineDetails:metadata.cratio')}: </MetadataTitle>{' '}
-            <CratioWithColor diff={Number(cratio) - Number(minCRatio)}>{normalizeAmount(cratio, 2)}%</CratioWithColor>
+            <CratioWithColor diff={Number(cratio) - Number(minCRatio)}>
+              {' '}
+              {Number(principal) === 0 ? '∞' : normalizeAmount(cratio, 2)} %
+            </CratioWithColor>
           </MetadataRow>
           <MetadataRow>
             <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.min-cratio')}</>}>
@@ -422,6 +453,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
       dispatch(ModalsActions.openModal({ modalName: 'enableCollateral' }));
     }
   };
+  console.log(revenue);
 
   const allCollateral: Collateral[] = [...Object.values(deposits ?? {}), ...Object.values(revenue ?? {})];
 
@@ -434,8 +466,11 @@ export const LineMetadata = (props: LineMetadataProps) => {
         return 'add-collateral';
     }
   };
-
+  console.log(allCollateral);
   const formattedCollateralData = allCollateral.map((c) => {
+    // console.log('Tokens Map: ', tokensMap);
+    // console.log('Tokens Map undefined?: ', c.token.address);
+    // console.log('Tokens Map c: ', c);
     const tokenIcon = tokensMap?.[getAddress(c.token.address)]?.icon ?? '';
     const tokenInfo = { icon: tokenIcon, ...c.token };
     const collateral = { ...c, token: tokenInfo };

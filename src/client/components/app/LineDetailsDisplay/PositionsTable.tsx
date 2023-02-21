@@ -14,6 +14,8 @@ import {
   NetworkSelectors,
   TokensSelectors,
   TokensActions,
+  CollateralActions,
+  CollateralSelectors,
 } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL, useWindowDimensions } from '@hooks';
 import { device, sharedTheme } from '@themes/default';
@@ -27,6 +29,7 @@ import {
   CreditProposal,
   PROPOSED_STATUS,
   CLOSED_STATUS,
+  AggregatedEscrow,
 } from '@src/core/types';
 import { humanize, formatAddress, normalizeAmount, getENS } from '@src/utils';
 import { getEnv } from '@config/env';
@@ -126,11 +129,14 @@ export const PositionsTable = ({
   const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
+  const collateralMap = useAppSelector(CollateralSelectors.selectCollateralMap);
+
   const explorerUrl = useExplorerURL(currentNetwork);
   const { NETWORK } = getEnv();
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
   const { OPTIMISTIC_UPDATE_TIMESTAMP } = getConstants();
+  const { minCRatio, cratio } = collateralMap[selectedLine!.escrowId] as AggregatedEscrow;
 
   // Initial set up for positions table
   useEffect(() => {
@@ -170,6 +176,12 @@ export const PositionsTable = ({
     dispatch(LinesActions.setSelectedLineAddress({ lineAddress: line }));
     dispatch(LinesActions.setSelectedLinePosition({ position }));
     dispatch(ModalsActions.openModal({ modalName: 'withdraw' }));
+  };
+
+  const setRatesHandler = (line?: string, position?: string) => {
+    dispatch(LinesActions.setSelectedLineAddress({ lineAddress: line }));
+    dispatch(LinesActions.setSelectedLinePosition({ position }));
+    dispatch(ModalsActions.openModal({ modalName: 'setRates' }));
   };
 
   const revokeConsentHandler = (line?: string, position?: string, proposal?: string) => {
@@ -223,7 +235,7 @@ export const PositionsTable = ({
       const borrowAction = {
         name: t('components.transaction.borrow'),
         handler: borrowHandler,
-        disabled: false,
+        disabled: Number(cratio) <= minCRatio ? true : false,
       };
 
       if (position.deposit === position.principal) return [repayAction];
@@ -235,13 +247,18 @@ export const PositionsTable = ({
       getAddress(position.lender) === userWallet &&
       BigNumber.from(position.deposit).gt(BigNumber.from(position.principal))
     ) {
-      return [
-        {
-          name: t('components.transaction.withdraw'),
-          handler: withdrawHandler,
-          disabled: false,
-        },
-      ];
+      const withdrawAction = {
+        name: t('components.transaction.withdraw'),
+        handler: withdrawHandler,
+        disabled: false,
+      };
+
+      const setRatesAction = {
+        name: t('components.transaction.set-rates'),
+        handler: setRatesHandler,
+        disabled: false,
+      };
+      return [setRatesAction, withdrawAction];
     }
 
     // not party to line. no actions;

@@ -54,6 +54,15 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
     _updatePosition();
   };
 
+  const getMax = (pos: CreditPosition): string => {
+    const maxBorrow = normalizeAmount(
+      BigNumber.from(pos.deposit).sub(BigNumber.from(pos.principal)).toString(),
+      pos.token.decimals
+    );
+
+    return maxBorrow.toString();
+  };
+
   const onSelectedPositionChange = (arg: CreditPosition): void => {
     dispatch(LinesActions.setSelectedLinePosition({ position: arg.id }));
   };
@@ -158,10 +167,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
     );
   }
 
-  const amountAvailableToBorrow = normalizeAmount(
-    BigNumber.from(selectedPosition.deposit).sub(BigNumber.from(selectedPosition.principal)).toString(),
-    selectedPosition.token.decimals
-  );
+  const amountAvailableToBorrow = getMax(selectedPosition);
 
   const borrowHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(
     amountAvailableToBorrow,

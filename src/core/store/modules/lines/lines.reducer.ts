@@ -103,7 +103,7 @@ const {
   // getUserLinesMetadata,
   clearSelectedLine,
   clearLineStatus,
-  // getInterestAccrued,
+  getInterestAccrued,
 } = LinesActions;
 const { OPTIMISTIC_UPDATE_TIMESTAMP } = getConstants();
 
@@ -181,9 +181,20 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     //   state.statusMap.initiateSaveLines = { error: error.message };
     // })
     /* --------------------------- getInterestAccrued ------------------------- */
-    // .addCase(getInterestAccrued.fulfilled, (state, { payload: { amount, lineAddress, id } }) => {
-    //   state.positionsMap[id].interestAccrued = amount;
+    // .addCase(getInterestAccrued.pending, (state) => {
+    //   state.statusMap.getInterestAccrued = { loading: true };
     // })
+    .addCase(getInterestAccrued.fulfilled, (state, { payload: { amount, lineAddress, id } }) => {
+      // if (lineData) {
+      //   state.linesMap = { ...state.linesMap, [lineData.id]: lineData };
+      // }
+      // state.statusMap.getLine = {};
+      state.positionsMap[id].interestAccrued = amount;
+    })
+    // .addCase(getInterestAccrued.rejected, (state, { error }) => {
+    //   state.statusMap.getInterestAccrued = { error: error.message };
+    // })
+
     /* -------------------------------- getLine ------------------------------- */
     .addCase(getLine.pending, (state) => {
       state.statusMap.getLine = { loading: true };

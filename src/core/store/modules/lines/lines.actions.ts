@@ -30,6 +30,7 @@ import {
   GetLinesResponse,
   MarketPageData,
   GetLineEventsResponse,
+  SetRatesProps,
 } from '@types';
 import {
   formatGetLinesData,
@@ -251,6 +252,29 @@ const getExpectedTransactionOutcome = createAsyncThunk<
   }
 );
 
+export interface GetInterestAccruedProps {
+  contractAddress: string;
+  id: BytesLike;
+}
+
+const getInterestAccrued = createAsyncThunk<
+  { amount: string; lineAddress: string; id: string },
+  GetInterestAccruedProps,
+  ThunkAPI
+>('lines/getInterestAccrued', async (props, { getState, extra }) => {
+  const { services } = extra;
+  const { creditLineService } = services;
+  const { contractAddress, id } = props;
+  const interestAccrued = await creditLineService.getInterestAccrued(contractAddress, id);
+  console.log('Interest Accrued: ');
+  console.log(interestAccrued.toString());
+  return {
+    amount: interestAccrued.toString(),
+    lineAddress: contractAddress,
+    id: id.toString(),
+  };
+});
+
 /* -------------------------------------------------------------------------- */
 /*                             Transaction Methods                            */
 /* -------------------------------------------------------------------------- */
@@ -371,6 +395,16 @@ const addCredit = createAsyncThunk<
     position: position,
   };
 });
+
+const setRates = createAsyncThunk<void, SetRatesProps, ThunkAPI>(
+  'lines/setRates',
+
+  async (props, { extra, getState }) => {
+    const { services } = extra;
+    const { creditLineService } = services;
+    const tx = await creditLineService.setRates(props);
+  }
+);
 
 const depositAndRepay = createAsyncThunk<
   void,
@@ -911,9 +945,11 @@ export const LinesActions = {
   getLinePage,
   getUserLinePositions,
   getUserPortfolio,
+  getInterestAccrued,
 
   approveDeposit,
   addCredit,
+  setRates,
   borrowCredit,
   deploySecuredLine,
   deploySecuredLineWithConfig,

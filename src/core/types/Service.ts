@@ -182,11 +182,12 @@ export interface CreditLineService {
   borrow: (props: BorrowCreditProps) => Promise<TransactionResponse | PopulatedTransaction>;
   withdraw: (props: WithdrawLineProps) => Promise<TransactionResponse | PopulatedTransaction>;
   revokeConsent: (props: RevokeConsentProps) => Promise<TransactionResponse | PopulatedTransaction>;
-  // setRates: (props: SetRatesProps) => Promise<TransactionResponse | PopulatedTransaction>;
+  setRates: (props: SetRatesProps) => Promise<TransactionResponse | PopulatedTransaction>;
   // increaseCredit: (props: IncreaseCreditProps) => Promise<TransactionResponse | PopulatedTransaction>;
 
   // helpers
   getFirstID: (contractAddress: string) => Promise<BytesLike>;
+  getInterestAccrued: (contractAddress: string, id: BytesLike) => Promise<BigNumber>;
   getCredit: (contractAddress: string, id: BytesLike) => Promise<CreditPosition>;
   getLenderByCreditID: (contractAddress: string, id: BytesLike) => Promise<Address>;
   getInterestRateContract: (contractAddress: string) => Promise<Address>;

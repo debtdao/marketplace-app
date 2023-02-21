@@ -2,6 +2,7 @@ import { isEmpty, zipWith } from 'lodash';
 import { BigNumber, ethers, utils } from 'ethers';
 import { getAddress } from '@ethersproject/address';
 import _ from 'lodash';
+import { formatUnits } from 'ethers/lib/utils';
 
 import {
   SecuredLineWithEvents,
@@ -46,9 +47,11 @@ import {
   CreditProposal,
   ProposalMap,
   TokenView,
+  ReservesMap,
 } from '@types';
 
 import { humanize, normalizeAmount, normalize, format, toUnit, toTargetDecimalUnits, BASE_DECIMALS } from './format';
+import { unnullify, _createTokenView } from './line';
 
 export const formatEscrowDeposit = (tokenInfo: TokenView): EscrowDeposit => {
   const tokenInfoFormatted = { ...tokenInfo, balance: '0.00', icon: '' };
@@ -62,4 +65,61 @@ export const formatEscrowDeposit = (tokenInfo: TokenView): EscrowDeposit => {
     // events: [];
   } as EscrowDeposit;
   return escrowDeposit;
+};
+
+export const formatCollateralRevenue = (
+  spigot: AggregatedSpigot,
+  reserves: {
+    [tokenAddress: string]: {
+      unusedTokens: string;
+      ownerTokens: string;
+      operatorTokens: string;
+    };
+  },
+  tokenPrices: {
+    [address: string]: BigNumber;
+  }
+): AggregatedSpigot => {
+  console.log(spigot);
+  const { revenueValue, revenueSummary, ...rest } = spigot;
+  const [newRevenueValue, newRevenueSummary]: [BigNumber, RevenueSummaryMap] = Object.values(
+    revenueSummary
+  ).reduce<any>(
+    (agg, { token, amount, ...summary }) => {
+      const checkSumAddress = ethers.utils.getAddress(token.address);
+      console.log(token.address);
+      const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
+      const amountLessOperatorTokens = BigNumber.from(amount).sub(
+        BigNumber.from(reserves[checkSumAddress]?.operatorTokens ?? 0)
+      );
+
+      const totalRevenueVolume = toTargetDecimalUnits(
+        amountLessOperatorTokens.toString(),
+        token.decimals,
+        BASE_DECIMALS
+      );
+
+      return [
+        agg[0].add(unnullify(totalRevenueVolume).toString()).mul(usdcPrice),
+        {
+          ...agg[1],
+          [getAddress(token.address)]: {
+            ...summary,
+            type: COLLATERAL_TYPE_REVENUE,
+            token: token,
+            amount: totalRevenueVolume,
+            value: formatUnits(usdcPrice.mul(unnullify(totalRevenueVolume).toString()), 6).toString(),
+          },
+        },
+      ];
+    },
+    [BigNumber.from(0), {} as RevenueSummaryMap]
+  );
+  console.log('Values: ', newRevenueValue.toString(), newRevenueSummary);
+  const updatedSpigot = {
+    revenueValue: formatUnits(unnullify(newRevenueValue), 6).toString().split('.')[0],
+    revenueSummary: newRevenueSummary,
+    ...rest,
+  };
+  return updatedSpigot;
 };

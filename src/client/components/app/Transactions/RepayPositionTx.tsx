@@ -28,7 +28,15 @@ import {
   CollateralSelectors,
 } from '@store';
 import { getConstants, testTokens } from '@src/config/constants';
-import { Balance, CreditPosition, RevenueSummary, TokenView, ZeroExAPIQuoteResponse } from '@src/core/types';
+import {
+  AggregatedSpigot,
+  Balance,
+  Collateral,
+  CreditPosition,
+  RevenueSummary,
+  TokenView,
+  ZeroExAPIQuoteResponse,
+} from '@src/core/types';
 
 import { TxContainer } from './components/TxContainer';
 import { TxTokenInput } from './components/TxTokenInput';
@@ -138,7 +146,14 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const [haveFetched0x, setHaveFetched0x] = useState<boolean>(false);
   // const [zeroExWarning, setZeroExWarning] = useState<boolean>(false);
   const [isTrade, setIsTrade] = useState<boolean>(false);
+  const [costToClose, setCostToClose] = useState('0');
   // TODO: replace usage in useFundsForClosing with appropriate value
+
+  useEffect(() => {
+    if (selectedPosition && selectedLine?.id) {
+      dispatch(LinesActions.getInterestAccrued({ contractAddress: selectedLine.id, id: selectedPosition.id }));
+    }
+  }, []);
 
   useEffect(() => {
     if (!selectedSellToken && !_.isEmpty(sourceAssetOptions)) {

@@ -17,8 +17,9 @@ import {
   RevenueSummaryMap,
   COLLATERAL_TYPE_ASSET,
   COLLATERAL_TYPE_REVENUE,
+  AggregatedSpigot,
 } from '@types';
-import { formatCollateralEvents, formatSpigotCollateralEvents } from '@src/utils';
+import { formatCollateralEvents, formatCollateralRevenue, formatSpigotCollateralEvents } from '@src/utils';
 
 import { LinesActions } from '../lines/lines.actions';
 
@@ -196,13 +197,22 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
       state.collateralMap = { ...state.collateralMap, ...map };
     })
     /* -------------------------------- reserves ------------------------------- */
-    .addCase(tradeable.fulfilled, (state, { payload: { tokenAddressMap, tokenAddress, lineAddress } }) => {
-      const map = { [tokenAddress]: tokenAddressMap };
-      state.reservesMap = {
-        ...state.reservesMap,
-        [lineAddress]: { ...(state.reservesMap[lineAddress] || {}), ...map },
-      };
-    });
+    .addCase(
+      tradeable.fulfilled,
+      (state, { payload: { tokenAddressMap, spigotAddress, tokenPrices, tokenAddress, lineAddress } }) => {
+        const map = { [tokenAddress]: tokenAddressMap };
+        state.reservesMap = {
+          ...state.reservesMap,
+          [lineAddress]: { ...(state.reservesMap[lineAddress] || {}), ...map },
+        };
+        // update spigot revenue
+        console.log(spigotAddress);
+        const spigot = state.collateralMap[spigotAddress.toLowerCase()] as AggregatedSpigot;
+        const reserves = state.reservesMap[lineAddress];
+        const updatedSpigot = formatCollateralRevenue(spigot, reserves, tokenPrices);
+        state.collateralMap[spigotAddress.toLowerCase()] = updatedSpigot;
+      }
+    );
 });
 
 export default collateralReducer;

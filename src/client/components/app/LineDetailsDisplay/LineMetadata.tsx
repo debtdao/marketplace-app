@@ -331,6 +331,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
       // populate reserves map with each revenue collateral token
       for (const token of revenueCollateralTokens as RevenueSummary[]) {
         console.log('revenue token: ', token);
+        console.log('tradeable network: ', walletNetwork);
         dispatch(
           CollateralActions.tradeable({
             lineAddress: getAddress(selectedLine?.id),

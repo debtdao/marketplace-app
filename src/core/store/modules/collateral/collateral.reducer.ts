@@ -173,6 +173,7 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
           if (line.spigot) map[line.spigotId!] = line.spigot;
         })
       );
+      console.log('Collateral Reducer - get Lines: ', map);
       state.collateralMap = { ...state.collateralMap, ...map };
     })
 

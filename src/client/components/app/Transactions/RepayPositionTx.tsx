@@ -124,6 +124,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
   const initialToken: string = selectedSellTokenAddress ?? selectedPosition?.token.address ?? DAI;
+  // used for 0x testing
+  const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
 
   // @cleanup TODO only use sell token for claimAndRepay/Trade. use selectedPosition.token for everything else
   const { selectedSellToken, sourceAssetOptions } = useSelectedSellToken({
@@ -131,9 +133,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     // selectedVaultOrLab: useAppSelector(VaultsSelectors.selectRecommendations)[0],
     allowTokenSelect: true,
   });
-
-  // used for 0x testing
-  const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
 
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionLoading, setLoading] = useState(false);
@@ -147,6 +146,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   // const [zeroExWarning, setZeroExWarning] = useState<boolean>(false);
   const [isTrade, setIsTrade] = useState<boolean>(false);
   const [costToClose, setCostToClose] = useState('0');
+  const [claimableTokenAddresses, setClaimableTokenAddress] = useState(['']);
   // TODO: replace usage in useFundsForClosing with appropriate value
 
   useEffect(() => {
@@ -157,11 +157,23 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
   useEffect(() => {
     if (!selectedSellToken && !_.isEmpty(sourceAssetOptions)) {
-      dispatch(
-        TokensActions.setSelectedTokenAddress({
-          tokenAddress: sourceAssetOptions[0].address,
-        })
-      );
+      if (Object.keys(reservesMap).length !== 0) {
+        const reservesTokenAddresses = reservesMap[getAddress(selectedPosition!.line)]
+          ? Object.keys(reservesMap[getAddress(selectedPosition!.line)])
+          : [];
+        dispatch(
+          TokensActions.setSelectedTokenAddress({
+            tokenAddress: reservesTokenAddresses[0],
+          })
+        );
+        setClaimableTokenAddress(reservesTokenAddresses);
+      } else {
+        dispatch(
+          TokensActions.setSelectedTokenAddress({
+            tokenAddress: sourceAssetOptions[0].address,
+          })
+        );
+      }
     }
     if (!selectedTokenAddress && selectedSellToken) {
       setSelectedTokenAddress(selectedSellToken.address);
@@ -179,7 +191,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
       // populate reserves map with each revenue collateral token
       for (const token of revenueCollateralTokens as RevenueSummary[]) {
-        console.log('revenue token: ', token);
         dispatch(
           CollateralActions.tradeable({
             lineAddress: getAddress(selectedPosition!.line),
@@ -755,7 +766,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
         const claimTargetBalance = normalizeAmount(
           reservesMap[getAddress(selectedPosition.line)]
-            ? reservesMap[getAddress(selectedPosition.line)][selectedSellToken.address].ownerTokens
+            ? reservesMap[getAddress(selectedPosition.line)][selectedSellToken.address]?.ownerTokens
             : '0',
           selectedSellToken.decimals
         );
@@ -764,10 +775,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
           claimTargetBalance,
           4
         )} ${selectedSellToken.symbol}`;
-
-        const claimableTokenAddresses = reservesMap[getAddress(selectedPosition.line)]
-          ? Object.keys(reservesMap[getAddress(selectedPosition.line)])
-          : [];
 
         // TODO: test claimableTokenOptions on Ethereum mainnet
         const claimableTokenOptions: TokenView[] = claimableTokenAddresses.map((address) => {

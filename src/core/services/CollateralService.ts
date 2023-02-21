@@ -74,6 +74,9 @@ export class CollateralServiceImpl implements CollateralService {
   }
 
   private _getLineContract(contractAddress: string) {
+    console.log('tradeable - contractAddress: ', contractAddress);
+    console.log('tradeable - Web3 Provider: ', this.web3Provider);
+    console.log('tradeable - Web3 Provider signer: ', this.web3Provider.getSigner());
     return getContract(contractAddress.toString(), this.lineAbi, this.web3Provider.getSigner().provider);
   }
 

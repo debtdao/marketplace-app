@@ -89,15 +89,26 @@ export const formatCollateralRevenue = (
       const checkSumAddress = ethers.utils.getAddress(token.address);
       console.log(token.address);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
-      const amountLessOperatorTokens = BigNumber.from(amount).sub(
-        BigNumber.from(reserves[checkSumAddress]?.operatorTokens ?? 0)
-      );
+      // const amountLessOperatorTokens = BigNumber.from(amount).sub(
+      //   BigNumber.from(reserves[checkSumAddress]?.operatorTokens ?? BigNumber.from(0))
+      // );
+      const amountLessOperatorTokens = BigNumber.from(reserves[checkSumAddress]?.ownerTokens ?? BigNumber.from(0));
+      // console.log('Usdc Price: ', usdcPrice.toString());
+      // console.log('amount: ', amount.toString());
+      // console.log('amountLessOperatorTokens: ', amountLessOperatorTokens.toString());
+      // console.log(
+      //   'owner tokens: ',
+      //   BigNumber.from(reserves[checkSumAddress]?.ownerTokens ?? BigNumber.from(0)).toString()
+      // );
+      // console.log('Token Reserves: ', reserves[checkSumAddress]);
 
       const totalRevenueVolume = toTargetDecimalUnits(
         amountLessOperatorTokens.toString(),
         token.decimals,
         BASE_DECIMALS
       );
+
+      // console.log('Total Revenue Volume: ', totalRevenueVolume);
 
       return [
         agg[0].add(unnullify(totalRevenueVolume).toString()).mul(usdcPrice),
@@ -115,11 +126,12 @@ export const formatCollateralRevenue = (
     },
     [BigNumber.from(0), {} as RevenueSummaryMap]
   );
-  console.log('Values: ', newRevenueValue.toString(), newRevenueSummary);
+  // console.log('Values: ', newRevenueValue.toString(), newRevenueSummary);
   const updatedSpigot = {
     revenueValue: formatUnits(unnullify(newRevenueValue), 6).toString().split('.')[0],
     revenueSummary: newRevenueSummary,
     ...rest,
   };
+  // console.log('Updated Spigot: ', updatedSpigot);
   return updatedSpigot;
 };

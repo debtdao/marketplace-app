@@ -192,8 +192,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
       // get all credit tokens
       const creditTokens = Object.values(positions).map((position) => position.token);
-      console.log('Positions: ', positions);
-      console.log('Credit Tokens: ', creditTokens);
 
       // populate reserves map with each revenue collateral token
       for (const token of revenueCollateralTokens as RevenueSummary[]) {

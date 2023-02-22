@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { BigNumber, BytesLike, ethers } from 'ethers';
 import { FC, useState, useEffect } from 'react';
 import { getAddress } from '@ethersproject/address';
+import { formatUnits } from 'ethers/lib/utils';
 
 import {
   formatAmount,
@@ -189,6 +190,11 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         (token) => token.type === 'revenue'
       );
 
+      // get all credit tokens
+      const creditTokens = Object.values(positions).map((position) => position.token);
+      console.log('Positions: ', positions);
+      console.log('Credit Tokens: ', creditTokens);
+
       // populate reserves map with each revenue collateral token
       for (const token of revenueCollateralTokens as RevenueSummary[]) {
         dispatch(
@@ -196,6 +202,18 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             lineAddress: getAddress(selectedPosition!.line),
             spigotAddress: getAddress(selectedLine!.spigotId),
             tokenAddress: getAddress(token.token.address),
+            network: walletNetwork!,
+          })
+        );
+      }
+
+      // populate reserves map with each credit token
+      for (const token of creditTokens) {
+        dispatch(
+          CollateralActions.tradeable({
+            lineAddress: getAddress(selectedPosition!.line),
+            spigotAddress: getAddress(selectedLine!.spigotId),
+            tokenAddress: getAddress(token.address),
             network: walletNetwork!,
           })
         );
@@ -719,10 +737,10 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         const buyToken = getAddress(selectedPosition.token.address);
         const sellToken = getAddress(selectedSellToken.address);
         const isZeroExTrade = sellToken !== buyToken;
-        const amountInWei = toWei(targetAmount, selectedSellToken!.decimals);
+        const sellAmountInWei = toWei(targetAmount, selectedSellToken!.decimals);
         console.log('Buy Token: ', buyToken);
         console.log('Sell Amount: ', targetAmount);
-        console.log('Sell Amount - Wei: ', amountInWei);
+        console.log('Sell Amount - Wei: ', sellAmountInWei);
         console.log('Network: ', walletNetwork);
         if (isZeroExTrade && !haveFetched0x) {
           const tradeTx = getTradeQuote({
@@ -732,7 +750,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
             buyToken,
             sellToken,
-            sellAmount: amountInWei, // targetAmount
+            sellAmount: sellAmountInWei, // targetAmount
             network: walletNetwork,
           }).then((result) => {
             console.log('Result: ', result);
@@ -741,7 +759,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
               setIsTrade(true);
               setHaveFetched0x(true);
               console.log('Buy Amount: ', result.buyAmount);
-              setTokensToBuy(result.buyAmount!);
+              const buyAmountInWei = formatUnits(result.buyAmount!, selectedPosition.token.decimals);
+              setTokensToBuy(buyAmountInWei);
               setTradeData(result);
             }
             //TODO: Make  util function that creates 0x trade data, an another func that construct. Use 0x.ts
@@ -794,7 +813,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             return createToken({ tokenData, userTokenData, allowancesMap });
           }
         });
-
+        console.log('Selected Token: ', selectedPosition.token);
+        console.log('Claimable Token Options: ', claimableTokenOptions);
         return (
           <>
             <TxTokenInput
@@ -802,7 +822,10 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
               inputText={claimTokenHeaderText}
               // TODO: create unit test for this
               amount={!isZeroExTrade ? claimTargetBalance : targetAmount}
-              onAmountChange={(amnt) => setTargetAmount(amnt)}
+              onAmountChange={(amnt) => {
+                setTargetAmount(amnt);
+                setHaveFetched0x(false);
+              }}
               // token to claim from spigot
               selectedToken={selectedSellToken}
               // 0x testing data
@@ -821,6 +844,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
                   amount={tokensToBuy} // TODO: uncomment this after testing 0x trade data.
                   // amount={targetAmount} // TODO: delete this after confirming 0x trade data is working.
                   selectedToken={selectedPosition.token}
+                  tokenOptions={[selectedPosition.token]}
                   // 0x testing data
                   // selectedToken={tokensMap[DAI]}
                   readOnly={true}

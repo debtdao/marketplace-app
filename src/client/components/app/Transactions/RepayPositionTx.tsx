@@ -719,7 +719,11 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         const buyToken = getAddress(selectedPosition.token.address);
         const sellToken = getAddress(selectedSellToken.address);
         const isZeroExTrade = sellToken !== buyToken;
-
+        const amountInWei = toWei(targetAmount, selectedSellToken!.decimals);
+        console.log('Buy Token: ', buyToken);
+        console.log('Sell Amount: ', targetAmount);
+        console.log('Sell Amount - Wei: ', amountInWei);
+        console.log('Network: ', walletNetwork);
         if (isZeroExTrade && !haveFetched0x) {
           const tradeTx = getTradeQuote({
             // set fake data for testing 0x
@@ -728,13 +732,15 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
             buyToken,
             sellToken,
-            sellAmount: targetAmount,
+            sellAmount: amountInWei, // targetAmount
             network: walletNetwork,
           }).then((result) => {
+            console.log('Result: ', result);
             console.log('repay modal: trade quote res', result, result?.buyAmount);
             if (result) {
               setIsTrade(true);
               setHaveFetched0x(true);
+              console.log('Buy Amount: ', result.buyAmount);
               setTokensToBuy(result.buyAmount!);
               setTradeData(result);
             }

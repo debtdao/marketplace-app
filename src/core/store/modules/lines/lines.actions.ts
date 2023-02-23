@@ -254,7 +254,7 @@ const getExpectedTransactionOutcome = createAsyncThunk<
 
 export interface GetInterestAccruedProps {
   contractAddress: string;
-  id: BytesLike;
+  id: string;
 }
 
 const getInterestAccrued = createAsyncThunk<

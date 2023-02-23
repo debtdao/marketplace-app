@@ -150,6 +150,17 @@ export const PositionsTable = ({
         dispatch(LinesActions.getLinePage({ id: lineAddress }));
       }
     }
+    if (selectedLine || lineAddress) {
+      // populate interestAccrued for each position in table
+      for (const position of positions) {
+        dispatch(
+          LinesActions.getInterestAccrued({
+            contractAddress: lineAddress ?? selectedLine!.id,
+            id: position.id,
+          })
+        );
+      }
+    }
   }, [lineAddress, selectedLine]);
 
   // Action Handlers for positions table

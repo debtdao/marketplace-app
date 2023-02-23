@@ -777,7 +777,6 @@ export const formatOptimisticProposal = (
   return proposedPosition;
 };
 
-// TODO: Move code from getLines to create state.categories into this function
 export const formatLineCategories = (lines: { [key: string]: SecuredLine }): { [key: string]: string[] } => {
   const highestCreditLines = _.map(
     _.sortBy(lines, (line) => -Number(BigNumber.from(line.deposit).div(BASE_DECIMALS))).slice(0, 3),

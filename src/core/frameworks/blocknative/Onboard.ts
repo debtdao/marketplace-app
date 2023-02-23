@@ -52,8 +52,6 @@ export class BlocknativeWalletImpl implements Wallet {
     const rpcUrl = getNetworkRpc(network);
     const appName = 'Debt DAO';
 
-    const { MAINNET_PROVIDER_HTTPS } = getConstants();
-
     const wallets = [
       {
         walletName: 'metamask',
@@ -61,7 +59,7 @@ export class BlocknativeWalletImpl implements Wallet {
       {
         walletName: 'walletConnect',
         rpc: {
-          [networkId]: MAINNET_PROVIDER_HTTPS,
+          [networkId]: rpcUrl,
         },
       },
       {

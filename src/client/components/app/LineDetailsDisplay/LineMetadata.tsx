@@ -332,7 +332,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
       for (const token of revenueCollateralTokens as RevenueSummary[]) {
         dispatch(
           CollateralActions.tradeable({
-            lineAddress: getAddress(selectedLine?.id),
+            lineAddress: getAddress(selectedLine!.id),
             spigotAddress: getAddress(selectedLine!.spigotId),
             tokenAddress: getAddress(token.token.address),
             network: walletNetwork!,

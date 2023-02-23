@@ -183,39 +183,37 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
   useEffect(() => {
     // populate collateral reservesmap in redux state
-    if (Object.keys(reservesMap).length === 0) {
-      // get all collateral tokens of type revenue
-      const lineRevenueSummary = selectedSpigot!.revenueSummary;
-      const revenueCollateralTokens: RevenueSummary[] = Object.values(lineRevenueSummary).filter(
-        (token) => token.type === 'revenue'
+    // get all collateral tokens of type revenue
+    const lineRevenueSummary = selectedSpigot!.revenueSummary;
+    const revenueCollateralTokens: RevenueSummary[] = Object.values(lineRevenueSummary).filter(
+      (token) => token.type === 'revenue'
+    );
+
+    // get all credit tokens
+    const creditTokens = Object.values(positions).map((position) => position.token);
+
+    // populate reserves map with each revenue collateral token
+    for (const token of revenueCollateralTokens as RevenueSummary[]) {
+      dispatch(
+        CollateralActions.tradeable({
+          lineAddress: getAddress(selectedPosition!.line),
+          spigotAddress: getAddress(selectedLine!.spigotId),
+          tokenAddress: getAddress(token.token.address),
+          network: walletNetwork!,
+        })
       );
+    }
 
-      // get all credit tokens
-      const creditTokens = Object.values(positions).map((position) => position.token);
-
-      // populate reserves map with each revenue collateral token
-      for (const token of revenueCollateralTokens as RevenueSummary[]) {
-        dispatch(
-          CollateralActions.tradeable({
-            lineAddress: getAddress(selectedPosition!.line),
-            spigotAddress: getAddress(selectedLine!.spigotId),
-            tokenAddress: getAddress(token.token.address),
-            network: walletNetwork!,
-          })
-        );
-      }
-
-      // populate reserves map with each credit token
-      for (const token of creditTokens) {
-        dispatch(
-          CollateralActions.tradeable({
-            lineAddress: getAddress(selectedPosition!.line),
-            spigotAddress: getAddress(selectedLine!.spigotId),
-            tokenAddress: getAddress(token.address),
-            network: walletNetwork!,
-          })
-        );
-      }
+    // populate reserves map with each credit token
+    for (const token of creditTokens) {
+      dispatch(
+        CollateralActions.tradeable({
+          lineAddress: getAddress(selectedPosition!.line),
+          spigotAddress: getAddress(selectedLine!.spigotId),
+          tokenAddress: getAddress(token.address),
+          network: walletNetwork!,
+        })
+      );
     }
   }, []);
 
@@ -736,10 +734,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         const sellToken = getAddress(selectedSellToken.address);
         const isZeroExTrade = sellToken !== buyToken;
         const sellAmountInWei = toWei(targetAmount, selectedSellToken!.decimals);
-        console.log('Buy Token: ', buyToken);
-        console.log('Sell Amount: ', targetAmount);
-        console.log('Sell Amount - Wei: ', sellAmountInWei);
-        console.log('Network: ', walletNetwork);
         if (isZeroExTrade && !haveFetched0x) {
           const tradeTx = getTradeQuote({
             // set fake data for testing 0x
@@ -811,8 +805,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             return createToken({ tokenData, userTokenData, allowancesMap });
           }
         });
-        console.log('Selected Token: ', selectedPosition.token);
-        console.log('Claimable Token Options: ', claimableTokenOptions);
+
         return (
           <>
             <TxTokenInput

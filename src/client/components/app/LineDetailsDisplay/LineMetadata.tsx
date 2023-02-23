@@ -330,8 +330,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
 
       // populate reserves map with each revenue collateral token
       for (const token of revenueCollateralTokens as RevenueSummary[]) {
-        console.log('revenue token: ', token);
-        console.log('tradeable network: ', walletNetwork);
         dispatch(
           CollateralActions.tradeable({
             lineAddress: getAddress(selectedLine?.id),
@@ -454,7 +452,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
       dispatch(ModalsActions.openModal({ modalName: 'enableCollateral' }));
     }
   };
-  console.log(revenue);
 
   const allCollateral: Collateral[] = [...Object.values(deposits ?? {}), ...Object.values(revenue ?? {})];
 
@@ -467,11 +464,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
         return 'add-collateral';
     }
   };
-  console.log(allCollateral);
+
   const formattedCollateralData = allCollateral.map((c) => {
-    // console.log('Tokens Map: ', tokensMap);
-    // console.log('Tokens Map undefined?: ', c.token.address);
-    // console.log('Tokens Map c: ', c);
     const tokenIcon = tokensMap?.[getAddress(c.token.address)]?.icon ?? '';
     const tokenInfo = { icon: tokenIcon, ...c.token };
     const collateral = { ...c, token: tokenInfo };

@@ -116,7 +116,9 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
     const promises = await Promise.all(
       categoryKeys
         .map((k) => categories[k])
-        .map((params: GetLinesArgs) => creditLineService.getLines({ network, ...params }))
+        .map((params: GetLinesArgs) => {
+          return creditLineService.getLines({ network, ...params });
+        })
     );
 
     const { linesData, allBorrowers } = categoryKeys.reduce(
@@ -125,6 +127,9 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
         if (!promises[i]) {
           return { linesData, allBorrowers };
         } else {
+          console.log('Formatter!');
+          console.log('Promises: ', promises);
+          console.log('Token Prices: ', tokenPrices);
           const categoryLines = formatGetLinesData(promises[i]!, tokenPrices);
           return {
             linesData: { ...linesData, [category]: categoryLines },
@@ -134,7 +139,6 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
       },
       { linesData: {}, allBorrowers: [] }
     );
-    // console.log('Lines Data: ', linesData);
     allBorrowers.map((b) => dispatch(OnchainMetaDataActions.getENS(b)));
 
     return { linesData };
@@ -266,7 +270,6 @@ const getInterestAccrued = createAsyncThunk<
   const { creditLineService } = services;
   const { contractAddress, id } = props;
   const interestAccrued = await creditLineService.getInterestAccrued(contractAddress, id);
-  console.log('Interest Accrued: ');
   console.log(interestAccrued.toString());
   return {
     amount: interestAccrued.toString(),

@@ -190,6 +190,7 @@ export function formatGetLinesData(
       status,
       ...rest
     } = data;
+    console.log('Secured line Data - 1');
     const { credit, spigot, escrow } = formatSecuredLineData(
       rest.id,
       spigotRes?.id ?? '',
@@ -200,7 +201,7 @@ export function formatGetLinesData(
       spigotRes,
       tokenPrices
     );
-
+    console.log('Secured line Data - 2');
     return {
       ...rest,
       ...credit,
@@ -287,6 +288,7 @@ export const formatSecuredLineData = (
   spigot: AggregatedSpigot;
   escrow: AggregatedEscrow;
 } => {
+  console.log('Line Address: ', line);
   // derivative or aggregated data we need to compute and store while mapping position data
   const collateralDeposits: BaseEscrowDepositFragResponse[] = escrow?.deposits || [];
   const revenues: SpigotRevenueSummaryFragResponse[] = spigot?.summaries || [];
@@ -320,7 +322,6 @@ export const formatSecuredLineData = (
     },
     { principal, deposit, highestApy, totalInterestRepaid }
   );
-
   // Sum value of deposits and create deposits map
   const [collateralValue, deposits]: [BigNumber, EscrowDepositMap] = collateralDeposits.reduce(
     (agg, collateralDeposit) => {
@@ -345,7 +346,6 @@ export const formatSecuredLineData = (
     },
     [BigNumber.from(0), {}]
   );
-
   // Create spigots map
   const spigotRevenueContracts: SpigotRevenueContractMap = spigots.reduce(
     (revenueContractMap: SpigotRevenueContractMap, revenueContract: SpigotRevenueContractFragResponse) => {
@@ -360,7 +360,6 @@ export const formatSecuredLineData = (
     },
     {} as SpigotRevenueContractMap
   );
-
   // Get escrow collateral events
   const escrowCollateralEvents: CollateralEvent[] = _.flatten(
     _.merge(
@@ -378,7 +377,6 @@ export const formatSecuredLineData = (
   );
 
   const creditEvents = formatCreditEvents('', BigNumber.from(0), eventFrags);
-
   const aggregatedEscrow: AggregatedEscrow = {
     id: escrowId,
     type: COLLATERAL_TYPE_ASSET,
@@ -391,7 +389,6 @@ export const formatSecuredLineData = (
     events: escrowCollateralEvents,
     deposits,
   };
-
   // aggregated revenue in USD by token across all spigots
   const [revenueValue, revenueSummary]: [BigNumber, RevenueSummaryMap] = revenues.reduce<any>(
     (agg, { token, totalVolume, totalVolumeUsd, ...summary }) => {
@@ -408,10 +405,8 @@ export const formatSecuredLineData = (
             token: _createTokenView(
               token,
               BigNumber.from(totalVolume),
-              BigNumber.from(totalVolumeUsd).div(BigNumber.from(totalVolume))
-            ), // use avg price at time of revenue
-            // amount: totalVolume,
-            // value: (totalVolumeUsd ?? '0').toString(),
+              BigNumber.from('0') // TODO: // use avg price at time of revenue
+            ),
             amount: totalRevenueVolume,
             value: formatUnits(usdcPrice.mul(unnullify(totalRevenueVolume).toString()), 6).toString(),
           },
@@ -420,7 +415,7 @@ export const formatSecuredLineData = (
     },
     [BigNumber.from(0), {} as RevenueSummaryMap]
   );
-
+  console.log('Secured line Data - 1.7');
   const spigotEvents = formatSpigotCollateralEvents(spigot.events);
   const collateralEvents = _.concat(spigotEvents, escrowCollateralEvents);
 

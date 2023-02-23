@@ -147,7 +147,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   // const [zeroExWarning, setZeroExWarning] = useState<boolean>(false);
   const [isTrade, setIsTrade] = useState<boolean>(false);
   const [costToClose, setCostToClose] = useState('0');
-  const [claimableTokenAddresses, setClaimableTokenAddress] = useState(['']);
+  const [claimableTokenAddresses, setClaimableTokenAddresses] = useState(['']);
+  const [blockZeroExTrade, setBlockZeroExTrade] = useState(false);
   // TODO: replace usage in useFundsForClosing with appropriate value
 
   useEffect(() => {
@@ -167,7 +168,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             tokenAddress: reservesTokenAddresses[0],
           })
         );
-        setClaimableTokenAddress(reservesTokenAddresses);
+        setClaimableTokenAddresses(reservesTokenAddresses);
       } else {
         dispatch(
           TokensActions.setSelectedTokenAddress({
@@ -583,7 +584,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             label: t('components.transaction.repay.claim-and-repay.cta'),
             onAction: claimAndRepay,
             status: true,
-            disabled: !haveFetched0x,
+            disabled: !haveFetched0x || blockZeroExTrade,
             contrast: false,
           },
         ];
@@ -723,6 +724,17 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     );
   }
 
+  const claimTargetBalance = normalizeAmount(
+    reservesMap[getAddress(selectedPosition.line)]
+      ? reservesMap[getAddress(selectedPosition.line)][selectedSellToken.address]?.ownerTokens
+      : '0',
+    selectedSellToken.decimals
+  );
+  const claimTokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(
+    claimTargetBalance,
+    4
+  )} ${selectedSellToken.symbol}`;
+
   let InputComponents; // might need to do this if returning from func causes rendering issues
   // @cleanup TODO try and move to its own component
   const renderInputComponents = () => {
@@ -733,7 +745,10 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         const buyToken = getAddress(selectedPosition.token.address);
         const sellToken = getAddress(selectedSellToken.address);
         const isZeroExTrade = sellToken !== buyToken;
-        const sellAmountInWei = toWei(targetAmount, selectedSellToken!.decimals);
+        // const sellAmountInWei = toWei(targetAmount, selectedSellToken!.decimals);
+        const sellAmountInWei = toWei(claimTargetBalance, selectedSellToken!.decimals);
+        // TODO: check if purchase amount exceeds debt amount
+        // TODO: compare 0x buyamount vs what you owe, if higher than trade and approve & repayment
         if (isZeroExTrade && !haveFetched0x) {
           const tradeTx = getTradeQuote({
             // set fake data for testing 0x
@@ -751,6 +766,12 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
               setIsTrade(true);
               setHaveFetched0x(true);
               console.log('Buy Amount: ', result.buyAmount);
+              if (
+                repayType.id === 'claim-and-repay' &&
+                BigNumber.from(result.buyAmount).gt(BigNumber.from(selectedPosition.principal))
+              ) {
+                setBlockZeroExTrade(true);
+              }
               const buyAmountInWei = formatUnits(result.buyAmount!, selectedPosition.token.decimals);
               setTokensToBuy(buyAmountInWei);
               setTradeData(result);
@@ -781,18 +802,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
           } as ZeroExAPIQuoteResponse);
         }
 
-        const claimTargetBalance = normalizeAmount(
-          reservesMap[getAddress(selectedPosition.line)]
-            ? reservesMap[getAddress(selectedPosition.line)][selectedSellToken.address]?.ownerTokens
-            : '0',
-          selectedSellToken.decimals
-        );
-
-        const claimTokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(
-          claimTargetBalance,
-          4
-        )} ${selectedSellToken.symbol}`;
-
         // TODO: test claimableTokenOptions on Ethereum mainnet
         const claimableTokenOptions: TokenView[] = claimableTokenAddresses.map((address) => {
           const isThisGoerli = isGoerli(walletNetwork);
@@ -812,7 +821,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
               headerText={t('components.transaction.repay.claim-and-repay.claim-token')}
               inputText={claimTokenHeaderText}
               // TODO: create unit test for this
-              amount={!isZeroExTrade ? claimTargetBalance : targetAmount}
+              // amount={!isZeroExTrade ? claimTargetBalance : targetAmount}
+              amount={claimTargetBalance}
               onAmountChange={(amnt) => {
                 setTargetAmount(amnt);
                 setHaveFetched0x(false);
@@ -823,7 +833,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
               // selectedToken={tokensMap[ETH]}
               onSelectedTokenChange={onSelectedSellTokenChange}
               tokenOptions={claimableTokenOptions}
-              readOnly={!isZeroExTrade ? true : false}
+              readOnly={true}
+              // readOnly={!isZeroExTrade ? true : false}
             />
             {/* rendner tokens to purchase based on trade data from 0x API response */}
             {sellToken !== buyToken ? (

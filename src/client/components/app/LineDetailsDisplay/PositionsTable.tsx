@@ -250,7 +250,7 @@ export const PositionsTable = ({
       const borrowAction = {
         name: t('components.transaction.borrow'),
         handler: borrowHandler,
-        disabled: Number(cratio) <= minCRatio ? true : false,
+        disabled: Number(cratio) <= minCRatio || BigNumber.from(position.principal).eq('0') ? true : false,
       };
 
       if (position.deposit === position.principal) return [repayAction];

@@ -140,9 +140,9 @@ const StatusWithColor = styled.span<{ status: string }>`
   }};
 `;
 
-const CratioWithColor = styled.span<{ diff: number }>`
-  color: ${({ diff }) => {
-    if (diff >= 15) return '#6AFF4D'; // decent margin - light green
+const CratioWithColor = styled.span<{ diff: number; principal: string }>`
+  color: ${({ diff, principal }) => {
+    if (diff >= 15 || BigNumber.from(principal).eq('0')) return '#6AFF4D'; // decent margin - light green
     else if (diff < 0) return '#FF1919'; // liquidatable - bright red
     else return '#E6E600'; // close to liquidatable - darkish yellow
   }};
@@ -394,7 +394,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
               <StyledIcon Component={InfoIcon} size="1.5rem" />
             </Tooltip>
             <MetadataTitle>{t('lineDetails:metadata.cratio')}: </MetadataTitle>{' '}
-            <CratioWithColor diff={Number(cratio) - Number(minCRatio)}>
+            <CratioWithColor diff={Number(cratio) - Number(minCRatio)} principal={principal}>
               {' '}
               {Number(principal) === 0 ? '∞' : normalizeAmount(cratio, 2)} %
             </CratioWithColor>

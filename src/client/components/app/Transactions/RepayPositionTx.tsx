@@ -73,7 +73,7 @@ interface RepayPositionProps {
 // }
 
 const {
-  CONTRACT_ADDRESSES: { DAI, ETH },
+  CONTRACT_ADDRESSES: { DAI, ETH, WETH },
   MAX_UINT256,
 } = getConstants();
 
@@ -158,16 +158,20 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   }, []);
 
   useEffect(() => {
+    console.log('Selected Sell Token Addy', selectedSellToken);
     if (!selectedSellToken && !_.isEmpty(sourceAssetOptions)) {
       if (Object.keys(reservesMap).length !== 0) {
         const reservesTokenAddresses = reservesMap[getAddress(selectedPosition!.line)]
           ? Object.keys(reservesMap[getAddress(selectedPosition!.line)])
           : [];
+        console.log('Are we here?');
+        console.log('Selected Sell Token: ', selectedSellToken);
         dispatch(
           TokensActions.setSelectedTokenAddress({
             tokenAddress: reservesTokenAddresses[0],
           })
         );
+        console.log('Reserves Token Addresses: ', reservesTokenAddresses);
         setClaimableTokenAddresses(reservesTokenAddresses);
       } else {
         dispatch(
@@ -808,12 +812,16 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
           if (isThisGoerli) {
             return testTokens.find((token) => token.address === address)!;
           } else {
+            // const tokenData =
+            //   address === ETH ? { ...tokensMap[WETH], address: ETH, name: 'Ether', symbol: 'ETH' } : tokensMap[address];
             const tokenData = tokensMap[address];
+            console.log('tokenData: ', tokenData);
             const userTokenData = {} as Balance;
             const allowancesMap = {};
             return createToken({ tokenData, userTokenData, allowancesMap });
           }
         });
+        console.log('Claimable Token Options: ', claimableTokenOptions);
 
         return (
           <>
@@ -823,10 +831,10 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
               // TODO: create unit test for this
               // amount={!isZeroExTrade ? claimTargetBalance : targetAmount}
               amount={claimTargetBalance}
-              onAmountChange={(amnt) => {
-                setTargetAmount(amnt);
-                setHaveFetched0x(false);
-              }}
+              // onAmountChange={(amnt) => {
+              //   setTargetAmount(amnt);
+              //   setHaveFetched0x(false);
+              // }}
               // token to claim from spigot
               selectedToken={selectedSellToken}
               // 0x testing data

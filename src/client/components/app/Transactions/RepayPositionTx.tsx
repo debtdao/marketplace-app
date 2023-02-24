@@ -404,7 +404,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       );
       return;
     }
-
     dispatch(
       LinesActions.claimAndRepay({
         lineAddress: selectedPosition.line,
@@ -777,8 +776,10 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
                 setBlockZeroExTrade(true);
               }
               const buyAmountInWei = formatUnits(result.buyAmount!, selectedPosition.token.decimals);
+              console.log('Buy Amount in Wei: ', buyAmountInWei);
               setTokensToBuy(buyAmountInWei);
               setTradeData(result);
+              console.log('0x Trade Result: ', result);
             }
             //TODO: Make  util function that creates 0x trade data, an another func that construct. Use 0x.ts
 
@@ -822,7 +823,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
           }
         });
         console.log('Claimable Token Options: ', claimableTokenOptions);
-
+        console.log('Selected Sell Token: ', selectedSellToken);
         return (
           <>
             <TxTokenInput

@@ -80,14 +80,12 @@ export const formatCollateralRevenue = (
     [address: string]: BigNumber;
   }
 ): AggregatedSpigot => {
-  console.log(spigot);
   const { revenueValue, revenueSummary, ...rest } = spigot;
   const [newRevenueValue, newRevenueSummary]: [BigNumber, RevenueSummaryMap] = Object.values(
     revenueSummary
   ).reduce<any>(
     (agg, { token, amount, ...summary }) => {
       const checkSumAddress = ethers.utils.getAddress(token.address);
-      console.log(token.address);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
       const ownerTokens = BigNumber.from(reserves[checkSumAddress]?.ownerTokens ?? BigNumber.from(0));
 

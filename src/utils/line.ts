@@ -190,7 +190,6 @@ export function formatGetLinesData(
       status,
       ...rest
     } = data;
-    console.log('Secured line Data - 1');
     const { credit, spigot, escrow } = formatSecuredLineData(
       rest.id,
       spigotRes?.id ?? '',
@@ -201,7 +200,6 @@ export function formatGetLinesData(
       spigotRes,
       tokenPrices
     );
-    console.log('Secured line Data - 2');
     return {
       ...rest,
       ...credit,
@@ -288,7 +286,6 @@ export const formatSecuredLineData = (
   spigot: AggregatedSpigot;
   escrow: AggregatedEscrow;
 } => {
-  console.log('Line Address: ', line);
   // derivative or aggregated data we need to compute and store while mapping position data
   const collateralDeposits: BaseEscrowDepositFragResponse[] = escrow?.deposits || [];
   const revenues: SpigotRevenueSummaryFragResponse[] = spigot?.summaries || [];
@@ -415,7 +412,6 @@ export const formatSecuredLineData = (
     },
     [BigNumber.from(0), {} as RevenueSummaryMap]
   );
-  console.log('Secured line Data - 1.7');
   const spigotEvents = formatSpigotCollateralEvents(spigot.events);
   const collateralEvents = _.concat(spigotEvents, escrowCollateralEvents);
 

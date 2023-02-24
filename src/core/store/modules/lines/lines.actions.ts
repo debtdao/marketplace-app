@@ -127,9 +127,6 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
         if (!promises[i]) {
           return { linesData, allBorrowers };
         } else {
-          console.log('Formatter!');
-          console.log('Promises: ', promises);
-          console.log('Token Prices: ', tokenPrices);
           const categoryLines = formatGetLinesData(promises[i]!, tokenPrices);
           return {
             linesData: { ...linesData, [category]: categoryLines },
@@ -270,7 +267,6 @@ const getInterestAccrued = createAsyncThunk<
   const { creditLineService } = services;
   const { contractAddress, id } = props;
   const interestAccrued = await creditLineService.getInterestAccrued(contractAddress, id);
-  console.log(interestAccrued.toString());
   return {
     amount: interestAccrued.toString(),
     lineAddress: contractAddress,

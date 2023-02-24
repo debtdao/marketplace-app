@@ -90,8 +90,6 @@ export const formatCollateralRevenue = (
       const ownerTokens = BigNumber.from(reserves[checkSumAddress]?.ownerTokens ?? BigNumber.from(0));
       const unusedTokens = BigNumber.from(reserves[checkSumAddress]?.unusedTokens ?? BigNumber.from(0));
       const totalUsableTokens = ownerTokens.add(unusedTokens);
-
-      // const totalRevenueVolume = toTargetDecimalUnits(ownerTokens.toString(), token.decimals, BASE_DECIMALS);
       const totalRevenueVolume = toTargetDecimalUnits(totalUsableTokens.toString(), token.decimals, BASE_DECIMALS);
 
       return [
@@ -115,5 +113,6 @@ export const formatCollateralRevenue = (
     revenueSummary: newRevenueSummary,
     ...rest,
   };
+  console.log('Updated Spigot: ', updatedSpigot);
   return updatedSpigot;
 };

@@ -47,6 +47,7 @@ export const selectDepositTokenOptionsByAsset = createSelector(
       if (isThisGoerli) {
         return testTokens;
       } else {
+        console.log('Main Tokens - Token Addresses: ', Object.values(TOKEN_ADDRESSES));
         const mainTokens = Object.values(TOKEN_ADDRESSES)
           .filter((address) => !!tokensMap[address] && address !== ETHEREUM_ADDRESS)
           .map((address) => {
@@ -67,6 +68,7 @@ export const selectDepositTokenOptionsByAsset = createSelector(
         // Return a list of supported tokens with mainTokens (e.g. ETH, WETH, DAI, etc.)
         // coming before subgraphTokens (e.g. AAVE, LINK, etc.) with both indepently sorted
         // from A-Z
+        console.log('Main Tokens: ', mainTokens);
         return unionBy(mainTokens, sortedSubgraphTokens, (o) => o.symbol);
       }
     })

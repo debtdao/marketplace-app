@@ -56,6 +56,10 @@ export class TokenServiceImpl implements TokenService {
     const { WETH } = this.config.CONTRACT_ADDRESSES;
     const yearn = this.yearnSdk.getInstanceOf(network);
     const supportedTokens = await yearn.tokens.supported();
+    console.log(
+      'Supported Tokens: ',
+      supportedTokens.filter((token) => token.address === WETH)
+    );
     // TODO: remove fixedSupportedTokens when WETH symbol is fixed on sdk
     const fixedSupportedTokens = supportedTokens.map((token) => ({
       ...token,

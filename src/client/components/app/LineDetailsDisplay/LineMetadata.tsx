@@ -321,25 +321,25 @@ export const LineMetadata = (props: LineMetadataProps) => {
 
   useEffect(() => {
     // populate collateral reservesmap in redux state
-    if (Object.keys(reservesMap).length === 0 && selectedLine) {
-      // get all collateral tokens of type revenue
-      const lineRevenueSummary = selectedLine!.spigot!.revenueSummary;
-      const revenueCollateralTokens: RevenueSummary[] = Object.values(lineRevenueSummary).filter(
-        (token) => token.type === 'revenue'
-      );
+    // if (Object.keys(reservesMap).length === 0 && selectedLine) {
+    // get all collateral tokens of type revenue
+    const lineRevenueSummary = selectedLine!.spigot!.revenueSummary;
+    const revenueCollateralTokens: RevenueSummary[] = Object.values(lineRevenueSummary).filter(
+      (token) => token.type === 'revenue'
+    );
 
-      // populate reserves map with each revenue collateral token
-      for (const token of revenueCollateralTokens as RevenueSummary[]) {
-        dispatch(
-          CollateralActions.tradeable({
-            lineAddress: getAddress(selectedLine!.id),
-            spigotAddress: getAddress(selectedLine!.spigotId),
-            tokenAddress: getAddress(token.token.address),
-            network: walletNetwork!,
-          })
-        );
-      }
+    // populate reserves map with each revenue collateral token
+    for (const token of revenueCollateralTokens as RevenueSummary[]) {
+      dispatch(
+        CollateralActions.tradeable({
+          lineAddress: getAddress(selectedLine!.id),
+          spigotAddress: getAddress(selectedLine!.spigotId),
+          tokenAddress: getAddress(token.token.address),
+          network: walletNetwork!,
+        })
+      );
     }
+    // }
   }, []);
 
   const renderEscrowMetadata = () => {

@@ -158,20 +158,16 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log('Selected Sell Token Addy', selectedSellToken);
     if (!selectedSellToken && !_.isEmpty(sourceAssetOptions)) {
       if (Object.keys(reservesMap).length !== 0) {
         const reservesTokenAddresses = reservesMap[getAddress(selectedPosition!.line)]
           ? Object.keys(reservesMap[getAddress(selectedPosition!.line)])
           : [];
-        console.log('Are we here?');
-        console.log('Selected Sell Token: ', selectedSellToken);
         dispatch(
           TokensActions.setSelectedTokenAddress({
             tokenAddress: reservesTokenAddresses[0],
           })
         );
-        console.log('Reserves Token Addresses: ', reservesTokenAddresses);
         setClaimableTokenAddresses(reservesTokenAddresses);
       } else {
         dispatch(
@@ -748,10 +744,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         const buyToken = getAddress(selectedPosition.token.address);
         const sellToken = getAddress(selectedSellToken.address);
         const isZeroExTrade = sellToken !== buyToken;
-        // const sellAmountInWei = toWei(targetAmount, selectedSellToken!.decimals);
         const sellAmountInWei = toWei(claimTargetBalance, selectedSellToken!.decimals);
-        // TODO: check if purchase amount exceeds debt amount
-        // TODO: compare 0x buyamount vs what you owe, if higher than trade and approve & repayment
+
         if (isZeroExTrade && !haveFetched0x) {
           const tradeTx = getTradeQuote({
             // set fake data for testing 0x
@@ -763,12 +757,9 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             sellAmount: sellAmountInWei, // targetAmount
             network: walletNetwork,
           }).then((result) => {
-            console.log('Result: ', result);
-            console.log('repay modal: trade quote res', result, result?.buyAmount);
             if (result) {
               setIsTrade(true);
               setHaveFetched0x(true);
-              console.log('Buy Amount: ', result.buyAmount);
               if (
                 repayType.id === 'claim-and-repay' &&
                 BigNumber.from(result.buyAmount).gt(BigNumber.from(selectedPosition.principal))
@@ -776,10 +767,8 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
                 setBlockZeroExTrade(true);
               }
               const buyAmountInWei = formatUnits(result.buyAmount!, selectedPosition.token.decimals);
-              console.log('Buy Amount in Wei: ', buyAmountInWei);
               setTokensToBuy(buyAmountInWei);
               setTradeData(result);
-              console.log('0x Trade Result: ', result);
             }
             //TODO: Make  util function that creates 0x trade data, an another func that construct. Use 0x.ts
 

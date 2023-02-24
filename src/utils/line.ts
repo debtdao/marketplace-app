@@ -52,6 +52,7 @@ import {
   PROPOSED_STATUS,
 } from '@types';
 import { getConstants } from '@config/constants';
+import { TOKEN_ADDRESSES } from '@src/config/constants';
 
 import { humanize, normalizeAmount, normalize, format, toUnit, toTargetDecimalUnits, BASE_DECIMALS } from './format';
 

@@ -69,6 +69,7 @@ export const selectDepositTokenOptionsByAsset = createSelector(
         // coming before subgraphTokens (e.g. AAVE, LINK, etc.) with both indepently sorted
         // from A-Z
         console.log('Main Tokens: ', mainTokens);
+        console.log('Subgraph Tokens: ', subgraphTokens);
         return unionBy(mainTokens, sortedSubgraphTokens, (o) => o.symbol);
       }
     })

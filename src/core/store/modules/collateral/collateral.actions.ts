@@ -180,6 +180,7 @@ const claimRevenue = createAsyncThunk<{ contract: string; success: boolean }, Cl
 const claimOperatorTokens = createAsyncThunk<{ claimed: string | undefined }, ClaimOperatorTokensProps, ThunkAPI>(
   'collateral/claimOperatorTokens',
   async (props, { extra }) => {
+    console.log('Claim Operator Tokens - props', props);
     const { collateralService } = extra.services;
     const tx = await collateralService.claimOperatorTokens(props);
     return {

@@ -64,9 +64,26 @@ export const ClaimOperatorTokensTx: FC<ClaimOperatorTokensTxProps> = (props) => 
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedSpigot = useAppSelector(CollateralSelectors.selectSelectedSpigot);
   const reservesMap = useAppSelector(CollateralSelectors.selectReservesMap);
+  const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
   const initialToken: string = selectedSellTokenAddress ?? selectedPosition?.token.address ?? DAI;
+
+  const claimableTokenAddresses = reservesMap?.[getAddress(selectedLine!.id)]
+    ? Object.keys(reservesMap[getAddress(selectedLine!.id)])
+    : [];
+
+  const claimableTokenOptions: TokenView[] = claimableTokenAddresses.map((address) => {
+    const isThisGoerli = isGoerli(walletNetwork);
+    if (isThisGoerli) {
+      return testTokens.find((token) => token.address === address)!;
+    } else {
+      const tokenData = tokensMap[address];
+      const userTokenData = {} as Balance;
+      const allowancesMap = {};
+      return createToken({ tokenData, userTokenData, allowancesMap });
+    }
+  });
 
   // @cleanup TODO only use sell token for claimAndRepay/Trade. use selectedPosition.token for everything else
   const { selectedSellToken, sourceAssetOptions } = useSelectedSellToken({
@@ -76,8 +93,6 @@ export const ClaimOperatorTokensTx: FC<ClaimOperatorTokensTxProps> = (props) => 
   });
 
   // used for 0x testing
-  const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
-
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionLoading, setLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>(['']);
@@ -100,29 +115,25 @@ export const ClaimOperatorTokensTx: FC<ClaimOperatorTokensTxProps> = (props) => 
 
   useEffect(() => {
     // populate collateral reservesmap in redux state
-    if (Object.keys(reservesMap).length === 0) {
-      // get all collateral tokens of type revenue
-      const lineRevenueSummary = selectedSpigot!.revenueSummary;
-      const revenueCollateralTokens: RevenueSummary[] = Object.values(lineRevenueSummary).filter(
-        (token) => token.type === 'revenue'
+    // get all collateral tokens of type revenue
+    const lineRevenueSummary = selectedSpigot!.revenueSummary;
+    const revenueCollateralTokens: RevenueSummary[] = Object.values(lineRevenueSummary).filter(
+      (token) => token.type === 'revenue'
+    );
+    // populate reserves map with each revenue collateral token
+    for (const token of revenueCollateralTokens as RevenueSummary[]) {
+      dispatch(
+        CollateralActions.tradeable({
+          lineAddress: getAddress(selectedLine!.id),
+          spigotAddress: getAddress(selectedLine!.spigotId),
+          tokenAddress: getAddress(token.token.address),
+          network: walletNetwork!,
+        })
       );
-      // populate reserves map with each revenue collateral token
-      for (const token of revenueCollateralTokens as RevenueSummary[]) {
-        console.log('revenue token: ', token);
-        dispatch(
-          CollateralActions.tradeable({
-            lineAddress: getAddress(selectedLine!.id),
-            spigotAddress: getAddress(selectedLine!.spigotId),
-            tokenAddress: getAddress(token.token.address),
-            network: walletNetwork!,
-          })
-        );
-      }
     }
   }, []);
 
   // Event Handlers
-
   const onTransactionCompletedDismissed = () => {
     if (onClose) {
       onClose();
@@ -138,12 +149,10 @@ export const ClaimOperatorTokensTx: FC<ClaimOperatorTokensTxProps> = (props) => 
     }
     const transactionData: ClaimOperatorTokensProps = {
       spigotAddress: getAddress(selectedLine?.spigotId),
-      token: getAddress(selectedTokenAddress),
+      token: getAddress(selectedSellTokenAddress),
       network: walletNetwork,
     };
-
-    console.log('INSIDE FUNC', selectedLine?.spigotId);
-    console.log('INSIDE FUNC', selectedTokenAddress);
+    console.log('Claim Operator Tokens - Transaction Data: ', transactionData);
 
     dispatch(CollateralActions.claimOperatorTokens(transactionData)).then((res) => {
       if (res.meta.requestStatus === 'rejected') {
@@ -188,38 +197,19 @@ export const ClaimOperatorTokensTx: FC<ClaimOperatorTokensTxProps> = (props) => 
     );
   }
 
+  const claimTargetBalance = normalizeAmount(
+    reservesMap[getAddress(selectedLine.id)] && reservesMap[getAddress(selectedLine.id)][selectedSellToken.address]
+      ? reservesMap[getAddress(selectedLine.id)][selectedSellToken.address].operatorTokens
+      : '0',
+    selectedSellToken.decimals
+  );
+
+  const claimTokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(
+    claimTargetBalance,
+    4
+  )} ${selectedSellToken.symbol}`;
+
   const renderInputComponents = () => {
-    const sellToken = getAddress(selectedSellToken.address);
-
-    const claimTargetBalance = normalizeAmount(
-      reservesMap[getAddress(selectedLine.id)] && reservesMap[getAddress(selectedLine.id)][selectedSellToken.address]
-        ? reservesMap[getAddress(selectedLine.id)][selectedSellToken.address].operatorTokens
-        : '0',
-      selectedSellToken.decimals
-    );
-
-    const claimTokenHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(
-      claimTargetBalance,
-      4
-    )} ${selectedSellToken.symbol}`;
-
-    const claimableTokenAddresses = reservesMap[getAddress(selectedLine.id)]
-      ? Object.keys(reservesMap[getAddress(selectedLine.id)])
-      : [];
-
-    // TODO: test claimableTokenOptions on Ethereum mainnet
-    const claimableTokenOptions: TokenView[] = claimableTokenAddresses.map((address) => {
-      const isThisGoerli = isGoerli(walletNetwork);
-      if (isThisGoerli) {
-        return testTokens.find((token) => token.address === address)!;
-      } else {
-        const tokenData = tokensMap[address];
-        const userTokenData = {} as Balance;
-        const allowancesMap = {};
-        return createToken({ tokenData, userTokenData, allowancesMap });
-      }
-    });
-
     return (
       <>
         <TxTokenInput
@@ -246,7 +236,7 @@ export const ClaimOperatorTokensTx: FC<ClaimOperatorTokensTxProps> = (props) => 
             'components.transaction.claim-revenue.claim-operator-tokens.cta'
           ).toLowerCase()}`}
           onClick={claimOperatorTokens}
-          disabled={false}
+          disabled={claimTargetBalance === '0'}
           contrast={false}
           isLoading={transactionLoading}
         >

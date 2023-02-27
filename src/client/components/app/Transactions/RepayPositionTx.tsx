@@ -796,7 +796,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
           } as ZeroExAPIQuoteResponse);
         }
 
-        // TODO: test claimableTokenOptions on Ethereum mainnet
         const claimableTokenOptions: TokenView[] = claimableTokenAddresses.map((address) => {
           const isThisGoerli = isGoerli(walletNetwork);
           if (isThisGoerli) {

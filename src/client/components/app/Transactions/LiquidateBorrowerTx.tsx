@@ -50,6 +50,7 @@ export const LiquidateBorrowerTx: FC<LiquidateBorrowerProps> = (props) => {
     selectedSellTokenAddress: initialToken,
     selectedVaultOrLab: useAppSelector(VaultsSelectors.selectRecommendations)[0],
     allowTokenSelect: true,
+    allowEth: true,
   });
 
   useEffect(() => {

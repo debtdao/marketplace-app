@@ -74,6 +74,7 @@ export const ClaimOperatorTokensTx: FC<ClaimOperatorTokensTxProps> = (props) => 
     selectedSellTokenAddress: initialToken,
     // selectedVaultOrLab: useAppSelector(VaultsSelectors.selectRecommendations)[0],
     allowTokenSelect: true,
+    allowEth: true,
   });
 
   // used for 0x testing

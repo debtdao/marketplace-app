@@ -652,6 +652,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
 
   const onSelectedSellTokenChange = (tokenAddress: string) => {
     console.log('Selected Token Change: ', tokenAddress);
+    setHaveFetched0x(false);
     dispatch(TokensActions.setSelectedTokenAddress({ tokenAddress }));
   };
 

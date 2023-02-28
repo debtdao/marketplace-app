@@ -57,19 +57,6 @@ export class TokenServiceImpl implements TokenService {
     const yearn = this.yearnSdk.getInstanceOf(network);
     // TODO: only pulling 100 tokens from this repo instead of ~300: https://github.com/yearn/yearn-assets/tree/master/icons/multichain-tokens/1
     const supportedTokens = await yearn.tokens.supported();
-    console.log(
-      'Yearn Supported Tokens - DPI: ',
-      supportedTokens.filter((token) => token.symbol === 'DPI')
-    );
-    console.log(
-      'Yearn Supported Tokens - CRV: ',
-      supportedTokens.filter((token) => token.symbol === 'CRV')
-    );
-    console.log(
-      'Yearn Supported Tokens - CVX: ',
-      supportedTokens.filter((token) => token.symbol === 'CVX')
-    );
-    console.log('Yearn Supported Tokens: ', supportedTokens);
     // TODO: remove fixedSupportedTokens when WETH symbol is fixed on sdk
     const wethToken = supportedTokens.filter((token) => token.address === WETH)[0] as Token;
     const ethToken = {

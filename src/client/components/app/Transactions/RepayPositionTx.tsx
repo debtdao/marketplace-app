@@ -159,7 +159,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log('Use Effect: ', selectedSellToken);
     if (!selectedSellToken && !_.isEmpty(sourceAssetOptions)) {
       if (Object.keys(reservesMap).length !== 0) {
         const reservesTokenAddresses = reservesMap[getAddress(selectedPosition!.line)]
@@ -179,9 +178,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         );
       }
     }
-    console.log('Selected Token Address: ', selectedTokenAddress);
     if (!selectedTokenAddress && selectedSellToken) {
-      console.log('Did I go here?: ', selectedTokenAddress);
       setSelectedTokenAddress(selectedSellToken.address);
     }
   }, [selectedSellToken]);
@@ -386,7 +383,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       !selectedSellTokenAddress,
       !walletNetwork
     );
-    console.log('Claim and Repay - selectedSellTokenAddress: ', selectedSellTokenAddress);
     if (!tradeData?.data || !selectedPosition?.line || !targetAmount || !selectedSellTokenAddress || !walletNetwork) {
       setLoading(false);
       return;
@@ -681,7 +677,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   };
 
   // generate token header text for deposit-and-repay and repay-and-close
-  // TODO: test that this generates correct token amount from user's wallet on mainnet
   const tokenTargetBalance = normalizeAmount(
     userTokensMap?.[selectedPosition.token.address]?.balance ?? '0',
     selectedPosition.token.decimals
@@ -821,21 +816,12 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             <TxTokenInput
               headerText={t('components.transaction.repay.claim-and-repay.claim-token')}
               inputText={claimTokenHeaderText}
-              // TODO: create unit test for this
-              // amount={!isZeroExTrade ? claimTargetBalance : targetAmount}
               amount={claimTargetBalance}
-              // onAmountChange={(amnt) => {
-              //   setTargetAmount(amnt);
-              //   setHaveFetched0x(false);
-              // }}
               // token to claim from spigot
               selectedToken={selectedSellToken}
-              // 0x testing data
-              // selectedToken={tokensMap[ETH]}
               onSelectedTokenChange={onSelectedSellTokenChange}
               tokenOptions={claimableTokenOptions}
               readOnly={true}
-              // readOnly={!isZeroExTrade ? true : false}
             />
             {/* rendner tokens to purchase based on trade data from 0x API response */}
             {sellToken !== buyToken ? (
@@ -843,13 +829,9 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
                 <TxTokenInput
                   headerText={t('components.transaction.repay.claim-and-repay.credit-token')}
                   inputText={t('components.transaction.repay.claim-and-repay.buy-amount')}
-                  // TODO: create unit test for this
-                  amount={tokensToBuy} // TODO: uncomment this after testing 0x trade data.
-                  // amount={targetAmount} // TODO: delete this after confirming 0x trade data is working.
+                  amount={tokensToBuy}
                   selectedToken={selectedPosition.token}
                   tokenOptions={[selectedPosition.token]}
-                  // 0x testing data
-                  // selectedToken={tokensMap[DAI]}
                   readOnly={true}
                 />
                 {/* TODO: Determine how to display an insufficient liquidity message when testing on Ethereum mainnet. */}

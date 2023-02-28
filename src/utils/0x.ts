@@ -46,7 +46,6 @@ export const getTradeQuote = async ({
   };
 
   try {
-    console.log('0x Trade Params: ', params);
     const response = await get(`${getBaseURLForNetwork(network)}swap/v1/quote`, {
       params: { ...referralFees, ...affiliateMetadata, ...params },
     });

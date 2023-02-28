@@ -289,6 +289,7 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
         headerText={t('components.transaction.release-collateral.select-token')}
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
+        // TODO: replace or remove as the amountValue is neither using BigNumber nor doing correct math
         // amountValue={String(10000000 * Number(targetTokenAmount))}
         maxAmount={targetBalance}
         onAmountChange={setTargetTokenAmount}

@@ -210,14 +210,6 @@ export function formatGetLinesData(
       arbiter,
       spigotId: spigotRes?.id,
       escrowId: escrowRes?.id,
-      // spigot: {
-      //   ...(spigotRes ?? {}),
-      //   ...spigot,
-      // },
-      // escrow: {
-      //   ...(escrowRes ?? {}),
-      //   ...escrow,
-      // },
       spigot,
       escrow,
     };

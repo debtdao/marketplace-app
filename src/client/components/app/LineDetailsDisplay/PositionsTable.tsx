@@ -246,7 +246,6 @@ export const PositionsTable = ({
 
       const currentLine = selectLineFunc(position.line);
       const { minCRatio, cratio } = collateralMap[currentLine?.escrowId] as AggregatedEscrow;
-      console.log('Current Line: ', currentLine);
       const borrowAction = {
         name: t('components.transaction.borrow'),
         handler: borrowHandler,

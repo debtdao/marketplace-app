@@ -21,7 +21,7 @@ export const useSelectedSellToken = ({
   selectedVaultOrLab,
   allowTokenSelect,
 }: SelectedSellTokenProps): SelectedSellToken => {
-  const sellTokensOptions = useAppSelector(selectDepositTokenOptionsByAsset)(selectedVaultOrLab?.address);
+  const sellTokensOptions = useAppSelector(selectDepositTokenOptionsByAsset)(false);
 
   let fullTokensOptions = sellTokensOptions.concat(testTokens); // @cleanup remove
 

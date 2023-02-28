@@ -69,7 +69,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedEscrow = useAppSelector(CollateralSelectors.selectSelectedEscrow);
-  const collateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
+  const collateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)(false);
   // need to get call statusMap from state for tx error messages
   //const collateralStatusMap = useAppSelector(CollateralSelectors.selectStatusMap);
 

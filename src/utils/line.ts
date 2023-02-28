@@ -394,7 +394,7 @@ export const formatSecuredLineData = (
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
       const totalRevenueVolume = toTargetDecimalUnits(totalVolume, token.decimals, BASE_DECIMALS);
       return [
-        agg[0].add(unnullify(totalRevenueVolume).toString()).mul(usdcPrice),
+        agg[0].add(unnullify(totalRevenueVolume, true).mul(usdcPrice)),
         {
           ...agg[1],
           [getAddress(token.id)]: {

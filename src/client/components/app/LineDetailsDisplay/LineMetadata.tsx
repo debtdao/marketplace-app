@@ -362,6 +362,8 @@ export const LineMetadata = (props: LineMetadataProps) => {
   };
   const renderSpigotMetadata = () => {
     if (!revenue) return null;
+    console.log('Revenue: ', revenue);
+    console.log('Revenue Value: ', revenueValue);
     return (
       <>
         <MetadataBox>
@@ -559,6 +561,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
     return;
   };
 
+  console.log('Formatted Collateral Data: ', formattedCollateralData);
   return (
     <>
       <MetadataContainer>
@@ -673,7 +676,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
               key: 'amount',
               header: t('lineDetails:metadata.escrow.assets-list.amount'),
               description: t('lineDetails:metadata.escrow.tooltip.amount'),
-              format: ({ amount }) => `${humanize('amount', amount, BASE_DECIMALS, 2)}`,
+              format: ({ amount }) => `${humanize('amount', amount, BASE_DECIMALS, 3)}`,
               sortable: true,
               className: 'col-assets',
             },

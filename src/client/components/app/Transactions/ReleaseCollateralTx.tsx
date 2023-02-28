@@ -102,7 +102,7 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
   const linesMap = useAppSelector(LinesSelectors.selectLinesMap);
   const borrower = linesMap[selectedLineAddress!].borrower;
   const selectedEscrow = useAppSelector(CollateralSelectors.selectSelectedEscrow);
-  const allCollateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
+  const allCollateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)(false);
 
   const { assetAddress: selectedCollateralAssetAddress } = useAppSelector(ModalSelectors.selectActiveModalProps);
   const collateralOptions = _.values(selectedEscrow?.deposits).map((d) => d.token);

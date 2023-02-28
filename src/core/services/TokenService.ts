@@ -72,7 +72,6 @@ export class TokenServiceImpl implements TokenService {
         name: 'Ether',
       },
     } as Token;
-    console.log('ETH Token: ', ethToken);
     const fixedSupportedTokens: Token[] = [ethToken].concat(
       supportedTokens.map((token) => ({
         ...token,

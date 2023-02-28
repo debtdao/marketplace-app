@@ -9,6 +9,7 @@ interface SelectedSellTokenProps {
   selectedSellTokenAddress?: string;
   selectedVaultOrLab?: GeneralVaultView | GeneralLabView; // TODO: types
   allowTokenSelect?: boolean;
+  allowEth?: boolean;
 }
 
 interface SelectedSellToken {
@@ -20,8 +21,9 @@ export const useSelectedSellToken = ({
   selectedSellTokenAddress,
   selectedVaultOrLab,
   allowTokenSelect,
+  allowEth,
 }: SelectedSellTokenProps): SelectedSellToken => {
-  const sellTokensOptions = useAppSelector(selectDepositTokenOptionsByAsset)(false);
+  const sellTokensOptions = useAppSelector(selectDepositTokenOptionsByAsset)(allowEth);
 
   let fullTokensOptions = sellTokensOptions.concat(testTokens); // @cleanup remove
 

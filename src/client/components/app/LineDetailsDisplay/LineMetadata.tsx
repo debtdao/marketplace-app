@@ -362,8 +362,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
   };
   const renderSpigotMetadata = () => {
     if (!revenue) return null;
-    console.log('Revenue: ', revenue);
-    console.log('Revenue Value: ', revenueValue);
     return (
       <>
         <MetadataBox>
@@ -561,7 +559,6 @@ export const LineMetadata = (props: LineMetadataProps) => {
     return;
   };
 
-  console.log('Formatted Collateral Data: ', formattedCollateralData);
   return (
     <>
       <MetadataContainer>

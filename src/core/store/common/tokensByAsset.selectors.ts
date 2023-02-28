@@ -41,7 +41,7 @@ export const selectDepositTokenOptionsByAsset = createSelector(
     servicesEnabled,
     currentNetwork = NETWORK
   ) =>
-    memoize((allowEth?: false): TokenView[] => {
+    memoize((allowEth: boolean = false): TokenView[] => {
       const { userTokensMap, userTokensAllowancesMap } = tokensUser;
       const isThisGoerli = isGoerli(currentNetwork);
       if (isThisGoerli) {

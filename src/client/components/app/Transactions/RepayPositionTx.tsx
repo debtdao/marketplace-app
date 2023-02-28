@@ -133,6 +133,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     selectedSellTokenAddress: initialToken,
     // selectedVaultOrLab: useAppSelector(VaultsSelectors.selectRecommendations)[0],
     allowTokenSelect: true,
+    allowEth: true,
   });
 
   const [transactionCompleted, setTransactionCompleted] = useState(0);
@@ -158,6 +159,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   }, []);
 
   useEffect(() => {
+    console.log('Use Effect: ', selectedSellToken);
     if (!selectedSellToken && !_.isEmpty(sourceAssetOptions)) {
       if (Object.keys(reservesMap).length !== 0) {
         const reservesTokenAddresses = reservesMap[getAddress(selectedPosition!.line)]
@@ -177,7 +179,9 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
         );
       }
     }
+    console.log('Selected Token Address: ', selectedTokenAddress);
     if (!selectedTokenAddress && selectedSellToken) {
+      console.log('Did I go here?: ', selectedTokenAddress);
       setSelectedTokenAddress(selectedSellToken.address);
     }
   }, [selectedSellToken]);
@@ -382,6 +386,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
       !selectedSellTokenAddress,
       !walletNetwork
     );
+    console.log('Claim and Repay - selectedSellTokenAddress: ', selectedSellTokenAddress);
     if (!tradeData?.data || !selectedPosition?.line || !targetAmount || !selectedSellTokenAddress || !walletNetwork) {
       setLoading(false);
       return;
@@ -646,6 +651,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   if (!selectedSellToken) return null;
 
   const onSelectedSellTokenChange = (tokenAddress: string) => {
+    console.log('Selected Token Change: ', tokenAddress);
     dispatch(TokensActions.setSelectedTokenAddress({ tokenAddress }));
   };
 
@@ -801,17 +807,14 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
           if (isThisGoerli) {
             return testTokens.find((token) => token.address === address)!;
           } else {
-            // const tokenData =
-            //   address === ETH ? { ...tokensMap[WETH], address: ETH, name: 'Ether', symbol: 'ETH' } : tokensMap[address];
             const tokenData = tokensMap[address];
-            console.log('tokenData: ', tokenData);
             const userTokenData = {} as Balance;
             const allowancesMap = {};
             return createToken({ tokenData, userTokenData, allowancesMap });
           }
         });
-        console.log('Claimable Token Options: ', claimableTokenOptions);
         console.log('Selected Sell Token: ', selectedSellToken);
+        console.log('Claimable Token Options: ', claimableTokenOptions);
         return (
           <>
             <TxTokenInput

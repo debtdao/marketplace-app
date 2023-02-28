@@ -87,11 +87,9 @@ export const formatCollateralRevenue = (
     (agg, { token, amount, ...summary }) => {
       const checkSumAddress = ethers.utils.getAddress(token.address);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
-      console.log('USDC Price: ', usdcPrice);
       const ownerTokens = BigNumber.from(reserves[checkSumAddress]?.ownerTokens ?? BigNumber.from(0));
       const unusedTokens = BigNumber.from(reserves[checkSumAddress]?.unusedTokens ?? BigNumber.from(0));
       const totalUsableTokens = ownerTokens.add(unusedTokens);
-      console.log('Total Revenue Volume - usable tokens: ', totalUsableTokens.toString());
       const totalRevenueVolume = toTargetDecimalUnits(totalUsableTokens.toString(), token.decimals, BASE_DECIMALS);
       return [
         agg[0].add(unnullify(totalRevenueVolume, true).mul(usdcPrice)),

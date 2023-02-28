@@ -207,7 +207,6 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
         };
         const spigot = state.collateralMap[spigotAddress.toLowerCase()] as AggregatedSpigot;
         const reserves = state.reservesMap[lineAddress];
-        console.log('Reserves: ', reserves);
         const updatedSpigot = formatCollateralRevenue(spigot, reserves, tokenPrices);
         state.collateralMap[spigotAddress.toLowerCase()] = updatedSpigot;
       }

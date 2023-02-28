@@ -81,34 +81,33 @@ export const formatCollateralRevenue = (
   }
 ): AggregatedSpigot => {
   const { revenueValue, revenueSummary, ...rest } = spigot;
-  const [newRevenueValue, newRevenueSummary]: [BigNumber, RevenueSummaryMap] = Object.values(
-    revenueSummary
-  ).reduce<any>(
+  const newRevenueSummary: RevenueSummaryMap = Object.values(revenueSummary).reduce<RevenueSummaryMap>(
     (agg, { token, amount, ...summary }) => {
       const checkSumAddress = ethers.utils.getAddress(token.address);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
       const ownerTokens = BigNumber.from(reserves[checkSumAddress]?.ownerTokens ?? BigNumber.from(0));
       const unusedTokens = BigNumber.from(reserves[checkSumAddress]?.unusedTokens ?? BigNumber.from(0));
-      const totalUsableTokens = ownerTokens.add(unusedTokens);
-      const totalRevenueVolume = toTargetDecimalUnits(totalUsableTokens.toString(), token.decimals, BASE_DECIMALS);
-      return [
-        agg[0].add(unnullify(totalRevenueVolume, true).mul(usdcPrice)),
-        {
-          ...agg[1],
-          [getAddress(token.address)]: {
-            ...summary,
-            type: COLLATERAL_TYPE_REVENUE,
-            token: token,
-            amount: totalRevenueVolume,
-            value: formatUnits(usdcPrice.mul(unnullify(totalRevenueVolume).toString()), 6).toString(),
-          },
+      const totalUsableTokens = toTargetDecimalUnits(
+        ownerTokens.add(unusedTokens).toString(),
+        token.decimals,
+        BASE_DECIMALS
+      );
+      return {
+        ...agg,
+        [getAddress(token.address)]: {
+          ...summary,
+          type: COLLATERAL_TYPE_REVENUE,
+          token: token,
+          amount: totalUsableTokens,
+          value: formatUnits(usdcPrice.mul(unnullify(totalUsableTokens).toString()), 6).toString(),
         },
-      ];
+      };
     },
-    [BigNumber.from(0), {} as RevenueSummaryMap]
+    {} as RevenueSummaryMap
   );
+
   const updatedSpigot = {
-    revenueValue: formatUnits(unnullify(newRevenueValue), 6).toString().split('.')[0],
+    revenueValue,
     revenueSummary: newRevenueSummary,
     ...rest,
   };

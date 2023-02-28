@@ -197,7 +197,7 @@ export interface AggregatedEscrow extends BaseEscrow {
 export interface RevenueSummary extends Collateral {
   type: CollateralTypeRevenue;
   token: TokenView;
-  unsused?: string;
+  unused?: string;
   ownerTokens?: string;
   amount: string;
   value: string;

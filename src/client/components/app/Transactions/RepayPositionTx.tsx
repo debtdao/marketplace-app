@@ -651,8 +651,9 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   if (!selectedSellToken) return null;
 
   const onSelectedSellTokenChange = (tokenAddress: string) => {
-    console.log('Selected Token Change: ', tokenAddress);
     setHaveFetched0x(false);
+    setBlockZeroExTrade(false);
+    setIsTrade(false);
     dispatch(TokensActions.setSelectedTokenAddress({ tokenAddress }));
   };
 
@@ -814,8 +815,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             return createToken({ tokenData, userTokenData, allowancesMap });
           }
         });
-        console.log('Selected Sell Token: ', selectedSellToken);
-        console.log('Claimable Token Options: ', claimableTokenOptions);
+
         return (
           <>
             <TxTokenInput

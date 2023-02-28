@@ -201,6 +201,7 @@ export function formatGetLinesData(
       spigotRes,
       tokenPrices
     );
+
     return {
       ...rest,
       ...credit,
@@ -209,14 +210,16 @@ export function formatGetLinesData(
       arbiter,
       spigotId: spigotRes?.id,
       escrowId: escrowRes?.id,
-      spigot: {
-        ...(spigotRes ?? {}),
-        ...spigot,
-      },
-      escrow: {
-        ...(escrowRes ?? {}),
-        ...escrow,
-      },
+      // spigot: {
+      //   ...(spigotRes ?? {}),
+      //   ...spigot,
+      // },
+      // escrow: {
+      //   ...(escrowRes ?? {}),
+      //   ...escrow,
+      // },
+      spigot,
+      escrow,
     };
   });
 }
@@ -389,12 +392,14 @@ export const formatSecuredLineData = (
   };
   // aggregated revenue in USD by token across all spigots
   const [revenueValue, revenueSummary]: [BigNumber, RevenueSummaryMap] = revenues.reduce<any>(
-    (agg, { token, totalVolume, totalVolumeUsd, ...summary }) => {
+    (agg, { token, ownerTokens, totalVolume, totalVolumeUsd, ...summary }) => {
       const checkSumAddress = ethers.utils.getAddress(token.id);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
-      const totalRevenueVolume = toTargetDecimalUnits(totalVolume, token.decimals, BASE_DECIMALS);
+      // TODO: Add unusedTokens to the subgraph and add into totalUsableTokens for more accurate revenue calculation in Collateral table of Line Page
+      const totalUsableTokens = toTargetDecimalUnits(ownerTokens.toString(), token.decimals, BASE_DECIMALS);
+      const totalVolumeFormatted = toTargetDecimalUnits(totalVolume.toString(), token.decimals, BASE_DECIMALS);
       return [
-        agg[0].add(unnullify(totalRevenueVolume, true).mul(usdcPrice)),
+        agg[0].add(unnullify(totalVolumeFormatted, true).mul(usdcPrice)),
         {
           ...agg[1],
           [getAddress(token.id)]: {
@@ -405,8 +410,8 @@ export const formatSecuredLineData = (
               BigNumber.from(totalVolume),
               BigNumber.from('0') // TODO: // use avg price at time of revenue
             ),
-            amount: totalRevenueVolume,
-            value: formatUnits(usdcPrice.mul(unnullify(totalRevenueVolume).toString()), 6).toString(),
+            amount: totalUsableTokens,
+            value: formatUnits(usdcPrice.mul(unnullify(totalUsableTokens).toString()), 6).toString(),
           },
         },
       ];

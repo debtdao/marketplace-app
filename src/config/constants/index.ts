@@ -61,7 +61,6 @@ const NETWORK_SETTINGS: NetworkSettings = {
     notifyEnabled: true,
     blockExplorerUrl: 'https://etherscan.io',
     txConfirmations: 2,
-    // zapsEnabled: true,
   },
   // NOTE: Arbitrum is not yet supported!
   // arbitrum: {

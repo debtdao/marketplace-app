@@ -20,6 +20,5 @@ export interface NetworkSettings {
     notifyEnabled?: boolean;
     blockExplorerUrl?: string;
     txConfirmations?: number;
-    // zapsEnabled?: boolean;
   };
 }

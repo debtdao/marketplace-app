@@ -777,15 +777,16 @@ export const formatLineCategories = (lines: { [key: string]: SecuredLine }): { [
     'id'
   );
 
-  const newCreditLines = _.map(
-    _.sortBy(lines, (line) => -line.start),
-    'id'
-  );
+  // TODO: add back if remove categorization from the subgraph
+  // const newCreditLines = _.map(
+  //   _.sortBy(lines, (line) => -line.start),
+  //   'id'
+  // );
 
   const updatedCategories = {
     'market:featured.highest-credit': highestCreditLines,
     'market:featured.highest-revenue': highestRevenueLines,
-    'market:featured.newest': newCreditLines,
+    // 'market:featured.newest': newCreditLines,
   };
 
   return updatedCategories;

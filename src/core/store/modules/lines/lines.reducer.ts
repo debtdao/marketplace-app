@@ -244,7 +244,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 
       state.linesMap = { ...state.linesMap, ...formattedLines };
       state.positionsMap = { ...state.positionsMap, ...positions };
-      state.categories = { ...state.categories, ...updatedCategories };
+      state.categories = { ...state.categories, ...categories, ...updatedCategories };
     })
     .addCase(getLines.rejected, (state, { error }) => {
       state.statusMap.getLines = { error: error.message };

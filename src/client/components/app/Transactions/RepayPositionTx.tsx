@@ -159,7 +159,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   }, []);
 
   useEffect(() => {
-    if (!selectedSellToken ) {
+    if (!selectedSellToken) {
       if (Object.keys(reservesMap).length !== 0) {
         const reservesTokenAddresses = reservesMap[getAddress(selectedPosition!.line)]
           ? Object.keys(reservesMap[getAddress(selectedPosition!.line)])

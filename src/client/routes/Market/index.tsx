@@ -82,7 +82,6 @@ export const Market = () => {
 
     const expectedCategories = _.keys(defaultLineCategories);
     const currentCategories = _.keys(lineCategoriesForDisplay);
-    console.log(expectedCategories);
     // const shouldFetch = expectedCategories.reduce((bool, cat) => bool && cuirrentCategories.includes(cat), true);
     let shouldFetch: boolean = false;
     expectedCategories.forEach((cat) => (shouldFetch = shouldFetch || !currentCategories.includes(cat)));

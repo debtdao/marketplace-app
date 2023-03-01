@@ -53,6 +53,7 @@ const StyledTxStatus = styled.div`
 
 export interface TxStatusProps {
   transactionCompletedLabel?: string;
+  transactionFailedReason?: string;
   link?: string;
   exit: () => void;
   success: number;
@@ -60,7 +61,15 @@ export interface TxStatusProps {
 
 // Pass down 2 as props for failed transactions and 1 for successful transactions
 
-export const TxStatus: FC<TxStatusProps> = ({ transactionCompletedLabel, link, success, exit, children, ...props }) => {
+export const TxStatus: FC<TxStatusProps> = ({
+  transactionCompletedLabel,
+  transactionFailedReason,
+  link,
+  success,
+  exit,
+  children,
+  ...props
+}) => {
   const { t } = useAppTranslation('common');
 
   const actionButtonLabel = transactionCompletedLabel ?? t('components.transaction.status.exit');
@@ -89,7 +98,7 @@ export const TxStatus: FC<TxStatusProps> = ({ transactionCompletedLabel, link, s
         <>
           <TxStatusContentFail>
             <StyledText>{t('components.transaction.status.transaction-failed')}</StyledText>
-            <StyledIcon Component={ErrorIcon} />
+            <StyledText>{transactionFailedReason}</StyledText>
           </TxStatusContentFail>
           <TxActions>
             <TxActionButton onClick={exit} success={false}>

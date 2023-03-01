@@ -10,6 +10,7 @@ import {
   CollateralModule,
   CollateralEvent,
   Address,
+  RootState,
   ClaimRevenueProps,
   ReleaseCollateraltProps,
   TradeableProps,
@@ -20,6 +21,8 @@ import {
 } from '@src/core/types';
 import { TxActionButton } from '@src/client/components/app';
 import { formatEscrowDeposit } from '@src/utils/collateral';
+
+import { TokensSelectors } from '../tokens/tokens.selectors';
 
 const setSelectedEscrow = createAction<{ escrowAddress?: string }>('collateral/setSelectedEscrow');
 const setSelectedSpigot = createAction<{ spigotAddress?: string }>('collateral/setSelectedSpigot');
@@ -189,6 +192,10 @@ const claimOperatorTokens = createAsyncThunk<{ claimed: string | undefined }, Cl
 const tradeable = createAsyncThunk<
   {
     tokenAddressMap: { unusedTokens: string; ownerTokens: string; operatorTokens: string };
+    spigotAddress: string;
+    tokenPrices: {
+      [address: string]: BigNumber;
+    };
     tokenAddress: string;
     lineAddress: string;
     success: boolean;
@@ -213,8 +220,13 @@ const tradeable = createAsyncThunk<
     operatorTokens: operatorTokenTxn.toString(),
   };
 
+  const state: RootState = getState();
+  const tokenPrices = TokensSelectors.selectTokenPrices(state);
+
   return {
     tokenAddressMap,
+    spigotAddress,
+    tokenPrices,
     tokenAddress: getAddress(tokenAddress),
     lineAddress: lineAddress,
     success: !!tradeableTxn && !!ownerTokenTxn && !!operatorTokenTxn,

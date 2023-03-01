@@ -3,18 +3,30 @@ import styled from 'styled-components';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import { useAppTranslation, useAppSelector } from '@hooks';
-import { Text, Icon, ZapIcon, LogoIcon } from '@components/common';
+import { Text, Icon, ZapIcon, LogoIcon, Link, RedirectIcon } from '@components/common';
 import { PositionSearchList } from '@src/client/components/common/PositionSearchList';
-import { OnchainMetaDataSelector } from '@src/core/store';
+import { WalletSelectors, OnchainMetaDataSelector } from '@src/core/store';
 import { CreditPosition } from '@src/core/types';
-import { normalizeAmount, formatAddress, getENS } from '@src/utils';
+import { normalizeAmount, formatAddress, getENS, BASE_DECIMALS } from '@src/utils';
+import { getConfig } from '@src/config';
 
 import { TokenIcon } from '../../TokenIcon';
+
+const { NETWORK_SETTINGS } = getConfig();
 
 const LineTitle = styled(Text)`
   color: ${({ theme }) => theme.colors.txModalColors.text};
   fontsize: large;
   margin-top: 0.5rem;
+`;
+
+const RedirectLink = styled(Link)`
+  display: flex;
+`;
+
+const LinkOut = styled(RedirectIcon)`
+  fill: ${({ theme }) => theme.colors.primary};
+  height: 1.4rem;
 `;
 
 const CreditLineData = styled.div`
@@ -157,6 +169,8 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
   const { t } = useAppTranslation('common');
   const [openedSearch, setOpenedSearch] = useState(false);
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
+  const selectedNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
+  const { blockExplorerUrl } = NETWORK_SETTINGS[selectedNetwork];
 
   if (!positions || positions.length < 1) return null;
   const position = selectedPosition || positions[0];
@@ -209,10 +223,17 @@ export const TxPositionInput: FC<TxPositionInputProps> = ({
             <CreditLineName>{position.token.symbol}</CreditLineName>
           </CreditLineSelector>
           <CreditLineData>
-            <LineTitle ellipsis> Lender: {formatAddress(getENS(position?.lender, ensMap)!)} </LineTitle>
-            <LineTitle ellipsis>
-              Available: {`${normalizeAmount(position?.deposit, 18)} ${position?.token.symbol}`}
-            </LineTitle>
+            <RedirectLink to={`${blockExplorerUrl}/address/${position?.lender}`}>
+              <LineTitle ellipsis>
+                Lender:
+                {' ' + formatAddress(getENS(position?.lender, ensMap)!)}
+              </LineTitle>
+              <LinkOut />
+            </RedirectLink>
+            <RedirectLink to={`${blockExplorerUrl}/address/${position!.line}`}>
+              <LineTitle ellipsis>Line: {' ' + formatAddress(position!.line)}</LineTitle>
+              <LinkOut />
+            </RedirectLink>
           </CreditLineData>
         </CreditLineInfo>
       </>

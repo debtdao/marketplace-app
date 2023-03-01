@@ -30,6 +30,7 @@ import {
   GetLinesResponse,
   MarketPageData,
   GetLineEventsResponse,
+  SetRatesProps,
 } from '@types';
 import {
   formatGetLinesData,
@@ -115,7 +116,9 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
     const promises = await Promise.all(
       categoryKeys
         .map((k) => categories[k])
-        .map((params: GetLinesArgs) => creditLineService.getLines({ network, ...params }))
+        .map((params: GetLinesArgs) => {
+          return creditLineService.getLines({ network, ...params });
+        })
     );
 
     const { linesData, allBorrowers } = categoryKeys.reduce(
@@ -133,7 +136,6 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
       },
       { linesData: {}, allBorrowers: [] }
     );
-    // console.log('Lines Data: ', linesData);
     allBorrowers.map((b) => dispatch(OnchainMetaDataActions.getENS(b)));
 
     return { linesData };
@@ -251,6 +253,27 @@ const getExpectedTransactionOutcome = createAsyncThunk<
   }
 );
 
+export interface GetInterestAccruedProps {
+  contractAddress: string;
+  id: string;
+}
+
+const getInterestAccrued = createAsyncThunk<
+  { amount: string; lineAddress: string; id: string },
+  GetInterestAccruedProps,
+  ThunkAPI
+>('lines/getInterestAccrued', async (props, { getState, extra }) => {
+  const { services } = extra;
+  const { creditLineService } = services;
+  const { contractAddress, id } = props;
+  const interestAccrued = await creditLineService.getInterestAccrued(contractAddress, id);
+  return {
+    amount: interestAccrued.toString(),
+    lineAddress: contractAddress,
+    id: id.toString(),
+  };
+});
+
 /* -------------------------------------------------------------------------- */
 /*                             Transaction Methods                            */
 /* -------------------------------------------------------------------------- */
@@ -323,7 +346,7 @@ const borrowCredit = createAsyncThunk<void, BorrowCreditProps, ThunkAPI>(
   async ({ positionId, amount, network, line }, { extra, getState }) => {
     const { wallet } = getState();
     const { services } = extra;
-    console.log('look at borrow credit', wallet, positionId, amount, line);
+    // console.log('look at borrow credit', wallet, positionId, amount, line);
     const { creditLineService } = services;
 
     const tx = await creditLineService.borrow({
@@ -371,6 +394,16 @@ const addCredit = createAsyncThunk<
     position: position,
   };
 });
+
+const setRates = createAsyncThunk<void, SetRatesProps, ThunkAPI>(
+  'lines/setRates',
+
+  async (props, { extra, getState }) => {
+    const { services } = extra;
+    const { creditLineService } = services;
+    const tx = await creditLineService.setRates(props);
+  }
+);
 
 const depositAndRepay = createAsyncThunk<
   void,
@@ -911,9 +944,11 @@ export const LinesActions = {
   getLinePage,
   getUserLinePositions,
   getUserPortfolio,
+  getInterestAccrued,
 
   approveDeposit,
   addCredit,
+  setRates,
   borrowCredit,
   deploySecuredLine,
   deploySecuredLineWithConfig,

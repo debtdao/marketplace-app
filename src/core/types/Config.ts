@@ -59,6 +59,7 @@ export interface Constants {
   AVAILABLE_THEMES: Theme[];
   AVAILABLE_CUSTOM_THEMES: Theme[];
   DEFAULT_ALERT_TIMEOUT: number;
+  OPTIMISTIC_UPDATE_TIMESTAMP: number;
   DEFAULT_LANG: Language;
   SUPPORTED_LANGS: Language[];
   DUST_AMOUNT_USD: string;

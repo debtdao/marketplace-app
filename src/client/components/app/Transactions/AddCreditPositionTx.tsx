@@ -38,7 +38,7 @@ const {
 } = getConstants();
 const StyledTransaction = styled(TxContainer)``;
 
-interface AddCreditPositionProps {
+export interface AddCreditPositionProps {
   header: string;
   onClose: () => void;
   acceptingOffer?: boolean;
@@ -82,10 +82,10 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
   const selectedSellTokenAddress = useAppSelector(TokensSelectors.selectSelectedTokenAddress);
   const initialToken: string = selectedSellTokenAddress || DAI;
-  console.log('add credit init tok', selectedPosition?.token.address, selectedSellTokenAddress, DAI);
   const { selectedSellToken, sourceAssetOptions } = useSelectedSellToken({
     selectedSellTokenAddress: initialToken,
     allowTokenSelect: true,
+    allowEth: false,
   });
   const positionToken = selectedPosition?.token ?? selectedSellToken;
   const acceptingOffer = props.acceptingOffer || (userMetadata.role === BORROWER_POSITION_ROLE && !!selectedPosition);
@@ -274,7 +274,6 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
           },
         ];
 
-  console.log('add cred sellToken', selectedPosition, positionToken, selectedSellToken);
   if (!positionToken) return null;
   if (!selectedCredit) return null;
 
@@ -283,7 +282,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
 
   if (transactionCompleted === 1) {
     return (
-      <StyledTransaction onClose={onClose} header={'transaction'}>
+      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.success-message')}
@@ -295,7 +294,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
 
   if (transactionCompleted === 2) {
     return (
-      <StyledTransaction onClose={onClose} header={'transaction'}>
+      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.add-credit.error-message')}

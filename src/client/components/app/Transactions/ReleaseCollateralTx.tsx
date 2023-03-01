@@ -102,7 +102,7 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
   const linesMap = useAppSelector(LinesSelectors.selectLinesMap);
   const borrower = linesMap[selectedLineAddress!].borrower;
   const selectedEscrow = useAppSelector(CollateralSelectors.selectSelectedEscrow);
-  const allCollateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
+  const allCollateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)(false);
 
   const { assetAddress: selectedCollateralAssetAddress } = useAppSelector(ModalSelectors.selectActiveModalProps);
   const collateralOptions = _.values(selectedEscrow?.deposits).map((d) => d.token);
@@ -234,7 +234,7 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
 
   if (transactionCompleted === 1) {
     return (
-      <StyledTransaction onClose={onClose} header={'transaction'}>
+      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.success-message')}
@@ -246,7 +246,7 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
 
   if (transactionCompleted === 2) {
     return (
-      <StyledTransaction onClose={onClose} header={'transaction'}>
+      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.release-collateral.error-message')}
@@ -289,7 +289,8 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
         headerText={t('components.transaction.release-collateral.select-token')}
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
-        amountValue={String(10000000 * Number(targetTokenAmount))}
+        // TODO: replace or remove as the amountValue is neither using BigNumber nor doing correct math
+        // amountValue={String(10000000 * Number(targetTokenAmount))}
         maxAmount={targetBalance}
         onAmountChange={setTargetTokenAmount}
         selectedToken={selectedCollateralAsset}

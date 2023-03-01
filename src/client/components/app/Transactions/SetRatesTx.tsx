@@ -9,7 +9,9 @@ import {
   useAppSelector,
 } from '@hooks';
 import { LinesSelectors, LinesActions, WalletSelectors } from '@store';
-import { withdrawUpdate, normalize, toWei, formatAmount } from '@src/utils';
+import { withdrawUpdate, normalize, toWei } from '@src/utils';
+import { getConstants } from '@src/config/constants';
+import { ACTIVE_STATUS, AddCreditProps, BORROWER_POSITION_ROLE, PROPOSED_STATUS } from '@src/core/types';
 
 import { TxContainer } from './components/TxContainer';
 import { TxCreditLineInput } from './components/TxCreditLineInput';
@@ -17,6 +19,12 @@ import { TxActionButton } from './components/TxActions';
 import { TxActions } from './components/TxActions';
 import { TxStatus } from './components/TxStatus';
 import { TxTTLInput } from './components/TxTTLInput';
+import { TxRateInput } from './components/TxRateInput';
+
+const {
+  CONTRACT_ADDRESSES: { DAI },
+  MAX_INTEREST_RATE,
+} = getConstants();
 
 const StyledTransaction = styled(TxContainer)``;
 
@@ -29,11 +37,20 @@ interface BorrowCreditProps {
   onPositionChange: (data: { credit?: string; amount?: string }) => void;
 }
 
-export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
+interface SetRateProps {
+  header: string;
+  onClose: () => void;
+  acceptingOffer?: boolean;
+  onSelectedCreditLineChange: Function;
+  onPositionChange: (data: { credit?: string; amount?: string }) => void;
+}
+
+export const SetRatesTx: FC<SetRateProps> = (props) => {
+  const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
-  const { header, onClose, onPositionChange } = props;
   const [transactionCompleted, setTransactionCompleted] = useState(0);
+  const { header, onClose, onPositionChange } = props;
   const [transactionLoading, setLoading] = useState(false);
   const [targetAmount, setTargetAmount] = useState('1');
   const [errors, setErrors] = useState<string[]>(['']);
@@ -42,6 +59,10 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const setSelectedCredit = (lineAddress: string) => dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
   const positions = useAppSelector(LinesSelectors.selectPositionsForSelectedLine);
+  const [drate, setDrate] = useState('0');
+  const [frate, setFrate] = useState('0');
+
+  const acceptingOffer = props.acceptingOffer || (userMetadata.role === BORROWER_POSITION_ROLE && !!selectedPosition);
 
   if (!selectedPosition) {
     return null;
@@ -77,11 +98,6 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
     return amountToWithdraw > maxWithdrawAmount;
   };
 
-  const withdrawHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(
-    getMaxWithdraw(),
-    4
-  )} ${selectedPosition.token.symbol}`;
-
   const _updatePosition = () =>
     onPositionChange({
       credit: selectedCredit?.id,
@@ -99,6 +115,11 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
     _updatePosition();
   };
 
+  const onRateChange = (type: string, amount: string): void => {
+    if (type === 'd') setDrate(amount);
+    if (type === 'f') setFrate(amount);
+  };
+
   const onTransactionCompletedDismissed = () => {
     if (onClose) {
       onClose();
@@ -107,7 +128,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
     }
   };
 
-  const withdrawCredit = () => {
+  const setRates = () => {
     setLoading(true);
     if (!selectedCredit?.id) {
       setErrors([...errors, 'no selected credit ID']);
@@ -136,10 +157,11 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
     }
 
     dispatch(
-      LinesActions.withdrawLine({
+      LinesActions.setRates({
         id: selectedPosition.id,
         lineAddress: selectedCredit.id,
-        amount: ethers.utils.parseEther(targetAmount),
+        frate: frate,
+        drate: drate,
         network: walletNetwork,
       })
     ).then((res) => {
@@ -163,22 +185,22 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
 
   const txActions = [
     {
-      label: t('components.transaction.withdraw'),
-      onAction: withdrawCredit,
+      label: t('components.transaction.set-rates'),
+      onAction: setRates,
       status: true,
-      disabled: isWithdrawable(),
+      disabled: false,
       contrast: false,
     },
   ];
 
   if (!selectedCredit) {
-    console.log('withdraw modal selected credit is undefined: ', selectedCredit);
+    console.log('Change Rates Modal undefined ', selectedCredit);
     return null;
   }
 
   if (transactionCompleted === 1) {
     return (
-      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
+      <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.success-message')}
@@ -190,7 +212,7 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
 
   if (transactionCompleted === 2) {
     return (
-      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
+      <StyledTransaction onClose={onClose} header={'transaction'}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.withdraw-credit.error-message')}
@@ -210,21 +232,18 @@ export const WithdrawCreditTx: FC<BorrowCreditProps> = (props) => {
         selectedCredit={selectedCredit}
         // creditOptions={sourceCreditOptions}
         // inputError={!!sourceStatus.error}
-        readOnly={false}
+        readOnly={true}
         // displayGuidance={displaySourceGuidance}
       />
-      <StyledAmountInput
-        headerText={t('components.transaction.withdraw-credit.select-amount')}
-        inputText={withdrawHeaderText}
-        inputError={false}
-        amount={targetAmount}
-        onAmountChange={onAmountChange}
-        maxAmount={getMaxWithdraw()}
-        maxLabel={'Max'}
-        readOnly={false}
-        hideAmount={false}
-        loading={false}
-        loadingText={''}
+      <TxRateInput
+        key={'frate'}
+        headerText={t('components.transaction.add-credit.select-rates')}
+        frate={frate}
+        drate={drate}
+        amount={frate}
+        maxAmount={MAX_INTEREST_RATE.toString()}
+        setRateChange={onRateChange}
+        readOnly={acceptingOffer}
       />
       <TxActions>
         {txActions.map(({ label, onAction, disabled, contrast }) => (

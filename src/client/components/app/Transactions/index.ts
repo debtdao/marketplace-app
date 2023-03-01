@@ -16,4 +16,5 @@ export * from './TestTx';
 export * from './WithdrawCreditTx';
 export * from './RevokeConsentTx';
 export * from './ReleaseCollateralTx';
+export * from './SetRatesTx';
 export * from './ClaimOperatorTokensTx';

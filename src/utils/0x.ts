@@ -39,9 +39,9 @@ export const getTradeQuote = async ({
   // to track all usage data about debt dao in 0x db
   const affiliateMetadata = { affiliateAddress: getReferrerForNetwork(network) };
 
-  // revenue go brrrrr
+  // TODO: revenue go brrrrr
   const referralFees = {
-    buyTokenPercentageFee: '0.1',
+    buyTokenPercentageFee: '0.0', // TODO: Arbiter can adjust to profit from trades
     feeRecipient: getReferrerForNetwork(network),
   };
 

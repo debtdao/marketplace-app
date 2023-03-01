@@ -23,6 +23,7 @@ import {
   ACTIVE_STATUS,
   RevenueSummaryMap,
 } from '@types';
+import { getConstants } from '@config/constants';
 import { BASE_DECIMALS, formatLineCategories, formatOptimisticProposal, getNetworkId } from '@src/utils';
 
 import { NetworkActions } from '../network/network.actions';
@@ -72,6 +73,7 @@ export const linesInitialState: CreditLineState = {
     getAllowances: initialStatus,
     getUserPortfolio: initialStatus,
     deploySecuredLine: initialStatus,
+    getInterestAccrued: initialStatus,
     user: initialUserMetadataStatusMap,
   },
 };
@@ -102,7 +104,9 @@ const {
   // getUserLinesMetadata,
   clearSelectedLine,
   clearLineStatus,
+  getInterestAccrued,
 } = LinesActions;
+const { OPTIMISTIC_UPDATE_TIMESTAMP } = getConstants();
 
 const linesReducer = createReducer(linesInitialState, (builder) => {
   builder
@@ -130,7 +134,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 
     .addCase(revokeProposal, (state, { payload: { lineAddress, positionId, proposalId } }) => {
       const { revokedAt, ...rest } = state.positionsMap[positionId]?.proposalsMap[proposalId];
-      const updatedProposal = { ...rest, revokedAt: 1234 }; // TODO: replace with actual time the proposal was revoked
+      const updatedProposal = { ...rest, revokedAt: OPTIMISTIC_UPDATE_TIMESTAMP }; // TODO: replace with actual time the proposal was revoked
       state.positionsMap[positionId].proposalsMap[proposalId] = updatedProposal;
     })
     /* -------------------------------------------------------------------------- */
@@ -177,6 +181,21 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     // .addCase(initiateSaveLines.rejected, (state, { error }) => {
     //   state.statusMap.initiateSaveLines = { error: error.message };
     // })
+    /* --------------------------- getInterestAccrued ------------------------- */
+    .addCase(getInterestAccrued.pending, (state) => {
+      state.statusMap.getInterestAccrued = { loading: true };
+    })
+    .addCase(getInterestAccrued.fulfilled, (state, { payload: { amount, lineAddress, id } }) => {
+      // if (lineData) {
+      //   state.linesMap = { ...state.linesMap, [lineData.id]: lineData };
+      // }
+      // state.statusMap.getLine = {};
+      state.positionsMap[id].interestAccrued = amount;
+    })
+    .addCase(getInterestAccrued.rejected, (state, { error }) => {
+      state.statusMap.getInterestAccrued = { error: error.message };
+    })
+
     /* -------------------------------- getLine ------------------------------- */
     .addCase(getLine.pending, (state) => {
       state.statusMap.getLine = { loading: true };
@@ -226,7 +245,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
 
       state.linesMap = { ...state.linesMap, ...formattedLines };
       state.positionsMap = { ...state.positionsMap, ...positions };
-      state.categories = { ...state.categories, ...updatedCategories };
+      state.categories = { ...state.categories, ...categories, ...updatedCategories };
     })
     .addCase(getLines.rejected, (state, { error }) => {
       state.statusMap.getLines = { error: error.message };

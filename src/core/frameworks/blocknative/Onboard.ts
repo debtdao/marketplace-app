@@ -3,6 +3,7 @@ import { API } from 'bnc-onboard/dist/src/interfaces';
 import { getAddress } from '@ethersproject/address';
 
 import { getConfig } from '@config';
+import { getConstants } from '@config/constants';
 import { getNetworkId, getNetworkRpc } from '@utils';
 import { Wallet, Subscriptions, Network, Theme } from '@types';
 
@@ -58,7 +59,7 @@ export class BlocknativeWalletImpl implements Wallet {
       {
         walletName: 'walletConnect',
         rpc: {
-          [networkId]: 'https://eth-goerli.public.blastapi.io',
+          [networkId]: rpcUrl,
         },
       },
       {

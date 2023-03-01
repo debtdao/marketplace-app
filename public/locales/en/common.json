@@ -100,6 +100,7 @@
       "weekly-apy": "Weekly APY"
     },
     "transaction": {
+      "header": "Transaction",
       "max-input": "Max",
       "approve": "Approve",
       "accept": "Accept",
@@ -110,6 +111,7 @@
       "claim-operator-revenue": "Claim Revenue",
       "deposit-and-close-header": "Deposit and Close",
       "withdraw": "Withdraw",
+      "set-rates": "Set Rates",
       "borrow-limit": {
         "borrow-apy": "Borrow APY",
         "borrowing": "Borrowing",
@@ -333,7 +335,8 @@
           "cta": "Claim Operator Tokens",
           "error-message": "could not claim operator tokens"
         },
-        "error-message": "could not claim revenue"
+        "error-message": "could not claim revenue",
+        "error-reason": "Ownership has not been transferred"
       },
       "success-message": "completed"
     }

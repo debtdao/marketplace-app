@@ -41,14 +41,14 @@ export const selectDepositTokenOptionsByAsset = createSelector(
     servicesEnabled,
     currentNetwork = NETWORK
   ) =>
-    memoize((assetAddress?: string): TokenView[] => {
+    memoize((allowEth: boolean = false): TokenView[] => {
       const { userTokensMap, userTokensAllowancesMap } = tokensUser;
       const isThisGoerli = isGoerli(currentNetwork);
       if (isThisGoerli) {
         return testTokens;
       } else {
         const mainTokens = Object.values(TOKEN_ADDRESSES)
-          .filter((address) => !!tokensMap[address] && address !== ETHEREUM_ADDRESS)
+          .filter((address) => !!tokensMap[address] && (allowEth ? true : address !== ETHEREUM_ADDRESS))
           .map((address) => {
             const tokenData = tokensMap[address];
             const userTokenData = userTokensMap[address];

@@ -14,6 +14,8 @@ import {
   NetworkSelectors,
   TokensSelectors,
   TokensActions,
+  CollateralActions,
+  CollateralSelectors,
 } from '@store';
 import { useAppDispatch, useAppSelector, useAppTranslation, useExplorerURL, useWindowDimensions } from '@hooks';
 import { device, sharedTheme } from '@themes/default';
@@ -27,9 +29,12 @@ import {
   CreditProposal,
   PROPOSED_STATUS,
   CLOSED_STATUS,
+  AggregatedEscrow,
+  SecuredLine,
 } from '@src/core/types';
 import { humanize, formatAddress, normalizeAmount, getENS } from '@src/utils';
 import { getEnv } from '@config/env';
+import { getConstants } from '@config/constants';
 
 const PositionsCard = styled(DetailCard)`
   max-width: 100%;
@@ -107,22 +112,32 @@ interface PositionsTableProps {
   lender?: string;
   positions: CreditPosition[];
   displayLine?: boolean; // whether to add the positions line to the table
+  hideActions?: boolean;
 }
 
-export const PositionsTable = ({ borrower, lender, positions, displayLine = false }: PositionsTableProps) => {
+export const PositionsTable = ({
+  borrower,
+  lender,
+  positions,
+  displayLine = false,
+  hideActions = false,
+}: PositionsTableProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const dispatch = useAppDispatch();
-  const { isMobile, width } = useWindowDimensions();
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const userRoleMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const lineAddress = useAppSelector(LinesSelectors.selectSelectedLineAddress);
   const userWallet = useAppSelector(WalletSelectors.selectSelectedAddress);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
+  const selectLineFunc = useAppSelector(LinesSelectors.selectLine);
+  const collateralMap = useAppSelector(CollateralSelectors.selectCollateralMap);
+
   const explorerUrl = useExplorerURL(currentNetwork);
   const { NETWORK } = getEnv();
   const ensMap = useAppSelector(OnchainMetaDataSelector.selectENSPairs);
   const tokensMap = useAppSelector(TokensSelectors.selectTokensMap);
+  const { OPTIMISTIC_UPDATE_TIMESTAMP } = getConstants();
 
   // Initial set up for positions table
   useEffect(() => {
@@ -135,47 +150,70 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
         dispatch(LinesActions.getLinePage({ id: lineAddress }));
       }
     }
+    if (selectedLine || lineAddress) {
+      // populate interestAccrued for each position in table
+      for (const position of positions) {
+        dispatch(
+          LinesActions.getInterestAccrued({
+            contractAddress: lineAddress ?? selectedLine!.id,
+            id: position.id,
+          })
+        );
+      }
+    }
   }, [lineAddress, selectedLine]);
 
   // Action Handlers for positions table
 
-  const depositHandler = (position?: string, proposal?: string) => {
+  const depositHandler = (line?: string, position?: string, proposal?: string) => {
     if (!userWallet) {
       connectWallet();
     } else {
+      dispatch(LinesActions.setSelectedLineAddress({ lineAddress: lineAddress }));
       dispatch(LinesActions.setSelectedLinePosition({ position }));
       dispatch(LinesActions.setSelectedLinePositionProposal({ proposal }));
       dispatch(ModalsActions.openModal({ modalName: 'addPosition' }));
     }
   };
 
-  const liquidateHandler = (position?: string) => {
+  const liquidateHandler = (line?: string, position?: string) => {
     if (!position) return;
+    dispatch(LinesActions.setSelectedLineAddress({ lineAddress: line }));
     dispatch(LinesActions.setSelectedLinePosition({ position }));
     dispatch(ModalsActions.openModal({ modalName: 'liquidateBorrower' }));
   };
 
-  const withdrawHandler = (position?: string) => {
+  const withdrawHandler = (line?: string, position?: string) => {
     if (!position) return;
+    dispatch(LinesActions.setSelectedLineAddress({ lineAddress: line }));
     dispatch(LinesActions.setSelectedLinePosition({ position }));
     dispatch(ModalsActions.openModal({ modalName: 'withdraw' }));
   };
 
-  const revokeConsentHandler = (position?: string, proposal?: string) => {
+  const setRatesHandler = (line?: string, position?: string) => {
+    dispatch(LinesActions.setSelectedLineAddress({ lineAddress: line }));
+    dispatch(LinesActions.setSelectedLinePosition({ position }));
+    dispatch(ModalsActions.openModal({ modalName: 'setRates' }));
+  };
+
+  const revokeConsentHandler = (line?: string, position?: string, proposal?: string) => {
     if (!position) return;
+    dispatch(LinesActions.setSelectedLineAddress({ lineAddress: line }));
     dispatch(LinesActions.setSelectedLinePosition({ position }));
     dispatch(LinesActions.setSelectedLinePositionProposal({ proposal }));
     dispatch(ModalsActions.openModal({ modalName: 'revokeConsent' }));
   };
 
-  const borrowHandler = (position?: string) => {
+  const borrowHandler = (line?: string, position?: string) => {
     if (!position) return;
+    dispatch(LinesActions.setSelectedLineAddress({ lineAddress: line }));
     dispatch(LinesActions.setSelectedLinePosition({ position }));
     dispatch(ModalsActions.openModal({ modalName: 'borrow' }));
   };
 
-  const depositAndRepayHandler = (position?: string) => {
+  const depositAndRepayHandler = (line?: string, position?: string) => {
     if (!position) return;
+    dispatch(LinesActions.setSelectedLineAddress({ lineAddress: line }));
     dispatch(LinesActions.setSelectedLinePosition({ position }));
     dispatch(ModalsActions.openModal({ modalName: 'depositAndRepay' }));
   };
@@ -206,10 +244,12 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
     if (userRoleMetadata.role === BORROWER_POSITION_ROLE) {
       if (position.status === CLOSED_STATUS) return [];
 
+      const currentLine = selectLineFunc(position.line);
+      const { minCRatio, cratio } = collateralMap[currentLine?.escrowId] as AggregatedEscrow;
       const borrowAction = {
         name: t('components.transaction.borrow'),
         handler: borrowHandler,
-        disabled: false,
+        disabled: Number(cratio) <= minCRatio && !BigNumber.from(position.principal).eq('0') ? true : false,
       };
 
       if (position.deposit === position.principal) return [repayAction];
@@ -221,13 +261,18 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
       getAddress(position.lender) === userWallet &&
       BigNumber.from(position.deposit).gt(BigNumber.from(position.principal))
     ) {
-      return [
-        {
-          name: t('components.transaction.withdraw'),
-          handler: withdrawHandler,
-          disabled: false,
-        },
-      ];
+      const withdrawAction = {
+        name: t('components.transaction.withdraw'),
+        handler: withdrawHandler,
+        disabled: false,
+      };
+
+      const setRatesAction = {
+        name: t('components.transaction.set-rates'),
+        handler: setRatesHandler,
+        disabled: true,
+      };
+      return [setRatesAction, withdrawAction];
     }
 
     // not party to line. no actions;
@@ -235,7 +280,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
   };
 
   // Returns a list of transactions to display on positions table for proposals
-  const getUserProposalActions = (proposal: CreditProposal) => {
+  const getUserProposalActions = (position: CreditPosition, proposal: CreditProposal) => {
     const approveMutualConsent = {
       name: t('components.transaction.add-credit.accept-terms'),
       handler: depositHandler,
@@ -245,7 +290,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
     const revokeMutualConsent = {
       name: t('components.transaction.revoke-consent.cta'),
       handler: revokeConsentHandler,
-      disabled: false,
+      disabled: proposal.acceptedAt === OPTIMISTIC_UPDATE_TIMESTAMP,
     };
 
     // Display button to approve proposal for the taker/borrower of the proposal
@@ -304,7 +349,9 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
         ),
         actions: (
           <ActionButtons
-            value1={position.id}
+            value1={position.line}
+            value2={position.id}
+            value3={''}
             // Note: if position is in PROPOSED_STATUS, then we want to display the proposal actions instead
             actions={position.status !== PROPOSED_STATUS ? getUserPositionActions(position) : []}
           />
@@ -352,9 +399,10 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
                   ),
                   actions: (
                     <ActionButtons
-                      value1={position.id}
-                      value2={proposal.id}
-                      actions={getUserProposalActions(proposal)}
+                      value1={position.line}
+                      value2={position.id}
+                      value3={proposal.id}
+                      actions={getUserProposalActions(position, proposal)}
                     />
                   ),
                 };
@@ -467,6 +515,7 @@ export const PositionsTable = ({ borrower, lender, positions, displayLine = fals
           filterLabel="Show 0% APY"
           initialSortBy="deposit"
           onAction={() => console.log('action')}
+          hideActions={hideActions}
           wrap
         />
       </div>

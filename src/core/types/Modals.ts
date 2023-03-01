@@ -19,6 +19,7 @@ export type ModalName =
   | 'communityThemes'
   | 'deposit'
   | 'withdraw'
+  | 'setRates'
   | 'revokeConsent'
   | 'testTx'
   | 'depositTx'

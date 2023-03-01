@@ -50,6 +50,7 @@ export const LiquidateBorrowerTx: FC<LiquidateBorrowerProps> = (props) => {
     selectedSellTokenAddress: initialToken,
     selectedVaultOrLab: useAppSelector(VaultsSelectors.selectRecommendations)[0],
     allowTokenSelect: true,
+    allowEth: true,
   });
 
   useEffect(() => {
@@ -165,7 +166,7 @@ export const LiquidateBorrowerTx: FC<LiquidateBorrowerProps> = (props) => {
 
   if (transactionCompleted === 1) {
     return (
-      <StyledTransaction onClose={onClose} header={'transaction'}>
+      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.success-message')}
@@ -177,7 +178,7 @@ export const LiquidateBorrowerTx: FC<LiquidateBorrowerProps> = (props) => {
 
   if (transactionCompleted === 2) {
     return (
-      <StyledTransaction onClose={onClose} header={'transaction'}>
+      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.arbiter-liquidate.error-message')}
@@ -206,7 +207,7 @@ export const LiquidateBorrowerTx: FC<LiquidateBorrowerProps> = (props) => {
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
         onAmountChange={onAmountChange}
-        amountValue={String(10000000 * Number(targetTokenAmount))}
+        // amountValue={String(10000000 * Number(targetTokenAmount))}
         maxAmount={targetBalance}
         selectedToken={selectedSellToken}
         onSelectedTokenChange={onSelectedSellTokenChange}

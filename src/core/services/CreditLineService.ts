@@ -1,4 +1,4 @@
-import { ContractFunction, ethers, PopulatedTransaction } from 'ethers';
+import { ContractFunction, ethers, PopulatedTransaction, BigNumber } from 'ethers';
 import { BytesLike } from '@ethersproject/bytes/src.ts';
 import { keccak256 } from 'ethers/lib/utils';
 
@@ -127,17 +127,17 @@ export class CreditLineServiceImpl implements CreditLineService {
     }
   }
 
-  public async setRates(props: SetRatesProps): Promise<string> {
+  public async setRates(props: SetRatesProps): Promise<TransactionResponse | PopulatedTransaction> {
     try {
       const { lineAddress: line, id } = props;
       // check mutualConsentById
-      const populatedTrx = await this.executeContractMethod(
+      const populatedTrx = (await this.executeContractMethod(
         props.lineAddress,
         'setRates',
         [props.id, props.drate, props.frate],
         props.network,
         true
-      );
+      )) as TransactionResponse;
       const borrower = await this.borrower(line);
       const lender = await this.getLenderByCreditID(line, id);
       if (!(await this.isMutualConsent(line, populatedTrx.data, borrower, lender))) {
@@ -145,15 +145,7 @@ export class CreditLineServiceImpl implements CreditLineService {
           `Setting rate is not possible. reason: "Consent has not been initialized by other party for the given creditLine [${props.lineAddress}]`
         );
       }
-
-      return (<TransactionResponse>(
-        await this.executeContractMethod(
-          props.lineAddress,
-          'setRates',
-          [props.id, props.drate, props.frate],
-          props.network
-        )
-      )).hash;
+      return populatedTrx;
     } catch (e) {
       console.log(`An error occured while setting rate, error = [${JSON.stringify(e)}]`);
       return Promise.reject(e);
@@ -397,6 +389,10 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   public async getLenderByCreditID(contractAddress: string, id: BytesLike): Promise<Address> {
     return (await this._getContract(contractAddress).credits(id)).lender;
+  }
+
+  public async getInterestAccrued(contractAddress: string, id: BytesLike): Promise<BigNumber> {
+    return await this._getContract(contractAddress).interestAccrued(id);
   }
 
   public async getInterestRateContract(contractAddress: string): Promise<Address> {

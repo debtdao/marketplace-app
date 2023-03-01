@@ -1,11 +1,11 @@
 import { FC, useState } from 'react';
 import styled from 'styled-components';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import _ from 'lodash';
 
 import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
 import { LinesSelectors, LinesActions, WalletSelectors } from '@store';
-import { normalizeAmount, borrowUpdate } from '@src/utils';
+import { normalizeAmount, borrowUpdate, formatAmount, BASE_DECIMALS } from '@src/utils';
 import { CreditPosition } from '@src/core/types';
 
 import { TxContainer } from './components/TxContainer';
@@ -52,6 +52,15 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
   const onAmountChange = (amount: string): void => {
     setTargetAmount(amount);
     _updatePosition();
+  };
+
+  const getMax = (pos: CreditPosition): string => {
+    const maxBorrow = normalizeAmount(
+      BigNumber.from(pos.deposit).sub(BigNumber.from(pos.principal)).toString(),
+      pos.token.decimals
+    );
+
+    return maxBorrow.toString();
   };
 
   const onSelectedPositionChange = (arg: CreditPosition): void => {
@@ -136,7 +145,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
 
   if (transactionCompleted === 1) {
     return (
-      <StyledTransaction onClose={onClose} header={'transaction'}>
+      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.success-message')}
@@ -148,7 +157,7 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
 
   if (transactionCompleted === 2) {
     return (
-      <StyledTransaction onClose={onClose} header={'transaction'}>
+      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.borrow-credit.error-message')}
@@ -157,6 +166,13 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
       </StyledTransaction>
     );
   }
+
+  const amountAvailableToBorrow = getMax(selectedPosition);
+
+  const borrowHeaderText = `${t('components.transaction.token-input.you-have')} ${formatAmount(
+    amountAvailableToBorrow,
+    4
+  )} ${selectedPosition.token.symbol}`;
 
   return (
     <StyledTransaction onClose={onClose} header={header || t('components.transaction.borrow')}>
@@ -174,11 +190,11 @@ export const BorrowCreditTx: FC<BorrowCreditProps> = (props) => {
       />
       <StyledAmountInput
         headerText={t('components.transaction.borrow-credit.select-amount')}
-        inputText={t('')}
+        inputText={borrowHeaderText}
         inputError={false}
         amount={targetAmount}
         onAmountChange={onAmountChange}
-        maxAmount={normalizeAmount(selectedPosition['deposit'], 18)}
+        maxAmount={amountAvailableToBorrow}
         maxLabel={'Max'}
         readOnly={false}
         hideAmount={false}

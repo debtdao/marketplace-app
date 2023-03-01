@@ -205,7 +205,6 @@ export const TxCreditLineInput: FC<TxCreditLineInputProps> = ({
     : t('components.transaction.add-credit-input.select-an-offer');
 
   const { blockExplorerUrl } = NETWORK_SETTINGS[selectedNetwork];
-  console.log('supported network', blockExplorerUrl, selectedNetwork);
 
   return (
     <StyledTxCreditLineInput {...props}>

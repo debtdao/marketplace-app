@@ -116,7 +116,7 @@ const SPIGOT_SUMMARY_FRAGMENT = gql`
   ${TOKEN_FRAGMENT}
   fragment SpigotSummaryFrag on SpigotRevenueSummary {
     id
-
+    ownerTokens
     totalVolume
     totalVolumeUsd
     timeOfFirstIncome

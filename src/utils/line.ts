@@ -51,6 +51,8 @@ import {
   AddCreditProps,
   PROPOSED_STATUS,
 } from '@types';
+import { getConstants } from '@config/constants';
+import { TOKEN_ADDRESSES } from '@src/config/constants';
 
 import { humanize, normalizeAmount, normalize, format, toUnit, toTargetDecimalUnits, BASE_DECIMALS } from './format';
 
@@ -208,14 +210,8 @@ export function formatGetLinesData(
       arbiter,
       spigotId: spigotRes?.id,
       escrowId: escrowRes?.id,
-      spigot: {
-        ...(spigotRes ?? {}),
-        ...spigot,
-      },
-      escrow: {
-        ...(escrowRes ?? {}),
-        ...escrow,
-      },
+      spigot,
+      escrow,
     };
   });
 }
@@ -319,7 +315,6 @@ export const formatSecuredLineData = (
     },
     { principal, deposit, highestApy, totalInterestRepaid }
   );
-
   // Sum value of deposits and create deposits map
   const [collateralValue, deposits]: [BigNumber, EscrowDepositMap] = collateralDeposits.reduce(
     (agg, collateralDeposit) => {
@@ -344,7 +339,6 @@ export const formatSecuredLineData = (
     },
     [BigNumber.from(0), {}]
   );
-
   // Create spigots map
   const spigotRevenueContracts: SpigotRevenueContractMap = spigots.reduce(
     (revenueContractMap: SpigotRevenueContractMap, revenueContract: SpigotRevenueContractFragResponse) => {
@@ -359,7 +353,6 @@ export const formatSecuredLineData = (
     },
     {} as SpigotRevenueContractMap
   );
-
   // Get escrow collateral events
   const escrowCollateralEvents: CollateralEvent[] = _.flatten(
     _.merge(
@@ -377,7 +370,6 @@ export const formatSecuredLineData = (
   );
 
   const creditEvents = formatCreditEvents('', BigNumber.from(0), eventFrags);
-
   const aggregatedEscrow: AggregatedEscrow = {
     id: escrowId,
     type: COLLATERAL_TYPE_ASSET,
@@ -390,15 +382,16 @@ export const formatSecuredLineData = (
     events: escrowCollateralEvents,
     deposits,
   };
-
   // aggregated revenue in USD by token across all spigots
   const [revenueValue, revenueSummary]: [BigNumber, RevenueSummaryMap] = revenues.reduce<any>(
-    (agg, { token, totalVolume, totalVolumeUsd, ...summary }) => {
+    (agg, { token, ownerTokens, totalVolume, totalVolumeUsd, ...summary }) => {
       const checkSumAddress = ethers.utils.getAddress(token.id);
       const usdcPrice = tokenPrices[checkSumAddress] ?? BigNumber.from(0);
-      const totalRevenueVolume = toTargetDecimalUnits(totalVolume, token.decimals, BASE_DECIMALS);
+      // TODO: Add unusedTokens to the subgraph and add into totalUsableTokens for more accurate revenue calculation in Collateral table of Line Page
+      const totalUsableTokens = toTargetDecimalUnits(ownerTokens.toString(), token.decimals, BASE_DECIMALS);
+      const totalVolumeFormatted = toTargetDecimalUnits(totalVolume.toString(), token.decimals, BASE_DECIMALS);
       return [
-        agg[0].add(unnullify(totalRevenueVolume).toString()).mul(usdcPrice),
+        agg[0].add(unnullify(totalVolumeFormatted, true).mul(usdcPrice)),
         {
           ...agg[1],
           [getAddress(token.id)]: {
@@ -407,19 +400,17 @@ export const formatSecuredLineData = (
             token: _createTokenView(
               token,
               BigNumber.from(totalVolume),
-              BigNumber.from(totalVolumeUsd).div(BigNumber.from(totalVolume))
-            ), // use avg price at time of revenue
-            // amount: totalVolume,
-            // value: (totalVolumeUsd ?? '0').toString(),
-            amount: totalRevenueVolume,
-            value: formatUnits(usdcPrice.mul(unnullify(totalRevenueVolume).toString()), 6).toString(),
+              BigNumber.from('0') // TODO: fix totalVolumeUsd in subgraph so can replace with this line that calculates avg price at time of revenue:
+              // BigNumber.from(totalVolumeUsd).div(BigNumber.from(totalVolume))
+            ),
+            amount: totalUsableTokens,
+            value: formatUnits(usdcPrice.mul(unnullify(totalUsableTokens).toString()), 6).toString(),
           },
         },
       ];
     },
     [BigNumber.from(0), {} as RevenueSummaryMap]
   );
-
   const spigotEvents = formatSpigotCollateralEvents(spigot.events);
   const collateralEvents = _.concat(spigotEvents, escrowCollateralEvents);
 
@@ -434,7 +425,7 @@ export const formatSecuredLineData = (
   };
 
   const positions = createPositionsMap(positionFrags, tokenPrices);
-  console.log('CRATIO', aggregatedEscrow.cratio);
+
   return {
     credit: {
       highestApy,
@@ -740,12 +731,13 @@ export const formatOptimisticProposal = (
   position: AddCreditProps,
   positionId: string
 ): CreditPosition => {
+  const { OPTIMISTIC_UPDATE_TIMESTAMP } = getConstants();
   const { lineAddress, drate, frate, amount, token, lender } = position;
   const proposalId = '0x' + Math.random().toFixed(64).slice(2, 68);
   const proposal = {
     id: proposalId,
-    proposedAt: 1234,
-    acceptedAt: 1234,
+    proposedAt: OPTIMISTIC_UPDATE_TIMESTAMP,
+    acceptedAt: OPTIMISTIC_UPDATE_TIMESTAMP,
     revokedAt: 0,
     maker: maker.toLowerCase(),
     taker: String(null),
@@ -775,7 +767,6 @@ export const formatOptimisticProposal = (
   return proposedPosition;
 };
 
-// TODO: Move code from getLines to create state.categories into this function
 export const formatLineCategories = (lines: { [key: string]: SecuredLine }): { [key: string]: string[] } => {
   const highestCreditLines = _.map(
     _.sortBy(lines, (line) => -Number(BigNumber.from(line.deposit).div(BASE_DECIMALS))).slice(0, 3),
@@ -787,15 +778,16 @@ export const formatLineCategories = (lines: { [key: string]: SecuredLine }): { [
     'id'
   );
 
-  const newCreditLines = _.map(
-    _.sortBy(lines, (line) => line.start),
-    'id'
-  );
+  // TODO: add back if remove categorization from the subgraph
+  // const newCreditLines = _.map(
+  //   _.sortBy(lines, (line) => -line.start),
+  //   'id'
+  // );
 
   const updatedCategories = {
     'market:featured.highest-credit': highestCreditLines,
     'market:featured.highest-revenue': highestRevenueLines,
-    'market:featured.newest': newCreditLines,
+    // 'market:featured.newest': newCreditLines,
   };
 
   return updatedCategories;

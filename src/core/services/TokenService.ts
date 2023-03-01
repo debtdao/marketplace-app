@@ -53,14 +53,31 @@ export class TokenServiceImpl implements TokenService {
   /*                                Fetch Methods                               */
   /* -------------------------------------------------------------------------- */
   public async getSupportedTokens({ network }: GetSupportedTokensProps): Promise<Token[]> {
-    const { WETH } = this.config.CONTRACT_ADDRESSES;
+    const { WETH, ETH } = this.config.CONTRACT_ADDRESSES;
     const yearn = this.yearnSdk.getInstanceOf(network);
+    // TODO: only pulling 100 tokens from this repo instead of ~300: https://github.com/yearn/yearn-assets/tree/master/icons/multichain-tokens/1
     const supportedTokens = await yearn.tokens.supported();
     // TODO: remove fixedSupportedTokens when WETH symbol is fixed on sdk
-    const fixedSupportedTokens = supportedTokens.map((token) => ({
-      ...token,
-      symbol: token.address === WETH ? 'WETH' : token.symbol,
-    }));
+    const wethToken = supportedTokens.filter((token) => token.address === WETH)[0] as Token;
+    const ethToken = {
+      ...wethToken,
+      address: ETH,
+      symbol: 'ETH',
+      name: 'Ether',
+      icon: 'https://raw.githack.com/yearn/yearn-assets/master/icons/multichain-tokens/1/0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE/logo-alt-128.png',
+      metadata: {
+        ...wethToken.metadata,
+        address: ETH,
+        symbol: 'ETH',
+        name: 'Ether',
+      },
+    } as Token;
+    const fixedSupportedTokens: Token[] = [ethToken].concat(
+      supportedTokens.map((token) => ({
+        ...token,
+        symbol: token.address === WETH ? 'WETH' : token.symbol,
+      }))
+    );
     return getUniqueAndCombine(fixedSupportedTokens, [], 'address');
   }
 

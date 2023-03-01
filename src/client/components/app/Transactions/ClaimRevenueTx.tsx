@@ -5,7 +5,7 @@ import { getAddress } from '@ethersproject/address';
 import { BytesLike, ethers } from 'ethers';
 import { ParamType } from '@ethersproject/abi';
 
-import { formatAmount, generateSig, isValidAddress, normalizeAmount } from '@utils';
+import { formatAmount, generateSig, isValidAddress, normalizeAmount, bytesToName } from '@utils';
 import {
   useAppTranslation,
   useAppDispatch,
@@ -76,6 +76,27 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
 
   // Event Handlers
 
+  useEffect(() => {
+    if (selectedSpigot.spigots) {
+      console.log(selectedSpigot.spigots[selectedRevenueContract].claimFunc);
+      setClaimFunc(selectedSpigot.spigots[selectedRevenueContract].claimFunc);
+    }
+    if (selectedRevenueContract) {
+      console.log(getAddress(selectedRevenueContract));
+      dispatch(OnchainMetaDataActions.getABI(getAddress(selectedRevenueContract)));
+    }
+
+    if (contractABI[selectedRevenueContract] !== undefined && selectedSpigot.spigots) {
+      const funcName = bytesToName(
+        selectedSpigot.spigots[selectedRevenueContract].claimFunc,
+        contractABI[selectedRevenueContract]
+      );
+      setClaimFuncType({ id: '', label: funcName, value: '' });
+      const funcInputs = generateClaimFuncInputs(funcName, contractABI[selectedRevenueContract]!);
+      setFuncInputs(funcInputs);
+    }
+  }, []);
+
   const onTransactionCompletedDismissed = () => {
     if (onClose) {
       onClose();
@@ -87,6 +108,7 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
   if (!selectedSpigot) return null;
 
   const claimRevenue = () => {
+    setLoading(true);
     if (!selectedSpigot.id) {
       console.log('claim rev modal: claimRevenue() - no spigot selected');
       return;
@@ -114,16 +136,25 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
       })
     )
       .then((res) => {
-        console.log('claim rev success', res);
+        if (res.meta.requestStatus === 'rejected') {
+          setTransactionCompleted(2);
+          setLoading(false);
+        }
+        if (res.meta.requestStatus === 'fulfilled') {
+          setTransactionCompleted(1);
+          setLoading(false);
+        }
       })
       .catch((err) => {
+        setTransactionCompleted(2);
+        setLoading(false);
         console.log('claim rev fail', err);
       });
   };
 
   if (transactionCompleted === 1) {
     return (
-      <StyledTransaction onClose={onClose} header={'transaction'}>
+      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.success-message')}
@@ -135,10 +166,11 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
 
   if (transactionCompleted === 2) {
     return (
-      <StyledTransaction onClose={onClose} header={'transaction'}>
+      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.claim-revenue.error-message')}
+          transactionFailedReason={t('components.transaction.claim-revenue.error-reason')}
           exit={onTransactionCompletedDismissed}
         />
       </StyledTransaction>
@@ -272,8 +304,8 @@ export const ClaimRevenueTx: FC<ClaimRevenueProps> = (props) => {
         <>
           <TxFuncSelector
             headerText={t('components.transaction.enable-spigot.function-revenue')}
-            typeOptions={funcOptions}
             selectedType={claimFuncType}
+            readOnly={true}
             onSelectedTypeChange={onClaimFuncSelection}
           />
           {generateInputFields()}

@@ -11,7 +11,6 @@ export interface AddCreditPositionTxModalProps {
 }
 
 export const AddCreditPositionTxModal: FC<AddCreditPositionTxModalProps> = ({ onClose, ...props }) => {
-  console.log('deposit modal', props);
   const { t } = useAppTranslation('common');
   // if (!creditLine) return; // TODO error or creditLine selector input
 

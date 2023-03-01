@@ -3,16 +3,15 @@ import styled from 'styled-components';
 
 import { useAppTranslation } from '@hooks';
 import { ModalTx } from '@components/common';
-import { BorrowCreditTx } from '@components/app';
+import { SetRatesTx } from '@components/app';
 
-const StyledBorrowTxModal = styled(ModalTx)``;
-export interface BorrowTxModalProps {
+const StyledSetRatesTxModal = styled(ModalTx)``;
+export interface SetRatesModalProps {
   onClose: () => void;
 }
 
-export const BorrowTxModal: FC<BorrowTxModalProps> = ({ onClose, ...props }) => {
+export const SetRatesTxModal: FC<SetRatesModalProps> = ({ onClose, ...props }) => {
   const { t } = useAppTranslation('common');
-  // if (!creditLine) return; // TODO error or creditLine selector input
 
   const onSelectedCreditLineChange = () => {
     // new creditLine selected to invest in
@@ -22,16 +21,14 @@ export const BorrowTxModal: FC<BorrowTxModalProps> = ({ onClose, ...props }) => 
   const onPositionChange = () => {
     // update deposit params
   };
-
   return (
-    <StyledBorrowTxModal {...props}>
-      <BorrowCreditTx
-        header={t('components.transaction.borrow-credit.header')} // TODO
-        acceptingOffer={false}
-        onClose={onClose}
+    <StyledSetRatesTxModal {...props}>
+      <SetRatesTx
+        header={t('components.transaction.set-rates')}
         onSelectedCreditLineChange={onSelectedCreditLineChange}
         onPositionChange={onPositionChange}
+        onClose={onClose}
       />
-    </StyledBorrowTxModal>
+    </StyledSetRatesTxModal>
   );
 };

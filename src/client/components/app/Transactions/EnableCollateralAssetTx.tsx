@@ -69,7 +69,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLine);
   const selectedEscrow = useAppSelector(CollateralSelectors.selectSelectedEscrow);
-  const collateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)();
+  const collateralOptions = useAppSelector(selectDepositTokenOptionsByAsset)(false);
   // need to get call statusMap from state for tx error messages
   //const collateralStatusMap = useAppSelector(CollateralSelectors.selectStatusMap);
 
@@ -200,7 +200,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
 
   if (transactionCompleted === 1) {
     return (
-      <StyledTransaction onClose={onClose} header={'transaction'}>
+      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.success-message')}
@@ -215,7 +215,7 @@ export const EnableCollateralAssetTx: FC<EnableCollateralAssetTxProps> = (props)
     // const errMsg = collateralStatusMap.enableCollateral[selectedLine?.escrow?.id || '']?.[selectedAssetAddress]?.error;
 
     return (
-      <StyledTransaction onClose={onClose} header={'transaction'}>
+      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.enable-collateral-asset.enable-failed')}

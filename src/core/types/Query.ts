@@ -206,6 +206,7 @@ export interface LineEventFragResponse {
 
 export interface SpigotRevenueSummaryFragResponse {
   token: TokenFragRepsonse;
+  ownerTokens: string;
   totalVolume: string;
   totalVolumeUsd: string;
   timeOfFirstIncome: number;

@@ -44,6 +44,7 @@ export interface LineOfCredit {
   principal: string;
   deposit: string;
   interest: string;
+
   // lifetime stats
   defaultSplit: string;
   totalInterestRepaid: string;
@@ -196,6 +197,8 @@ export interface AggregatedEscrow extends BaseEscrow {
 export interface RevenueSummary extends Collateral {
   type: CollateralTypeRevenue;
   token: TokenView;
+  unused?: string;
+  ownerTokens?: string;
   amount: string;
   value: string;
   timeOfFirstIncome: number;

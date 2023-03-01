@@ -1,5 +1,6 @@
 import { isEmpty } from 'lodash';
 import { BigNumber, ethers } from 'ethers';
+import { FC, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { format } from 'date-fns';
 import { getAddress } from 'ethers/lib/utils';
@@ -36,6 +37,7 @@ import {
   CollateralActions,
   NetworkSelectors,
   TokensSelectors,
+  CollateralSelectors,
 } from '@src/core/store';
 import { humanize } from '@src/utils';
 import { getEnv } from '@config/env';
@@ -138,10 +140,9 @@ const StatusWithColor = styled.span<{ status: string }>`
   }};
 `;
 
-const CratioWithColor = styled.span<{ diff: number }>`
-  color: ${({ diff }) => {
-    console.log('CRATIO', diff);
-    if (diff >= 15) return '#6AFF4D'; // decent margin - light green
+const CratioWithColor = styled.span<{ diff: number; principal: string }>`
+  color: ${({ diff, principal }) => {
+    if (diff >= 15 || BigNumber.from(principal).eq('0')) return '#6AFF4D'; // decent margin - light green
     else if (diff < 0) return '#FF1919'; // liquidatable - bright red
     else return '#E6E600'; // close to liquidatable - darkish yellow
   }};
@@ -291,11 +292,13 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const { t } = useAppTranslation(['common', 'lineDetails']);
   const walletIsConnected = useAppSelector(WalletSelectors.selectWalletIsConnected);
   const userPositionMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
+  const reservesMap = useAppSelector(CollateralSelectors.selectReservesMap);
   const { isMobile, width } = useWindowDimensions();
   const { devices } = sharedTheme;
   const selectedLine = useAppSelector(LinesSelectors.selectSelectedLinePage);
   const dispatch = useAppDispatch();
   const { NETWORK } = getEnv();
+  const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const connectWallet = () => dispatch(WalletActions.walletSelect({ network: NETWORK }));
   const network = useAppSelector(NetworkSelectors.selectCurrentNetwork);
   const explorerUrl = useExplorerURL(network);
@@ -316,8 +319,30 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const { deposits, minCRatio, cratio, collateralValue } = escrow!;
   const { revenueValue, revenueSummary: revenue } = spigot!;
 
+  useEffect(() => {
+    // populate collateral reservesmap in redux state
+    // if (Object.keys(reservesMap).length === 0 && selectedLine) {
+    // get all collateral tokens of type revenue
+    const lineRevenueSummary = selectedLine!.spigot!.revenueSummary;
+    const revenueCollateralTokens: RevenueSummary[] = Object.values(lineRevenueSummary).filter(
+      (token) => token.type === 'revenue'
+    );
+
+    // populate reserves map with each revenue collateral token
+    for (const token of revenueCollateralTokens as RevenueSummary[]) {
+      dispatch(
+        CollateralActions.tradeable({
+          lineAddress: getAddress(selectedLine!.id),
+          spigotAddress: getAddress(selectedLine!.spigotId),
+          tokenAddress: getAddress(token.token.address),
+          network: walletNetwork!,
+        })
+      );
+    }
+    // }
+  }, []);
+
   const renderEscrowMetadata = () => {
-    console.log(cratio);
     if (!deposits) return null;
     if (!collateralValue)
       return (
@@ -369,7 +394,10 @@ export const LineMetadata = (props: LineMetadataProps) => {
               <StyledIcon Component={InfoIcon} size="1.5rem" />
             </Tooltip>
             <MetadataTitle>{t('lineDetails:metadata.cratio')}: </MetadataTitle>{' '}
-            <CratioWithColor diff={Number(cratio) - Number(minCRatio)}>{normalizeAmount(cratio, 2)}%</CratioWithColor>
+            <CratioWithColor diff={Number(cratio) - Number(minCRatio)} principal={principal}>
+              {' '}
+              {Number(principal) === 0 ? '∞' : normalizeAmount(cratio, 2)} %
+            </CratioWithColor>
           </MetadataRow>
           <MetadataRow>
             <Tooltip placement="bottom-start" tooltipComponent={<>{t('lineDetails:metadata.tooltip.min-cratio')}</>}>
@@ -645,7 +673,7 @@ export const LineMetadata = (props: LineMetadataProps) => {
               key: 'amount',
               header: t('lineDetails:metadata.escrow.assets-list.amount'),
               description: t('lineDetails:metadata.escrow.tooltip.amount'),
-              format: ({ amount }) => `${humanize('amount', amount, BASE_DECIMALS, 2)}`,
+              format: ({ amount }) => `${humanize('amount', amount, BASE_DECIMALS, 3)}`,
               sortable: true,
               className: 'col-assets',
             },

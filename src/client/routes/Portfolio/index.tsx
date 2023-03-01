@@ -127,13 +127,11 @@ export const Portfolio = () => {
       if (selectedRole === BORROWER_POSITION_ROLE) {
         if (borrowerLineOfCredits && borrowerLineOfCredits[0]) {
           const lineAddress = borrowerLineOfCredits[0].id;
-          dispatch(LinesActions.clearSelectedLine());
           dispatch(LinesActions.setSelectedLineAddress({ lineAddress }));
         }
       } else {
         if (lenderPositions && lenderPositions[0]) {
           const position = lenderPositions[0];
-          dispatch(LinesActions.clearSelectedLine());
           dispatch(LinesActions.setSelectedLinePosition({ position }));
           dispatch(LinesActions.setSelectedLineAddress({ lineAddress: allPositions[position].line }));
         }
@@ -153,7 +151,12 @@ export const Portfolio = () => {
 
       {selectedRole === BORROWER_POSITION_ROLE && (
         <StyledBorrowerContainer>
-          <PositionsTable borrower={portfolioAddress!} positions={borrowerPositions} displayLine={true} />
+          <PositionsTable
+            borrower={portfolioAddress!}
+            positions={borrowerPositions}
+            displayLine={true}
+            hideActions={true}
+          />
         </StyledBorrowerContainer>
       )}
 
@@ -163,6 +166,7 @@ export const Portfolio = () => {
             lender={portfolioAddress}
             positions={lenderPositions.map((id) => allPositions[id])}
             displayLine={true}
+            hideActions={true}
           />
         </StyledBorrowerContainer>
       )}

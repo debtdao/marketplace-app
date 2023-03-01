@@ -265,7 +265,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
 
   if (transactionCompleted === 1) {
     return (
-      <StyledTransaction onClose={onClose} header={'transaction'}>
+      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.success-message')}
@@ -277,7 +277,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
 
   if (transactionCompleted === 2) {
     return (
-      <StyledTransaction onClose={onClose} header={'transaction'}>
+      <StyledTransaction onClose={onClose} header={t('components.transaction.header')}>
         <TxStatus
           success={transactionCompleted}
           transactionCompletedLabel={t('components.transaction.add-collateral.error-message')}
@@ -318,7 +318,7 @@ export const AddCollateralTx: FC<AddCollateralTxProps> = (props) => {
         headerText={t('components.transaction.deposit-collateral.select-token')}
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
-        amountValue={String(10000000 * Number(targetTokenAmount))}
+        // amountValue={String(10000000 * Number(targetTokenAmount))}
         maxAmount={targetBalance}
         onAmountChange={setTargetTokenAmount}
         selectedToken={selectedCollateralAsset}

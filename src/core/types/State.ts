@@ -122,6 +122,7 @@ export interface CreditLineState {
     getAllowances: Status;
     getUserPortfolio: Status;
     deploySecuredLine: Status;
+    getInterestAccrued: Status;
     user: UserLineMetadataStatusMap;
   };
 }

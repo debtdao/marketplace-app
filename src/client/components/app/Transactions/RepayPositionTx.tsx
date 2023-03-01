@@ -754,12 +754,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
             if (result) {
               setIsTrade(true);
               setHaveFetched0x(true);
-              if (
-                repayType.id === 'claim-and-repay' &&
-                BigNumber.from(result.buyAmount).gt(BigNumber.from(selectedPosition.principal))
-              ) {
-                setBlockZeroExTrade(true);
-              }
               const buyAmountInWei = formatUnits(result.buyAmount!, selectedPosition.token.decimals);
               setTokensToBuy(buyAmountInWei);
               setTradeData(result);

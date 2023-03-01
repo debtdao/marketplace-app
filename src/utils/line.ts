@@ -400,7 +400,8 @@ export const formatSecuredLineData = (
             token: _createTokenView(
               token,
               BigNumber.from(totalVolume),
-              BigNumber.from('0') // TODO: // use avg price at time of revenue
+              BigNumber.from('0') // TODO: fix totalVolumeUsd in subgraph so can replace with this line that calculates avg price at time of revenue:
+              // BigNumber.from(totalVolumeUsd).div(BigNumber.from(totalVolume))
             ),
             amount: totalUsableTokens,
             value: formatUnits(usdcPrice.mul(unnullify(totalUsableTokens).toString()), 6).toString(),
@@ -512,7 +513,9 @@ export const formatLineWithEvents = (
             token: _createTokenView(
               token,
               BigNumber.from(totalVolume),
-              BigNumber.from(totalVolumeUsd).div(BigNumber.from(totalVolume))
+              // TODO: Add this line back after fixing subgraph
+              // BigNumber.from(totalVolumeUsd).div(BigNumber.from(totalVolume))
+              BigNumber.from('0') // TODO: // use avg price at time of revenue
             ),
             amount: totalRevenueVolume,
             value: formatUnits(usdcPrice.mul(unnullify(totalRevenueVolume).toString()), 6).toString(),

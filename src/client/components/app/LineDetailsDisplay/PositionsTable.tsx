@@ -270,7 +270,7 @@ export const PositionsTable = ({
       const setRatesAction = {
         name: t('components.transaction.set-rates'),
         handler: setRatesHandler,
-        disabled: false,
+        disabled: true,
       };
       return [setRatesAction, withdrawAction];
     }

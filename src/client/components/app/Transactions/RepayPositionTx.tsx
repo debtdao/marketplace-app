@@ -159,7 +159,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   }, []);
 
   useEffect(() => {
-    if (!selectedSellToken && !_.isEmpty(sourceAssetOptions)) {
+    if (!selectedSellToken) {
       if (Object.keys(reservesMap).length !== 0) {
         const reservesTokenAddresses = reservesMap[getAddress(selectedPosition!.line)]
           ? Object.keys(reservesMap[getAddress(selectedPosition!.line)])
@@ -170,7 +170,7 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
           })
         );
         setClaimableTokenAddresses(reservesTokenAddresses);
-      } else {
+      } else if (_.isEmpty(sourceAssetOptions)) {
         dispatch(
           TokensActions.setSelectedTokenAddress({
             tokenAddress: sourceAssetOptions[0].address,

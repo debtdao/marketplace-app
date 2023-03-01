@@ -513,9 +513,7 @@ export const formatLineWithEvents = (
             token: _createTokenView(
               token,
               BigNumber.from(totalVolume),
-              // TODO: Add this line back after fixing subgraph
-              // BigNumber.from(totalVolumeUsd).div(BigNumber.from(totalVolume))
-              BigNumber.from('0') // TODO: // use avg price at time of revenue
+              BigNumber.from(totalVolumeUsd).div(BigNumber.from(totalVolume))
             ),
             amount: totalRevenueVolume,
             value: formatUnits(usdcPrice.mul(unnullify(totalRevenueVolume).toString()), 6).toString(),

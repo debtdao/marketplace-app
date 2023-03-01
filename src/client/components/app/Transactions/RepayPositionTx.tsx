@@ -187,32 +187,23 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
     // populate collateral reservesmap in redux state
     // get all collateral tokens of type revenue
     const lineRevenueSummary = selectedSpigot!.revenueSummary;
-    const revenueCollateralTokens: RevenueSummary[] = Object.values(lineRevenueSummary).filter(
-      (token) => token.type === 'revenue'
-    );
+    const revenueCollateralTokens: string[] = Object.values(lineRevenueSummary)
+      .filter((summary) => summary.type === 'revenue')
+      .map((summary) => summary.token.address);
 
     // get all credit tokens
-    const creditTokens = Object.values(positions).map((position) => position.token);
+    const creditTokens = Object.values(positions).map((position) => position.token.address);
 
-    // populate reserves map with each revenue collateral token
-    for (const token of revenueCollateralTokens as RevenueSummary[]) {
+    // merge credit and collateral tokens and only keep unique values
+    const allTokenAddresses = Array.from(new Set([...revenueCollateralTokens, ...creditTokens]));
+
+    // populate reserves map
+    for (const tokenAddress of allTokenAddresses) {
       dispatch(
         CollateralActions.tradeable({
           lineAddress: getAddress(selectedPosition!.line),
           spigotAddress: getAddress(selectedLine!.spigotId),
-          tokenAddress: getAddress(token.token.address),
-          network: walletNetwork!,
-        })
-      );
-    }
-
-    // populate reserves map with each credit token
-    for (const token of creditTokens) {
-      dispatch(
-        CollateralActions.tradeable({
-          lineAddress: getAddress(selectedPosition!.line),
-          spigotAddress: getAddress(selectedLine!.spigotId),
-          tokenAddress: getAddress(token.address),
+          tokenAddress: getAddress(tokenAddress),
           network: walletNetwork!,
         })
       );
@@ -831,7 +822,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
                   inputText={t('components.transaction.repay.claim-and-repay.buy-amount')}
                   amount={tokensToBuy}
                   selectedToken={selectedPosition.token}
-                  tokenOptions={[selectedPosition.token]}
                   readOnly={true}
                 />
                 {/* TODO: Determine how to display an insufficient liquidity message when testing on Ethereum mainnet. */}

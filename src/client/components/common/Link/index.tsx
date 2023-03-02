@@ -38,7 +38,8 @@ export const Link: FC<LinkProps> = ({ to, className, target = '_blank', children
 
   // TODO do Regex for different  parts of url
   const isInternal = to.startsWith('/') || window.location.host === to;
-  const isSubdomain = to.split('.').length > 2; // false positive on files (.pdf) but we want those in new tabs too"
+  const isSubdomain = to.split('.').length > 2 || // false positive on files (.pdf) but we want those in new tabs too"
+    (to.includes("debtdao") && !to.includes("debtdao.finance")); // other sites not on this domain
 
   const onNavigate = () => {
     const eventData = { to, wallet, target };

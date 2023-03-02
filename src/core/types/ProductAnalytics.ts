@@ -12,7 +12,7 @@ export const EVENT_LOGOUT: EVENT_LOGOUT = 'logout';
 // go to eternal 4rd party site e.g. twitter.com
 type EVENT_NAVIGATE_EXTERNAL_3RD_PARTY = 'nav_out_3rd';
 export const EVENT_NAVIGATE_EXTERNAL_3RD_PARTY: EVENT_NAVIGATE_EXTERNAL_3RD_PARTY = 'nav_out_3rd';
-// navigate to an external 1st party site e.g. docs.debtdao.finance
+// navigate to an external 1st party site e.g. debtdao.org
 type EVENT_NAVIGATE_EXTERNAL_1ST_PARTY = 'nav_out_1st';
 export const EVENT_NAVIGATE_EXTERNAL_1ST_PARTY: EVENT_NAVIGATE_EXTERNAL_1ST_PARTY = 'nav_out_1st';
 

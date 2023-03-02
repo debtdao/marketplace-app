@@ -35,7 +35,7 @@ const navLinks: NavigationLink[] = [
     icon: VaultIcon,
   },
   {
-    to: 'https://docs.debtdao.finance',
+    to: 'https://debtdao.org',
     text: 'navigation.docs',
     icon: SearchIcon,
     external: true,

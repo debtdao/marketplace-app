@@ -92,7 +92,7 @@ export const Market = () => {
   }, []);
 
   const onLenderCtaClick = () => {
-    window.open('https://docs.debtdao.finance/products/introduction/line-of-credit', '_blank');
+    window.open('https://debtdao.org/products/introduction/line-of-credit', '_blank');
   };
 
   const onBorrowerCtaClick = () => {

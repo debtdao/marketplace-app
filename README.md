@@ -104,7 +104,7 @@ Download prod locales with: `yarn downloadProdLocales`
 
 ## Repo Structure
 
-'''
+```
 |
 |- public
 		|- locales = Where we store all copy translations that you see on the page
@@ -126,6 +126,6 @@ Download prod locales with: `yarn downloadProdLocales`
 							|- OnchainMetadata = ens + abis + ?
 				|- store = Redux. dynamic state about marketplace, user, tokens, etc. + actions to query/interact
 
-'''
+```
 
 

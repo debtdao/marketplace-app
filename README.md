@@ -128,4 +128,33 @@ Download prod locales with: `yarn downloadProdLocales`
 
 ```
 
+## Code Practices / Styleguide
 
+1. AWLAYS use translated text for anything user facing
+    1. using i18n and public.locales
+2. prefer constant immutable vars and functional programming
+3. Type EVERYTHING
+    1. We have types for every API call arg, expected API responses, and formatted API responses once processed.
+
+### Code Structure
+
+1. Always try to utilize state vars instead of local vars. Allows connecting workflows between ux components a lot more seamless across the app and its more proper modern react using hooks and selectors.
+
+**BAD Practice** 
+
+```jsx
+const [activeAddress,setAddress] = useState();
+setAddress(window.location.path.split('/')[2])
+return <h1>User Address: {activeAddress} </h1>
+```
+
+**GOOD Practice**
+
+```jsx
+const activeAddress = useAppSelector(WalletSelectors.selectSelectedAddress)
+const setAddress = () => dispatch(WalletActions.setSelectedAddress)
+setAddress(window.location.path.split('/')[2])
+return <h1>User Address: {activeAddress} </h1>
+```
+
+1. **Try to organize code by how/when you use it not by arbitrary taxonomies.** E.g. when making services, cbe originally had 1 service file for each contract and mapped functions 1<>1 between them. I refactored and combined anything related to borrowing/lending into CreditService and anything related to spigot/escrow to CollateralService (including liquidate() from LoC contract). Or i made “OnchainMetadataService” for ENS + ABIs + who knows what else we might want to get context about random hashes

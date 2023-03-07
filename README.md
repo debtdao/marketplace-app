@@ -158,3 +158,78 @@ return <h1>User Address: {activeAddress} </h1>
 ```
 
 2. **Try to organize code by how/when you use it not by arbitrary taxonomies.** E.g. when making services, cbe originally had 1 service file for each contract and mapped functions 1<>1 between them. I refactored and combined anything related to borrowing/lending into CreditService and anything related to spigot/escrow to CollateralService (including liquidate() from LoC contract). Or i made “OnchainMetadataService” for ENS + ABIs + who knows what else we might want to get context about random hashes
+
+### Error Handling
+
+1. Good error messages and UX
+    1. should only check 1-2 conditions per if to have specific error messages.
+    2. Good error message:
+    ![https://cdn.discordapp.com/attachments/1009551123339825163/1034974530881470494/Screen_Shot_2022-10-26_at_7.39.00_PM.png](https://cdn.discordapp.com/attachments/1009551123339825163/1034974530881470494/Screen_Shot_2022-10-26_at_7.39.00_PM.png)
+    ![image](https://user-images.githubusercontent.com/39887628/223519819-0cc8bb2a-aa0a-4d7d-ab23-791c6104cadc.png)
+2. handling undefined vars
+	a. `if(!something)`
+	```
+	// good
+	if (!something) {...}
+	//bad
+	if (something === undefined) {...}
+	if (something != null) { ... }
+	```
+3. handling errors in calls
+    1. API GET request
+        1. return null/undefined as data. ideally error string to users
+    2. API POST
+        1. return  null/undefined as data. error string to users
+```
+// Good GET 
+const getAPI = () => {
+	const response = await axios.get('my.api')
+	if(!response || response.error) {
+		return {
+			data: null,
+			error: response?.error || 'Could not fetch API'
+		}
+	}
+}
+
+// Bad GET
+
+const getAPI = () => {
+	const response = await axios.get('my.api')
+	// ALWAYS validate response + data
+	return response.data
+}
+
+const getAPI = () => {
+	const response = await axios.get('my.api')
+	if(!response || response.error) {
+		throw new Error('aaaaaaaaah');
+	}
+}
+
+const getAPI = () => {
+	const response = await axios.get('my.api')
+	if(!response || response.error) {
+		return Promise.resolve();
+	}
+}
+
+// Good POST
+const getAPI = () => {
+	const response = await axios.post('my.api', {data: myData})
+	if(!response || response.error) {
+		return {
+			data: null,
+			error: response?.error || 'Could not fetch API'
+		}
+	}
+}
+
+// Bad POST 
+const getAPI = () => {
+	const response = await axios.post('my.api', {data: myData})
+	// DONT do side effects regardless of results
+	setTransactionStatus(1);
+	return response.data;
+}
+```

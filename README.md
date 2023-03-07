@@ -99,3 +99,33 @@ Sync with: `yarn syncDevLocales` **must provide api key**
 Check sync changes with: `yarn checkDevLocales`
 
 Download prod locales with: `yarn downloadProdLocales`
+
+
+
+## Repo Structure
+
+'''
+|
+|- public
+		|- locales = Where we store all copy translations that you see on the page
+| src
+		|- config = all env vars and constants
+		|- client = all React/HTML/CSS
+		|- tests = testing services
+		|- utils = small helper functinos throughout the codebase 
+		|- core
+				|- types = data structs for entire codebase
+							|- State = for redux state data structs
+							|- Service = Credit + Collateral + other services
+							|- CreditLine = anything related to credit specifically
+				|- frameworks = 3rd party dependency integrations (ethersjs, subgraph, blocknative)
+				|- services = Libs for composing frameworks in actions for users
+							|- Tx = sending txs
+							|- CreditLine = interacting with credit/debt positions
+							|- Collateral = interacting with line collateral (Spigot + Escrow)
+							|- OnchainMetadata = ens + abis + ?
+				|- store = Redux. dynamic state about marketplace, user, tokens, etc. + actions to query/interact
+
+'''
+
+

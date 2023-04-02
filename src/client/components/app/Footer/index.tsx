@@ -18,7 +18,7 @@ const footerLinks = [
   //   name: 'buyback',
   // },
   {
-    link: 'https://docs.debtdao.finance',
+    link: 'https://debtdao.org',
     name: 'docs',
   },
   // {

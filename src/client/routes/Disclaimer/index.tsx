@@ -130,7 +130,7 @@ export const Disclaimer = () => {
           </u>{' '}
           The only way to fully understand such risks is to have a strong understanding of the relevant technical
           systems and the incentive design mechanisms they embody--we strongly encourage you to review Debt DAO’s{' '}
-          <StyledLink href="https://docs.debtdao.finance/products/introduction" target="_blank">
+          <StyledLink href="https://debtdao.org/products/secured-line-of-credit" target="_blank">
             technical documentation
           </StyledLink>{' '}
           and{' '}

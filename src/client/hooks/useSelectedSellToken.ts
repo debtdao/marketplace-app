@@ -1,4 +1,5 @@
 import { keyBy } from 'lodash';
+import { ethers } from 'ethers';
 
 import { useAppSelector } from '@hooks';
 import { LinesSelectors, selectDepositTokenOptionsByAsset } from '@store';
@@ -24,14 +25,13 @@ export const useSelectedSellToken = ({
   allowEth,
 }: SelectedSellTokenProps): SelectedSellToken => {
   const sellTokensOptions = useAppSelector(selectDepositTokenOptionsByAsset)(allowEth);
-
-  let fullTokensOptions = sellTokensOptions.concat(testTokens); // @cleanup remove
-
+  const fullTokensOptions = sellTokensOptions.concat(testTokens); // @cleanup remove
   const sellTokensOptionsMap = keyBy(fullTokensOptions, 'address');
-  let selectedSellToken: TokenView | undefined = selectedSellTokenAddress
-    ? sellTokensOptionsMap[selectedSellTokenAddress]
-    : undefined;
 
+  const selectedSellToken: TokenView | undefined = selectedSellTokenAddress
+    ? sellTokensOptionsMap[ethers.utils.getAddress(selectedSellTokenAddress)]
+    : undefined;
+  console.log('use selected sell token options', selectedSellToken, selectedSellTokenAddress, sellTokensOptionsMap);
   const sourceAssetOptions = selectedSellToken && allowTokenSelect === false ? [selectedSellToken] : sellTokensOptions;
 
   return { selectedSellToken, sourceAssetOptions };

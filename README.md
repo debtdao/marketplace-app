@@ -99,3 +99,137 @@ Sync with: `yarn syncDevLocales` **must provide api key**
 Check sync changes with: `yarn checkDevLocales`
 
 Download prod locales with: `yarn downloadProdLocales`
+
+
+
+## Repo Structure
+
+```
+|
+|- public
+	|- locales = Where we store all copy translations that you see on the page
+| src
+	|- config = all env vars and constants
+	|- client = all React/HTML/CSS
+	|- tests = testing services
+	|- utils = small helper functinos throughout the codebase 
+	|- core
+		|- types = data structs for entire codebase
+			|- State = for redux state data structs
+			|- Service = Credit + Collateral + other services
+			|- CreditLine = anything related to credit specifically
+		|- frameworks = 3rd party dependency integrations (ethersjs, subgraph, blocknative)
+		|- services = Libs for composing frameworks in actions for users
+			|- Tx = sending txs
+			|- CreditLine = interacting with credit/debt positions
+			|- Collateral = interacting with line collateral (Spigot + Escrow)
+			|- OnchainMetadata = ens + abis + ?
+		|- store = Redux. dynamic state about marketplace, user, tokens, etc. + actions to query/interact
+
+```
+
+## Code Practices / Styleguide
+
+1. AWLAYS use translated text for anything user facing
+    1. using i18n and public.locales
+2. prefer constant immutable vars and functional programming
+3. Type EVERYTHING
+    1. We have types for every API call arg, expected API responses, and formatted API responses once processed.
+
+### Code Structure
+
+1. Always try to utilize state vars instead of local vars. Allows connecting workflows between ux components a lot more seamless across the app and its more proper modern react using hooks and selectors.
+
+**BAD Practice** 
+
+```jsx
+const [activeAddress,setAddress] = useState();
+setAddress(window.location.path.split('/')[2])
+return <h1>User Address: {activeAddress} </h1>
+```
+
+**GOOD Practice**
+
+```jsx
+const activeAddress = useAppSelector(WalletSelectors.selectSelectedAddress)
+const setAddress = () => dispatch(WalletActions.setSelectedAddress)
+setAddress(window.location.path.split('/')[2])
+return <h1>User Address: {activeAddress} </h1>
+```
+
+2. **Try to organize code by how/when you use it not by arbitrary taxonomies.** E.g. when making services, cbe originally had 1 service file for each contract and mapped functions 1<>1 between them. I refactored and combined anything related to borrowing/lending into CreditService and anything related to spigot/escrow to CollateralService (including liquidate() from LoC contract). Or i made “OnchainMetadataService” for ENS + ABIs + who knows what else we might want to get context about random hashes
+
+### Error Handling
+
+1. Good error messages and UX
+    1. should only check 1-2 conditions per if to have specific error messages.
+    2. Good error message:
+    ![https://cdn.discordapp.com/attachments/1009551123339825163/1034974530881470494/Screen_Shot_2022-10-26_at_7.39.00_PM.png](https://cdn.discordapp.com/attachments/1009551123339825163/1034974530881470494/Screen_Shot_2022-10-26_at_7.39.00_PM.png)
+    ![image](https://user-images.githubusercontent.com/39887628/223519819-0cc8bb2a-aa0a-4d7d-ab23-791c6104cadc.png)
+2. handling undefined vars
+	a. `if(!something)`
+	```
+	// good
+	if (!something) {...}
+	//bad
+	if (something === undefined) {...}
+	if (something != null) { ... }
+	```
+3. handling errors in calls
+    1. API GET request
+        1. return null/undefined as data. ideally error string to users
+    2. API POST
+        1. return  null/undefined as data. error string to users
+```
+// Good GET 
+const getAPI = () => {
+	const response = await axios.get('my.api')
+	if(!response || response.error) {
+		return {
+			data: null,
+			error: response?.error || 'Could not fetch API'
+		}
+	}
+}
+
+// Bad GET
+
+const getAPI = () => {
+	const response = await axios.get('my.api')
+	// ALWAYS validate response + data
+	return response.data
+}
+
+const getAPI = () => {
+	const response = await axios.get('my.api')
+	if(!response || response.error) {
+		throw new Error('aaaaaaaaah');
+	}
+}
+
+const getAPI = () => {
+	const response = await axios.get('my.api')
+	if(!response || response.error) {
+		return Promise.resolve();
+	}
+}
+
+// Good POST
+const getAPI = () => {
+	const response = await axios.post('my.api', {data: myData})
+	if(!response || response.error) {
+		return {
+			data: null,
+			error: response?.error || 'Could not fetch API'
+		}
+	}
+}
+
+// Bad POST 
+const getAPI = () => {
+	const response = await axios.post('my.api', {data: myData})
+	// DONT do side effects regardless of results
+	setTransactionStatus(1);
+	return response.data;
+}
+```

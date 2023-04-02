@@ -146,10 +146,9 @@ export const Navbar = ({
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const walletNetworkName = useAppSelector(WalletSelectors.selectWalletNetworkName);
 
-  const { SUPPORTED_NETWORKS } = getConstants();
+  const { SUPPORTED_NETWORKS, NEW_NETWORKS } = getConstants();
 
-  // TODO: goerli is not included in SUPPORTED_NETWORKS from config/constants because doing so causes issues with the Yearn SDK which does not support Goerli test network.
-  const SUPPORTED_NETWORK_OPTIONS = SUPPORTED_NETWORKS.concat('goerli').map((network) => {
+  const SUPPORTED_NETWORK_OPTIONS = [...SUPPORTED_NETWORKS, ...NEW_NETWORKS].map((network) => {
     return {
       value: network,
       label: NETWORK_SETTINGS[network].name ?? 'other',

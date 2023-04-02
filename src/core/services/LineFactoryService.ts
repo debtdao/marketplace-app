@@ -31,8 +31,8 @@ export class LineFactoryServiceImpl {
     this.transactionService = transactionService;
     this.web3Provider = web3Provider;
     this.config = config;
-    const { GRAPH_API_URL } = getConfig();
-    this.graphUrl = GRAPH_API_URL || 'https://api.thegraph.com';
+    const { MAINNET_GRAPH_API_URL } = getConfig();
+    this.graphUrl = MAINNET_GRAPH_API_URL || 'https://api.thegraph.com';
     this.abi = LineFactoryABI;
   }
 

@@ -1,10 +1,13 @@
 {
     "networks":{
-        "goerli":{
-            "lineFactory": "0x400C6ec8B915e5703E043AA646EA5cb225288D6c"
+        "gnosis": {
+            "lineFactory": ""
         },
         "mainnet": {
             "lineFactory": "0xe725e25961e04E685A573B1587F8297aC233cD07"
+        },
+        "goerli":{
+            "lineFactory": "0x400C6ec8B915e5703E043AA646EA5cb225288D6c"
         }
     }
 }

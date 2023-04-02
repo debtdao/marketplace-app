@@ -4,12 +4,13 @@
 
 // Source Documentation: https://www.apollographql.com/docs/react/data/fragments/#using-fragments-with-unions-and-interfaces
 
+import { getConfig } from '@src/config';
 import * as fs from 'fs';
 import * as path from 'path';
 
 const fetch = require('cross-fetch');
 
-const GRAPH_API_URL = process.env.GRAPH_API_URL;
+const { GOERLI_GRAPH_API_URL } = getConfig();
 
 const homeDirectory = path.resolve(process.cwd());
 const destinationDirectoryJS = '/src/core/frameworks/gql/possibleTypes.js';
@@ -18,7 +19,7 @@ const destinationPathJS = path.join(homeDirectory, destinationDirectoryJS);
 console.log('home directory: ', homeDirectory);
 console.log('destination path: ', destinationPathJS);
 
-fetch(`${GRAPH_API_URL}`, {
+fetch(`${GOERLI_GRAPH_API_URL}`, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({

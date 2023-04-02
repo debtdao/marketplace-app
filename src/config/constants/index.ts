@@ -30,14 +30,14 @@ const PARTNERS = {
 const BLACKLISTED_LINES = ['0x0000000000000000000000000000000000000000'];
 
 const NETWORK_SETTINGS: NetworkSettings = {
-  goerli: {
-    id: 'goerli',
-    name: 'Goerli',
+  gnosis: {
+    id: 'gnosis',
+    name: 'Gnosis',
     networkId: 5,
-    rpcUrl: 'https://goerli.infura.io/v3/',
+    rpcUrl: 'https://rpc.gnosis.gateway.fm',
     nativeCurrency: {
-      name: 'ETH',
-      symbol: 'GoerliETH',
+      name: 'xDA(',
+      symbol: 'xDAI',
       decimals: 18,
     },
     simulationsEnabled: true,
@@ -60,6 +60,22 @@ const NETWORK_SETTINGS: NetworkSettings = {
     earningsEnabled: true,
     notifyEnabled: true,
     blockExplorerUrl: 'https://etherscan.io',
+    txConfirmations: 2,
+  },
+  goerli: {
+    id: 'goerli',
+    name: 'Goerli',
+    networkId: 5,
+    rpcUrl: 'https://goerli.infura.io/v3/',
+    nativeCurrency: {
+      name: 'ETH',
+      symbol: 'GoerliETH',
+      decimals: 18,
+    },
+    simulationsEnabled: true,
+    earningsEnabled: true,
+    notifyEnabled: true,
+    blockExplorerUrl: 'https://goerli.etherscan.io/',
     txConfirmations: 2,
   },
   // NOTE: Arbitrum is not yet supported!
@@ -92,11 +108,15 @@ export const getConstants = memoize((): Constants => {
     DEBT_DAO_API: 'https://api.yearn.finance/v1/chains/1/vaults/all',
     DEBT_DAO_ALERTS_API: 'http://yearn-alerts-balancer-2019386215.us-east-1.elb.amazonaws.com',
     SUPPORTED_NETWORKS: ['mainnet'],
+    // Separate yearn networks with vs networks we added.
+    NEW_NETWORKS: ['goerli', 'gnosis'],
     CHAIN_IDS: CHAIN_IDS,
     CHAIN_NAMES: CHAIN_NAMES,
     NETWORK_SETTINGS,
     MAINNET_PROVIDER_HTTPS: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     MAINNET_PROVIDER_WSS: `wss://eth-mainnet.ws.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+    GNOSIS_PROVIDER_HTTPS: `https://blockscout.com/xdai/mainnet/api`,
+    // GNOSIS_PROVIDER_WSS: `wss://eth-mainnet.ws.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     GOERLI_PROVIDER_HTTPS: 'https://goerli.infura.io/v3/',
     // GOERLI_PROVIDER_WSS: `FILL THIS IN`,
     ARBITRUM_PROVIDER_HTTPS: 'https://arb1.arbitrum.io/rpc',

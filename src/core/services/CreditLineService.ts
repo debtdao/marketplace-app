@@ -44,7 +44,7 @@ import { getContract } from '@frameworks/ethers';
 import { getLineEvents, getLinePage, getLines, getUserPortfolio } from '@frameworks/gql';
 import { decodeErrorData } from '@src/utils/decodeError';
 
-const { GRAPH_API_URL } = getConfig();
+const { MAINNET_GRAPH_API_URL } = getConfig();
 
 export class CreditLineServiceImpl implements CreditLineService {
   private graphUrl: string;
@@ -67,7 +67,7 @@ export class CreditLineServiceImpl implements CreditLineService {
     this.web3Provider = web3Provider;
     this.config = config;
 
-    this.graphUrl = GRAPH_API_URL || 'https://api.thegraph.com';
+    this.graphUrl = MAINNET_GRAPH_API_URL || 'https://api.thegraph.com';
     this.abi = SecuredLineABI;
   }
 

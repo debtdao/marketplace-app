@@ -35,16 +35,20 @@ import { possibleTypes } from './possibleTypes.js';
 const fetch = require('cross-fetch');
 
 // TODO: GRAPH_CHAINLINK_FEED_REGISTRY_API_URL
-const { GRAPH_API_URL, GRAPH_TEST_API_URL, GRAPH_CHAINLINK_FEED_REGISTRY_API_URL } = getEnv();
+
+const { MAINNET_GRAPH_API_URL, GOERLI_GRAPH_API_URL, GNOSIS_GRAPH_API_URL, GRAPH_CHAINLINK_FEED_REGISTRY_API_URL } =
+  getEnv();
 const { BLACKLISTED_LINES: blacklist } = getConstants();
 
-// utility function get GRAPH_API_URL based on network parameter
+// utility function get MAINNET_GRAPH_API_URL based on network parameter
 const getGraphURL = (network: string) => {
   let url = '';
   if (network === 'mainnet') {
-    url = GRAPH_API_URL!;
+    url = MAINNET_GRAPH_API_URL!;
   } else if (network === 'goerli') {
-    url = GRAPH_TEST_API_URL!;
+    url = GOERLI_GRAPH_API_URL!;
+  } else if (network === 'gnosis') {
+    url = GNOSIS_GRAPH_API_URL!;
   }
   return url;
 };

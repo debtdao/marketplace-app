@@ -1,7 +1,7 @@
 {
     "networks":{
         "gnosis": {
-            "lineFactory": ""
+            "lineFactory": "0xe725e25961e04E685A573B1587F8297aC233cD07"
         },
         "mainnet": {
             "lineFactory": "0xe725e25961e04E685A573B1587F8297aC233cD07"

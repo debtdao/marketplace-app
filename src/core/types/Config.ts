@@ -37,7 +37,7 @@ export interface Constants {
   DEBT_DAO_ALERTS_API: string;
   SUPPORTED_NETWORKS: Network[];
   // Separate yearn networks with vs networks we added.
-  NEW_NETWORKS: Network[];
+  ALL_NETWORKS: Network[];
   CHAIN_IDS: {
     [KEY: number]: string;
   };

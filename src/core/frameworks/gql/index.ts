@@ -42,15 +42,13 @@ const { BLACKLISTED_LINES: blacklist } = getConstants();
 
 // utility function get MAINNET_GRAPH_API_URL based on network parameter
 const getGraphURL = (network: string) => {
-  let url = '';
   if (network === 'mainnet') {
-    url = MAINNET_GRAPH_API_URL!;
+    return MAINNET_GRAPH_API_URL;
   } else if (network === 'goerli') {
-    url = GOERLI_GRAPH_API_URL!;
+    return GOERLI_GRAPH_API_URL;
   } else if (network === 'gnosis') {
-    url = GNOSIS_GRAPH_API_URL!;
+    return GNOSIS_GRAPH_API_URL;
   }
-  return url;
 };
 
 let client: any;

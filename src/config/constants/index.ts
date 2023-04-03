@@ -33,7 +33,7 @@ const NETWORK_SETTINGS: NetworkSettings = {
   gnosis: {
     id: 'gnosis',
     name: 'Gnosis',
-    networkId: 5,
+    networkId: 100,
     rpcUrl: 'https://rpc.gnosis.gateway.fm',
     nativeCurrency: {
       name: 'xDA(',
@@ -43,7 +43,7 @@ const NETWORK_SETTINGS: NetworkSettings = {
     simulationsEnabled: true,
     earningsEnabled: true,
     notifyEnabled: true,
-    blockExplorerUrl: 'https://goerli.etherscan.io/',
+    blockExplorerUrl: 'https://gnosisscan.io/',
     txConfirmations: 2,
   },
   mainnet: {
@@ -109,13 +109,13 @@ export const getConstants = memoize((): Constants => {
     DEBT_DAO_ALERTS_API: 'http://yearn-alerts-balancer-2019386215.us-east-1.elb.amazonaws.com',
     SUPPORTED_NETWORKS: ['mainnet'],
     // Separate yearn networks with vs networks we added.
-    NEW_NETWORKS: ['goerli', 'gnosis'],
+    ALL_NETWORKS: ['mainnet', 'goerli', 'gnosis'],
     CHAIN_IDS: CHAIN_IDS,
     CHAIN_NAMES: CHAIN_NAMES,
     NETWORK_SETTINGS,
     MAINNET_PROVIDER_HTTPS: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     MAINNET_PROVIDER_WSS: `wss://eth-mainnet.ws.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
-    GNOSIS_PROVIDER_HTTPS: `https://blockscout.com/xdai/mainnet/api`,
+    GNOSIS_PROVIDER_HTTPS: `https://rpc.gnosis.gateway.fm/`,
     // GNOSIS_PROVIDER_WSS: `wss://eth-mainnet.ws.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     GOERLI_PROVIDER_HTTPS: 'https://goerli.infura.io/v3/',
     // GOERLI_PROVIDER_WSS: `FILL THIS IN`,

@@ -92,7 +92,7 @@ export const Layout: FC = ({ children }) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
   const location = useLocation();
-  const { SUPPORTED_NETWORKS } = getConfig();
+  const { SUPPORTED_NETWORKS, ALL_NETWORKS } = getConfig();
   const { isMobile } = useWindowDimensions();
   const partner = useAppSelector(PartnerSelectors.selectPartnerState);
   const selectedAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
@@ -116,10 +116,6 @@ export const Layout: FC = ({ children }) => {
   const hideOptionalLinks = isLedgerLive;
 
   let titleLink;
-  // TODO Add lab details route when its added the view
-
-  // TODO This is only assetAddress on the vault page
-  //const assetAddress: string | undefined = location.pathname.split('/')[2];
 
   // Used to check zapper api
   // const { ZAPPER_AUTH_TOKEN } = getConfig();
@@ -171,6 +167,8 @@ export const Layout: FC = ({ children }) => {
     // dispatch(LinesActions.getLinePage({ id: selectedLineAddress! }));
     // dispatch(LinesActions.getUserPortfolio({ user: userWalletAddress! }));
     // dispatch(TokensActions.getTokens());
+
+    // TODO FIX should be in market page not general loader
     dispatch(TokensActions.getTokens()).then(() => dispatch(LinesActions.getLines(defaultLineCategories)));
     dispatch(TokensActions.getSupportedOracleTokens());
   }, [currentNetwork]);
@@ -192,7 +190,7 @@ export const Layout: FC = ({ children }) => {
           onWalletClick={() => dispatch(WalletActions.walletSelect({ network: currentNetwork }))}
           disableWalletSelect={hideControls || isCoinbaseApp()}
           selectedNetwork={currentNetwork}
-          networkOptions={SUPPORTED_NETWORKS}
+          networkOptions={ALL_NETWORKS}
           //
           onNetworkChange={(network) => dispatch(NetworkActions.changeNetwork({ network: network as Network }))}
           disableNetworkChange={hideControls}

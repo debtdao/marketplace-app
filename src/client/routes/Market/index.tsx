@@ -26,7 +26,7 @@ import { getEnv } from '@config/env';
 import { getDefaultLineCategories, getENS } from '@src/utils';
 import { getConstants } from '@src/config/constants';
 
-const { SUPPORTED_NETWORKS } = getConstants();
+const { SUPPORTED_NETWORKS, ALL_NETWORKS } = getConstants();
 
 const StyledRecommendationsCard = styled(RecommendationsCard)``;
 
@@ -92,6 +92,7 @@ export const Market = () => {
   }, []);
 
   const onLenderCtaClick = () => {
+    // TODO <Link> component
     window.open('https://debtdao.org/products/secured-line-of-credit', '_blank');
   };
 
@@ -148,25 +149,26 @@ export const Market = () => {
         background={<img src={DebtDAOBanner} alt={'Debt DAO Banner?'} />}
       />
 
-      {getLinesStatus.loading ||
-      (_.isEmpty(lineCategoriesForDisplay) && SUPPORTED_NETWORKS.includes(currentNetwork)) ? (
+      {getLinesStatus.loading || (_.isEmpty(lineCategoriesForDisplay) && ALL_NETWORKS.includes(currentNetwork)) ? (
         <SpinnerLoading flex="1" width="100%" />
       ) : (
-        Object.entries(lineCategoriesForDisplay!).map(([key, val]: [string, SecuredLine[]], i: number) => {
-          return (
-            <StyledRecommendationsCard
-              header={t(key)}
-              key={key}
-              items={
-                val.map(({ id, ...stuff }) => ({
-                  ...stuff,
-                  icon: '',
-                  onAction: () => history.push(`/${currentNetwork}/lines/${id}`),
-                })) as Item[]
-              }
-            />
-          );
-        })
+        Object.entries(lineCategoriesForDisplay!)
+          .filter(([_, v]) => !!v)
+          .map(([key, val]: [string, SecuredLine[]], i: number) => {
+            return (
+              <StyledRecommendationsCard
+                header={t(key)}
+                key={key}
+                items={
+                  val.map(({ id, ...stuff }) => ({
+                    ...stuff,
+                    icon: '',
+                    onAction: () => history.push(`/${currentNetwork}/lines/${id}`),
+                  })) as Item[]
+                }
+              />
+            );
+          })
       )}
       {/**/}
       {/* TODO keep this UI but populate with state.lines.linesMap */}

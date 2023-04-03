@@ -4,8 +4,8 @@ const getLineFactoryforNetwork = (network: number | string) => {
   switch (network) {
     case 'mainnet' || 1:
       return networks.mainnet.lineFactory;
-    case 'goerli' || 5:
-      return networks.goerli.lineFactory;
+    case 'gnosis' || 100:
+      return networks.gnosis.lineFactory;
     case 'goerli' || 5:
       return networks.gnosis.lineFactory;
   }

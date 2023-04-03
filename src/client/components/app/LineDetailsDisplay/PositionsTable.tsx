@@ -276,7 +276,7 @@ export const PositionsTable = ({
     }
 
     // not party to line. no actions;
-    return [];
+    return [repayAction];
   };
 
   // Returns a list of transactions to display on positions table for proposals

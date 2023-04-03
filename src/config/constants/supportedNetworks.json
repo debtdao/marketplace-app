@@ -1,10 +1,10 @@
 {
     "networks":{
+        "mainnet": {
+            "lineFactory": "0xc9eF6509A09b92043cedce689DfAA760048aBd7F"
+        },
         "goerli":{
             "lineFactory": "0x400C6ec8B915e5703E043AA646EA5cb225288D6c"
-        },
-        "mainnet": {
-            "lineFactory": "0xe725e25961e04E685A573B1587F8297aC233cD07"
         }
     }
 }

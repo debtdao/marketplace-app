@@ -154,8 +154,6 @@ export const Layout: FC = ({ children }) => {
 
     // Clear Redux state when switching networks
     if (previousNetwork) {
-      console.log('reloading on new network', previousNetwork, currentNetwork);
-      debugger;
       // window.location.reload();
       const newMarket = `/${currentNetwork}/market/`;
       dispatch(

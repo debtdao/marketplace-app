@@ -53,12 +53,22 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
       blockExplorerUrls: [NETWORK_SETTINGS[network].blockExplorerUrl],
     };
 
-    if (network === 'goerli') {
-      return { network };
-    } else if (network === 'mainnet') {
+    // push network change to wallet
+    if (network === 'mainnet') {
       await updateChainSettings(network, ethChainSettings);
     } else if (network === 'gnosis') {
       await updateChainSettings(network, gnoChainSettings);
+    } else if (network === 'goerli') {
+      // await updateChainSettings(network, ethChainSettings);
+      return { network };
+    }
+
+    // clear old app data
+    dispatch(LinesActions.clearLinesData());
+    dispatch(AppActions.clearAppData());
+    if (wallet.selectedAddress) {
+      dispatch(LinesActions.clearUserData());
+      dispatch(AppActions.clearUserAppData());
     }
 
     // Set Yearn context
@@ -79,6 +89,8 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
 );
 
 const updateChainSettings = async (currentNetwork: string, newChainSettings: any) => {
+  // TODO probably need to do things in here for full frame support
+
   // Change wallet network to match selected network in dropdown
   try {
     if (!window.ethereum) throw new Error('web3 provider No crypto wallet found!');

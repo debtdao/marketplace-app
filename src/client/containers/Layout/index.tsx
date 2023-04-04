@@ -109,7 +109,8 @@ export const Layout: FC = ({ children }) => {
 
   // TODO: update how we get page name for a path to be more dynamic
   // const path = useAppSelector(({ route }) => route.path);
-  const path = getPageName(location.pathname) as Route;
+  const pathName = getPageName(location.pathname) as Route;
+  const [_, targetNetwork, ...path] = location.pathname.split('/');
 
   const isLedgerLive = partner.id === 'ledger';
   const isIframe = isInIframe();
@@ -140,7 +141,13 @@ export const Layout: FC = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    dispatch(RouteActions.changeRoute({ path: location.pathname }));
+    if (targetNetwork !== currentNetwork) {
+      dispatch(NetworkActions.changeNetwork({ network: targetNetwork }));
+      const to = `${targetNetwork}${path.join('')}`;
+      dispatch(AppActions.navigate({ to, onNavigate: () => history.push(to) }));
+    } else {
+      dispatch(RouteActions.changeRoute({ path: location.pathname }));
+    }
   }, [location]);
 
   useEffect(() => {
@@ -152,18 +159,14 @@ export const Layout: FC = ({ children }) => {
   useEffect(() => {
     if (activeModal) dispatch(ModalsActions.closeModal());
 
+    console.log('target network', targetNetwork, currentNetwork, path);
+
+    debugger;
+
     // Clear Redux state when switching networks
     if (previousNetwork) {
       // window.location.reload();
       const newMarket = `/${currentNetwork}/market/`;
-      dispatch(LinesActions.clearLinesData());
-
-      if (selectedAddress) {
-        dispatch(AppActions.clearAppData());
-        dispatch(LinesActions.clearUserData());
-        dispatch(AppActions.clearUserAppData());
-      }
-
       dispatch(
         AppActions.navigate({
           onNavigate: () => history.push(newMarket),
@@ -191,7 +194,7 @@ export const Layout: FC = ({ children }) => {
 
       <Content collapsedSidebar={collapsedSidebar} useTabbar={isMobile}>
         <Navbar
-          title={t(`pages.${path}`)}
+          title={t(`pages.${pathName}`)}
           titleLink={titleLink}
           subTitle={''}
           walletAddress={selectedAddress}

@@ -16,8 +16,8 @@ export const TOKEN_ADDRESSES = {
   DAI: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
   USDC: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
   // SUSD: '0x57ab1ec28d129707052df4df418d58a2d46d5f51',
-  // LUSD: '0x5f98805a4e8be255a32880fdec7f6728c6568ba0',
-  // ALUSD: '0xbc6da0fe9ad5f3b0d58160288917aa56653660e9',
+  LUSD: '0x5f98805a4e8be255a32880fdec7f6728c6568ba0',
+  ALUSD: '0xbc6da0fe9ad5f3b0d58160288917aa56653660e9',
   // RAI: '0x03ab458634910aad20ef5f1c8ee96f1d6ac54919',
   USDT: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
   WBTC: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
@@ -27,25 +27,7 @@ const PARTNERS = {
   LEDGER_PARTNER_ID: '0x558247e365be655f9144e1a0140D793984372Ef3',
 };
 
-const BLACKLISTED_LINES = ['0x0000000000000000000000000000000000000000', '0xd3d2030c9a0be7b6c6c32ccecb8df011b22f942d'];
-
 const NETWORK_SETTINGS: NetworkSettings = {
-  gnosis: {
-    id: 'gnosis',
-    name: 'Gnosis',
-    networkId: 100,
-    rpcUrl: 'https://rpc.gnosis.gateway.fm',
-    nativeCurrency: {
-      name: 'xDA(',
-      symbol: 'xDAI',
-      decimals: 18,
-    },
-    simulationsEnabled: true,
-    earningsEnabled: true,
-    notifyEnabled: true,
-    blockExplorerUrl: 'https://gnosisscan.io/',
-    txConfirmations: 2,
-  },
   mainnet: {
     id: 'mainnet',
     name: 'Ethereum',
@@ -60,6 +42,22 @@ const NETWORK_SETTINGS: NetworkSettings = {
     earningsEnabled: true,
     notifyEnabled: true,
     blockExplorerUrl: 'https://etherscan.io',
+    txConfirmations: 2,
+  },
+  gnosis: {
+    id: 'gnosis',
+    name: 'Gnosis',
+    networkId: 100,
+    rpcUrl: 'https://rpc.gnosis.gateway.fm',
+    nativeCurrency: {
+      name: 'xDA(',
+      symbol: 'xDAI',
+      decimals: 18,
+    },
+    simulationsEnabled: true,
+    earningsEnabled: true,
+    notifyEnabled: true,
+    blockExplorerUrl: 'https://gnosisscan.io/',
     txConfirmations: 2,
   },
   goerli: {
@@ -96,6 +94,7 @@ const NETWORK_SETTINGS: NetworkSettings = {
   //   txConfirmations: 2,
   // },
 };
+const BLACKLISTED_LINES = ['0x0000000000000000000000000000000000000000', '0xd3d2030c9a0be7b6c6c32ccecb8df011b22f942d'];
 
 export const getConstants = memoize((): Constants => {
   const { ALCHEMY_API_KEY } = getEnv();
@@ -109,7 +108,7 @@ export const getConstants = memoize((): Constants => {
     DEBT_DAO_ALERTS_API: 'http://yearn-alerts-balancer-2019386215.us-east-1.elb.amazonaws.com',
     SUPPORTED_NETWORKS: ['mainnet'],
     // Separate yearn networks with vs networks we added.
-    ALL_NETWORKS: ['mainnet', 'goerli', 'gnosis'],
+    ALL_NETWORKS: ['mainnet', 'goerli'], //  'gnosis',
     CHAIN_IDS: CHAIN_IDS,
     CHAIN_NAMES: CHAIN_NAMES,
     NETWORK_SETTINGS,

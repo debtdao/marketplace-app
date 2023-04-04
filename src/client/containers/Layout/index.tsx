@@ -156,19 +156,21 @@ export const Layout: FC = ({ children }) => {
     if (previousNetwork) {
       // window.location.reload();
       const newMarket = `/${currentNetwork}/market/`;
+      dispatch(LinesActions.clearLinesData());
+
+      if (selectedAddress) {
+        dispatch(AppActions.clearAppData());
+        dispatch(LinesActions.clearUserData());
+        dispatch(AppActions.clearUserAppData());
+      }
+
       dispatch(
         AppActions.navigate({
           onNavigate: () => history.push(newMarket),
           to: newMarket,
         })
       );
-      // dispatch(AppActions.clearAppData());
-      // dispatch(LinesActions.clearLinesData());
-      // dispatch(LinesActions.clearLineStatus({ lineAddress: selectedLineAddress! }));
-      // dispatch(LinesActions.clearSelectedLineAndStatus());
-      // dispatch(LinesActions.clearUserData());
     }
-    if (selectedAddress) dispatch(AppActions.clearUserAppData());
 
     // Fetch lines data when switching networks
     // dispatch(LinesActions.getLines(defaultLineCategories));

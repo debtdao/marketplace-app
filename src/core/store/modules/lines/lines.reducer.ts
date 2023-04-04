@@ -164,7 +164,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
     })
 
     .addCase(clearLineStatus, (state, { payload: { lineAddress } }) => {
-      // state.statusMap.linesActionsStatusMap[lineAddress] = initialLineActionsStatusMap;
+      // state.statusMap[lineAddress] = initialLineActionsStatusMap;
     })
 
     /* -------------------------------------------------------------------------- */

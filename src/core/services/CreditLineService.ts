@@ -15,9 +15,11 @@ import {
   ExecuteTransactionProps,
   CreditPosition,
   GetUserLinesProps,
-  GetLineProps,
-  GetLinesProps,
-  GetLinePageProps,
+  GetLineArgs,
+  GetLinesArgs,
+  GetLineEventsArgs,
+  GetLinePageArgs,
+  GetUserPortfolioArgs,
   AddCreditProps,
   CloseProps,
   WithdrawLineProps,
@@ -41,7 +43,12 @@ import {
 import { getConfig } from '@config';
 import { SecuredLineABI } from '@services/contracts';
 import { getContract } from '@frameworks/ethers';
-import { getLineEvents, getLinePage, getLines, getUserPortfolio } from '@frameworks/gql';
+import {
+  getLineEvents as queryLineEvents,
+  getLinePage as queryLinePage,
+  getLines as queryLines,
+  getUserPortfolio as queryPortfolio,
+} from '@frameworks/gql';
 import { decodeErrorData } from '@src/utils/decodeError';
 
 const { MAINNET_GRAPH_API_URL } = getConfig();
@@ -458,13 +465,13 @@ export class CreditLineServiceImpl implements CreditLineService {
 
   /* Subgraph Getters */
 
-  public async getLine(props: GetLineProps): Promise<SecuredLine | undefined> {
+  public async getLine(props: GetLineArgs): Promise<SecuredLine | undefined> {
     return;
   }
 
-  public async getLines(prop: GetLinesProps): Promise<GetLinesResponse[] | undefined> {
+  public async getLines(prop: GetLinesArgs): Promise<GetLinesResponse[] | undefined> {
     // todo get all token prices from yearn add update store with values
-    const response = getLines(prop)
+    const response = queryLines(prop)
       .then((data) => {
         return data;
       })
@@ -475,8 +482,8 @@ export class CreditLineServiceImpl implements CreditLineService {
     return response;
   }
 
-  public async getLineEvents(prop: GetLineEventsProps): Promise<GetLineEventsResponse | undefined> {
-    const response = getLineEvents(prop)
+  public async getLineEvents(prop: GetLineEventsArgs): Promise<GetLineEventsResponse | undefined> {
+    const response = queryLineEvents(prop)
       .then((data) => data)
       .catch((err) => {
         console.log('CreditLineService: error fetching line events', err);
@@ -485,8 +492,8 @@ export class CreditLineServiceImpl implements CreditLineService {
     return response;
   }
 
-  public async getLinePage(prop: GetLinePageProps): Promise<GetLinePageResponse | undefined> {
-    const response = getLinePage(prop)
+  public async getLinePage(prop: GetLinePageArgs): Promise<GetLinePageResponse | undefined> {
+    const response = queryLinePage(prop)
       .then((data) => data)
       .catch((err) => {
         console.log('CreditLineService: error fetching line page data', err);
@@ -496,8 +503,8 @@ export class CreditLineServiceImpl implements CreditLineService {
     return response;
   }
 
-  public async getUserLinePositions(prop: GetUserLinesProps): Promise<any | undefined> {
-    const response = getLines(prop)
+  public async getUserLinePositions(prop: GetLinesArgs): Promise<any | undefined> {
+    const response = queryLines(prop)
       .then((data) => {
         console.log(data);
       })
@@ -508,8 +515,8 @@ export class CreditLineServiceImpl implements CreditLineService {
     return response;
   }
 
-  public async getUserPortfolio(prop: GetUserPortfolioProps): Promise<GetUserPortfolioResponse | undefined> {
-    const response = getUserPortfolio(prop)
+  public async getUserPortfolio(prop: GetUserPortfolioArgs): Promise<GetUserPortfolioResponse | undefined> {
+    const response = queryPortfolio(prop)
       .then((data) => data)
       .catch((err) => {
         console.log('CreditLineService error fetching user portfolio', err);

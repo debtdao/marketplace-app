@@ -41,7 +41,7 @@ const { MAINNET_GRAPH_API_URL, GOERLI_GRAPH_API_URL, GNOSIS_GRAPH_API_URL, GRAPH
 const { BLACKLISTED_LINES: blacklist } = getConstants();
 
 // utility function get MAINNET_GRAPH_API_URL based on network parameter
-const getGraphURL = (network: string) => {
+const getGraphURL = (network: Network) => {
   if (network === 'mainnet') {
     return MAINNET_GRAPH_API_URL;
   } else if (network === 'goerli') {
@@ -51,17 +51,23 @@ const getGraphURL = (network: string) => {
   }
 };
 
-let client: any;
-export const getClient = (network: string) => (client ? client : createClient(network));
+const clients: { [key: string]: ApolloClient<{}> | null } = {
+  mainnet: null,
+  goerli: null,
+  gnosis: null,
+};
+
+export const getClient = (network: Network): ApolloClient<{}> =>
+  clients[network] ? clients[network]! : createClient(network);
 const createClient = (network: string): ApolloClient<{}> => {
   const graphApiUrL = getGraphURL(network);
-  client = new ApolloClient({
+  clients[network] = new ApolloClient({
     uri: graphApiUrL,
     cache: new InMemoryCache({
       possibleTypes,
     }),
   });
-  return client;
+  return clients[network]!;
 };
 
 let priceFeedClient: any;
@@ -88,10 +94,10 @@ const createPriceFeedClient = (isOracle?: boolean): typeof ApolloClient => {
  *        1. for creating curried func and 2. for defining arg/return types of that func
  */
 export const createQuery =
-  (query: DocumentNode, path?: string, network?: string, isOracle?: boolean): Function =>
-  <A, R>(variables: A): Promise<QueryResponse<R>> =>
+  (query: DocumentNode, path?: string, isOracle?: boolean): Function =>
+  <A, R>(network: string, variables: A): Promise<QueryResponse<R>> =>
     new Promise(async (resolve, reject) => {
-      const client = isOracle ? getPriceFeedClient() : getClient(network!);
+      const client = isOracle ? getPriceFeedClient() : getClient(network);
       client
         .query({ query, variables })
         .then((result: QueryResult) => {
@@ -108,34 +114,33 @@ export const createQuery =
 
 const getLineQuery = createQuery(GET_LINE_QUERY);
 export const getLine: QueryCreator<GetLineArgs, SecuredLine> = <GetLineArgs, SecuredLine>(
-  arg: GetLineArgs
-): QueryResponse<SecuredLine> => getLineQuery(arg);
+  arg: any
+): QueryResponse<SecuredLine> => getLineQuery(arg.network, arg);
 
 const getLinePageQuery = createQuery(GET_LINE_PAGE_QUERY, 'lineOfCredit');
 export const getLinePage: QueryCreator<GetLinePageArgs, GetLinePageResponse> = <GetLinePageArgs, GetLinePageResponse>(
-  arg: GetLinePageArgs
-): QueryResponse<GetLinePageResponse> => getLinePageQuery(arg);
+  arg: any
+): QueryResponse<GetLinePageResponse> => getLinePageQuery(arg.network, arg);
 
 const getLinesQuery = createQuery(GET_LINES_QUERY, 'lineOfCredits');
 export const getLines: QueryCreator<GetLinesArgs, GetLinesResponse[]> = <GetLinesArgs, GetLinesResponse>(
-  arg: GetLinesArgs
-): QueryResponse<GetLinesResponse[]> => getLinesQuery({ ...arg, blacklist });
+  arg: any
+): QueryResponse<GetLinesResponse[]> => getLinesQuery(arg.network, { ...arg, blacklist });
 
 const getLineEventsQuery = createQuery(GET_LINE_EVENTS_QUERY, 'lineOfCredit');
 export const getLineEvents: QueryCreator<GetLineEventsArgs, GetLineEventsResponse> = <
   GetLineEventsArgs,
   GetLineEventsResponse
 >(
-  arg: GetLineEventsArgs
-): QueryResponse<GetLineEventsResponse> => getLineEventsQuery(arg);
+  arg: any
+): QueryResponse<GetLineEventsResponse> => getLineEventsQuery(arg.network, arg);
 
-const getSupportedOracleTokensQuery = createQuery(GET_SUPPORTED_ORACLE_TOKENS_QUERY, undefined, undefined, true);
+const getSupportedOracleTokensQuery = createQuery(GET_SUPPORTED_ORACLE_TOKENS_QUERY, undefined, true);
 export const getSupportedOracleTokens: QueryCreator<
   undefined,
   SupportedOracleTokenResponse | undefined
 > = (): QueryResponse<SupportedOracleTokenResponse | undefined> => getSupportedOracleTokensQuery();
 
 const getUserPortfolioQuery = createQuery(GET_USER_PORTFOLIO_QUERY);
-export const getUserPortfolio: QueryCreator<GetUserPortfolioArgs, GetUserPortfolioResponse> = (
-  arg: GetUserPortfolioArgs
-) => getUserPortfolioQuery(arg);
+export const getUserPortfolio: QueryCreator<GetUserPortfolioArgs, GetUserPortfolioResponse> = (arg: any) =>
+  getUserPortfolioQuery(arg.network, arg);

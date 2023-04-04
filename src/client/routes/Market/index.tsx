@@ -106,18 +106,16 @@ export const Market = () => {
 
   let ctaButtonText = userWallet ? `${t('market:banner.cta-borrower')}` : `${t('components.connect-button.connect')}`;
 
+  const isEmptyMarket =
+    _.isEmpty(lineCategoriesForDisplay) ||
+    !_.reduce(
+      Object.values(lineCategoriesForDisplay).map((cat) => _.isEmpty(cat) || !cat[0]),
+      (x, y) => x && y
+    ); // fails if any category is empty
+
+  console.log('new lin category', isEmptyMarket, lineCategoriesForDisplay);
   return (
     <ViewContainer>
-      {addCreditStatus.loading && (
-        <div>
-          <p>.... loading......</p>
-        </div>
-      )}
-      {addCreditStatus.error && (
-        <div>
-          <p>.... ERROR: {addCreditStatus.error}</p>
-        </div>
-      )}
       <StyledSliderCard
         header={t('market:banner.title')}
         Component={
@@ -149,26 +147,24 @@ export const Market = () => {
         background={<img src={DebtDAOBanner} alt={'Debt DAO Banner?'} />}
       />
 
-      {getLinesStatus.loading || (_.isEmpty(lineCategoriesForDisplay) && ALL_NETWORKS.includes(currentNetwork)) ? (
+      {getLinesStatus.loading || (!isEmptyMarket && ALL_NETWORKS.includes(currentNetwork)) ? (
         <SpinnerLoading flex="1" width="100%" />
       ) : (
-        Object.entries(lineCategoriesForDisplay!)
-          .filter(([_, v]) => !!v)
-          .map(([key, val]: [string, SecuredLine[]], i: number) => {
-            return (
-              <StyledRecommendationsCard
-                header={t(key)}
-                key={key}
-                items={
-                  val.map(({ id, ...stuff }) => ({
-                    ...stuff,
-                    icon: '',
-                    onAction: () => history.push(`/${currentNetwork}/lines/${id}`),
-                  })) as Item[]
-                }
-              />
-            );
-          })
+        Object.entries(lineCategoriesForDisplay!).map(([key, val]: [string, SecuredLine[]], i: number) => {
+          return (
+            <StyledRecommendationsCard
+              header={t(key)}
+              key={key}
+              items={
+                val.map(({ id, ...stuff }) => ({
+                  ...stuff,
+                  icon: '',
+                  onAction: () => history.push(`/${currentNetwork}/lines/${id}`),
+                })) as Item[]
+              }
+            />
+          );
+        })
       )}
       {/**/}
       {/* TODO keep this UI but populate with state.lines.linesMap */}

@@ -30,6 +30,7 @@ import {
   GetLineEventsArgs,
   GetLinesResponse,
   GetLinePageResponse,
+  GetUserPortfolioArgs,
   SecuredLineWithEvents,
   SupportedOracleTokenResponse,
   GetUserPortfolioResponse,
@@ -157,12 +158,12 @@ export interface InterestRateCreditService {
 }
 
 export interface CreditLineService {
-  getLine: (props: GetLineProps) => Promise<SecuredLine | undefined>;
-  getLines: (props: GetLinesProps) => Promise<GetLinesResponse[] | undefined>;
-  getLineEvents: (props: GetLineEventsProps) => Promise<GetLineEventsResponse | undefined>;
-  getLinePage: (props: GetLinePageProps) => Promise<GetLinePageResponse | undefined>;
+  getLine: (props: GetLineArgs) => Promise<SecuredLine | undefined>;
+  getLines: (props: GetLinesArgs) => Promise<GetLinesResponse[] | undefined>;
+  getLineEvents: (props: GetLineEventsArgs) => Promise<GetLineEventsResponse | undefined>;
+  getLinePage: (props: GetLinePageArgs) => Promise<GetLinePageResponse | undefined>;
   getUserLinePositions: (...args: any) => Promise<any | undefined>;
-  getUserPortfolio: (props: GetUserPortfolioProps) => Promise<GetUserPortfolioResponse | undefined>;
+  getUserPortfolio: (props: GetUserPortfolioArgs) => Promise<GetUserPortfolioResponse | undefined>;
   getExpectedTransactionOutcome: (...args: any) => Promise<any | undefined>;
 
   // Repay from wallet
@@ -328,27 +329,27 @@ export interface InterestRateAccrueInterestProps {
   facilityBalance: BigNumber;
 }
 
-export interface GetLineProps extends GetLineArgs {
+export interface GetLineProps {
   id: string;
-  network: Network;
 }
 
-export interface GetLinesProps extends GetLinesArgs {
-  network: Network;
+export interface GetLinesProps {
+  first: number;
+  orderBy: string;
+  orderDirection: 'asc' | 'desc';
+  currentTime: number;
 }
 
-export interface GetUserLinesProps extends GetLinesArgs {
+export interface GetUserLinesProps {
   walletAddress: Address;
 }
 
-export interface GetLineEventsProps extends GetLineEventsArgs {
+export interface GetLineEventsProps {
   id: string;
-  network: Network;
 }
 
-export interface GetLinePageProps extends GetLinePageArgs {
+export interface GetLinePageProps {
   id: string;
-  network: Network;
 }
 
 export interface GetUserLineProps {

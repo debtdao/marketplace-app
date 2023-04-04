@@ -26,10 +26,7 @@ const disableService = createAction<{ service: ExternalServiceId }>('app/disable
 /* -------------------------------------------------------------------------- */
 
 const clearAppData = createAsyncThunk<void, void, ThunkAPI>('app/clearAppData', async (_, { dispatch }) => {
-  await Promise.all([
-    dispatch(TokensActions.clearTokensData()),
-    // dispatch(LabsActions.clearLabsData()),
-  ]);
+  await Promise.all([dispatch(TokensActions.clearTokensData())]);
 });
 
 const clearUserAppData = createAsyncThunk<void, void, ThunkAPI>('app/clearUserAppData', async (_, { dispatch }) => {

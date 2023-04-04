@@ -4,7 +4,7 @@
             "lineFactory": "0x6934fa7c8ce29ac6c14cd707926fa2539b5cf4cc"
         },
         "mainnet": {
-            "lineFactory": "0xe725e25961e04E685A573B1587F8297aC233cD07"
+            "lineFactory": "0xc9eF6509A09b92043cedce689DfAA760048aBd7F"
         },
         "goerli":{
             "lineFactory": "0x400C6ec8B915e5703E043AA646EA5cb225288D6c"

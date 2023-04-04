@@ -158,9 +158,6 @@ export const Navbar = ({
     };
   });
 
-  // console.log('network options', networkOptions, walletNetwork, walletNetworkName);
-  // debugger;
-
   const dropdownSelectedWalletNetwork = {
     value: walletNetwork,
     label: walletNetworkName,
@@ -172,8 +169,6 @@ export const Navbar = ({
   const titleText = secondTitleEnabled ? <>{title}&nbsp;/&nbsp;</> : title;
   const isThisGoerli = isGoerli(walletNetwork);
 
-  console.log('network options', networkOptions, walletNetwork, networkOptions.includes(walletNetwork));
-  debugger;
   return (
     <div>
       <StyledNavbar className={className}>

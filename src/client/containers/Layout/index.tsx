@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 
 import {
@@ -92,6 +92,7 @@ export const Layout: FC = ({ children }) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
   const location = useLocation();
+  const history = useHistory();
   const { SUPPORTED_NETWORKS, ALL_NETWORKS } = getConfig();
   const { isMobile } = useWindowDimensions();
   const partner = useAppSelector(PartnerSelectors.selectPartnerState);
@@ -153,7 +154,16 @@ export const Layout: FC = ({ children }) => {
 
     // Clear Redux state when switching networks
     if (previousNetwork) {
-      window.location.reload();
+      console.log('reloading on new network', previousNetwork, currentNetwork);
+      debugger;
+      // window.location.reload();
+      const newMarket = `/${currentNetwork}/market/`;
+      dispatch(
+        AppActions.navigate({
+          onNavigate: () => history.push(newMarket),
+          to: newMarket,
+        })
+      );
       // dispatch(AppActions.clearAppData());
       // dispatch(LinesActions.clearLinesData());
       // dispatch(LinesActions.clearLineStatus({ lineAddress: selectedLineAddress! }));

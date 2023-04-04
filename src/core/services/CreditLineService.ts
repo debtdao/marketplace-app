@@ -47,7 +47,6 @@ import { decodeErrorData } from '@src/utils/decodeError';
 const { MAINNET_GRAPH_API_URL } = getConfig();
 
 export class CreditLineServiceImpl implements CreditLineService {
-  private graphUrl: string;
   private web3Provider: Web3Provider;
   private transactionService: TransactionService;
   private config: Config;
@@ -67,7 +66,6 @@ export class CreditLineServiceImpl implements CreditLineService {
     this.web3Provider = web3Provider;
     this.config = config;
 
-    this.graphUrl = MAINNET_GRAPH_API_URL || 'https://api.thegraph.com';
     this.abi = SecuredLineABI;
   }
 

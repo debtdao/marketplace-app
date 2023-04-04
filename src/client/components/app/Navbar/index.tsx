@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import _ from 'lodash';
 
 import { ConnectWalletButton } from '@components/app';
-import { OptionList, EthereumIcon, ArbitrumIcon, Link } from '@components/common';
+import { OptionList, EthereumIcon, GnosisIcon, ArbitrumIcon, Link } from '@components/common';
 import { WalletSelectors } from '@src/core/store';
 import { useAppSelector, useWindowDimensions } from '@hooks';
 import { Network } from '@types';
@@ -104,6 +104,8 @@ const getNetworkIcon = (network: Network) => {
   switch (network) {
     case 'mainnet':
       return EthereumIcon;
+    case 'gnosis':
+      return GnosisIcon;
     case 'goerli':
       return EthereumIcon;
     case 'arbitrum':
@@ -170,6 +172,8 @@ export const Navbar = ({
   const titleText = secondTitleEnabled ? <>{title}&nbsp;/&nbsp;</> : title;
   const isThisGoerli = isGoerli(walletNetwork);
 
+  console.log('network options', networkOptions, walletNetwork, networkOptions.includes(walletNetwork));
+  debugger;
   return (
     <div>
       <StyledNavbar className={className}>

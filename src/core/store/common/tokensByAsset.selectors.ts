@@ -46,6 +46,8 @@ export const selectDepositTokenOptionsByAsset = createSelector(
       const isThisGoerli = isGoerli(currentNetwork);
       if (isThisGoerli) {
         return testTokens;
+      } else if (currentNetwork === 'gnosis') {
+        return testTokens;
       } else {
         const mainTokens = Object.values(TOKEN_ADDRESSES)
           .filter((address) => !!tokensMap[address] && (allowEth ? true : address !== ETHEREUM_ADDRESS))

@@ -50,6 +50,12 @@ export interface LogAppAnalyticsActionProps {
   data: TrackEventData | TrackExternalNavigationEvent | TrackInternalNavigationEvent;
 }
 
+export interface NavigateActionProps {
+  onNavigate: Function; // callback to react router histrory for navigating
+  to: string; // path or url to navigate to
+  target?: string; // html <a> tag target
+}
+
 // Navigation Events
 
 // Auth Events

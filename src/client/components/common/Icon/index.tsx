@@ -35,6 +35,7 @@ import { ReactComponent as ErrorIcon } from '@assets/icons/error.svg';
 import { ReactComponent as RedirectIcon } from '@assets/icons/redirect.svg';
 // NOTE NETWORK Icons
 import { ReactComponent as EthereumIcon } from '@assets/icons/networks/ethereum.svg';
+import { ReactComponent as GnosisIcon } from '@assets/icons/networks/gnosis.svg';
 import { ReactComponent as ArbitrumIcon } from '@assets/icons/networks/arbitrum.svg';
 import { ReactComponent as EtherscanIcon } from '@assets/icons/etherscan.svg';
 import { ReactComponent as FtmscanIcon } from '@assets/icons/ftmscan.svg';
@@ -97,6 +98,7 @@ export {
   WalletMissingIcon,
   ConstructionIcon,
   EthereumIcon,
+  GnosisIcon,
   ArbitrumIcon,
   AddCircleIcon,
   AddIcon,

@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { Provider } from 'react-redux';
 import { createGlobalStyle } from 'styled-components';
+import * as Sentry from '@sentry/react';
 import { ApolloProvider } from '@apollo/client';
 import '@i18n';
 

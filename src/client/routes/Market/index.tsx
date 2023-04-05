@@ -109,11 +109,12 @@ export const Market = () => {
   const isEmptyMarket =
     _.isEmpty(lineCategoriesForDisplay) ||
     !_.reduce(
+      // check if array exists or if has null els
       Object.values(lineCategoriesForDisplay).map((cat) => _.isEmpty(cat) || !cat[0]),
+      // fails if any category is empty
       (x, y) => x && y
-    ); // fails if any category is empty
+    );
 
-  console.log('new lin category', isEmptyMarket, lineCategoriesForDisplay);
   return (
     <ViewContainer>
       <StyledSliderCard

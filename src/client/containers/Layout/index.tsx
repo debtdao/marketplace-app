@@ -141,7 +141,7 @@ export const Layout: FC = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (targetNetwork !== currentNetwork) {
+    if (ALL_NETWORKS.includes(targetNetwork) && targetNetwork !== currentNetwork) {
       dispatch(NetworkActions.changeNetwork({ network: targetNetwork }));
       const to = `${targetNetwork}${path.join('')}`;
       dispatch(AppActions.navigate({ to, onNavigate: () => history.push(to) }));
@@ -158,10 +158,6 @@ export const Layout: FC = ({ children }) => {
 
   useEffect(() => {
     if (activeModal) dispatch(ModalsActions.closeModal());
-
-    console.log('target network', targetNetwork, currentNetwork, path);
-
-    debugger;
 
     // Clear Redux state when switching networks
     if (previousNetwork) {

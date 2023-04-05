@@ -7,6 +7,7 @@ export interface Env {
   ENV: string;
   VERSION: string;
   NETWORK: Network;
+  SENTRY_DSN: string | undefined;
   CUSTOM_PROVIDER_HTTPS: string;
   USE_MAINNET_FORK: boolean;
   USE_SDK_MOCK: boolean;

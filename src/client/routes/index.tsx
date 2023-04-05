@@ -2,8 +2,8 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-d
 
 import { Layout } from '@containers';
 import { NetworkSelectors } from '@src/core/store';
-
-import { useAppSelector } from '../hooks';
+import { useAppSelector, useAppTranslation } from '@hooks';
+import { ErrorBoundary } from '@components/app/ErrorBoundary';
 
 import { Portfolio } from './Portfolio';
 import { LineDetail } from './LineDetail';
@@ -42,24 +42,28 @@ const routes = [
 
 export const Routes = () => {
   const currentNetwork = useAppSelector(NetworkSelectors.selectCurrentNetwork);
-  return (
-    <Router basename="/#">
-      <Switch>
-        <Route exact path="/health" component={Health} />
+  const { t } = useAppTranslation(['errors']);
 
-        <Route>
-          <Layout>
-            <Switch>
-              {routes.map((route, index) => {
-                return <Route key={index} exact path={route.path} component={route.component} />;
-              })}
-              <Route path="*">
-                <Redirect to={`/${currentNetwork}/market`} />
-              </Route>
-            </Switch>
-          </Layout>
-        </Route>
-      </Switch>
-    </Router>
+  return (
+    <ErrorBoundary message={t('errors:global-app-error')} boundaryId="global">
+      <Router basename="/#">
+        <Switch>
+          <Route exact path="/health" component={Health} />
+
+          <Route>
+            <Layout>
+              <Switch>
+                {routes.map((route, index) => {
+                  return <Route key={index} exact path={route.path} component={route.component} />;
+                })}
+                <Route path="*">
+                  <Redirect to={`/${currentNetwork}/market`} />
+                </Route>
+              </Switch>
+            </Layout>
+          </Route>
+        </Switch>
+      </Router>
+    </ErrorBoundary>
   );
 };

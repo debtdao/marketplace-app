@@ -65,7 +65,6 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
 
     // clear old app data
     dispatch(LinesActions.clearLinesData());
-    dispatch(AppActions.clearAppData());
     if (wallet.selectedAddress) {
       dispatch(LinesActions.clearUserData());
       dispatch(AppActions.clearUserAppData());

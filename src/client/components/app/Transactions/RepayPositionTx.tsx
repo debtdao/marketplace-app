@@ -131,7 +131,6 @@ export const RepayPositionTx: FC<RepayPositionProps> = (props) => {
   // @cleanup TODO only use sell token for claimAndRepay/Trade. use selectedPosition.token for everything else
   const { selectedSellToken, sourceAssetOptions } = useSelectedSellToken({
     selectedSellTokenAddress: initialToken,
-    // selectedVaultOrLab: useAppSelector(VaultsSelectors.selectRecommendations)[0],
     allowTokenSelect: true,
     allowEth: true,
   });

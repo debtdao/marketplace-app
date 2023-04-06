@@ -87,6 +87,8 @@ const tokensReducer = createReducer(tokensInitialState, (builder) => {
     })
     .addCase(getTokens.fulfilled, (state, { payload: { tokensData } }) => {
       const tokenAddresses: string[] = [];
+
+      console.log('getTokens', tokensData);
       tokensData.forEach((token) => {
         const checkSumAddress = utils.getAddress(token.address);
         state.tokensMap[checkSumAddress] = token;

@@ -186,10 +186,7 @@ const linesReducer = createReducer(linesInitialState, (builder) => {
       state.statusMap.getInterestAccrued = { loading: true };
     })
     .addCase(getInterestAccrued.fulfilled, (state, { payload: { amount, lineAddress, id } }) => {
-      // if (lineData) {
-      //   state.linesMap = { ...state.linesMap, [lineData.id]: lineData };
-      // }
-      // state.statusMap.getLine = {};
+      state.statusMap.getInterestAccrued = {};
       state.positionsMap[id].interestAccrued = amount;
     })
     .addCase(getInterestAccrued.rejected, (state, { error }) => {

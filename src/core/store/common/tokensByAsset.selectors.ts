@@ -43,8 +43,11 @@ export const selectDepositTokenOptionsByAsset = createSelector(
   ) =>
     memoize((allowEth: boolean = false): TokenView[] => {
       const { userTokensMap, userTokensAllowancesMap } = tokensUser;
-      const isThisGoerli = isGoerli(currentNetwork);
-      if (isThisGoerli) {
+      // console.log('select tokens', currentNetwork, supportedTokensMap, tokensMap);
+
+      if (isGoerli(currentNetwork)) {
+        return testTokens;
+      } else if (currentNetwork === 'gnosis') {
         return testTokens;
       } else {
         const mainTokens = Object.values(TOKEN_ADDRESSES)
@@ -64,6 +67,8 @@ export const selectDepositTokenOptionsByAsset = createSelector(
             return createToken({ tokenData, userTokenData, allowancesMap });
           });
         const sortedSubgraphTokens = sortBy(subgraphTokens, (o) => o.symbol);
+        // console.log('tokens', mainTokens, subgraphTokens, sortedSubgraphTokens);
+
         // Return a list of supported tokens with mainTokens (e.g. ETH, WETH, DAI, etc.)
         // coming before subgraphTokens (e.g. AAVE, LINK, etc.) with both indepently sorted
         // from A-Z

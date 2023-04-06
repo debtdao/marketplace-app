@@ -8,6 +8,7 @@
     "featured": {
       "highest-credit": "Highest Credit",
       "highest-revenue": "Most Revenue",
-      "newest": "New"
+      "newest": "New",
+      "repaid": "Recently Repaid"
     }
 }

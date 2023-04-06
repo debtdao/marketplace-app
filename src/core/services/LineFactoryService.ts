@@ -12,7 +12,6 @@ import { TransactionResponse } from '../types';
 import { LineFactoryABI } from './contracts';
 
 export class LineFactoryServiceImpl {
-  private graphUrl: string;
   private web3Provider: Web3Provider;
   private transactionService: TransactionService;
   private config: Config;
@@ -32,8 +31,7 @@ export class LineFactoryServiceImpl {
     this.transactionService = transactionService;
     this.web3Provider = web3Provider;
     this.config = config;
-    const { GRAPH_API_URL } = getConfig();
-    this.graphUrl = GRAPH_API_URL || 'https://api.thegraph.com';
+    const { MAINNET_GRAPH_API_URL } = getConfig();
     this.abi = LineFactoryABI;
   }
 
@@ -73,11 +71,11 @@ export class LineFactoryServiceImpl {
     ttl: number;
     network: Network;
   }): Promise<ethers.providers.TransactionResponse | PopulatedTransaction> {
-    const { borrower, ttl } = props;
-    // console.log(props);
+    const { borrower, ttl, network } = props;
+    console.log('deploy line', props);
     return <TransactionResponse>(
       await this.executeContractMethod(
-        getLineFactoryforNetwork(props.network),
+        getLineFactoryforNetwork(network),
         'deploySecuredLine',
         [borrower, ttl],
         props.network,
@@ -95,7 +93,7 @@ export class LineFactoryServiceImpl {
   }): Promise<[transaction: TransactionResponse | PopulatedTransaction, lineAddress: string]> {
     const { borrower, ttl, cratio, revenueSplit, network } = props;
     const tx = await this.executeContractMethod(
-      getLineFactoryforNetwork(props.network),
+      getLineFactoryforNetwork(network),
       'deploySecuredLineWithConfig',
       [{ borrower, ttl: ttl.toString(), cratio: cratio.toString(), revenueSplit: revenueSplit.toString() }],
       network,
@@ -150,14 +148,17 @@ export class LineFactoryServiceImpl {
     dryRun: boolean
   ) {
     let props: ExecuteTransactionProps | undefined = undefined;
+
     try {
       props = {
-        network: network,
+        network,
         args: params,
         methodName: methodName,
         abi: this.abi,
-        contractAddress: contractAddress,
+        contractAddress,
       };
+
+      console.log('execute line factory func', props);
 
       let tx;
       tx = await this.transactionService.execute(props);

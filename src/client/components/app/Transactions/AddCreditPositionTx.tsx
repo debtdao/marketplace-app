@@ -72,7 +72,6 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const dispatch = useAppDispatch();
   const history = useHistory();
 
-  //in case user is on Goerli Testnet, we set up a testnet state:
   const userMetadata = useAppSelector(LinesSelectors.selectUserPositionMetadata);
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const selectedPosition = useAppSelector(LinesSelectors.selectSelectedPosition);

@@ -15,7 +15,7 @@ import {
   GetLineArgs,
   GetLinesArgs,
   GetLineEventsArgs,
-  GetLinePageArgs,
+  GetLinePageProps,
   AddCreditProps,
   UseCreditLinesParams,
   BorrowCreditProps,
@@ -31,6 +31,8 @@ import {
   MarketPageData,
   GetLineEventsResponse,
   SetRatesProps,
+  GetLineProps,
+  GetLinesProps,
 } from '@types';
 import {
   formatGetLinesData,
@@ -88,13 +90,13 @@ const clearLineStatus = createAction<{ lineAddress: string }>('lines/clearLineSt
 //   }
 // );
 
-const getLine = createAsyncThunk<{ lineData: SecuredLine | undefined }, GetLineArgs, ThunkAPI>(
+const getLine = createAsyncThunk<{ lineData: SecuredLine | undefined }, GetLineProps, ThunkAPI>(
   'lines/getLine',
   async (params, { getState, extra }) => {
     const { wallet } = getState();
     const network = getNetwork(wallet.networkVersion);
     const { creditLineService } = extra.services;
-    const lineData = await creditLineService.getLine({ network: network, ...params });
+    const lineData = await creditLineService.getLine({ ...params, network });
     return { lineData };
   }
 );
@@ -105,19 +107,22 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
     const state: RootState = getState();
     const {
       wallet,
+      network: { current },
       tokens: { tokensMap },
     } = state;
     const { creditLineService, onchainMetaDataService } = extra.services;
     const network = getNetwork(wallet.networkVersion);
+    // const network = current;
     const tokenPrices = TokensSelectors.selectTokenPrices(state);
 
+    console.log('network to getLines', network, wallet.networkVersion, getNetwork(wallet.networkVersion));
     // ensure consistent ordering of categories
     const categoryKeys = Object.keys(categories);
     const promises = await Promise.all(
       categoryKeys
         .map((k) => categories[k])
-        .map((params: GetLinesArgs) => {
-          return creditLineService.getLines({ network, ...params });
+        .map((params: GetLinesProps) => {
+          return creditLineService.getLines({ ...params, network });
         })
     );
 
@@ -142,7 +147,7 @@ const getLines = createAsyncThunk<{ linesData: { [category: string]: SecuredLine
   }
 );
 
-const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | undefined }, GetLinePageArgs, ThunkAPI>(
+const getLinePage = createAsyncThunk<{ linePageData: SecuredLineWithEvents | undefined }, GetLinePageProps, ThunkAPI>(
   'lines/getLinePage',
   async ({ id }, { getState, extra, dispatch }) => {
     const state: RootState = getState();
@@ -201,10 +206,13 @@ const getUserPortfolio = createAsyncThunk<
   { user: string },
   ThunkAPI
 >('lines/getUserPortfolio', async ({ user }, { extra, getState }) => {
+  const {
+    network: { current },
+  } = getState();
   const { creditLineService } = extra.services;
   const tokenPrices = TokensSelectors.selectTokenPrices(getState());
 
-  const userPortfolio = await creditLineService.getUserPortfolio({ user });
+  const userPortfolio = await creditLineService.getUserPortfolio({ network: current, user });
   if (!userPortfolio) return { address: user, lines: {}, lenderPositions: {} };
 
   const { lines, positions: lenderPositions } = formatUserPortfolioData(userPortfolio, tokenPrices);
@@ -282,8 +290,12 @@ const deploySecuredLine = createAsyncThunk<void, DeploySecuredLineProps, ThunkAP
   'lines/deploySecredLine',
   async (deployData, { getState, extra }) => {
     const { lineFactoryService } = extra.services;
+    const {
+      network: { current },
+    } = getState();
     const deployedLineData = await lineFactoryService.deploySecuredLine({
       ...deployData,
+      network: current,
     });
 
     console.log('new secured line deployed. tx response', deployedLineData);
@@ -301,8 +313,12 @@ const deploySecuredLineWithConfig = createAsyncThunk<
   ThunkAPI
 >('lines/deploySecuredLineWithConfigProps', async (deployData, { getState, extra }) => {
   const { lineFactoryService, creditLineService } = extra.services;
+  const {
+    network: { current },
+  } = getState();
   const [deploySecuredLineWithConfigData, lineAddress] = await lineFactoryService.deploySecuredLineWtihConfig({
     ...deployData,
+    network: current,
   });
   const arbiterAddress = await creditLineService.arbiter(lineAddress);
   const lineObj: LineOfCredit = formatOptimisticLineData(lineAddress, arbiterAddress, deployData);

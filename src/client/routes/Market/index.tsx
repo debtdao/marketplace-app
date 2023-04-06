@@ -26,7 +26,7 @@ import { getEnv } from '@config/env';
 import { getDefaultLineCategories, getENS } from '@src/utils';
 import { getConstants } from '@src/config/constants';
 
-const { SUPPORTED_NETWORKS } = getConstants();
+const { SUPPORTED_NETWORKS, ALL_NETWORKS } = getConstants();
 
 const StyledRecommendationsCard = styled(RecommendationsCard)``;
 
@@ -92,6 +92,7 @@ export const Market = () => {
   }, []);
 
   const onLenderCtaClick = () => {
+    // TODO <Link> component
     window.open('https://debtdao.org/products/secured-line-of-credit', '_blank');
   };
 
@@ -105,18 +106,17 @@ export const Market = () => {
 
   let ctaButtonText = userWallet ? `${t('market:banner.cta-borrower')}` : `${t('components.connect-button.connect')}`;
 
+  const isEmptyMarket =
+    _.isEmpty(lineCategoriesForDisplay) ||
+    !_.reduce(
+      // check if array exists or if has null els
+      Object.values(lineCategoriesForDisplay).map((cat) => _.isEmpty(cat) || !cat[0]),
+      // fails if any category is empty
+      (x, y) => x && y
+    );
+
   return (
     <ViewContainer>
-      {addCreditStatus.loading && (
-        <div>
-          <p>.... loading......</p>
-        </div>
-      )}
-      {addCreditStatus.error && (
-        <div>
-          <p>.... ERROR: {addCreditStatus.error}</p>
-        </div>
-      )}
       <StyledSliderCard
         header={t('market:banner.title')}
         Component={
@@ -148,8 +148,7 @@ export const Market = () => {
         background={<img src={DebtDAOBanner} alt={'Debt DAO Banner?'} />}
       />
 
-      {getLinesStatus.loading ||
-      (_.isEmpty(lineCategoriesForDisplay) && SUPPORTED_NETWORKS.includes(currentNetwork)) ? (
+      {getLinesStatus.loading || (!isEmptyMarket && ALL_NETWORKS.includes(currentNetwork)) ? (
         <SpinnerLoading flex="1" width="100%" />
       ) : (
         Object.entries(lineCategoriesForDisplay!).map(([key, val]: [string, SecuredLine[]], i: number) => {

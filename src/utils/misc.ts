@@ -78,6 +78,7 @@ export const getDefaultLineCategories = () => {
     // using i18m translation as keys for easy display
     'market:featured.highest-credit': {
       first: 3,
+      status: 'ACTIVE',
       // NOTE: terrible proxy for total credit (oldest = most). Currently getLines only allows filtering by line metadata not modules'
       orderBy: 'start',
       orderDirection: 'asc',
@@ -85,6 +86,7 @@ export const getDefaultLineCategories = () => {
     },
     'market:featured.highest-revenue': {
       first: 16,
+      status: 'ACTIVE',
       // NOTE: terrible proxy for total revenue earned (highest % = highest notional). Currently getLines only allows filtering by line metadata not modules'
       orderBy: 'defaultSplit',
       orderDirection: 'desc',
@@ -92,7 +94,15 @@ export const getDefaultLineCategories = () => {
     },
     'market:featured.newest': {
       first: 15,
+      status: 'ACTIVE',
       orderBy: 'start', // NOTE: theoretically gets lines that start in the future, will have to refine query
+      orderDirection: 'desc',
+      currentTime: currentTime,
+    },
+    'market:featured.repaid': {
+      first: 15,
+      status: 'REPAID',
+      orderBy: 'end',
       orderDirection: 'desc',
       currentTime: currentTime,
     },

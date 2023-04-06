@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import _ from 'lodash';
 
 import { ConnectWalletButton } from '@components/app';
-import { OptionList, EthereumIcon, ArbitrumIcon, Link } from '@components/common';
+import { OptionList, EthereumIcon, GnosisIcon, ArbitrumIcon, Link } from '@components/common';
 import { WalletSelectors } from '@src/core/store';
 import { useAppSelector, useWindowDimensions } from '@hooks';
 import { Network } from '@types';
@@ -10,6 +10,8 @@ import { device } from '@themes/default';
 import { getConfig } from '@config';
 import { getConstants } from '@src/config/constants';
 import { isGoerli } from '@src/utils';
+
+const { SUPPORTED_NETWORKS } = getConstants();
 
 const StyledOptionList = styled(OptionList)`
   width: 15rem;
@@ -102,6 +104,8 @@ const getNetworkIcon = (network: Network) => {
   switch (network) {
     case 'mainnet':
       return EthereumIcon;
+    case 'gnosis':
+      return GnosisIcon;
     case 'goerli':
       return EthereumIcon;
     case 'arbitrum':
@@ -137,6 +141,7 @@ export const Navbar = ({
   onWalletClick,
   disableWalletSelect,
   selectedNetwork,
+  networkOptions,
   onNetworkChange,
   disableNetworkChange,
   hideDisabledControls,
@@ -146,10 +151,7 @@ export const Navbar = ({
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
   const walletNetworkName = useAppSelector(WalletSelectors.selectWalletNetworkName);
 
-  const { SUPPORTED_NETWORKS } = getConstants();
-
-  // TODO: goerli is not included in SUPPORTED_NETWORKS from config/constants because doing so causes issues with the Yearn SDK which does not support Goerli test network.
-  const SUPPORTED_NETWORK_OPTIONS = SUPPORTED_NETWORKS.concat('goerli').map((network) => {
+  const formattedOptions = networkOptions.map((network) => {
     return {
       value: network,
       label: NETWORK_SETTINGS[network].name ?? 'other',
@@ -187,7 +189,7 @@ export const Navbar = ({
               setSelected={(option) => onNetworkChange(option.value)}
               hideIcons={isMobile}
               disabled={disableNetworkChange}
-              options={SUPPORTED_NETWORK_OPTIONS}
+              options={formattedOptions}
             />
           )}
 
@@ -202,8 +204,7 @@ export const Navbar = ({
 
       {/* Display warning if not connected to supported network! */}
       {/* TODO: Add goerli to SUPPORTED_NETWORKS. Difficult to do because goerli is not supported by Yearn SDK. */}
-
-      {!(SUPPORTED_NETWORKS.includes(walletNetwork ?? 'other') || isThisGoerli) && (
+      {!(networkOptions.includes(walletNetwork ?? 'other') || isThisGoerli) && (
         <StyledNavbar warning={true}>
           {title && (
             <>

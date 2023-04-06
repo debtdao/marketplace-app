@@ -21,10 +21,12 @@ export const getNetwork = (networkId?: number | string): Network => {
 };
 
 export const getNetworkRpc = (network: Network): string => {
-  const { MAINNET_PROVIDER_HTTPS, ARBITRUM_PROVIDER_HTTPS, GOERLI_PROVIDER_HTTPS } = getConfig();
+  const { MAINNET_PROVIDER_HTTPS, ARBITRUM_PROVIDER_HTTPS, GOERLI_PROVIDER_HTTPS, GNOSIS_PROVIDER_HTTPS } = getConfig();
   switch (network) {
     case 'mainnet':
       return MAINNET_PROVIDER_HTTPS;
+    case 'gnosis':
+      return GNOSIS_PROVIDER_HTTPS;
     case 'arbitrum':
       return ARBITRUM_PROVIDER_HTTPS;
     case 'goerli':
@@ -40,6 +42,8 @@ export const getProviderType = (network: Network): ProviderType => {
       return 'ethereum';
     case 'arbitrum':
       return 'arbitrum';
+    case 'gnosis':
+      return 'gnosis';
     case 'goerli':
       return 'goerli';
     default:

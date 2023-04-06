@@ -46,9 +46,9 @@ import {
   CreditProposal,
   ProposalMap,
   LineOfCredit,
-  ACTIVE_STATUS,
   DeploySecuredLineWithConfigProps,
   AddCreditProps,
+  ACTIVE_STATUS,
   PROPOSED_STATUS,
 } from '@types';
 import { getConstants } from '@config/constants';
@@ -769,12 +769,18 @@ export const formatOptimisticProposal = (
 
 export const formatLineCategories = (lines: { [key: string]: SecuredLine }): { [key: string]: string[] } => {
   const highestCreditLines = _.map(
-    _.sortBy(lines, (line) => -Number(BigNumber.from(line.deposit).div(BASE_DECIMALS))).slice(0, 3),
+    _.sortBy(
+      _.filter(lines, ({ status }) => status === ACTIVE_STATUS),
+      (line) => -Number(BigNumber.from(line.deposit).div(BASE_DECIMALS))
+    ).slice(0, 6),
     'id'
   );
 
   const highestRevenueLines = _.map(
-    _.sortBy(lines, (line) => -Number(BigNumber.from(line!.spigot!.revenueValue).div(BASE_DECIMALS))).slice(0, 3),
+    _.sortBy(
+      _.filter(lines, ({ status }) => status === ACTIVE_STATUS),
+      (line) => -Number(BigNumber.from(line!.spigot!.revenueValue).div(BASE_DECIMALS))
+    ).slice(0, 6),
     'id'
   );
 

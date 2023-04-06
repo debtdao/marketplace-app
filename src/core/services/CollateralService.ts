@@ -42,7 +42,6 @@ import { EscrowABI } from './contracts';
 // import { SpigotABI } from './contracts';
 
 export class CollateralServiceImpl implements CollateralService {
-  private graphUrl: string;
   private web3Provider: Web3Provider;
   private transactionService: TransactionService;
   private creditLineService: CreditLineService;
@@ -66,8 +65,7 @@ export class CollateralServiceImpl implements CollateralService {
     this.creditLineService = creditLineService;
     this.web3Provider = web3Provider;
     this.config = config;
-    const { GRAPH_API_URL } = getConfig();
-    this.graphUrl = GRAPH_API_URL || 'https://api.thegraph.com';
+    const { MAINNET_GRAPH_API_URL } = getConfig();
     this.lineAbi = SecuredLineABI;
     this.spigotAbi = SpigotABI;
     this.escrowAbi = EscrowABI;

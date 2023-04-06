@@ -135,6 +135,8 @@ export const ClaimOperatorTokensTx: FC<ClaimOperatorTokensTxProps> = (props) => 
     const isThisGoerli = isGoerli(walletNetwork);
     if (isThisGoerli) {
       return testTokens.find((token) => token.address === address)!;
+    } else if (walletNetwork === 'gnosis') {
+      return testTokens.find((token) => token.address === address)!;
     } else {
       const tokenData = tokensMap[address];
       const userTokenData = {} as Balance;

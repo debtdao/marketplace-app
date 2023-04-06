@@ -27,7 +27,7 @@ export const CHAIN_IDS: { [key: number]: string } = {
   82: 'meter',
   87: 'nova network',
   88: 'tomochain',
-  100: 'xdai',
+  100: 'gnosis', // aka xdai
   106: 'velas',
   108: 'thundercore',
   122: 'fuse',

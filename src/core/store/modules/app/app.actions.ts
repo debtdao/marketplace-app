@@ -1,10 +1,11 @@
+import { useHistory } from 'react-router-dom';
 import { createAsyncThunk, createAction } from '@reduxjs/toolkit';
 
 import { ThunkAPI } from '@frameworks/redux';
 import { isGnosisApp, isLedgerLive, isCoinbaseApp, get } from '@utils';
 import { ExternalServiceId, EVENT_NAVIGATE_EXTERNAL_1ST_PARTY, EVENT_NAVIGATE_EXTERNAL_3RD_PARTY } from '@types';
 import { idUser, trackPage, trackAnalyticsEvent } from '@frameworks/segment';
-import { AnalyticsEventNames, LogAppAnalyticsActionProps } from '@src/core/types/ProductAnalytics';
+import { AnalyticsEventNames, LogAppAnalyticsActionProps, NavigateActionProps } from '@src/core/types/ProductAnalytics';
 
 import { WalletActions } from '../wallet/wallet.actions';
 import { TokensActions } from '../tokens/tokens.actions';
@@ -25,10 +26,7 @@ const disableService = createAction<{ service: ExternalServiceId }>('app/disable
 /* -------------------------------------------------------------------------- */
 
 const clearAppData = createAsyncThunk<void, void, ThunkAPI>('app/clearAppData', async (_, { dispatch }) => {
-  await Promise.all([
-    dispatch(TokensActions.clearTokensData()),
-    // dispatch(LabsActions.clearLabsData()),
-  ]);
+  await Promise.all([dispatch(TokensActions.clearTokensData())]);
 });
 
 const clearUserAppData = createAsyncThunk<void, void, ThunkAPI>('app/clearUserAppData', async (_, { dispatch }) => {
@@ -126,6 +124,46 @@ const checkExternalServicesStatus = createAsyncThunk<void, void, ThunkAPI>(
 /*                                Analytics                               */
 /* -------------------------------------------------------------------------- */
 
+const navigate = createAsyncThunk<void, NavigateActionProps, ThunkAPI>(
+  'app/logAnalytics',
+  async ({ onNavigate, to, target = '' }, { dispatch, getState, extra }) => {
+    const { wallet, ...state } = getState();
+    const eventData = { to, wallet, target };
+    const isInternal = to.startsWith('/') || window.location.host === to;
+    const isSubdomain =
+      to.split('.').length > 2 || // false positive on files (.pdf) but we want those in new tabs too"
+      to.includes('debtdao'); // other sites not on this domain
+
+    if (isInternal) {
+      dispatch(AppActions.logAppAnalytics({ type: 'page', data: { ...eventData } }));
+      onNavigate();
+      return;
+    } else if (isSubdomain) {
+      dispatch(
+        AppActions.logAppAnalytics({
+          type: 'track',
+          data: { eventName: EVENT_NAVIGATE_EXTERNAL_1ST_PARTY, ...eventData },
+        })
+      );
+      // external links are always opened in another tab
+      onNavigate();
+      // try focusing on our content if we opne it
+      // tab?.focus();
+      return;
+    } else {
+      dispatch(
+        AppActions.logAppAnalytics({
+          type: 'track',
+          data: { eventName: EVENT_NAVIGATE_EXTERNAL_3RD_PARTY, ...eventData },
+        })
+      );
+      // external links are always opened in another tab
+      onNavigate();
+      return;
+    }
+  }
+);
+
 const logAppAnalytics = createAsyncThunk<void, LogAppAnalyticsActionProps, ThunkAPI>(
   'app/logAnalytics',
   async ({ type, data }, { dispatch, getState, extra }) => {
@@ -172,6 +210,7 @@ export const AppActions = {
   clearUserAppData,
   initApp,
 
+  navigate,
   logAppAnalytics,
   // initSubscriptions,
 };

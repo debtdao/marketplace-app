@@ -25,8 +25,7 @@ export const useSelectedSellToken = ({
   allowEth,
 }: SelectedSellTokenProps): SelectedSellToken => {
   const sellTokensOptions = useAppSelector(selectDepositTokenOptionsByAsset)(allowEth);
-  const fullTokensOptions = sellTokensOptions.concat(testTokens); // @cleanup remove
-  const sellTokensOptionsMap = keyBy(fullTokensOptions, 'address');
+  const sellTokensOptionsMap = keyBy(sellTokensOptions, 'address');
 
   const selectedSellToken: TokenView | undefined = selectedSellTokenAddress
     ? sellTokensOptionsMap[ethers.utils.getAddress(selectedSellTokenAddress)]

@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 
 import {
@@ -92,7 +92,8 @@ export const Layout: FC = ({ children }) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
   const location = useLocation();
-  const { SUPPORTED_NETWORKS } = getConfig();
+  const history = useHistory();
+  const { SUPPORTED_NETWORKS, ALL_NETWORKS } = getConfig();
   const { isMobile } = useWindowDimensions();
   const partner = useAppSelector(PartnerSelectors.selectPartnerState);
   const selectedAddress = useAppSelector(WalletSelectors.selectSelectedAddress);
@@ -108,7 +109,8 @@ export const Layout: FC = ({ children }) => {
 
   // TODO: update how we get page name for a path to be more dynamic
   // const path = useAppSelector(({ route }) => route.path);
-  const path = getPageName(location.pathname) as Route;
+  const pathName = getPageName(location.pathname) as Route;
+  const [_, targetNetwork, ...path] = location.pathname.split('/');
 
   const isLedgerLive = partner.id === 'ledger';
   const isIframe = isInIframe();
@@ -116,10 +118,6 @@ export const Layout: FC = ({ children }) => {
   const hideOptionalLinks = isLedgerLive;
 
   let titleLink;
-  // TODO Add lab details route when its added the view
-
-  // TODO This is only assetAddress on the vault page
-  //const assetAddress: string | undefined = location.pathname.split('/')[2];
 
   // Used to check zapper api
   // const { ZAPPER_AUTH_TOKEN } = getConfig();
@@ -143,7 +141,21 @@ export const Layout: FC = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    dispatch(RouteActions.changeRoute({ path: location.pathname }));
+    // console.log(
+    //   'Layout: refresh network?',
+    //   targetNetwork,
+    //   currentNetwork,
+    //   ALL_NETWORKS.includes(targetNetwork) && targetNetwork !== currentNetwork
+    // );
+
+    if (ALL_NETWORKS.includes(targetNetwork) && targetNetwork !== currentNetwork) {
+      dispatch(LinesActions.clearLinesData());
+      dispatch(NetworkActions.changeNetwork({ network: targetNetwork }));
+      const to = `${targetNetwork}${path.join('')}`;
+      dispatch(AppActions.navigate({ to, onNavigate: () => history.push(to) }));
+    } else {
+      dispatch(RouteActions.changeRoute({ path: location.pathname }));
+    }
   }, [location]);
 
   useEffect(() => {
@@ -157,20 +169,23 @@ export const Layout: FC = ({ children }) => {
 
     // Clear Redux state when switching networks
     if (previousNetwork) {
-      window.location.reload();
-      // dispatch(AppActions.clearAppData());
-      // dispatch(LinesActions.clearLinesData());
-      // dispatch(LinesActions.clearLineStatus({ lineAddress: selectedLineAddress! }));
-      // dispatch(LinesActions.clearSelectedLineAndStatus());
-      // dispatch(LinesActions.clearUserData());
+      // window.location.reload();
+      const newMarket = `/${currentNetwork}/market/`;
+      dispatch(
+        AppActions.navigate({
+          onNavigate: () => history.push(newMarket),
+          to: newMarket,
+        })
+      );
     }
-    if (selectedAddress) dispatch(AppActions.clearUserAppData());
 
     // Fetch lines data when switching networks
     // dispatch(LinesActions.getLines(defaultLineCategories));
     // dispatch(LinesActions.getLinePage({ id: selectedLineAddress! }));
     // dispatch(LinesActions.getUserPortfolio({ user: userWalletAddress! }));
     // dispatch(TokensActions.getTokens());
+
+    // TODO FIX should be in market page not general loader
     dispatch(TokensActions.getTokens()).then(() => dispatch(LinesActions.getLines(defaultLineCategories)));
     dispatch(TokensActions.getSupportedOracleTokens());
   }, [currentNetwork]);
@@ -183,7 +198,7 @@ export const Layout: FC = ({ children }) => {
 
       <Content collapsedSidebar={collapsedSidebar} useTabbar={isMobile}>
         <Navbar
-          title={t(`pages.${path}`)}
+          title={t(`pages.${pathName}`)}
           titleLink={titleLink}
           subTitle={''}
           walletAddress={selectedAddress}
@@ -192,7 +207,7 @@ export const Layout: FC = ({ children }) => {
           onWalletClick={() => dispatch(WalletActions.walletSelect({ network: currentNetwork }))}
           disableWalletSelect={hideControls || isCoinbaseApp()}
           selectedNetwork={currentNetwork}
-          networkOptions={SUPPORTED_NETWORKS}
+          networkOptions={ALL_NETWORKS}
           //
           onNetworkChange={(network) => dispatch(NetworkActions.changeNetwork({ network: network as Network }))}
           disableNetworkChange={hideControls}

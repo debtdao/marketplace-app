@@ -7,6 +7,7 @@ export interface Env {
   ENV: string;
   VERSION: string;
   NETWORK: Network;
+  SENTRY_DSN: string | undefined;
   CUSTOM_PROVIDER_HTTPS: string;
   USE_MAINNET_FORK: boolean;
   USE_SDK_MOCK: boolean;
@@ -19,8 +20,9 @@ export interface Env {
   PORTIS_KEY: string | undefined;
   SEGMENT_API_KEY: string | undefined;
   // ZAPPER_API_KEY: string | undefined;
-  GRAPH_API_URL: string | undefined;
-  GRAPH_TEST_API_URL: string | undefined;
+  MAINNET_GRAPH_API_URL: string | undefined;
+  GOERLI_GRAPH_API_URL: string | undefined;
+  GNOSIS_GRAPH_API_URL: string | undefined;
   GRAPH_CHAINLINK_FEED_REGISTRY_API_URL: string | undefined;
 }
 
@@ -35,6 +37,8 @@ export interface Constants {
   DEBT_DAO_API: string;
   DEBT_DAO_ALERTS_API: string;
   SUPPORTED_NETWORKS: Network[];
+  // Separate yearn networks with vs networks we added.
+  ALL_NETWORKS: Network[];
   CHAIN_IDS: {
     [KEY: number]: string;
   };
@@ -44,6 +48,7 @@ export interface Constants {
   NETWORK_SETTINGS: NetworkSettings;
   MAINNET_PROVIDER_HTTPS: string;
   MAINNET_PROVIDER_WSS: string;
+  GNOSIS_PROVIDER_HTTPS: string;
   GOERLI_PROVIDER_HTTPS: string;
   ARBITRUM_PROVIDER_HTTPS: string;
   BLACKLISTED_LINES: string[];

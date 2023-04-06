@@ -2,6 +2,7 @@ import { PopulatedTransaction } from 'ethers';
 
 import { LineStatusTypes, PositionStatusTypes, SpigotRevenueContract } from './CreditLine';
 import { Address, Network } from './Blockchain';
+import { GetLinesProps } from './Service';
 
 // 0x API
 
@@ -65,6 +66,7 @@ export type QueryArgOption = GetLineArgs | GetLinePageArgs | GetLinesArgs | unde
  */
 export interface GetLineArgs {
   id: Address;
+  network: Network;
 }
 
 /**
@@ -73,6 +75,7 @@ export interface GetLineArgs {
  */
 export interface GetLineEventsArgs {
   id: Address;
+  network: Network;
 }
 
 /**
@@ -81,10 +84,12 @@ export interface GetLineEventsArgs {
  */
 export interface GetLinePageArgs {
   id: Address;
+  network: Network;
 }
 
 export interface GetLinePageAuxArgs {
   id: Address;
+  network: Network;
 }
 
 /**
@@ -95,6 +100,7 @@ export interface GetLinePageAuxArgs {
  * @property {number} GetLinesArgs.currentTime - lines must end after this time
  */
 export interface GetLinesArgs {
+  network: Network;
   first: number;
   orderBy: string;
   orderDirection: 'asc' | 'desc';
@@ -107,11 +113,12 @@ export interface GetLinesArgs {
  */
 export interface GetUserPortfolioArgs {
   user: Address;
+  network: Network;
 }
 
 // React hook args wrapping these queries
 export interface UseCreditLinesParams {
-  [key: string]: GetLinesArgs;
+  [key: string]: GetLinesProps;
 }
 
 export interface UseCreditLineParams {

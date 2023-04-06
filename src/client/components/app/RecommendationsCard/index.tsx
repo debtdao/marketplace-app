@@ -168,15 +168,16 @@ export const RecommendationsCard = ({ header, subHeader, items, ...props }: Reco
                 </ItemName>
                 <Divider />
 
-                <Metric>
-                  ${humanize('amount', item.principal, 18, 2)} / ${humanize('amount', item.deposit, 18, 2)}
-                </Metric>
                 <MetricsTextContainer>
                   <MetricsText>
                     {' '}
-                    {t('components.line-card.total-debt')} / {t('components.line-card.total-credit')}{' '}
+                    {/* {t('components.line-card.total-debt')} / remove for simplicity */}
+                    {t('components.line-card.total-credit')}{' '}
                   </MetricsText>
                 </MetricsTextContainer>
+                <Metric>
+                  {/* ${humanize('amount', item.principal, 18, 2)} / */}${humanize('amount', item.deposit, 18, 2)}
+                </Metric>
                 <Divider />
 
                 <ItemInfoLabel>{t('components.line-card.secured-by')}:</ItemInfoLabel>

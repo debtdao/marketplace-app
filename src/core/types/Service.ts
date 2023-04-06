@@ -335,6 +335,7 @@ export interface GetLineProps {
 
 export interface GetLinesProps {
   first: number;
+  status: 'ACTIVE' | 'REPAID' | 'LIQUIDATABLE' | 'UNINITIALIZED' | 'INSOLVENT';
   orderBy: string;
   orderDirection: 'asc' | 'desc';
   currentTime: number;

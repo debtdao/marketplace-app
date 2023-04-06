@@ -63,12 +63,11 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
       return { network };
     }
 
-    // clear old app data
-    dispatch(LinesActions.clearLinesData());
-    if (wallet.selectedAddress) {
-      dispatch(LinesActions.clearUserData());
-      dispatch(AppActions.clearUserAppData());
-    }
+    // // clear old app data
+    // if (wallet.selectedAddress) {
+    //   dispatch(LinesActions.clearUserData());
+    //   dispatch(AppActions.clearUserAppData());
+    // }
 
     // Set Yearn context
     if (web3Provider.hasInstanceOf('wallet') && config.SUPPORTED_NETWORKS.includes(network)) {

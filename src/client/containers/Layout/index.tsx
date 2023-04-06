@@ -142,6 +142,7 @@ export const Layout: FC = ({ children }) => {
 
   useEffect(() => {
     if (ALL_NETWORKS.includes(targetNetwork) && targetNetwork !== currentNetwork) {
+      dispatch(LinesActions.clearLinesData());
       dispatch(NetworkActions.changeNetwork({ network: targetNetwork }));
       const to = `${targetNetwork}${path.join('')}`;
       dispatch(AppActions.navigate({ to, onNavigate: () => history.push(to) }));

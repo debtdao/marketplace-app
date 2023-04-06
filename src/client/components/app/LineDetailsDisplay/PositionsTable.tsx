@@ -31,6 +31,7 @@ import {
   CLOSED_STATUS,
   AggregatedEscrow,
   SecuredLine,
+  REPAID_STATUS,
 } from '@src/core/types';
 import { humanize, formatAddress, normalizeAmount, getENS } from '@src/utils';
 import { getEnv } from '@config/env';
@@ -515,7 +516,7 @@ export const PositionsTable = ({
           filterLabel="Show 0% APY"
           initialSortBy="deposit"
           onAction={() => console.log('action')}
-          hideActions={hideActions}
+          hideActions={selectedLine?.status === REPAID_STATUS || hideActions}
           wrap
         />
       </div>

@@ -239,6 +239,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       onClose={onClose}
       header={header || t('components.transaction.title')}
       subheader={t('components.transaction.deploy-line.subheader')}
+      learnMoreUrl="https://debtdao.org/products/secured-line-of-credit"
     >
       <TxAddressInput
         key={'credit-input'}

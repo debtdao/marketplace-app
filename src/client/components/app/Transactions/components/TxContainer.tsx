@@ -1,11 +1,13 @@
 import { FC } from 'react';
 import styled from 'styled-components';
+import { t } from 'i18next';
 
-import { Icon, CloseIcon } from '@components/common';
+import { Icon, CloseIcon, Link } from '@components/common';
 
 export interface TxContainerProps {
   header?: string;
   subheader?: string;
+  learnMoreUrl?: string;
   onClose?: () => void;
 }
 
@@ -40,10 +42,16 @@ const TxHeaderTitle = styled.h1`
   margin: 0;
 `;
 
-const TxSubheaderTitle = styled.h5`
+const ExplainerTextContainer = styled.div`
   color: ${({ theme }) => theme.colors.titles};
   font-size: 1.6rem;
   margin: 1.6rem 0;
+`;
+
+const TxSubheaderTitle = styled.h5``;
+
+const LearnMoreLink = styled(Link)`
+  text-decoration: underline;
 `;
 
 const TxContainerContent = styled.div`
@@ -76,7 +84,7 @@ const StyledTxContainer = styled.div`
   gap: ${({ theme }) => theme.txModal.gap};
 `;
 
-export const TxContainer: FC<TxContainerProps> = ({ header, subheader, onClose, children, ...props }) => {
+export const TxContainer: FC<TxContainerProps> = ({ header, subheader, learnMoreUrl, onClose, children, ...props }) => {
   let closeButton;
 
   if (onClose) {
@@ -95,7 +103,10 @@ export const TxContainer: FC<TxContainerProps> = ({ header, subheader, onClose, 
           <TxHeaderActions>{closeButton}</TxHeaderActions>
         </TxHeader>
       )}
-      {subheader && <TxSubheaderTitle>{subheader}</TxSubheaderTitle>}
+      <ExplainerTextContainer>
+        {subheader && <TxSubheaderTitle>{subheader}</TxSubheaderTitle>}
+        {learnMoreUrl && <LearnMoreLink to={learnMoreUrl}>{t('components.transaction.learn-more')}</LearnMoreLink>}
+      </ExplainerTextContainer>
 
       <TxContainerContent>{children}</TxContainerContent>
     </StyledTxContainer>

@@ -18,6 +18,7 @@ import { RepayPositionTxModal } from './RepayPositionTxModal';
 import { WithdrawCreditTxModal } from './WithdrawCreditTxModal';
 import { RevokeConsentTxModal } from './RevokeConsentTxModal';
 import { AddCollateralTxModal } from './AddCollateralTxModal';
+import { RequestCollateralTxModal } from './RequestCollateralTxModal';
 import { EnableSpigotTxModal } from './EnableSpigotTxModal';
 import { ClaimRevenueTxModal } from './ClaimRevenueTxModal';
 import { ReleaseCollateralTxModal } from './ReleaseCollateralTxModal';
@@ -194,6 +195,12 @@ export const Modals = () => {
       {activeModal === 'addCollateral' && (
         <CSSTransition key={'addCollateral'} timeout={modalTimeout} classNames="slideBottom">
           <AddCollateralTxModal onClose={closeModal} />
+        </CSSTransition>
+      )}
+
+      {activeModal === 'requestCollateral' && (
+        <CSSTransition key={'requestCollateral'} timeout={modalTimeout} classNames="slideBottom">
+          <RequestCollateralTxModal onClose={closeModal} />
         </CSSTransition>
       )}
 

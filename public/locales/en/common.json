@@ -126,6 +126,13 @@
         "enable-failed": "Could not add token as collateral",
         "cta": "Enable Asset"
       },
+      "request-collateral": {
+        "header": "Enable Collateral",
+        "select-token": "Select an asset",
+        "token-input-header": "Ask your Arbiter to whitelist collateral on Twitter",
+        "token-input-desc": "",
+        "cta": "Send Request"
+      },
       "oracle-price": "Oracle Price",
       "claim": "Claim",
       "deposit": "Deposit",

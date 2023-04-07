@@ -436,6 +436,11 @@ export const LineMetadata = (props: LineMetadataProps) => {
     }
   };
 
+  const requestCollateralHandler = (token: TokenView) => {
+    dispatch(CollateralActions.setSelectedCollateralAsset({ assetAddress: token.address }));
+    dispatch(ModalsActions.openModal({ modalName: 'requestCollateral', modalProps: { assetAddress: token.address } }));
+  };
+
   const addSpigotHandler = (token: TokenView) => {
     if (!walletIsConnected) {
       connectWallet();
@@ -493,7 +498,13 @@ export const LineMetadata = (props: LineMetadataProps) => {
   const getCollateralTableActions = () => {
     switch (userPositionMetadata.role) {
       case BORROWER_POSITION_ROLE:
-        return <></>;
+        return (
+          <>
+            <StyledButton onClick={requestCollateralHandler}>
+              {t('lineDetails:metadata.collateral-table.request-asset')}
+            </StyledButton>
+          </>
+        );
       case ARBITER_POSITION_ROLE:
         return (
           <>

@@ -134,6 +134,7 @@ const changeWalletTheme =
     }
   };
 
+// old Yearn code
 // export interface ChangeWalletNetworkResult {
 //   networkChanged: boolean;
 //   networkId: number;

@@ -264,7 +264,9 @@ export const TxTokenInput: FC<TxTokenInputProps> = ({
     ? t('components.transaction.token-input.search-select-vault')
     : t('components.transaction.token-input.search-select-token');
 
-  const tokenInfoIcon = style === 'oracle' ? ChailinkIcon : ZapIcon;
+  console.log('token input amount', amount, amountValue);
+  const isOracleDisplay = style === 'oracle';
+  const tokenInfoIcon = isOracleDisplay ? ChailinkIcon : ZapIcon;
   return (
     <StyledTxTokenInput {...props}>
       <>{headerText && <Header>{headerText}</Header>}</>
@@ -298,7 +300,7 @@ export const TxTokenInput: FC<TxTokenInputProps> = ({
               <AmountInputContainer>
                 {style === 'oracle' && '$'}
                 <StyledAmountInput
-                  value={amount}
+                  value={isOracleDisplay ? amountValue : amount}
                   onChange={onAmountChange ? (e) => onAmountChange(e.target.value) : undefined}
                   placeholder={loading ? loadingText : '0.00000000'}
                   readOnly={readOnly}

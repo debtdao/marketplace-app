@@ -119,17 +119,15 @@ export const RequestCollateralTx: FC<RequestCollateralTxProps> = (props) => {
     }
   }, [selectedCollateralAsset, collateralOptionsList]);
 
-  // only putting localhost:3000 on testing, see if persists with real urls
-  // const targetLineUrl = window.location.href;
-  const targetLineUrl = 'https://debtdao.finance';
-
   const openTwitterPrompt = () => {
     if (!selectedCollateralAsset || !selectedLine) {
       onClose();
     }
 
-    const tweetText = `Requesting $${selectedCollateralAsset.symbol} to be approved for collateral on my line ${selectedLine?.id} on ${currentNetwork} network.
-                                                                      Thanks @debtdao 🙏💧                                                              `;
+    // only outputting localhost:3000 on testing, see if persists with real urls
+    // const targetLineUrl = window.location.href;
+    const tweetText = `Requesting $${selectedCollateralAsset.symbol} to be approved as collateral for my line ${selectedLine?.id} on ${currentNetwork}.                                                                      
+                       Thanks @debtdao 🙏💧`;
     const twitterPrompt = `https://twitter.com/intent/tweet?text=${tweetText}&related=debtdao,kibagateaux`;
     window.open(twitterPrompt, '_blank');
     onClose();

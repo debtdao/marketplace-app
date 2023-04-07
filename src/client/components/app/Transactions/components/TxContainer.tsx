@@ -5,6 +5,7 @@ import { Icon, CloseIcon } from '@components/common';
 
 export interface TxContainerProps {
   header?: string;
+  subheader?: string;
   onClose?: () => void;
 }
 
@@ -39,6 +40,12 @@ const TxHeaderTitle = styled.h1`
   margin: 0;
 `;
 
+const TxSubheaderTitle = styled.h5`
+  color: ${({ theme }) => theme.colors.titles};
+  font-size: 1.6rem;
+  margin: 1.6rem 0;
+`;
+
 const TxContainerContent = styled.div`
   display: flex;
   flex-direction: column;
@@ -69,7 +76,7 @@ const StyledTxContainer = styled.div`
   gap: ${({ theme }) => theme.txModal.gap};
 `;
 
-export const TxContainer: FC<TxContainerProps> = ({ header, onClose, children, ...props }) => {
+export const TxContainer: FC<TxContainerProps> = ({ header, subheader, onClose, children, ...props }) => {
   let closeButton;
 
   if (onClose) {
@@ -88,6 +95,7 @@ export const TxContainer: FC<TxContainerProps> = ({ header, onClose, children, .
           <TxHeaderActions>{closeButton}</TxHeaderActions>
         </TxHeader>
       )}
+      {subheader && <TxSubheaderTitle>{subheader}</TxSubheaderTitle>}
 
       <TxContainerContent>{children}</TxContainerContent>
     </StyledTxContainer>

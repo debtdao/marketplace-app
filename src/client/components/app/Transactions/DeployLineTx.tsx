@@ -233,8 +233,13 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
     );
   }
 
+  // add Learn More link to SecuredLine docs. Then how  to deploy a secured line docs
   return (
-    <StyledTransaction onClose={onClose} header={header || t('components.transaction.title')}>
+    <StyledTransaction
+      onClose={onClose}
+      header={header || t('components.transaction.title')}
+      subheader={t('components.transaction.deploy-line.subheader')}
+    >
       <TxAddressInput
         key={'credit-input'}
         headerText={t('components.transaction.deploy-line.select-borrower')}
@@ -249,6 +254,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
       {inputAddressWarning !== '' ? <div style={{ color: '#C3272B' }}>{inputAddressWarning}</div> : ''}
       <TxTTLInput
         headerText={t('components.transaction.deploy-line.select-ttl')}
+        descText={t('components.transaction.deploy-line.select-ttl-desc')}
         inputText={t('components.transaction.deploy-line.time-to-live')}
         inputError={false}
         amount={timeToLive}
@@ -265,6 +271,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
         <SectionContent>
           <TxNumberInput
             headerText={t('components.transaction.deploy-line.cratio')}
+            descText={t('components.transaction.deploy-line.cratio-desc')}
             inputLabel={t('components.transaction.deploy-line.cratio-input')}
             inputAlign="right"
             width={'sm'}
@@ -278,6 +285,7 @@ export const DeployLineTx: FC<DeployLineProps> = (props) => {
           />
           <TxNumberInput
             headerText={t('components.transaction.deploy-line.revenue-split')}
+            descText={t('components.transaction.deploy-line.revenue-split-desc')}
             inputLabel={t('components.transaction.deploy-line.revenue-split-input')}
             inputAlign="right"
             width={'sm'}

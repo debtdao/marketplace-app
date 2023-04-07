@@ -73,9 +73,14 @@ const TokenData = styled.div`
   flex: 1;
 `;
 
-const Header = styled.div`
+const HeaderText = styled.h2`
   font-size: 1.6rem;
   text-transform: capitalize;
+  color: ${({ theme }) => theme.colors.txModalColors.text};
+`;
+
+const DescText = styled.p`
+  font-size: 1.4rem;
   color: ${({ theme }) => theme.colors.txModalColors.text};
 `;
 
@@ -113,6 +118,7 @@ const StyledTxTokenInput = styled(TransitionGroup)`
 
 export interface TxTokenInputProps {
   headerText?: string;
+  descText?: string;
   inputText?: string;
   inputError?: boolean;
   amount: string;
@@ -127,6 +133,7 @@ export interface TxTokenInputProps {
 
 export const TxTTLInput: FC<TxTokenInputProps> = ({
   headerText,
+  descText,
   inputText,
   inputError,
   amount,
@@ -143,7 +150,8 @@ export const TxTTLInput: FC<TxTokenInputProps> = ({
 
   return (
     <StyledTxTokenInput {...props}>
-      <>{headerText && <Header>{headerText}</Header>}</>
+      <>{headerText && <HeaderText>{headerText}</HeaderText>}</>
+      <>{descText && <DescText>{descText}</DescText>}</>
 
       {/* NOTE Using fragments here because: https://github.com/yearn/yearn-finance-v3/pull/565 */}
       <>

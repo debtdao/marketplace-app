@@ -86,6 +86,11 @@ const Header = styled.div`
   color: ${({ theme }) => theme.colors.txModalColors.text};
 `;
 
+const DescText = styled.p`
+  font-size: 1.4rem;
+  color: ${({ theme }) => theme.colors.txModalColors.text};
+`;
+
 const scaleTransitionTime = 300;
 
 const StyledTxNumberInput = styled(TransitionGroup)`
@@ -119,6 +124,7 @@ const StyledTxNumberInput = styled(TransitionGroup)`
 
 export interface TxNumberInputProps {
   headerText?: string;
+  descText?: string;
   inputLabel?: string;
   width?: 'sm' | 'md';
   inputAlign?: 'left' | 'right';
@@ -133,6 +139,7 @@ export interface TxNumberInputProps {
 
 export const TxNumberInput: FC<TxNumberInputProps> = ({
   headerText,
+  descText,
   inputLabel,
   width = 'sm',
   inputError,
@@ -150,6 +157,7 @@ export const TxNumberInput: FC<TxNumberInputProps> = ({
     <>
       <StyledTxNumberInput {...props}>
         <>{headerText && <Header>{headerText}</Header>}</>
+        <>{descText && <DescText>{descText}</DescText>}</>
         {/* NOTE Using fragments here because: https://github.com/yearn/yearn-finance-v3/pull/565 */}
         <>
           <PositionData>

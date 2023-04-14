@@ -12,7 +12,15 @@ import {
   useAppSelector,
   useSelectedSellToken,
 } from '@hooks';
-import { AddCreditProps, ACTIVE_STATUS, BORROWER_POSITION_ROLE, PROPOSED_STATUS } from '@src/core/types';
+import {
+  AddCreditProps,
+  ACTIVE_STATUS,
+  BORROWER_POSITION_ROLE,
+  PROPOSED_STATUS,
+  STATUS,
+  PositionRole,
+  LENDER_POSITION_ROLE,
+} from '@src/core/types';
 import { getConstants } from '@src/config/constants';
 import {
   TokensActions,
@@ -32,6 +40,7 @@ import { TxActionButton } from './components/TxActions';
 import { TxActions } from './components/TxActions';
 import { TxStatus } from './components/TxStatus';
 import { TxAddressInput } from './components/TxAddressInput';
+
 const {
   CONTRACT_ADDRESSES: { DAI },
   MAX_INTEREST_RATE,
@@ -40,6 +49,7 @@ const StyledTransaction = styled(TxContainer)``;
 
 export interface AddCreditPositionProps {
   header: string;
+  subheader?: string;
   onClose: () => void;
   acceptingOffer?: boolean;
 }
@@ -90,7 +100,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
   const acceptingOffer = props.acceptingOffer || (userMetadata.role === BORROWER_POSITION_ROLE && !!selectedPosition);
 
   //state for params
-  const { header, onClose } = props;
+  const { header, subheader, onClose } = props;
   const [transactionCompleted, setTransactionCompleted] = useState(0);
   const [transactionApproved, setTransactionApproved] = useState(true);
   const [transactionLoading, setLoading] = useState(false);
@@ -327,10 +337,28 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
     );
   }
 
+  const getDescCopy = (role: PositionRole) => {
+    if (role === LENDER_POSITION_ROLE) {
+      return acceptingOffer
+        ? t('components.transaction.add-credit.desc-lender-accept')
+        : t('components.transaction.add-credit.desc-lender-propose');
+    }
+
+    if (role === BORROWER_POSITION_ROLE) {
+      return acceptingOffer
+        ? t('components.transaction.add-credit.desc-borrower-accept')
+        : t('components.transaction.add-credit.desc-borrower-propose');
+    }
+
+    return subheader;
+  };
+
   return (
     <StyledTransaction
       onClose={onClose}
       header={acceptingOffer ? t('components.transaction.add-credit.header-accepting') : header}
+      subheader={getDescCopy(userMetadata.role)}
+      learnMoreUrl="https://debtdao.org/products/secured-line-of-credit"
     >
       <TxCreditLineInput
         key={'borrower-input'}
@@ -344,6 +372,7 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
       <TxTokenInput
         key={'token-input'}
         headerText={t('components.transaction.add-credit.select-token')}
+        // descText={t('components.transaction.add-credit.token-desc')}
         inputText={tokenHeaderText}
         amount={targetTokenAmount}
         onAmountChange={onAmountChange}
@@ -355,18 +384,21 @@ export const AddCreditPositionTx: FC<AddCreditPositionProps> = (props) => {
         readOnly={acceptingOffer}
       />
 
-      <TxAddressInput
+      {/* use wallet address */}
+      {/* <TxAddressInput
         key={'lender-input'}
         headerText={t('components.transaction.add-credit.select-lender')}
+        descText={t('components.transaction.add-credit.lender-desc')}
         inputText={t('components.transaction.add-credit.lender-address')}
         onAddressChange={onLenderAddressChange}
         address={lenderAddress}
         readOnly={acceptingOffer}
-      />
+      /> */}
 
       <TxRateInput
         key={'frate'}
         headerText={t('components.transaction.add-credit.select-rates')}
+        descText={t('components.transaction.add-credit.rates.desc')}
         frate={frate}
         drate={drate}
         amount={frate}

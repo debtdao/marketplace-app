@@ -181,13 +181,19 @@
         "selected-line": "Line"
       },
       "add-credit": {
-        "header": "Setup deal terms",
+        "header": "Propose your terms to the borrower",
+        "desc-lender-propose": "Set the token, amount, and interest rate you want to lend at. Then the borrower gets to decline or accept your offer. If accepted, your tokens will be moved from your wallet to their credit account and start earning interest.",
+        "desc-lender-accept": "The borrower has requested a loan from you. If you accept, funds will be transferred from your wallet to their credit account immediately and earning interest",
+        "desc-borrower-propose": "Ask a lender to give you a line of credit. You can propose any terms you want but should be acceptable for them",
+        "desc-borrower-accept": "Accept lender's terms for your line of credit. If you accept, funds will be transferred to your credit account immediately and start accruing interest",
+        "token-desc": "The token you want to lend out",
         "header-accepting": "Agree To Deal Terms",
         "select-credit": "1. Borrower:",
         "select-token": "2. The token being lent",
         "select-lender": "3. Lender:",
         "select-rates": "4. Set Interest Rates",
         "rates": {
+          "desc": "The Drawn Rate is charged on all currently borrowed funds and the Facility Rate is charged on all other undrawn capital.",
           "facility-rate": "Facility  Rate",
           "drawn-rate": "Drawn Rate"
         },

@@ -5,6 +5,8 @@ import { TransitionGroup } from 'react-transition-group';
 import { useAppTranslation } from '@hooks';
 import { Text } from '@components/common';
 
+import { DescText, HeaderText } from './TxDetailsCopy';
+
 const StyledBorrowerInput = styled.input<{ readOnly?: boolean; error?: boolean }>`
   font-size: 1.7rem;
   font-weight: 500;
@@ -66,12 +68,6 @@ const TokenData = styled.div`
   flex: 1;
 `;
 
-const Header = styled.div`
-  font-size: 1.6rem;
-  text-transform: capitalize;
-  color: ${({ theme }) => theme.colors.txModalColors.text};
-`;
-
 const scaleTransitionTime = 300;
 
 const StyledTxTokenInput = styled(TransitionGroup)`
@@ -105,6 +101,7 @@ const StyledTxTokenInput = styled(TransitionGroup)`
 
 export interface TxAddressProps {
   headerText?: string;
+  descText?: string;
   inputText?: string;
   inputError?: boolean;
   address: string;
@@ -114,6 +111,7 @@ export interface TxAddressProps {
 
 export const TxAddressInput: FC<TxAddressProps> = ({
   headerText,
+  descText,
   inputText,
   inputError,
   address,
@@ -126,7 +124,8 @@ export const TxAddressInput: FC<TxAddressProps> = ({
 
   return (
     <StyledTxTokenInput {...props}>
-      <>{headerText && <Header>{headerText}</Header>}</>
+      <>{headerText && <HeaderText>{headerText}</HeaderText>}</>
+      <>{descText && <DescText>{descText}</DescText>}</>
 
       {/* NOTE Using fragments here because: https://github.com/yearn/yearn-finance-v3/pull/565 */}
       <>

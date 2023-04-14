@@ -6,6 +6,8 @@ import { useAppTranslation } from '@hooks';
 import { Text } from '@components/common';
 import { normalizeAmount, toWei } from '@src/utils';
 
+import { DescText, HeaderText } from './TxDetailsCopy';
+
 const RatesContainer = styled.div``;
 
 const InterestRateInputContainer = styled.div`
@@ -122,6 +124,7 @@ export interface TxRateInputProps {
   frate?: string;
   drate?: string;
   headerText: string;
+  descText?: string;
   amount: string;
   maxAmount?: string;
   setRateChange?: (type: string, amount: string) => void;
@@ -144,6 +147,7 @@ export const TxRateInput: FC<TxRateInputProps> = ({
   frate,
   drate,
   headerText,
+  descText,
   inputError,
   amount,
   setRateChange,
@@ -158,7 +162,8 @@ export const TxRateInput: FC<TxRateInputProps> = ({
   return (
     <>
       <StyledTxTokenInput {...props}>
-        <>{headerText && <Header>{headerText}</Header>}</>
+        <>{headerText && <HeaderText>{headerText}</HeaderText>}</>
+        <>{descText && <DescText>{descText}</DescText>}</>
 
         {/* NOTE Using fragments here because: https://github.com/yearn/yearn-finance-v3/pull/565 */}
         <>

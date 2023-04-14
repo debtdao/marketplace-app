@@ -126,7 +126,7 @@ type BorrowerRole = 'borrower';
 export const BORROWER_POSITION_ROLE: BorrowerRole = 'borrower';
 type ArbiterRole = 'arbiter';
 export const ARBITER_POSITION_ROLE: ArbiterRole = 'arbiter';
-type PositionRole = LenderRole | BorrowerRole | ArbiterRole;
+export type PositionRole = LenderRole | BorrowerRole | ArbiterRole;
 
 type CollateralTypeAsset = 'asset';
 export const COLLATERAL_TYPE_ASSET: CollateralTypeAsset = 'asset';

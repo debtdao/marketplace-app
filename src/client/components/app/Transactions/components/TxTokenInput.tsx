@@ -8,6 +8,8 @@ import { Text, Icon, Button, SearchList, ChailinkIcon, ZapIcon, SearchListItem }
 import { humanize } from '@utils';
 import { TokenView } from '@src/core/types';
 
+import { DescText, HeaderText } from './TxDetailsCopy';
+
 const MaxButton = styled(Button)`
   border-radius: ${({ theme }) => theme.globalRadius};
   width: min-content;
@@ -195,6 +197,7 @@ type TokenInputStyles = 'amount' | 'oracle';
 export interface TxTokenInputProps {
   style?: TokenInputStyles;
   headerText?: string;
+  descText?: string;
   inputText?: string;
   inputError?: boolean;
   amount?: string;
@@ -216,6 +219,7 @@ export interface TxTokenInputProps {
 export const TxTokenInput: FC<TxTokenInputProps> = ({
   style = 'amount',
   headerText,
+  descText,
   inputText,
   inputError,
   amount,
@@ -269,7 +273,8 @@ export const TxTokenInput: FC<TxTokenInputProps> = ({
   const tokenInfoIcon = isOracleDisplay ? ChailinkIcon : ZapIcon;
   return (
     <StyledTxTokenInput {...props}>
-      <>{headerText && <Header>{headerText}</Header>}</>
+      <>{headerText && <HeaderText>{headerText}</HeaderText>}</>
+      <>{descText && <DescText>{descText}</DescText>}</>
       {openedSearch && (
         <CSSTransition in={openedSearch} appear={true} timeout={scaleTransitionTime} classNames="scale">
           <StyledSearchList

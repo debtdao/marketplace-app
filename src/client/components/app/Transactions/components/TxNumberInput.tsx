@@ -4,6 +4,8 @@ import { TransitionGroup } from 'react-transition-group';
 
 import { Text } from '@components/common';
 
+import { DescText, HeaderText } from './TxDetailsCopy';
+
 const RatesContainer = styled.div``;
 
 const InterestRateInputContainer = styled.div`
@@ -80,17 +82,6 @@ const PositionData = styled.div`
   flex: 1;
 `;
 
-const Header = styled.div`
-  font-size: 1.6rem;
-  text-transform: capitalize;
-  color: ${({ theme }) => theme.colors.txModalColors.text};
-`;
-
-const DescText = styled.p`
-  font-size: 1.4rem;
-  color: ${({ theme }) => theme.colors.txModalColors.text};
-`;
-
 const scaleTransitionTime = 300;
 
 const StyledTxNumberInput = styled(TransitionGroup)`
@@ -156,7 +147,7 @@ export const TxNumberInput: FC<TxNumberInputProps> = ({
   return (
     <>
       <StyledTxNumberInput {...props}>
-        <>{headerText && <Header>{headerText}</Header>}</>
+        <>{headerText && <HeaderText>{headerText}</HeaderText>}</>
         <>{descText && <DescText>{descText}</DescText>}</>
         {/* NOTE Using fragments here because: https://github.com/yearn/yearn-finance-v3/pull/565 */}
         <>

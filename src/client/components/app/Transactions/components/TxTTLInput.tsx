@@ -5,6 +5,8 @@ import { TransitionGroup } from 'react-transition-group';
 import { useAppTranslation } from '@hooks';
 import { Text, Button } from '@components/common';
 
+import { DescText, HeaderText } from './TxDetailsCopy';
+
 const MaxButton = styled(Button)`
   border-radius: ${({ theme }) => theme.globalRadius};
   width: min-content;
@@ -71,17 +73,6 @@ const TokenData = styled.div`
   padding: ${({ theme }) => theme.layoutPadding};
   font-size: 1.4rem;
   flex: 1;
-`;
-
-const HeaderText = styled.h2`
-  font-size: 1.6rem;
-  text-transform: capitalize;
-  color: ${({ theme }) => theme.colors.txModalColors.text};
-`;
-
-const DescText = styled.p`
-  font-size: 1.4rem;
-  color: ${({ theme }) => theme.colors.txModalColors.text};
 `;
 
 const scaleTransitionTime = 300;

@@ -33,6 +33,8 @@ import { ReactComponent as WarningIcon } from '@assets/icons/warning.svg';
 import { ReactComponent as ZapIcon } from '@assets/icons/zap-icon.svg';
 import { ReactComponent as ErrorIcon } from '@assets/icons/error.svg';
 import { ReactComponent as RedirectIcon } from '@assets/icons/redirect.svg';
+// Spigot Integration Partner Logos
+import { ReactComponent as UnlockProtocolLogo } from '@assets/icons/spigot-integrations/unlock-protocol.svg';
 // NOTE NETWORK Icons
 import { ReactComponent as EthereumIcon } from '@assets/icons/networks/ethereum.svg';
 import { ReactComponent as GnosisIcon } from '@assets/icons/networks/gnosis.svg';
@@ -97,6 +99,9 @@ export {
   ChevronTxIcon,
   WalletMissingIcon,
   ConstructionIcon,
+  // spigot integratoin logos
+  UnlockProtocolLogo,
+  // network icons
   EthereumIcon,
   GnosisIcon,
   ArbitrumIcon,

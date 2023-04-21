@@ -39,6 +39,7 @@ export const collateralInitialState: CollateralState = {
   selectedEscrow: undefined,
   selectedSpigot: undefined,
   selectedCollateralAsset: undefined,
+  selectedSpigotIntegration: 'none',
   selectedRevenueContract: undefined,
   reservesMap: {},
   collateralMap: {},
@@ -55,6 +56,7 @@ const {
   setSelectedEscrow,
   setSelectedSpigot,
   setSelectedRevenueContract,
+  setSelectedSpigotIntegration,
   setSelectedCollateralAsset,
   addCollateral,
   enableCollateral,
@@ -79,6 +81,9 @@ const collateralReducer = createReducer(collateralInitialState, (builder) => {
     })
     .addCase(setSelectedCollateralAsset, (state, { payload: { assetAddress } }) => {
       state.selectedCollateralAsset = assetAddress;
+    })
+    .addCase(setSelectedSpigotIntegration, (state, { payload: { name } }) => {
+      state.selectedSpigotIntegration = name;
     })
     /* -------------------------------- enableCollateral ------------------------------- */
     .addCase(enableCollateral.pending, (state) => {

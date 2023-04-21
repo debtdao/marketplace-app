@@ -245,6 +245,26 @@ export interface SpigotRevenueContract extends Collateral {
   events?: SpigotEvents[];
 }
 
+// Spigot revenue contract integrations
+export interface SpigotIntegration {
+  name: SPIGOT_INTEGRATION_LIST;
+  desc?: string;
+  icon?: string;
+  address?: string; // must eventually have an address but could be predefined protocol singleton or dynamic per user
+  // 4 byte hash used by spigot
+  claimFuncSelector: string;
+  transferFuncSelector: string;
+  // human readable parameter definition
+  claimFuncSignature?: string;
+  transferFuncSignature?: string;
+}
+
+type UNLOCK_PROTOCOL = 'unlock-protocol';
+export const UNLOCK_PROTOCOL: UNLOCK_PROTOCOL = 'unlock-protocol';
+export type SPIGOT_INTEGRATION_LIST = 'none' | UNLOCK_PROTOCOL;
+
+/// Meta tyoes
+
 type SPIGOT_NAME = 'spigot';
 export const SPIGOT_MODULE_NAME: SPIGOT_NAME = 'spigot';
 type ESCROW_NAME = 'escrow';

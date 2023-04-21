@@ -1,0 +1,18 @@
+{
+    "unlock-protocol": {
+        "name": "Unlock Protocol",
+        "desc": "",
+        "icon": "https://docs.unlock-protocol.com/img/logo.svg",
+        "claimFuncSignature": "withdraw(address, address payable, uint)",
+        "claimFuncSelector": "0xd9caed12",
+        "transferFuncSignature": "addLockManager(address)",
+        "transferFuncSelector": "0xd2503485"
+    },
+    "none": {
+        "name": "N/A",
+        "desc": "No Integration Selected",
+        "icon": "",
+        "claimFuncSelector": "0x00000000",
+        "transferFuncSelector": "0x00000000"
+    }
+}

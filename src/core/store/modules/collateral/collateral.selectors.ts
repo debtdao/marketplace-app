@@ -15,6 +15,7 @@ const selectCollateralEventsMap = (state: RootState) => state.collateral.eventsM
 const selectReservesMap = (state: RootState) => state.collateral.reservesMap;
 const selectSelectedEscrowAddress = (state: RootState) => state.collateral.selectedEscrow;
 const selectSelectedSpigotAddress = (state: RootState) => state.collateral.selectedSpigot;
+const selectSelectedSpigotIntegration = (state: RootState) => state.collateral.selectedSpigotIntegration ?? 'none';
 const selectSpigotForSelectedLine = (state: RootState) =>
   state.lines.linesMap[state.lines.selectedLineAddress ?? '']?.spigotId;
 
@@ -47,6 +48,7 @@ export const CollateralSelectors = {
   selectSelectedSpigotAddress,
   selectSelectedCollateralAsset,
   selectSelectedRevenueContractAddress,
+  selectSelectedSpigotIntegration,
   selectCollateralEventsMap,
   selectReservesMap,
 };

@@ -117,6 +117,7 @@ export const SearchList: FC<SearchListProps> = ({
   ...props
 }) => {
   const [filteredItems, setFilteredItems] = useState(list);
+  console.log('filt list', selected, list, filteredItems);
 
   useEffect(() => {
     setFilteredItems(list);

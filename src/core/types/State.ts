@@ -18,6 +18,7 @@ import {
   CollateralEvent,
   AggregatedEscrow,
   AggregatedSpigot,
+  SPIGOT_INTEGRATION_LIST,
 } from './CreditLine';
 import {
   Position,
@@ -131,6 +132,7 @@ export interface CollateralState {
   selectedEscrow?: Address;
   selectedSpigot?: Address;
   selectedRevenueContract?: Address;
+  selectedSpigotIntegration?: SPIGOT_INTEGRATION_LIST;
   selectedCollateralAsset?: Address;
   collateralMap: { [module: string]: AggregatedEscrow | AggregatedSpigot };
   eventsMap: { [module: string]: CollateralEvent[] };

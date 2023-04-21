@@ -18,6 +18,7 @@ import {
   TokenFragRepsonse,
   EscrowDeposit,
   TokenView,
+  SPIGOT_INTEGRATION_LIST,
 } from '@src/core/types';
 import { TxActionButton } from '@src/client/components/app';
 import { formatEscrowDeposit } from '@src/utils/collateral';
@@ -27,6 +28,9 @@ import { TokensSelectors } from '../tokens/tokens.selectors';
 const setSelectedEscrow = createAction<{ escrowAddress?: string }>('collateral/setSelectedEscrow');
 const setSelectedSpigot = createAction<{ spigotAddress?: string }>('collateral/setSelectedSpigot');
 const setSelectedRevenueContract = createAction<{ contractAddress?: string }>('collateral/setSelectedRevenueContract');
+const setSelectedSpigotIntegration = createAction<{ name?: SPIGOT_INTEGRATION_LIST }>(
+  'collateral/setSelectedSpigotIntegration'
+);
 const setSelectedCollateralAsset = createAction<{ assetAddress?: string }>('collateral/setSelectedCollateralAsset');
 
 // util function to set collateral to state from getLine responses
@@ -237,6 +241,7 @@ export const CollateralActions = {
   setSelectedEscrow,
   setSelectedSpigot,
   setSelectedRevenueContract,
+  setSelectedSpigotIntegration,
   setSelectedCollateralAsset,
   enableCollateral,
   addCollateral,

@@ -7,7 +7,7 @@ import { Text } from '@components/common';
 
 import { DescText, HeaderText } from './TxDetailsCopy';
 
-const StyledBorrowerInput = styled.input<{ readOnly?: boolean; error?: boolean }>`
+const StyledAddressInput = styled.input<{ readOnly?: boolean; error?: boolean }>`
   font-size: 1.7rem;
   font-weight: 500;
   background: transparent;
@@ -45,7 +45,7 @@ const StyledBorrowerInput = styled.input<{ readOnly?: boolean; error?: boolean }
   `}
 `;
 
-const AmountInputContainer = styled.div`
+const AddressInputContainer = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
@@ -57,7 +57,7 @@ const AmountTitle = styled(Text)`
   text-overflow: ellipsis;
 `;
 
-const TokenData = styled.div`
+const InputContainer = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -100,11 +100,11 @@ const StyledTxTokenInput = styled(TransitionGroup)`
 `;
 
 export interface TxAddressProps {
+  address: string;
   headerText?: string;
   descText?: string;
   inputText?: string;
   inputError?: boolean;
-  address: string;
   onAddressChange?: (amount: string) => void;
   readOnly?: boolean;
 }
@@ -129,10 +129,10 @@ export const TxAddressInput: FC<TxAddressProps> = ({
 
       {/* NOTE Using fragments here because: https://github.com/yearn/yearn-finance-v3/pull/565 */}
       <>
-        <TokenData>
+        <InputContainer>
           <AmountTitle ellipsis>{inputText || t('components.transaction.token-input.you-have')}</AmountTitle>
-          <AmountInputContainer>
-            <StyledBorrowerInput
+          <AddressInputContainer>
+            <StyledAddressInput
               value={address}
               onChange={onAddressChange ? (e) => onAddressChange(e.target.value) : undefined}
               placeholder={'Address'}
@@ -141,8 +141,8 @@ export const TxAddressInput: FC<TxAddressProps> = ({
               type="text"
               aria-label={headerText}
             />
-          </AmountInputContainer>
-        </TokenData>
+          </AddressInputContainer>
+        </InputContainer>
       </>
     </StyledTxTokenInput>
   );

@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import { generateSig } from '@src/utils';
 import { isValidAddress, toWei } from '@src/utils';
-import { useAppTranslation, useAppDispatch, useAppSelector } from '@hooks';
+import { useAppTranslation, useAppDispatch, useAppSelector, useSpigotIntegration } from '@hooks';
 import { ACTIVE_STATUS, AddSpigotProps } from '@src/core/types';
 import {
   WalletSelectors,
@@ -23,6 +23,7 @@ import { TxAddressInput } from './components/TxAddressInput';
 import { TxByteInput } from './components/TxByteInput';
 import { TxFuncSelector } from './components/TxFuncSelector';
 import { TxNumberInput } from './components/TxNumberInput';
+import { TxSpigotIntegrationSelector } from './components/TxSpigotIntegrationSelector';
 
 const StyledTransaction = styled(TxContainer)`
   min-height: 60vh;
@@ -36,6 +37,8 @@ interface EnableSpigotTxProps {
 export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   const { t } = useAppTranslation('common');
   const dispatch = useAppDispatch();
+  const integrationName = useAppSelector(CollateralSelectors.selectSelectedSpigotIntegration);
+  const selectedIntegration = useSpigotIntegration(integrationName);
 
   // user data
   const walletNetwork = useAppSelector(WalletSelectors.selectWalletNetwork);
@@ -67,6 +70,15 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       dispatch(CollateralActions.setSelectedSpigot({ spigotAddress: selectedLine.spigotId }));
     }
   }, [selectedSpigot, selectedLine]);
+
+  useEffect(() => {
+    // if escrow not set yet then correct state
+    if (selectedIntegration) {
+      const { claimFuncSelector, transferFuncSelector } = selectedIntegration;
+      claimFuncSelector !== claimFunc && setClaimFunc(claimFuncSelector);
+      transferFuncSelector !== transferFunc && setTransferFunc(transferFuncSelector);
+    }
+  }, [selectedIntegration, claimFunc, transferFunc]);
 
   useEffect(() => {
     if (isValidAddress(revenueContractAddy)) {
@@ -185,9 +197,8 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
   return (
     // <div />
     <StyledTransaction onClose={onClose} header={header}>
-      <TxAddressInput
-        headerText={t('components.transaction.enable-spigot.revenue-contract')}
-        address={revenueContractAddy}
+      <TxSpigotIntegrationSelector
+        revenueContractAddress={revenueContractAddy}
         onAddressChange={setRevenueContractAdd}
       />
 

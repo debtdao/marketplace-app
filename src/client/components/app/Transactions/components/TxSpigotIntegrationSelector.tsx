@@ -14,6 +14,7 @@ import {
   ZapIcon,
   SearchListItem,
   UnlockProtocolLogo,
+  SpigotLogo,
 } from '@components/common';
 import { humanize } from '@utils';
 import integrationsList from '@config/constants/spigot-integrations.json';
@@ -69,7 +70,7 @@ const AmountInputContainer = styled.div`
   font-weight: 700;
 `;
 
-const AmountTitle = styled(Text)`
+const AddressTitle = styled(Text)`
   color: ${({ theme }) => theme.colors.txModalColors.text};
   text-overflow: ellipsis;
 `;
@@ -87,9 +88,7 @@ const IntegrationData = styled.div`
 
 const IntegrationName = styled.div`
   width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  overflow: wrap;
   text-align: center;
   font-size: 1.3rem;
   max-height: 3rem;
@@ -194,7 +193,6 @@ export interface TxIntegrationInputProps {
   onSelectedIntegrationChange?: (integration: string) => void;
   integrationOptions?: SpigotIntegration[];
   readOnly?: boolean;
-  hideAmount?: boolean;
   loading?: boolean;
   loadingText?: string;
   displayGuidance?: boolean;
@@ -210,7 +208,6 @@ export const TxSpigotIntegrationSelector: FC<TxIntegrationInputProps> = ({
   onSelectedIntegrationChange,
   integrationOptions,
   readOnly,
-  hideAmount,
   loading,
   loadingText,
   displayGuidance,
@@ -227,7 +224,8 @@ export const TxSpigotIntegrationSelector: FC<TxIntegrationInputProps> = ({
       ? []
       : _.map(integrationsList, (val, key) => ({
           id: key,
-          icon: getIntegrationIcon(key),
+          svg: getIntegrationIcon(key),
+          // icon: val.icon,
           label: val.name,
           value: key,
         }));
@@ -236,65 +234,62 @@ export const TxSpigotIntegrationSelector: FC<TxIntegrationInputProps> = ({
     setOpenedSearch(true);
   };
 
-  console.log('integrations list', integrationsList, listItems);
-
   const [openedSearch, setOpenedSearch] = useState(false);
-  const searchListHeader = t('components.transaction.integration-input.search-select-integration');
 
   const onIntegrationSelected = (name: SPIGOT_INTEGRATION_LIST) => {
+    console.log('integration selected from menu', name);
     dispatch(CollateralActions.setSelectedSpigotIntegration({ name }));
     onSelectedIntegrationChange && onSelectedIntegrationChange(name);
   };
+
+  const itemForSelected = _.find(listItems, (i) => i.id === integrationName)!;
+  console.log('integration ite,selected ', itemForSelected);
 
   return (
     <StyledTxIntegrationInput {...props}>
       <>{headerText && <HeaderText>{headerText}</HeaderText>}</>
       <>{descText && <DescText>{descText}</DescText>}</>
-      {openedSearch && (
-        <CSSTransition in={openedSearch} appear={true} timeout={scaleTransitionTime} classNames="scale">
-          <StyledSearchList
-            list={listItems}
-            headerText={searchListHeader}
-            selected={selectedIntegration}
-            setSelected={(item) => onIntegrationSelected(item.id as SPIGOT_INTEGRATION_LIST)}
-            onCloseList={() => setOpenedSearch(false)}
-          />
-        </CSSTransition>
-      )}
 
       {/* NOTE Using fragments here because: https://github.com/yearn/yearn-finance-v3/pull/565 */}
       <>
-        <IntegrationInfo center={hideAmount}>
-          <IntegrationSelector onClick={listItems?.length > 0 ? openSearchList : undefined} center={hideAmount}>
+        <IntegrationInfo center={false}>
+          <IntegrationSelector onClick={listItems?.length > 0 ? openSearchList : undefined} center={false}>
             <IntegrationIconContainer>
-              <TokenIcon icon={selectedIntegration.icon} symbol={selectedIntegration.label} size="big" />
+              <TokenIcon SVG={itemForSelected.svg} symbol={itemForSelected.label} size="small" />
               {listItems?.length > 1 && <IntegrationListIcon Component={TokenIcon} />}
             </IntegrationIconContainer>
-            <IntegrationName>{selectedIntegration.label}</IntegrationName>
+            <IntegrationName>{selectedIntegration.name}</IntegrationName>
           </IntegrationSelector>
 
-          {!hideAmount && (
-            <IntegrationData>
-              <AmountTitle ellipsis>{inputText || t('components.transaction.integration-input.you-have')}</AmountTitle>
-              <TxAddressInput
-                headerText={t('components.transaction.enable-spigot.address.header')}
-                inputText={t('components.transaction.enable-spigot.address.input')}
-                descText={t('components.transaction.enable-spigot.address.desc')}
-                address={revenueContractAddress}
-                onAddressChange={onAddressChange}
-              />
-            </IntegrationData>
-          )}
+          <IntegrationData>
+            {openedSearch && (
+              <CSSTransition in={openedSearch} appear={true} timeout={scaleTransitionTime} classNames="scale">
+                <StyledSearchList
+                  list={listItems}
+                  headerText={t('components.transaction.enable-spigot.select-integration')}
+                  selected={itemForSelected}
+                  setSelected={(item) => onIntegrationSelected(item.id as SPIGOT_INTEGRATION_LIST)}
+                  onCloseList={() => setOpenedSearch(false)}
+                />
+              </CSSTransition>
+            )}
+
+            <TxAddressInput address={revenueContractAddress} onAddressChange={onAddressChange} />
+          </IntegrationData>
         </IntegrationInfo>
       </>
     </StyledTxIntegrationInput>
   );
 };
 
-const getIntegrationIcon = (name: string) => {
+const getIntegrationIcon = (name: string): React.FC => {
+  console.log('get inte icon', name);
+
   switch (name) {
     case UNLOCK_PROTOCOL:
-      // return UnlockProtocolLogo
-      return 'https://docs.unlock-protocol.com/img/logo.svg';
+      return UnlockProtocolLogo;
+    case 'custom':
+    default:
+      return SpigotLogo;
   }
 };

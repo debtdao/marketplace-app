@@ -10,6 +10,11 @@ const StyledTokenIcon = styled.div`
   justify-content: center;
 `;
 
+const StyledSvg = styled.svg`
+  width: auto;
+  height: 100%;
+`;
+
 type TokenIconSize = 'default' | 'small' | 'big' | 'xBig' | 'xxBig';
 
 interface TokenIconProps {
@@ -49,6 +54,7 @@ export const TokenIcon = ({ SVG, icon, symbol, size, margin }: TokenIconProps) =
     marginRight: margin,
   };
 
+  console.log('token svg', SVG);
   return (
     <StyledTokenIcon>{SVG ? <SVG /> : src && <Img alt={symbol ?? 'n/a'} style={style} src={src} />}</StyledTokenIcon>
   );

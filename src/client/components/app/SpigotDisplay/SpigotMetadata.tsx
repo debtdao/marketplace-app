@@ -195,21 +195,21 @@ export const SpigotMetadata = (props: SpigotMetadataProps) => {
 
   const getCollateralTableActions = () => {
     switch (userPositionMetadata.role) {
-      case BORROWER_POSITION_ROLE:
-        return <StyledButton onClick={claimOperatorTokensHandler}>{ClaimOperatorTokensText}</StyledButton>;
+      // case BORROWER_POSITION_ROLE:
+      //   return <StyledButton onClick={claimOperatorTokensHandler}>{ClaimOperatorTokensText}</StyledButton>;
+      default:
       case ARBITER_POSITION_ROLE:
         return (
           <>
             <StyledButton onClick={addSpigotHandler}>{enableSpigotText}</StyledButton>
           </>
         );
-      case LENDER_POSITION_ROLE:
-      default:
-        return (
-          <>
-            <StyledButton onClick={claimOperatorTokensHandler}>{ClaimOperatorTokensText}</StyledButton>
-          </>
-        );
+      // case LENDER_POSITION_ROLE:
+      //   return (
+      //     <>
+      //       <StyledButton onClick={claimOperatorTokensHandler}>{ClaimOperatorTokensText}</StyledButton>
+      //     </>
+      //   );
     }
   };
 

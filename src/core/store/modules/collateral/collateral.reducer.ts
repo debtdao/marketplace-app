@@ -39,7 +39,7 @@ export const collateralInitialState: CollateralState = {
   selectedEscrow: undefined,
   selectedSpigot: undefined,
   selectedCollateralAsset: undefined,
-  selectedSpigotIntegration: 'none',
+  selectedSpigotIntegration: 'custom',
   selectedRevenueContract: undefined,
   reservesMap: {},
   collateralMap: {},

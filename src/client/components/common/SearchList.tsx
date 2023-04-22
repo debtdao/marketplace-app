@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import React, { FC, FunctionComponent, ReactComponentElement, ReactElement, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { TokenIcon } from '@components/app';
@@ -89,6 +89,7 @@ const StyledSearchList = styled.div`
 export type SearchListItem = {
   id: string;
   icon?: string;
+  svg?: React.FC;
   label: string;
   value: string;
 };

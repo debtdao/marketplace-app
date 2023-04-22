@@ -268,7 +268,6 @@ export const TxTokenInput: FC<TxTokenInputProps> = ({
     ? t('components.transaction.token-input.search-select-vault')
     : t('components.transaction.token-input.search-select-token');
 
-  console.log('token input amount', amount, amountValue);
   const isOracleDisplay = style === 'oracle';
   const tokenInfoIcon = isOracleDisplay ? ChailinkIcon : ZapIcon;
   return (

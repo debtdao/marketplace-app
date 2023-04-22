@@ -130,12 +130,12 @@ export const TxAddressInput: FC<TxAddressProps> = ({
       {/* NOTE Using fragments here because: https://github.com/yearn/yearn-finance-v3/pull/565 */}
       <>
         <InputContainer>
-          <AmountTitle ellipsis>{inputText || t('components.transaction.token-input.you-have')}</AmountTitle>
+          {inputText && <AmountTitle ellipsis>{inputText}</AmountTitle>}
           <AddressInputContainer>
             <StyledAddressInput
               value={address}
               onChange={onAddressChange ? (e) => onAddressChange(e.target.value) : undefined}
-              placeholder={'Address'}
+              placeholder={'0x'}
               readOnly={readOnly}
               error={inputError}
               type="text"

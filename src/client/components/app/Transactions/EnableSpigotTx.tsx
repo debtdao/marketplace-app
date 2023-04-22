@@ -195,14 +195,15 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       }));
 
   return (
-    // <div />
     <StyledTransaction onClose={onClose} header={header}>
       <TxSpigotIntegrationSelector
+        headerText={t('components.transaction.enable-spigot.address.header')}
+        descText={t('components.transaction.enable-spigot.address.desc')}
         revenueContractAddress={revenueContractAddy}
         onAddressChange={setRevenueContractAdd}
       />
 
-      {isVerifiedContract ? (
+      {integrationName !== 'custom' ? null : isVerifiedContract ? (
         <>
           <TxFuncSelector
             headerText={t('components.transaction.enable-spigot.function-transfer')}

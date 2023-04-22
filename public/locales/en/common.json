@@ -330,8 +330,14 @@
         "error-message": "could not cancel proposed deal"
       },
       "enable-spigot": {
-        "header": "Enable Spigot",
+        "header": "Stake Your Revenue Stream",
+        "address": {
+          "header": "1. Address sending revenue",
+          "input": "",
+          "desc": "Who is sending tokens to your Spigot? If its your smart contract, transfer ownership to your Spigot!"
+        },
         "select-function": "Select Function",
+        "select-integration": "Common Spigot Integrations",
         "revenue-contract": "1. Revenue Contract",
         "revenue-token-to-claim": "2. Revenue Token to Claim",
         "function-revenue": "3. Select function to claim revenue",

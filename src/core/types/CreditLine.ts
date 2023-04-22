@@ -261,7 +261,7 @@ export interface SpigotIntegration {
 
 type UNLOCK_PROTOCOL = 'unlock-protocol';
 export const UNLOCK_PROTOCOL: UNLOCK_PROTOCOL = 'unlock-protocol';
-export type SPIGOT_INTEGRATION_LIST = 'none' | UNLOCK_PROTOCOL;
+export type SPIGOT_INTEGRATION_LIST = 'custom' | UNLOCK_PROTOCOL;
 
 /// Meta tyoes
 

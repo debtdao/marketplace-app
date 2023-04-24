@@ -75,8 +75,8 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
     // if escrow not set yet then correct state
     if (selectedIntegration) {
       const { claimFuncSelector, transferFuncSelector } = selectedIntegration;
-      claimFuncSelector !== claimFunc && setClaimFunc(claimFuncSelector);
-      transferFuncSelector !== transferFunc && setTransferFunc(transferFuncSelector);
+      (claimFunc === '' || claimFunc === '0x') && setClaimFunc(claimFuncSelector);
+      (transferFunc === '' || transferFunc === '0x') && setTransferFunc(transferFuncSelector);
     }
   }, [selectedIntegration, claimFunc, transferFunc]);
 
@@ -194,6 +194,8 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
         value: '',
       }));
 
+  console.log('spigot rev contract funcs', integrationName, isVerifiedContract, claimFunc, transferFunc);
+
   return (
     <StyledTransaction onClose={onClose} header={header}>
       <TxSpigotIntegrationSelector
@@ -204,6 +206,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       />
 
       {integrationName !== 'custom' ? null : isVerifiedContract ? (
+        // select from ABI functions if no preconfigured integration
         <>
           <TxFuncSelector
             headerText={t('components.transaction.enable-spigot.function-transfer')}
@@ -254,7 +257,7 @@ export const EnableSpigotTx: FC<EnableSpigotTxProps> = (props) => {
       <TxActions>
         <TxActionButton
           key={t('components.transaction.enable-spigot.cta') as string}
-          data-testid={`modal-action-${t('components.transaction.enable-spigot.cta').toLowerCase()}`}
+          data-testid={`modal-action-spigot-cta`}
           onClick={enableSpigot}
           disabled={false}
           contrast={true}

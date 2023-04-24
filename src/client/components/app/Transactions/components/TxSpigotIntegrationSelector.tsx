@@ -237,13 +237,11 @@ export const TxSpigotIntegrationSelector: FC<TxIntegrationInputProps> = ({
   const [openedSearch, setOpenedSearch] = useState(false);
 
   const onIntegrationSelected = (name: SPIGOT_INTEGRATION_LIST) => {
-    console.log('integration selected from menu', name);
     dispatch(CollateralActions.setSelectedSpigotIntegration({ name }));
     onSelectedIntegrationChange && onSelectedIntegrationChange(name);
   };
 
   const itemForSelected = _.find(listItems, (i) => i.id === integrationName)!;
-  console.log('integration ite,selected ', itemForSelected);
 
   return (
     <StyledTxIntegrationInput {...props}>
@@ -283,8 +281,6 @@ export const TxSpigotIntegrationSelector: FC<TxIntegrationInputProps> = ({
 };
 
 const getIntegrationIcon = (name: string): React.FC => {
-  console.log('get inte icon', name);
-
   switch (name) {
     case UNLOCK_PROTOCOL:
       return UnlockProtocolLogo;

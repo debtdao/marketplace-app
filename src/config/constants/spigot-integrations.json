@@ -3,7 +3,7 @@
         "name": "Unlock Protocol",
         "desc": "",
         "icon": "unlock-protocol",
-        "claimFuncSignature": "withdraw(address, address payable, uint)",
+        "claimFuncSignature": "withdraw(address,address payable,uint)",
         "claimFuncSelector": "0xd9caed12",
         "transferFuncSignature": "addLockManager(address)",
         "transferFuncSelector": "0xd2503485"

@@ -332,9 +332,9 @@
       "enable-spigot": {
         "header": "Stake Your Revenue Stream",
         "address": {
-          "header": "1. Address sending revenue",
+          "header": "1. Select Revenue Generating Address",
           "input": "",
-          "desc": "Who is sending tokens to your Spigot? If its your smart contract, transfer ownership to your Spigot!"
+          "desc": "Who is sending tokens to your Spigot? If its your smart contract, transfer ownership of it to your Spigot too!"
         },
         "select-function": "Select Function",
         "select-integration": "Common Spigot Integrations",

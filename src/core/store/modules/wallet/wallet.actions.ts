@@ -59,6 +59,7 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
     const { NETWORK, ALLOW_DEV_MODE, SUPPORTED_NETWORKS, NETWORK_SETTINGS } = config;
     const { theme, settings } = getState();
 
+    console.log('select w allet', walletName, network, web3Provider);
     if (!wallet.isCreated) {
       const customSubscriptions: Subscriptions = {
         wallet: (wallet) => {
@@ -108,7 +109,9 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
       const subscriptions = getSubscriptions(dispatch, customSubscriptions);
       wallet.create(network ?? NETWORK, subscriptions, theme.current);
     }
-    const isConnected = await wallet.connect({ name: walletName });
+
+    // const isConnected = await wallet.connect({ name: walletName });
+    const connectedWallet = await wallet.connectedWallet();
 
     // @analytics
     dispatch(AppActions.logAppAnalytics({ type: 'id', data: {} }));
@@ -122,7 +125,8 @@ const walletSelect = createAsyncThunk<{ isConnected: boolean }, WalletSelectProp
     // Generate User Tokens Map in state with supported tokens from subgraph
     const supportedTokens = TokensSelectors.selectSupportedTokens(getState());
     dispatch(TokensActions.getUserTokens({ addresses: supportedTokens }));
-    return { isConnected };
+
+    return { isConnected: !!connectedWallet };
   }
 );
 

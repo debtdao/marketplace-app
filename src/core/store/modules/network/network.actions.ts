@@ -1,7 +1,7 @@
 import { createAsyncThunk, PayloadAction, createAction } from '@reduxjs/toolkit';
 
 import { ThunkAPI } from '@frameworks/redux';
-import { notify } from '@frameworks/blocknative';
+// import { notify } from '@frameworks/blocknative';
 import { getProviderType, getNetworkId } from '@utils';
 import { Network, UseCreditLinesParams } from '@types';
 import { AppActions, LinesActions, LinesSelectors, WalletSelectors } from '@store';
@@ -59,15 +59,10 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
     } else if (network === 'gnosis') {
       await updateChainSettings(network, gnoChainSettings);
     } else if (network === 'goerli') {
+      // unsupported testnet by yearn
       // await updateChainSettings(network, ethChainSettings);
       return { network };
     }
-
-    // // clear old app data
-    // if (wallet.selectedAddress) {
-    //   dispatch(LinesActions.clearUserData());
-    //   dispatch(AppActions.clearUserAppData());
-    // }
 
     // Set Yearn context
     if (web3Provider.hasInstanceOf('wallet') && config.SUPPORTED_NETWORKS.includes(network)) {
@@ -80,7 +75,7 @@ const changeNetwork = createAsyncThunk<{ network: Network }, { network: Network 
       });
     }
 
-    notify.config({ networkId: getNetworkId(network) });
+    // notify.config({ networkId: getNetworkId(network) });
 
     return { network };
   }

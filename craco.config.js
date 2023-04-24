@@ -29,6 +29,13 @@ module.exports = {
         },
       ],
     ],
+    // found on stack overflow as fix to metamask node module issue
+    // rules: [{ test: /node_modules[\\/]@walletconnect/, loader: 'babel-loader' }],
+    // https://github.com/babel/babel-loader#options
+    // module: {
+    //   rules: [{ test: /node_modules\/@walletconnect/, use: { loader: 'babel-loader' } }],
+    //   // rules: [{ test: /@metamask/, use: { loader: 'babel-loader' } }],
+    // },
   },
   webpack: {
     plugins: {
@@ -39,6 +46,10 @@ module.exports = {
         }),
       ],
     },
+    // found on stack overflow as fix to metamask node module issue
+    // module: {
+    //   exclude: /node_modules\/@[metamask|walletconnect]\/.*/,
+    // },
     configure: (webpackConfig, { env, paths }) => {
       if (isProd) webpackConfig.output.crossOriginLoading = 'anonymous';
       return webpackConfig;

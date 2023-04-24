@@ -1,6 +1,6 @@
 import { PopulatedTransaction } from '@ethersproject/contracts/src.ts';
 
-import { notify, UpdateNotification } from '@frameworks/blocknative';
+// import { notify, UpdateNotification } from '@frameworks/blocknative';
 import { getConfig } from '@config';
 import {
   TransactionService,
@@ -117,12 +117,13 @@ export class TransactionServiceImpl implements TransactionService {
     const currentNetworkSettings = NETWORK_SETTINGS[network];
     const useBlocknativeNotifyService = useExternalService && currentNetworkSettings.notifyEnabled;
 
-    let updateNotification: UpdateNotification | undefined;
+    // let updateNotification: UpdateNotification | undefined;
+    let updateNotification: any | undefined;
     let dismissNotification: () => void = () => undefined;
     let blocknativeNotifyServiceFailed;
     if (renderNotification && useBlocknativeNotifyService) {
       try {
-        notify.hash(tx.hash);
+        // notify.hash(tx.hash);
       } catch (error: any) {
         blocknativeNotifyServiceFailed = true;
         console.error(error);
@@ -131,13 +132,13 @@ export class TransactionServiceImpl implements TransactionService {
 
     if (renderNotification && (!useBlocknativeNotifyService || blocknativeNotifyServiceFailed)) {
       // Send custom notification that does not consumes Blocknative service
-      const { update, dismiss } = notify.notification({
-        eventCode: 'txSentCustom',
-        type: 'pending',
-        message: 'Your transaction has been sent to the network',
-      });
-      updateNotification = update;
-      dismissNotification = dismiss;
+      // const { update, dismiss } = notify.notification({
+      //   eventCode: 'txSentCustom',
+      //   type: 'pending',
+      //   message: 'Your transaction has been sent to the network',
+      // });
+      // updateNotification = update;
+      // dismissNotification = dismiss;
     }
 
     try {

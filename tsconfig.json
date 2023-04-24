@@ -27,6 +27,8 @@
     }
   },
   "include": [
-    "src"
+    "src",
+    "node_modules/@metamask",
+    "node_modules/@walletconnect"
   ]
 }

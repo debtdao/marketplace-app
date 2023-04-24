@@ -9,7 +9,7 @@ export const appInitialState: AppState = {
   servicesEnabled: {
     zapper: true,
     tenderly: true,
-    notify: true,
+    notify: false,
   },
   statusMap: {
     initApp: initialStatus,

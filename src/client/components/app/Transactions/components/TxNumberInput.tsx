@@ -141,7 +141,7 @@ export const TxNumberInput: FC<TxNumberInputProps> = ({
   readOnly,
   hideAmount,
   children,
-  inputAlign = 'left',
+  inputAlign = 'right',
   ...props
 }) => {
   return (

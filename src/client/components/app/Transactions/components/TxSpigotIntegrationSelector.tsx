@@ -17,7 +17,7 @@ import {
   SpigotLogo,
 } from '@components/common';
 import { humanize } from '@utils';
-import integrationsList from '@config/constants/spigot-integrations.json';
+import integrationsList from '@config/constants/spigot-integrations.js';
 import { SPIGOT_INTEGRATION_LIST, SpigotIntegration, UNLOCK_PROTOCOL } from '@src/core/types';
 import { CollateralActions, CollateralSelectors } from '@src/core/store';
 

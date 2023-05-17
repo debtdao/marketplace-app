@@ -112,14 +112,12 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
 
   useEffect(() => {
     if (!selectedEscrow && selectedLine?.escrowId) {
-      console.log('set selected escrow', selectedLine.escrowId);
       dispatch(CollateralActions.setSelectedEscrow({ escrowAddress: selectedLine.escrowId }));
     }
   }, [selectedEscrow, selectedLine]);
 
   useEffect(() => {
     if (!selectedCollateralAsset && collateralOptions.length > 0) {
-      console.log('set collat asset', selectedCollateralAsset, collateralOptions[0].address);
       dispatch(
         CollateralActions.setSelectedCollateralAsset({
           assetAddress: collateralOptions[0].address,
@@ -133,7 +131,6 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
     onClose();
   };
 
-  console.log('no collat to render?', collateralOptions.length === 0);
   if (collateralOptions.length === 0) {
     return (
       <StyledTransaction onClose={onClose} header={t('components.transaction.release-collateral.header')}>
@@ -176,17 +173,11 @@ export const ReleaseCollateralTx: FC<ReleaseCollateralTxProps> = (props) => {
     setLoading(true);
     // TODO set error in state to display no line selected
     if (!selectedEscrow || !selectedCollateralAsset || !targetTokenAmount) {
-      console.log('check this', selectedLine?.id, targetTokenAmount, selectedCollateralAsset);
       setLoading(false);
       return;
     }
-    const amount = BigNumber.from(targetTokenAmount).mul(BigNumber.from(10).pow(selectedCollateralAsset.decimals));
-    console.log(
-      'add collateral',
-      targetTokenAmount,
-      toUnit(targetTokenAmount, Number(selectedCollateralAsset.decimals)),
-      amount
-    );
+
+    const amount = BigNumber.from(toWei(targetTokenAmount, selectedCollateralAsset.decimals));
 
     const transactionData: ReleaseCollateraltProps = {
       to: borrower,

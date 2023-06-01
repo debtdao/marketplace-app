@@ -47,7 +47,6 @@ export class TransactionServiceImpl implements TransactionService {
 
       const signer = this.web3Provider.getSigner();
       const contract = getContract(contractAddress, abi, signer);
-      console.log(contract, contractAddress, abi, 'jackpot');
       const unsignedTx = await contract.populateTransaction[methodName](...txArgs);
       // const contractIface = new Interface(abi);
       // const decodedData = contractIface.decodeFunctionData(methodName, unsignedTx.data!.toString());
@@ -99,7 +98,7 @@ export class TransactionServiceImpl implements TransactionService {
       const txArgs = args ? [...args, txOverrides] : [txOverrides];
 
       const contract = getContract(contractAddress, abi, this.web3Provider.getInstanceOf(network as ProviderType));
-      console.log(contract, 'jackpot');
+      console.log('jackpot', contract, txArgs);
       return await contract.populateTransaction[methodName](...txArgs);
     } catch (error: any) {
       console.log(error);

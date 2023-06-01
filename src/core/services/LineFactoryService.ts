@@ -164,6 +164,7 @@ export class LineFactoryServiceImpl {
       tx = await this.transactionService.execute(props);
       return tx;
     } catch (e) {
+      console.log('Just the error 1', e);
       const txnData = JSON.parse(JSON.stringify(e)).transaction.data;
       // const humanErrorMsg = ethers.utils.formatBytes32String(txnData);
       console.log('Just the error 1', txnData);

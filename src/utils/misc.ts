@@ -77,11 +77,11 @@ export const getDefaultLineCategories = () => {
   const defaultLineCategories: UseCreditLinesParams = {
     // using i18m translation as keys for easy display
     'market:featured.highest-credit': {
-      first: 3,
+      first: 10,
       status: 'ACTIVE',
       // NOTE: terrible proxy for total credit (oldest = most). Currently getLines only allows filtering by line metadata not modules'
       orderBy: 'start',
-      orderDirection: 'asc',
+      orderDirection: 'desc',
       currentTime: currentTime,
     },
     'market:featured.highest-revenue': {

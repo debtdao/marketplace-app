@@ -3,25 +3,15 @@ import { memoize } from 'lodash';
 import { Constants, NetworkSettings, TokenView } from '@types';
 import { getEnv } from '@config/env';
 
-import { networks } from './supportedNetworks.json';
+import { networks, tokens } from './supportedNetworks.json';
 import { CHAIN_IDS, CHAIN_NAMES } from './chainIds';
 
 // import { encode } from '@src/utils';
 
-export const TOKEN_ADDRESSES = {
-  ETH: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
-  WETH: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
-  // AAVE: '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9',
-  // YFI: '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e',
-  DAI: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-  USDC: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-  // SUSD: '0x57ab1ec28d129707052df4df418d58a2d46d5f51',
-  LUSD: '0x5f98805a4e8be255a32880fdec7f6728c6568ba0',
-  ALUSD: '0xbc6da0fe9ad5f3b0d58160288917aa56653660e9',
-  // RAI: '0x03ab458634910aad20ef5f1c8ee96f1d6ac54919',
-  USDT: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-  WBTC: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
-};
+export const TOKEN_ADDRESSES: { [key: string]: string } = Object.values(tokens.mainnet).reduce(
+  (acc, token) => ({ ...acc, [token.symbol]: token.address }),
+  {}
+);
 
 const PARTNERS = {
   LEDGER_PARTNER_ID: '0x558247e365be655f9144e1a0140D793984372Ef3',

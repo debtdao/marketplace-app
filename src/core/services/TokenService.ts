@@ -1,4 +1,5 @@
 import { ethers } from 'ethers';
+import { ERC20 } from '@yfi/sdk';
 
 import {
   TokenService,
@@ -19,10 +20,19 @@ import {
   GetTokenAllowanceProps,
 } from '@types';
 import { getContract } from '@frameworks/ethers';
-import { get, getUniqueAndCombine, toBN, USDC_DECIMALS } from '@utils';
+import {
+  get,
+  getUniqueAndCombine,
+  normalizeUsdc,
+  toBN,
+  toTargetDecimalUnits,
+  USD_PRICE_DECIMALS,
+  USDC_DECIMALS,
+} from '@utils';
 import { getConstants } from '@config/constants';
 import { getSupportedOracleTokens } from '@frameworks/gql';
 import { getBalances } from '@src/utils/getTokenBalances';
+import { tokens } from '@config/constants/supportedNetworks.json';
 
 import erc20Abi from './contracts/erc20.json';
 
@@ -53,32 +63,45 @@ export class TokenServiceImpl implements TokenService {
   /*                                Fetch Methods                               */
   /* -------------------------------------------------------------------------- */
   public async getSupportedTokens({ network }: GetSupportedTokensProps): Promise<Token[]> {
-    const { WETH, ETH } = this.config.CONTRACT_ADDRESSES;
-    const yearn = this.yearnSdk.getInstanceOf(network);
+    // old token price fetching using yearn api
+    // const yearn = this.yearnSdk.getInstanceOf(network);
     // TODO: only pulling 100 tokens from this repo instead of ~300: https://github.com/yearn/yearn-assets/tree/master/icons/multichain-tokens/1
-    const supportedTokens = await yearn.tokens.supported();
-    // TODO: remove fixedSupportedTokens when WETH symbol is fixed on sdk
-    const wethToken = supportedTokens.filter((token) => token.address === WETH)[0] as Token;
-    const ethToken = {
-      ...wethToken,
-      address: ETH,
-      symbol: 'ETH',
-      name: 'Ether',
-      icon: 'https://raw.githack.com/yearn/yearn-assets/master/icons/multichain-tokens/1/0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE/logo-alt-128.png',
-      metadata: {
-        ...wethToken.metadata,
-        address: ETH,
-        symbol: 'ETH',
-        name: 'Ether',
+    // const supportedTokens = await yearn.tokens.supported();
+
+    const geckoNetworkName = network === 'mainnet' ? 'ethereum' : network;
+    const networkTokens: ERC20[] = Object.values(tokens[network as keyof object]);
+
+    const tokenPrices = await get(`https://api.coingecko.com/api/v3/simple/token_price/${geckoNetworkName}`, {
+      withCredentials: false,
+      params: {
+        contract_addresses: networkTokens.map((token: any) => token.address).join(','),
+        vs_currencies: 'usd',
       },
-    } as Token;
-    const fixedSupportedTokens: Token[] = [ethToken].concat(
-      supportedTokens.map((token) => ({
-        ...token,
-        symbol: token.address === WETH ? 'WETH' : token.symbol,
-      }))
+    });
+
+    const formattedTokens: Token[] = Object.entries<any>(tokenPrices.data).map(
+      ([address, price]: [string, any]): Token => {
+        const tokenData = tokens[network as keyof object][ethers.utils.getAddress(address)] as ERC20;
+        return {
+          ...tokenData,
+          priceUsdc: toTargetDecimalUnits(price.usd, 0, USDC_DECIMALS),
+          dataSource: 'sdk',
+          supported: {},
+          metadata: {
+            ...tokenData,
+            description: '',
+            website: '',
+            localization: {
+              en: {
+                description: '',
+              },
+            },
+          },
+        };
+      }
     );
-    return getUniqueAndCombine(fixedSupportedTokens, [], 'address');
+
+    return formattedTokens;
   }
 
   public async getSupportedOracleTokens(): Promise<SupportedOracleTokenResponse | undefined> {

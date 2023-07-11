@@ -30,6 +30,7 @@ export const useSelectedSellToken = ({
   const selectedSellToken: TokenView | undefined = selectedSellTokenAddress
     ? sellTokensOptionsMap[ethers.utils.getAddress(selectedSellTokenAddress)]
     : undefined;
+
   console.log('use selected sell token options', selectedSellToken, selectedSellTokenAddress, sellTokensOptionsMap);
   const sourceAssetOptions = selectedSellToken && allowTokenSelect === false ? [selectedSellToken] : sellTokensOptions;
 
